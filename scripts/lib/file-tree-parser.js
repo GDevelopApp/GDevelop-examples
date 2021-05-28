@@ -9,17 +9,10 @@ const fs = require('fs').promises;
 /** @typedef {{parsedContent?: any}} OptionalParsedJSONContent */
 /** @typedef {{children?: DreeWithMetadata[]} & AssetMetadata & OptionalParsedJSONContent & Dree} DreeWithMetadata */
 
-const ignoredTagNames = [
-  'Retina',
-  'PNG',
-  'SVG',
-  'Master',
-  'Default size',
-  'Sprites',
-  'Sprites X2',
-];
-
-/** @param {string} content */
+/**
+ * Remove if necessary the BOM character at the beginning of a JSON file content.
+ * @param {string} content
+ */
 const sanitizeJSONContent = (content) => {
   if (content[0] === '\uFEFF') return content.slice(1);
 
@@ -27,6 +20,7 @@ const sanitizeJSONContent = (content) => {
 };
 
 /**
+ * Clean a tag name.
  * @param {string} tagName
  * @returns {string}
  */
@@ -35,6 +29,8 @@ const sanitizeTagName = (tagName) => {
 };
 
 /**
+ * Extract the license name and authors from a license file, using the list
+ * of known authors and licenses.
  * @param {Author[]} authors
  * @param {License[]} licenses
  * @param {string} content
@@ -64,11 +60,15 @@ const isSampleImageFile = (fileName) => {
 };
 
 /**
- * @param {string} assetsRoot
+ * Create a "file tree" by browsing all the files of the specified folder,
+ * ignoring some specific folder names and only listing files with extensions
+ * that we know are useful.
+ *
+ * @param {string} rootPath
  * @returns {Promise<Dree>}
  */
-const readFileTree = async (assetsRoot) => {
-  return await dree.scanAsync(assetsRoot, {
+const readFileTree = async (rootPath) => {
+  return await dree.scanAsync(rootPath, {
     stat: false,
     normalize: true,
     followLinks: true,
@@ -88,6 +88,9 @@ const readFileTree = async (assetsRoot) => {
 };
 
 /**
+ * Filter a file tree to remove folders that are marked as being ignored (with a IGNORED.md file)
+ * or have a specific name that we know we must ignore.
+ *
  * @param {Dree} fileTree
  * @param {Dree[]} siblings
  * @returns {Dree | null}
@@ -127,6 +130,20 @@ const filterIgnoredFolders = (fileTree, siblings = []) => {
 };
 
 /**
+ * Tags that are always ignored when constructing an enhanced file tree.
+ */
+ const ignoredTagNames = [
+  'Retina',
+  'PNG',
+  'SVG',
+  'Master',
+  'Default size',
+  'Sprites',
+  'Sprites X2',
+];
+
+/**
+ * Browse the specified file tree and add tags, license, author, and the file content (if applicable) for each file.
  * @param {Dree} fileTree
  * @param {AssetMetadata} parentMetadata
  * @returns {Promise<{tagsTree: any[], allTags: Set<string>, fileTreeWithMetadata: DreeWithMetadata, errors: Error[]}>}
@@ -282,7 +299,7 @@ const enhanceFileTreeWithMetadata = async (fileTree, parentMetadata) => {
 };
 
 /**
- * Get all files of a tree indexed by their absolute path.
+ * Get all files of a file tree indexed by their absolute path.
  * @param {DreeWithMetadata} fileTreeWithMetadata
  * @returns {Object.<string, DreeWithMetadata>}
  */

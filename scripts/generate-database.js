@@ -19,10 +19,8 @@ const allLicenses = require('./lib/licenses.json');
 const examplesRootPath = path.join(__dirname, '../examples');
 const databaseRootPath = path.join(__dirname, '../database');
 
-shell.mkdir('-p', databaseRootPath);
-shell.mkdir('-p', path.join(databaseRootPath, 'examples'));
-
 /**
+ * Generate the URL used after deployment for a file in the examples folder.
  * @param {string} filePath
  */
 const getResourceUrl = (filePath) => {
@@ -31,6 +29,7 @@ const getResourceUrl = (filePath) => {
 };
 
 /**
+ * Generate a unique id for an example game.
  * @param {string} name
  * @param {string[]} tags
  */
@@ -47,6 +46,7 @@ const getExampleUniqueId = (name, tags) => {
 };
 
 /**
+ * Extract the information about the example games from the examples folder.
  * @param {Object.<string, DreeWithMetadata>} allFiles
  * @returns {{allExamples: Example[], errors: Error[]}}
  */
@@ -118,7 +118,8 @@ const extractExamples = (allFiles) => {
           : [],
         license: fileWithMetadata.license,
         projectFileUrl: getResourceUrl(fileWithMetadata.path),
-        gdevelopVersion: '', //TODO
+        gdevelopVersion: '', //TODO: set to the GDevelop version used to author the example?
+        // TODO: extract information about used extensions (builtin or from the community).
       };
     })
     .filter(Boolean);
@@ -127,6 +128,7 @@ const extractExamples = (allFiles) => {
 };
 
 /**
+ * Generate the "short headers" for the examples.
  * @param {Example[]} allExamples
  * @return {ExampleShortHeader[]}
  */
@@ -142,6 +144,9 @@ const generateShortHeaders = (allExamples) => {
   }));
 };
 
+/**
+ * Discover all examples and extract information from them.
+ */
 (async () => {
   const fileTree = await readFileTree(examplesRootPath);
   const filteredFileTree = filterIgnoredFolders(fileTree);
@@ -175,6 +180,9 @@ const generateShortHeaders = (allExamples) => {
     }
 
     try {
+      shell.mkdir('-p', databaseRootPath);
+      shell.mkdir('-p', path.join(databaseRootPath, 'examples'));
+
       await Promise.all(
         allExamples.map((example) =>
           fs.writeFile(
@@ -213,8 +221,3 @@ const generateShortHeaders = (allExamples) => {
     }
   }
 })();
-
-// Make another script that extract the examples information using libGDevelop.js
-// The goal => extract used extensions. Add them as tags. By the way, add event extensions names!
-
-// Create a CircleCI that runs the generate-database, deploy.js with the appropriate secrets (cloudflare, aws s3)
