@@ -10,10 +10,16 @@ jobs:
     steps:
       - checkout
       - run: npm install
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
   tests:
     docker:
       - image: cimg/node:14.17.0
     steps:
+      - attach_workspace:
+          at: .
       - run: npm run check-types
       - run: npm test
       - run: npm run check-format
@@ -21,11 +27,19 @@ jobs:
     docker:
       - image: cimg/node:14.17.0
     steps:
+      - attach_workspace:
+          at: .
       - run: npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
   deploy:
     docker:
       - image: cimg/node:14.17.0
     steps:
+      - attach_workspace:
+          at: .
       - run: npm run deploy
 
 workflows:
@@ -39,6 +53,9 @@ workflows:
           requires:
             - install
       - deploy:
+          requires:
+            - build
+            - tests
           filters:
             branches:
-              only: main
+              only: master
