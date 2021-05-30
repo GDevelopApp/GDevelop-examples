@@ -10,14 +10,18 @@ jobs:
     steps:
       - checkout
       - run: npm install
+      - run: git clone git@github.com:4ian/GDevelop.git --depth 1
+      - run: cd GDevelop/newIDE/app && npm install
       - persist_to_workspace:
           root: .
           paths:
-            - .
+            - node_modules # For npm install.
+            - GDevelop/newIDE/app # As we have a dependency on GDevelop sources.
   tests:
     docker:
       - image: cimg/node:14.17.0
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - run: npm run check-types
@@ -27,17 +31,19 @@ jobs:
     docker:
       - image: cimg/node:14.17.0
     steps:
+      - checkout
       - attach_workspace:
           at: .
-      - run: npm run build
+      - run: npm run build -- --gdevelop-root-path GDevelop
       - persist_to_workspace:
           root: .
           paths:
-            - .
+            - dist
   deploy:
     docker:
       - image: cimg/node:14.17.0
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - aws-cli/setup

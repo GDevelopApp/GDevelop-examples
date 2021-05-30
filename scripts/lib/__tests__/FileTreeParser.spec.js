@@ -5,10 +5,10 @@ const {
   filterIgnoredFolders,
   enhanceFileTreeWithMetadata,
   getAllFiles,
-} = require('../file-tree-parser.js');
+} = require('../FileTreeParser.js');
 const allLicenses = require('../licenses.json');
 
-/** @typedef {import('../file-tree-parser.js').DreeWithMetadata} DreeWithMetadata */
+/** @typedef {import('../FileTreeParser.js').DreeWithMetadata} DreeWithMetadata */
 
 /**
  *

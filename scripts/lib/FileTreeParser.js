@@ -132,7 +132,7 @@ const filterIgnoredFolders = (fileTree, siblings = []) => {
 /**
  * Tags that are always ignored when constructing an enhanced file tree.
  */
- const ignoredTagNames = [
+const ignoredTagNames = [
   'Retina',
   'PNG',
   'SVG',

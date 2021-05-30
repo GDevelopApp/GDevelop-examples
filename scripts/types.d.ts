@@ -5,12 +5,14 @@ export interface Example {
   id: string;
   name: string;
   shortDescription: string;
-  description: string;
-  projectFileUrl: string;
   license: string;
   tags: string[];
   previewImageUrls: string[];
   gdevelopVersion: string;
+
+  description: string;
+  projectFileUrl: string;
+  authors: string[];
 }
 
 /**
@@ -26,3 +28,7 @@ export interface ExampleShortHeader {
   previewImageUrls: string[];
   gdevelopVersion: string;
 }
+
+export type gdProject = any;
+export type gdPlatformExtension = any;
+export type libGDevelop = any;

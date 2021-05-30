@@ -8,16 +8,36 @@ const {
   filterIgnoredFolders,
   enhanceFileTreeWithMetadata,
   getAllFiles,
-} = require('./lib/file-tree-parser');
+} = require('./lib/FileTreeParser');
+const { loadGDevelopCoreAndExtensions } = require('./lib/GDevelopCoreLoader');
 const allLicenses = require('./lib/licenses.json');
+const args = require('minimist')(process.argv.slice(2));
+const { loadSerializedProject } = require('./lib/LocalProjectOpener');
+const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
 
-/** @typedef {import('./lib/file-tree-parser.js').AssetMetadata} AssetMetadata */
-/** @typedef {import('./lib/file-tree-parser.js').DreeWithMetadata} DreeWithMetadata */
+/** @typedef {import('./lib/FileTreeParser.js').AssetMetadata} AssetMetadata */
+/** @typedef {import('./lib/FileTreeParser.js').DreeWithMetadata} DreeWithMetadata */
+/** @typedef {import('./types').libGDevelop} libGDevelop */
+/** @typedef {import('./types').gdProject} gdProject */
+/** @typedef {import('./types').gdPlatformExtension} gdPlatformExtension */
 /** @typedef {import('./types').Example} Example */
 /** @typedef {import('./types').ExampleShortHeader} ExampleShortHeader */
 
-const examplesRootPath = path.join(__dirname, '../examples');
-const databaseRootPath = path.join(__dirname, '../database');
+if (!args['gdevelop-root-path']) {
+  shell.echo(
+    '❌ You must pass --gdevelop-root-path with the path to GDevelop repository with `npm install` ran in `newIDE/app`.'
+  );
+  shell.exit(1);
+}
+
+const sourceExamplesRootPath = path.join(__dirname, '../examples');
+const distPath = path.join(__dirname, '../dist');
+const examplesRootPath = path.join(distPath, 'examples');
+const databaseRootPath = path.join(distPath, 'database');
+const gdevelopRootPath = path.resolve(
+  process.cwd(),
+  args['gdevelop-root-path']
+);
 
 /**
  * Generate the URL used after deployment for a file in the examples folder.
@@ -26,6 +46,16 @@ const databaseRootPath = path.join(__dirname, '../database');
 const getResourceUrl = (filePath) => {
   const relativeFilePath = path.relative(examplesRootPath, filePath);
   return `https://resources.gdevelop-app.com/examples/${relativeFilePath}`;
+};
+
+
+/**
+ * @param {string} name
+ */
+const formatExampleName = (name) => {
+  if (!name.length) return '';
+
+  return name[0].toUpperCase() + name.substr(1).replace(/-/g, ' ');
 };
 
 /**
@@ -46,14 +76,11 @@ const getExampleUniqueId = (name, tags) => {
 };
 
 /**
- * Extract the information about the example games from the examples folder.
+ * Return only the files that are GDevelop example project files.
  * @param {Object.<string, DreeWithMetadata>} allFiles
- * @returns {{allExamples: Example[], errors: Error[]}}
+ * @returns {DreeWithMetadata[]}
  */
-const extractExamples = (allFiles) => {
-  /** @type {Error[]} */
-  const errors = [];
-
+const getAllExampleFiles = (allFiles) => {
   /** @param {DreeWithMetadata} fileWithMetadata */
   const isGame = (fileWithMetadata) => {
     if (fileWithMetadata.name === 'game.json') return true;
@@ -69,62 +96,185 @@ const extractExamples = (allFiles) => {
     return false;
   };
 
+  return Object.values(allFiles).filter((fileWithMetadata) => {
+    return isGame(fileWithMetadata);
+  });
+};
+
+/**
+ *
+ * @param {libGDevelop} gd
+ * @param {gdProject} project
+ * @param {string} baseUrl
+ */
+const updateResources = (gd, project, baseUrl) => {
+  const worker = new gd.ArbitraryResourceWorkerJS();
+  /** @param {string} file */
+  worker.exposeImage = (file) => {
+    // Don't do anything
+    return file;
+  };
+  /** @param {string} shader */
+  worker.exposeShader = (shader) => {
+    // Don't do anything
+    return shader;
+  };
+  /** @param {string} file */
+  worker.exposeFile = (file) => {
+    if (file.length === 0) return '';
+    return baseUrl + '/' + file;
+  };
+
+  project.exposeResources(worker);
+};
+
+/**
+ * Extract the information about the example games from the examples folder.
+ * @param {libGDevelop} gd
+ * @param {Record<string, gdPlatformExtension>} platformExtensionsMap
+ * @param {Object.<string, DreeWithMetadata>} allFiles
+ * @param {DreeWithMetadata[]} allExampleFiles
+ * @returns {{allExamples: Example[], errors: Error[]}}
+ */
+const extractExamples = (
+  gd,
+  platformExtensionsMap,
+  allFiles,
+  allExampleFiles
+) => {
+  /** @type {Error[]} */
+  const errors = [];
+
   /** @type {Example[]} */
   // @ts-ignore
-  const allExamples = Object.keys(allFiles)
-    .map((absolutePath) => {
-      const fileWithMetadata = allFiles[absolutePath];
-      if (!isGame(fileWithMetadata)) return null;
+  const allExamples = allExampleFiles
+    .map(
+      /** @param {DreeWithMetadata} fileWithMetadata */
+      (fileWithMetadata) => {
+        // Analyze the project
+        const projectObject = fileWithMetadata.parsedContent;
+        if (!projectObject) {
+          errors.push(
+            new Error(
+              `Expected valid JSON content in ${fileWithMetadata.path}.`
+            )
+          );
+          return null;
+        }
 
-      if (!fileWithMetadata.parsedContent) {
-        errors.push(
-          new Error(`Expected valid JSON content in ${absolutePath}.`)
-        );
-        return null;
-      }
+        const project = loadSerializedProject(gd, projectObject);
 
-      const gameFolderPath = path.dirname(fileWithMetadata.path);
-      const readmePath = path.join(gameFolderPath, 'README.md');
-      const thumbnailPath = path.join(gameFolderPath, 'thumbnail.png');
-      const hasThumbnailFile = !!allFiles[thumbnailPath];
-      const readmeFileWithMetadata = allFiles[readmePath];
-      if (!readmeFileWithMetadata) {
-        errors.push(new Error(`Expected a game README at ${readmePath}.`));
-        return null;
-      }
-      if (!readmeFileWithMetadata.parsedContent) {
-        errors.push(
-          new Error(
-            `Expected a game README that is not empty at ${readmePath}.`
-          )
-        );
-        return null;
-      }
-      const shortDescription =
-        readmeFileWithMetadata.parsedContent.split('\n\n')[0];
-      const description = readmeFileWithMetadata.parsedContent
-        .split('\n\n')
-        .slice(1)
-        .join('\n\n');
+        /** @type {{name: string, fullName: string}[]} */
+        const usedExtensions = gd.UsedExtensionsFinder.scanProject(project)
+          .toNewVectorString()
+          .toJSArray()
+          .map(
+            /** @param {string} name */
+            (name) => ({
+              name,
+              fullName: platformExtensionsMap[name]
+                ? platformExtensionsMap[name].getFullName()
+                : '',
+            })
+          );
+        /** @type {{name: string, fullName: string}[]} */
+        const eventsBasedExtensions = [];
+        for (let i = 0; i < project.getEventsFunctionsExtensionsCount(); ++i) {
+          eventsBasedExtensions.push({
+            name: project.getEventsFunctionsExtensionAt(i).getName(),
+            fullName: project.getEventsFunctionsExtensionAt(i).getFullName(),
+          });
+        }
 
-      return {
-        id: getExampleUniqueId(fileWithMetadata.name, fileWithMetadata.tags),
-        name: fileWithMetadata.name,
-        shortDescription,
-        description,
-        tags: fileWithMetadata.tags,
-        previewImageUrls: hasThumbnailFile
-          ? [getResourceUrl(thumbnailPath)]
-          : [],
-        license: fileWithMetadata.license,
-        projectFileUrl: getResourceUrl(fileWithMetadata.path),
-        gdevelopVersion: '', //TODO: set to the GDevelop version used to author the example?
-        // TODO: extract information about used extensions (builtin or from the community).
-      };
-    })
+        // Extract example informations
+        const gameFolderPath = path.dirname(fileWithMetadata.path);
+        const readmePath = path.join(gameFolderPath, 'README.md');
+        const thumbnailPath = path.join(gameFolderPath, 'thumbnail.png');
+        const hasThumbnailFile = !!allFiles[thumbnailPath];
+        const readmeFileWithMetadata = allFiles[readmePath];
+        if (!readmeFileWithMetadata) {
+          errors.push(new Error(`Expected a game README at ${readmePath}.`));
+          return null;
+        }
+        if (!readmeFileWithMetadata.parsedContent) {
+          errors.push(
+            new Error(
+              `Expected a game README that is not empty at ${readmePath}.`
+            )
+          );
+          return null;
+        }
+        const shortDescription =
+          readmeFileWithMetadata.parsedContent.split('\n\n')[0];
+        const description = readmeFileWithMetadata.parsedContent
+          .split('\n\n')
+          .slice(1)
+          .join('\n\n');
+
+        return {
+          id: getExampleUniqueId(fileWithMetadata.name, fileWithMetadata.tags),
+          name: formatExampleName(path.basename(fileWithMetadata.name, ".json")),
+          shortDescription,
+          description,
+          tags: [
+            ...fileWithMetadata.tags,
+            ...usedExtensions.map(({ fullName }) => fullName),
+            ...eventsBasedExtensions.map(({ fullName }) => fullName),
+          ],
+          usedExtensions,
+          eventsBasedExtensions,
+          previewImageUrls: hasThumbnailFile
+            ? [getResourceUrl(thumbnailPath)]
+            : [],
+          license: fileWithMetadata.license,
+          projectFileUrl: getResourceUrl(fileWithMetadata.path),
+          gdevelopVersion: '', //TODO: set to the GDevelop version used to author the example?
+        };
+      }
+    )
     .filter(Boolean);
 
   return { allExamples, errors };
+};
+
+/**
+ * Update the example game files to use resources on resources.gdevelop-app.com
+ * @param {libGDevelop} gd
+ * @param {DreeWithMetadata[]} allExampleFiles
+ * @returns {Promise<{errors: Error[]}>}
+ */
+const updateExampleFiles = async (gd, allExampleFiles) => {
+  /** @type {Error[]} */
+  const errors = [];
+
+  await Promise.all(
+    allExampleFiles.map(async (fileWithMetadata) => {
+      const projectObject = fileWithMetadata.parsedContent;
+      if (!projectObject) {
+        errors.push(
+          new Error(`Expected valid JSON content in ${fileWithMetadata.path}.`)
+        );
+        return;
+      }
+
+      const project = loadSerializedProject(gd, projectObject);
+      const gameFolderPath = path.dirname(fileWithMetadata.path);
+      updateResources(gd, project, getResourceUrl(gameFolderPath));
+
+      try {
+        await writeProjectJSONFile(gd, project, fileWithMetadata.path);
+      } catch (error) {
+        errors.push(
+          new Error(
+            `Error while writing the updated project file at ${fileWithMetadata.path}: ` +
+              error
+          )
+        );
+      }
+    })
+  );
+
+  return { errors };
 };
 
 /**
@@ -145,9 +295,46 @@ const generateShortHeaders = (allExamples) => {
 };
 
 /**
+ *
+ * @param {libGDevelop} gd
+ * @returns {Record<string, gdPlatformExtension>}
+ */
+const createPlatformExtensionsMap = (gd) => {
+  /** @type {Record<string, gdPlatformExtension>} */
+  const platformExtensionsMap = {};
+  const allPlatformExtensions = gd.JsPlatform.get().getAllPlatformExtensions();
+  for (let i = 0; i < allPlatformExtensions.size(); ++i) {
+    const platformExtension = allPlatformExtensions.at(i);
+    platformExtensionsMap[platformExtension.getName()] = platformExtension;
+  }
+
+  return platformExtensionsMap;
+};
+
+/**
  * Discover all examples and extract information from them.
  */
 (async () => {
+  shell.mkdir('-p', distPath);
+  shell.rm('-rf', examplesRootPath);
+  shell.cp('-r', sourceExamplesRootPath, examplesRootPath);
+
+  const loadedGDevelop = await loadGDevelopCoreAndExtensions({
+    gdevelopRootPath,
+  });
+  const { gd } = loadedGDevelop;
+  if (!gd || loadedGDevelop.errors.length) {
+    console.error(
+      'Unable to load GDevelop core and the extensions:',
+      loadedGDevelop.errors
+    );
+    shell.exit(1);
+  }
+  console.info(
+    'Loaded GDevelop and extensions',
+    loadedGDevelop.extensionLoadingResults
+  );
+
   const fileTree = await readFileTree(examplesRootPath);
   const filteredFileTree = filterIgnoredFolders(fileTree);
   if (!filteredFileTree)
@@ -160,64 +347,79 @@ const generateShortHeaders = (allExamples) => {
     license: 'MIT', // Unless state otherwise, games are MIT licensed.
     tags: [],
   });
-  const { fileTreeWithMetadata, errors } = enhancedTree;
-  if (errors.length) {
-    console.error('There were errors while parsing example files:', errors);
+  const { fileTreeWithMetadata } = enhancedTree;
+  if (enhancedTree.errors.length) {
+    console.error(
+      'There were errors while parsing example files:',
+      enhancedTree.errors
+    );
     console.info('Aborting because of these errors.');
-    return;
+    shell.exit(1);
   }
 
-  {
-    const allFiles = getAllFiles(fileTreeWithMetadata);
-    const { allExamples, errors } = extractExamples(allFiles);
-    if (errors.length) {
-      console.error(
-        'There were errors while extracting example files:',
-        errors
-      );
-      console.info('Aborting because of these errors.');
-      return;
-    }
+  const allFiles = getAllFiles(fileTreeWithMetadata);
+  const allExampleFiles = getAllExampleFiles(allFiles);
+  const platformExtensionsMap = createPlatformExtensionsMap(gd);
 
-    try {
-      shell.mkdir('-p', databaseRootPath);
-      shell.mkdir('-p', path.join(databaseRootPath, 'examples'));
+  const { allExamples, errors } = extractExamples(
+    gd,
+    platformExtensionsMap,
+    allFiles,
+    allExampleFiles
+  );
+  if (errors.length) {
+    console.error('There were errors while extracting example files:', errors);
+    console.info('Aborting because of these errors.');
+    shell.exit(1);
+  }
 
-      await Promise.all(
-        allExamples.map((example) =>
-          fs.writeFile(
-            path.join(databaseRootPath, 'examples', example.id + '.json'),
-            JSON.stringify(example)
-          )
+  const updatedExampleFiles = await updateExampleFiles(gd, allExampleFiles);
+  if (updatedExampleFiles.errors.length) {
+    console.error('There were errors while updating example files:', errors);
+    console.info('Aborting because of these errors.');
+    shell.exit(1);
+  }
+
+  try {
+    shell.mkdir('-p', databaseRootPath);
+    shell.mkdir('-p', path.join(databaseRootPath, 'examples'));
+
+    await Promise.all(
+      allExamples.map((example) =>
+        fs.writeFile(
+          path.join(databaseRootPath, 'examples', example.id + '.json'),
+          JSON.stringify(example)
         )
-      );
+      )
+    );
 
-      const exampleShortHeaders = generateShortHeaders(allExamples);
-      await fs.writeFile(
-        path.join(databaseRootPath, 'exampleShortHeaders.json'),
-        JSON.stringify(exampleShortHeaders)
-      );
+    const exampleShortHeaders = generateShortHeaders(allExamples);
+    await fs.writeFile(
+      path.join(databaseRootPath, 'exampleShortHeaders.json'),
+      JSON.stringify(exampleShortHeaders)
+    );
 
-      await fs.writeFile(
-        path.join(databaseRootPath, 'filters.json'),
-        JSON.stringify(
-          {
-            allTags: enhancedTree.allTags,
-            tagsTree: enhancedTree.tagsTree,
-            defaultTags: [],
-          },
-          (key, value) => {
-            if (value instanceof Set) {
-              return [...value.keys()];
-            }
-
-            return value;
+    await fs.writeFile(
+      path.join(databaseRootPath, 'filters.json'),
+      JSON.stringify(
+        {
+          allTags: enhancedTree.allTags,
+          tagsTree: enhancedTree.tagsTree,
+          defaultTags: Object.values(platformExtensionsMap).map(
+            (platformExtension) => platformExtension.getFullName()
+          ),
+        },
+        (key, value) => {
+          if (value instanceof Set) {
+            return [...value.keys()];
           }
-        )
-      );
-    } catch (error) {
-      console.error('Error while writing the database files:', error);
-      shell.exit(1);
-    }
+
+          return value;
+        }
+      )
+    );
+  } catch (error) {
+    console.error('Error while writing the database files:', error);
+    shell.exit(1);
   }
 })();

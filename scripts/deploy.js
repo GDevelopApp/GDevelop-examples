@@ -3,10 +3,10 @@ const path = require('path');
 const { default: axios } = require('axios');
 const args = require('minimist')(process.argv.slice(2));
 
-const databasePath = path.join(__dirname, '../database');
-const examplesPath = path.join(__dirname, '../examples');
+const databasePath = path.join(__dirname, '../dist/database');
+const examplesPath = path.join(__dirname, '../dist/examples');
 const databaseDestination = `s3://resources.gdevelop-app.com/examples-database`;
-const examplesDestination = `s3://resources.gdevelop-app.com/examplesTEST`;
+const examplesDestination = `s3://resources.gdevelop-app.com/examples`;
 
 if (!args['cf-zoneid'] || !args['cf-token']) {
   shell.echo(
