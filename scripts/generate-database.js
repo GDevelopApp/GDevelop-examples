@@ -48,7 +48,6 @@ const getResourceUrl = (filePath) => {
   return `https://resources.gdevelop-app.com/examples/${relativeFilePath}`;
 };
 
-
 /**
  * @param {string} name
  */
@@ -213,7 +212,9 @@ const extractExamples = (
 
         return {
           id: getExampleUniqueId(fileWithMetadata.name, fileWithMetadata.tags),
-          name: formatExampleName(path.basename(fileWithMetadata.name, ".json")),
+          name: formatExampleName(
+            path.basename(fileWithMetadata.name, '.json')
+          ),
           shortDescription,
           description,
           tags: [
