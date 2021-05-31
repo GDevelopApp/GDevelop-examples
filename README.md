@@ -24,6 +24,8 @@ If you've created an example with GDevelop, you can submit it to be shared with 
 3. **Export** your game and all its resources to a zip file (you can save it in a new folder and zip this folder).
 4. Submit it! You can either [submit it here](https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose), attaching the _zip file_.
 
+If you know how to create *Pull Requests*, you can also clone this repository and add your example in the examples folder, and then open a PR.
+
 ## License
 
 All examples provided on this repository are MIT licensed, unless specified otherwise.
