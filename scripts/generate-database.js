@@ -133,7 +133,7 @@ const updateResources = (gd, project, baseUrl) => {
  * @param {Record<string, gdPlatformExtension>} platformExtensionsMap
  * @param {Object.<string, DreeWithMetadata>} allFiles
  * @param {DreeWithMetadata[]} allExampleFiles
- * @returns {{allExamples: Example[], errors: Error[]}}
+ * @returns {{allExamples: Example[], allExampleTags: Set<string>, errors: Error[]}}
  */
 const extractExamples = (
   gd,
@@ -143,6 +143,9 @@ const extractExamples = (
 ) => {
   /** @type {Error[]} */
   const errors = [];
+
+  /** @type {Set<string>} */
+  const allExampleTags = new Set();
 
   /** @type {Example[]} */
   // @ts-ignore
@@ -210,6 +213,13 @@ const extractExamples = (
           .slice(1)
           .join('\n\n');
 
+        const tags = [
+          ...fileWithMetadata.tags,
+          ...usedExtensions.map(({ fullName }) => fullName),
+          ...eventsBasedExtensions.map(({ fullName }) => fullName),
+        ];
+        tags.forEach((tag) => allExampleTags.add(tag));
+
         return {
           id: getExampleUniqueId(fileWithMetadata.name, fileWithMetadata.tags),
           name: formatExampleName(
@@ -217,11 +227,7 @@ const extractExamples = (
           ),
           shortDescription,
           description,
-          tags: [
-            ...fileWithMetadata.tags,
-            ...usedExtensions.map(({ fullName }) => fullName),
-            ...eventsBasedExtensions.map(({ fullName }) => fullName),
-          ],
+          tags,
           usedExtensions,
           eventsBasedExtensions,
           previewImageUrls: hasThumbnailFile
@@ -235,7 +241,7 @@ const extractExamples = (
     )
     .filter(Boolean);
 
-  return { allExamples, errors };
+  return { allExamples, allExampleTags, errors };
 };
 
 /**
@@ -362,7 +368,7 @@ const createPlatformExtensionsMap = (gd) => {
   const allExampleFiles = getAllExampleFiles(allFiles);
   const platformExtensionsMap = createPlatformExtensionsMap(gd);
 
-  const { allExamples, errors } = extractExamples(
+  const { allExamples, allExampleTags, errors } = extractExamples(
     gd,
     platformExtensionsMap,
     allFiles,
@@ -404,11 +410,12 @@ const createPlatformExtensionsMap = (gd) => {
       path.join(databaseRootPath, 'filters.json'),
       JSON.stringify(
         {
-          allTags: enhancedTree.allTags,
-          tagsTree: enhancedTree.tagsTree,
-          defaultTags: Object.values(platformExtensionsMap).map(
-            (platformExtension) => platformExtension.getFullName()
-          ),
+          allTags: [],
+          tagsTree: [],
+          defaultTags: Object.values(platformExtensionsMap)
+            .map((platformExtension) => platformExtension.getFullName())
+            // Ensure we only show by default tags that actually have examples for them.
+            .filter((tag) => allExampleTags.has(tag)),
         },
         (key, value) => {
           if (value instanceof Set) {

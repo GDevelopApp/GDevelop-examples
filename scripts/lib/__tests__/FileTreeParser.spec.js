@@ -36,13 +36,13 @@ describe('FileTreeParser', () => {
     );
 
     // Check that folders were read, apart from those with an ignored name.
-    expect(fileTree.children).toHaveLength(3);
+    expect(fileTree.children).toHaveLength(4);
 
     // Check that additional ignored folders are removed.
     const filteredFileTree = filterIgnoredFolders(fileTree, []);
     if (!filteredFileTree)
       throw new Error('filteredFileTree should not be undefined');
-    expect(filteredFileTree.children).toHaveLength(2);
+    expect(filteredFileTree.children).toHaveLength(3);
 
     const enhancedTree = await enhanceFileTreeWithMetadata(filteredFileTree, {
       allLicenses,
@@ -93,7 +93,23 @@ describe('FileTreeParser', () => {
       'fake-content': 'my fake other game content',
     });
 
+    const someTagFolder = findInFileTreeWithMetadataFolder(
+      fileTreeWithMetadata,
+      'Some Tag'
+    );
+    const myTaggedGameFolder = findInFileTreeWithMetadataFolder(
+      someTagFolder,
+      'MyTaggedGame'
+    );
+    const myTaggedGameGameJsonFile = findInFileTreeWithMetadataFolder(
+      myTaggedGameFolder,
+      'MyTaggedGame.json'
+    );
+    expect(myTaggedGameGameJsonFile.parsedContent).toEqual({
+      'fake-content': 'my fake tagged game content',
+    });
+
     const allFiles = getAllFiles(fileTreeWithMetadata);
-    expect(Object.keys(allFiles)).toHaveLength(3);
+    expect(Object.keys(allFiles)).toHaveLength(4);
   });
 });
