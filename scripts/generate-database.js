@@ -415,7 +415,8 @@ const createPlatformExtensionsMap = (gd) => {
           defaultTags: Object.values(platformExtensionsMap)
             .map((platformExtension) => platformExtension.getFullName())
             // Ensure we only show by default tags that actually have examples for them.
-            .filter((tag) => allExampleTags.has(tag)),
+            .filter((tag) => allExampleTags.has(tag))
+            .sort((a, b) => a.localeCompare(b)),
         },
         (key, value) => {
           if (value instanceof Set) {
