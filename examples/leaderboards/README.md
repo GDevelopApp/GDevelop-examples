@@ -1,0 +1,1 @@
+A simple leaderboards made with Firestore queries.
