@@ -10,10 +10,10 @@ assignees: ''
 **⚠️ Please edit and complete this before submitting your game:**
 -->
 
-## Describe the extension
+## Describe the example
 
 <!--
-A clear and concise description of what the extension is, how useful it is.
+A clear and concise description of what the example is, how useful it is.
 -->
 
 ## Checklist
@@ -24,6 +24,7 @@ A clear and concise description of what the extension is, how useful it is.
 - [ ] I've added myself as the author in the game properties.
 - [ ] I've included a file called "README.md" with a description in proper English, explaining what this example is doing.
 - [ ] I confirm that this game and all of its resources can be integrated to this GitHub repository, distributed and MIT licensed.
+- [ ] I've cleaned unused resources.
 
 ## Game folder
 
