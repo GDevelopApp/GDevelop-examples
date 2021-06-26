@@ -1,1 +1,1 @@
-Example showing how to create a grid and have objects snapped to the grid.
+Show how to have objects snapped to grids from rectangular to hexagonal.
