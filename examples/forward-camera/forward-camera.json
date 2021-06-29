@@ -378,19 +378,19 @@
             {
               "name": "PlatformerObject",
               "type": "PlatformBehavior::PlatformerObjectBehavior",
+              "canGrabPlatforms": false,
+              "roundCoordinates": true,
+              "slopeMaxAngle": 50,
               "jumpSustainTime": 0.5,
               "maxSpeed": 300,
               "gravity": 1800,
               "jumpSpeed": 800,
-              "roundCoordinates": false,
               "xGrabTolerance": 0,
               "acceleration": 1500,
-              "canGrabPlatforms": false,
               "deceleration": 1500,
               "ignoreDefaultControls": false,
               "ladderClimbingSpeed": 150,
               "maxFallingSpeed": 700,
-              "slopeMaxAngle": 60,
               "yGrabOffset": 0
             }
           ],
@@ -608,7 +608,19 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PlatformBehavior::IsMoving"
+                  },
+                  "parameters": [
+                    "Player",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
               "actions": [
                 {
                   "type": {
@@ -619,6 +631,54 @@
                     "Cam_horizontal",
                     "=",
                     "sign(Player.PlatformerObject::CurrentSpeed()) * 220"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Setting the variable \"Cam_horizontal\" to zero when the player is not able to move is a simple fix for a camera jitter caused by the player is walking into a wall that is not perfectly vertical.",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "PlatformBehavior::IsMoving"
+                  },
+                  "parameters": [
+                    "Player",
+                    "PlatformerObject"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "Cam_horizontal",
+                    "=",
+                    "0"
                   ],
                   "subInstructions": []
                 }
