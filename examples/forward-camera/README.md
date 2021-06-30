@@ -1,0 +1,1 @@
+A platformer camera that leans toward the direction the player is looking at. Useful to give more visibility to the player when running through a level.
