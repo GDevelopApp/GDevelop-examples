@@ -5,8 +5,9 @@ const {
   filterIgnoredFolders,
   enhanceFileTreeWithMetadata,
   getAllFiles,
+  sortTagsTree,
 } = require('../FileTreeParser.js');
-const allLicenses = require('../licenses.json');
+const allLicenses = require('./fixtures/licenses.json');
 
 /** @typedef {import('../FileTreeParser.js').DreeWithMetadata} DreeWithMetadata */
 
@@ -36,10 +37,15 @@ describe('FileTreeParser', () => {
     );
 
     // Check that folders were read, apart from those with an ignored name.
-    expect(fileTree.children).toHaveLength(4);
+    expect(fileTree.children).toHaveLength(5);
 
     // Check that additional ignored folders are removed.
-    const filteredFileTree = filterIgnoredFolders(fileTree, []);
+    const filteredFileTree = filterIgnoredFolders(fileTree, {
+      fileMagicNamesToIgnoreFolder: [
+        'CUSTOM_IGNORED_MAGIC_NAME.md',
+        'IGNORED.md',
+      ],
+    });
     if (!filteredFileTree)
       throw new Error('filteredFileTree should not be undefined');
     expect(filteredFileTree.children).toHaveLength(3);
@@ -111,5 +117,39 @@ describe('FileTreeParser', () => {
 
     const allFiles = getAllFiles(fileTreeWithMetadata);
     expect(Object.keys(allFiles)).toHaveLength(4);
+  });
+
+  it('can sort tree of tags', () => {
+    expect(
+      sortTagsTree([
+        {
+          name: 'Zzz',
+          children: [
+            { name: '456', children: [], allChildrenTags: [] },
+            { name: '123', children: [], allChildrenTags: [] },
+          ],
+          allChildrenTags: ['456', '123'],
+        },
+        {
+          name: 'Aaa',
+          children: [],
+          allChildrenTags: [],
+        },
+      ])
+    ).toEqual([
+      {
+        name: 'Aaa',
+        children: [],
+        allChildrenTags: [],
+      },
+      {
+        name: 'Zzz',
+        children: [
+          { name: '123', children: [], allChildrenTags: [] },
+          { name: '456', children: [], allChildrenTags: [] },
+        ],
+        allChildrenTags: ['123', '456'],
+      },
+    ]);
   });
 });

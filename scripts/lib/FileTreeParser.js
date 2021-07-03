@@ -5,9 +5,10 @@ const fs = require('fs').promises;
 /** @typedef {{name: string, searchToken: string}} Author */
 /** @typedef {{name: string, searchToken: string}} License */
 /** @typedef {import('dree').Dree} Dree */
-/** @typedef {{tags: String[], authors: string[], license: string, allAuthors: Author[], allLicenses: License[]}} AssetMetadata */
+/** @typedef {{tags: String[], authors: string[], license: string, allAuthors: Author[], allLicenses: License[]}} FileMetadata */
 /** @typedef {{parsedContent?: any}} OptionalParsedJSONContent */
-/** @typedef {{children?: DreeWithMetadata[]} & AssetMetadata & OptionalParsedJSONContent & Dree} DreeWithMetadata */
+/** @typedef {{children?: DreeWithMetadata[]} & FileMetadata & OptionalParsedJSONContent & Dree} DreeWithMetadata */
+/** @typedef {{name: string, children: TagsTreeNode[], allChildrenTags: string[] }} TagsTreeNode */
 
 /**
  * Remove if necessary the BOM character at the beginning of a JSON file content.
@@ -91,11 +92,17 @@ const readFileTree = async (rootPath) => {
  * Filter a file tree to remove folders that are marked as being ignored (with a IGNORED.md file)
  * or have a specific name that we know we must ignore.
  *
- * @param {Dree} fileTree
- * @param {Dree[]} siblings
- * @returns {Dree | null}
+ * @template {{type: string, children?: Tree[] | undefined, name: string}} Tree
+ * @param {Tree} fileTree
+ * @param {{fileMagicNamesToIgnoreFolder: string[]}} fileTree
+ * @param {Tree[]} siblings
+ * @returns {Tree | null}
  */
-const filterIgnoredFolders = (fileTree, siblings = []) => {
+const filterIgnoredFolders = (
+  fileTree,
+  options = { fileMagicNamesToIgnoreFolder: ['IGNORED.md'] },
+  siblings = []
+) => {
   if (fileTree.type === 'file') return fileTree;
 
   // Remove empty folders
@@ -111,8 +118,8 @@ const filterIgnoredFolders = (fileTree, siblings = []) => {
 
   // Remove ignored folders
   if (
-    fileTree.children.some(
-      (childFileTree) => childFileTree.name === 'IGNORED.md'
+    fileTree.children.some((childFileTree) =>
+      options.fileMagicNamesToIgnoreFolder.includes(childFileTree.name)
     )
   ) {
     return null;
@@ -123,7 +130,7 @@ const filterIgnoredFolders = (fileTree, siblings = []) => {
     // @ts-ignore
     children: fileTree.children
       .map((childFileTree) =>
-        filterIgnoredFolders(childFileTree, fileTree.children)
+        filterIgnoredFolders(childFileTree, options, fileTree.children)
       )
       .filter(Boolean),
   };
@@ -145,8 +152,8 @@ const ignoredTagNames = [
 /**
  * Browse the specified file tree and add tags, license, author, and the file content (if applicable) for each file.
  * @param {Dree} fileTree
- * @param {AssetMetadata} parentMetadata
- * @returns {Promise<{tagsTree: any[], allTags: Set<string>, fileTreeWithMetadata: DreeWithMetadata, errors: Error[]}>}
+ * @param {FileMetadata} parentMetadata
+ * @returns {Promise<{tagsTree: TagsTreeNode[], allTags: Set<string>, fileTreeWithMetadata: DreeWithMetadata, errors: Error[]}>}
  */
 const enhanceFileTreeWithMetadata = async (fileTree, parentMetadata) => {
   /** @type {any[]} */
@@ -299,6 +306,30 @@ const enhanceFileTreeWithMetadata = async (fileTree, parentMetadata) => {
 };
 
 /**
+ * @param {TagsTreeNode[]} tagsTree
+ * @return {TagsTreeNode[]}
+ */
+const sortTagsTree = (tagsTree) => {
+  return tagsTree
+    .map((tagTreeNode) => {
+      return {
+        ...tagTreeNode,
+        allChildrenTags: [...tagTreeNode.allChildrenTags].sort((tag1, tag2) =>
+          tag1.localeCompare(tag2)
+        ),
+        children: sortTagsTree(tagTreeNode.children),
+      };
+    })
+    .sort(
+      /**
+       * @param {TagsTreeNode} node1
+       * @param {TagsTreeNode} node2
+       */
+      (node1, node2) => node1.name.localeCompare(node2.name)
+    );
+};
+
+/**
  * Get all files of a file tree indexed by their absolute path.
  * @param {DreeWithMetadata} fileTreeWithMetadata
  * @returns {Object.<string, DreeWithMetadata>}
@@ -309,7 +340,12 @@ const getAllFiles = (fileTreeWithMetadata) => {
   } else {
     /** @type {Object.<string, DreeWithMetadata>} */
     let allFiles = {};
-    // @ts-ignore
+
+    if (!fileTreeWithMetadata.children) {
+      // A folder without children - just ignore it.
+      return allFiles;
+    }
+
     fileTreeWithMetadata.children.forEach((childFileTreeWithMetadata) => {
       allFiles = { ...allFiles, ...getAllFiles(childFileTreeWithMetadata) };
     });
@@ -321,5 +357,6 @@ module.exports = {
   readFileTree,
   filterIgnoredFolders,
   enhanceFileTreeWithMetadata,
+  sortTagsTree,
   getAllFiles,
 };

@@ -15,7 +15,6 @@ const args = require('minimist')(process.argv.slice(2));
 const { loadSerializedProject } = require('./lib/LocalProjectOpener');
 const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
 
-/** @typedef {import('./lib/FileTreeParser.js').AssetMetadata} AssetMetadata */
 /** @typedef {import('./lib/FileTreeParser.js').DreeWithMetadata} DreeWithMetadata */
 /** @typedef {import('./types').libGDevelop} libGDevelop */
 /** @typedef {import('./types').gdProject} gdProject */
