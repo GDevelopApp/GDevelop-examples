@@ -15,7 +15,7 @@
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -69,7 +69,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.8399999999999999
       },
       "objectsGroups": [],
       "variables": [],
@@ -101,7 +101,6 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "string": "Hi, I'm fading out!",
           "font": "",
@@ -126,72 +125,15 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "As long the value of Fade is > 0, we are decreasing the value of Fade and use sinus to set the value of the opacity.\nIt makes the text to fade out",
+          "comment": "Lerp is used to smoothly fade in and out",
           "comment2": ""
         },
         {
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "DepartScene"
-              },
-              "parameters": [
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
+          "conditions": [],
           "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Fade",
-                "=",
-                "0.5"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "VarScene"
-              },
-              "parameters": [
-                "Fade",
-                ">",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Fade",
-                "-",
-                "0.1*TimeDelta()"
-              ],
-              "subInstructions": []
-            },
             {
               "type": {
                 "inverted": false,
@@ -200,7 +142,7 @@
               "parameters": [
                 "FadeOutText",
                 "=",
-                "sin( Variable(Fade)*3.14159 )*255"
+                "lerp(FadeOutText.Opacity(), 0, 0.02)"
               ],
               "subInstructions": []
             }
@@ -259,10 +201,16 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.8799999999999999
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "Fade",
+          "type": "string",
+          "value": "FadeOut"
+        }
+      ],
       "instances": [
         {
           "angle": 0,
@@ -273,8 +221,8 @@
           "name": "FadeInOutText",
           "persistentUuid": "6c92f0d1-a94e-4e79-be62-3d472f7b4ff1",
           "width": 0,
-          "x": 190,
-          "y": 264,
+          "x": 210,
+          "y": 262,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -291,7 +239,6 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "string": "Hi, I'm fading in and out!",
           "font": "",
@@ -316,7 +263,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "As long the value of Fade is < 1, we are increasing the value of Fade and use sinus to set the opacity. \nBecause at the beginning the value of Fade is 0, it makes the opacity of the text to be 0 this is why it faiding in first and then as the value of Fade increase it cause the text to fade out as the value of the opcitiy decreasing when the value of Fade is higher",
+          "comment": "Lerp is used to smoothly fade in and out",
           "comment2": ""
         },
         {
@@ -327,10 +274,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "DepartScene"
+                "value": "VarSceneTxt"
               },
               "parameters": [
-                ""
+                "Fade",
+                "=",
+                "\"FadeOut\""
               ],
               "subInstructions": []
             }
@@ -339,12 +288,24 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ModVarScene"
+                "value": "TextObject::Opacity"
               },
               "parameters": [
-                "Fade",
+                "FadeInOutText",
                 "=",
-                "0"
+                "lerp(FadeInOutText.Opacity(), 0, 0.02)"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::String"
+              },
+              "parameters": [
+                "FadeInOutText",
+                "=",
+                "\"Hi, I'm fading Out\""
               ],
               "subInstructions": []
             }
@@ -359,12 +320,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "VarScene"
+                "value": "VarSceneTxt"
               },
               "parameters": [
                 "Fade",
-                "<",
-                "1"
+                "=",
+                "\"FadeIn\""
               ],
               "subInstructions": []
             }
@@ -373,15 +334,50 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ModVarScene"
+                "value": "TextObject::Opacity"
               },
               "parameters": [
-                "Fade",
-                "+",
-                "0.1*TimeDelta()"
+                "FadeInOutText",
+                "=",
+                "lerp(FadeInOutText.Opacity(), 255, 0.02)"
               ],
               "subInstructions": []
             },
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::String"
+              },
+              "parameters": [
+                "FadeInOutText",
+                "=",
+                "\"Hi, I'm fading In\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "When opacity of text is greater tahn 245, Fade is set to FadeOut, making the text Fade Out",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
             {
               "type": {
                 "inverted": false,
@@ -389,8 +385,71 @@
               },
               "parameters": [
                 "FadeInOutText",
+                ">=",
+                "245"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "Fade",
                 "=",
-                "sin( Variable(Fade)*3.14159 )*255"
+                "\"FadeOut\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "When opacity of text is less than 10, Fade is set to FadeIn, making the text Fade In",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::Opacity"
+              },
+              "parameters": [
+                "FadeInOutText",
+                "<=",
+                "10"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "Fade",
+                "=",
+                "\"FadeIn\""
               ],
               "subInstructions": []
             }
@@ -449,7 +508,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 1
+        "zoomFactor": 0.8599999999999999
       },
       "objectsGroups": [],
       "variables": [],
@@ -481,7 +540,6 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "string": "Hi, I'm fading in!",
           "font": "",
@@ -494,21 +552,6 @@
         }
       ],
       "events": [
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "As long the value of Fade is < 0.5, we are increasing the value of Fade and set the opacity using sinus. \nBecause at the beginning the value of Fade is 0, it makes the opacity of the text to be 0 this is why it faiding in",
-          "comment2": ""
-        },
         {
           "disabled": false,
           "folded": false,
@@ -529,10 +572,10 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ModVarScene"
+                "value": "TextObject::Opacity"
               },
               "parameters": [
-                "Fade",
+                "FadeInText",
                 "=",
                 "0"
               ],
@@ -544,34 +587,24 @@
         {
           "disabled": false,
           "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Lerp is used to smoothly fade in and out",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "VarScene"
-              },
-              "parameters": [
-                "Fade",
-                "<",
-                "0.5"
-              ],
-              "subInstructions": []
-            }
-          ],
+          "conditions": [],
           "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Fade",
-                "+",
-                "0.1*TimeDelta()"
-              ],
-              "subInstructions": []
-            },
             {
               "type": {
                 "inverted": false,
@@ -580,7 +613,7 @@
               "parameters": [
                 "FadeInText",
                 "=",
-                "sin( Variable(Fade)*3.14159 )*255"
+                "lerp(FadeInText.Opacity(), 255, 0.02)"
               ],
               "subInstructions": []
             }
