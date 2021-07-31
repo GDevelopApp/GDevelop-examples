@@ -15,7 +15,7 @@
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -127,7 +127,6 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "string": "The sprite is fading out",
           "font": "",
@@ -144,7 +143,6 @@
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "animations": [
             {
@@ -192,72 +190,15 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "As long the value of Fade is > 0, we are decreasing the value of Fade and use sinus to set the value of the opacity.\nIt makes the sprite fade out",
+          "comment": "Lerp is used to smoothly fade in and out",
           "comment2": ""
         },
         {
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "DepartScene"
-              },
-              "parameters": [
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
+          "conditions": [],
           "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Fade",
-                "=",
-                "0.5"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "VarScene"
-              },
-              "parameters": [
-                "Fade",
-                ">",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Fade",
-                "-",
-                "0.1*TimeDelta()"
-              ],
-              "subInstructions": []
-            },
             {
               "type": {
                 "inverted": false,
@@ -266,7 +207,7 @@
               "parameters": [
                 "kenney",
                 "=",
-                "sin( Variable(Fade)*3.14159 )*255"
+                "lerp(kenney.Opacity(), 0, 0.02)"
               ],
               "subInstructions": []
             }
@@ -328,7 +269,13 @@
         "zoomFactor": 1
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "Fade",
+          "type": "string",
+          "value": "FadeIn"
+        }
+      ],
       "instances": [
         {
           "angle": 0,
@@ -373,7 +320,6 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "string": "The sprite fading in and out!",
           "font": "",
@@ -390,7 +336,6 @@
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "animations": [
             {
@@ -438,7 +383,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "As long the value of Fade is < 1, we are increasing the value of Fade and use sinus to set the opacity. \nBecause at the beginning the value of Fade is 0, it makes the opacity of the sprite to be 0 this is why it is fading in first. Then as the value of Fade increases, it causes the sprite to fade out as the value of the opacity is decreasing when the value of Fade is higher.",
+          "comment": "Lerp is used to smoothly fade in and out",
           "comment2": ""
         },
         {
@@ -449,61 +394,17 @@
             {
               "type": {
                 "inverted": false,
-                "value": "DepartScene"
-              },
-              "parameters": [
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
+                "value": "VarSceneTxt"
               },
               "parameters": [
                 "Fade",
                 "=",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "VarScene"
-              },
-              "parameters": [
-                "Fade",
-                "<",
-                "1"
+                "\"FadeOut\""
               ],
               "subInstructions": []
             }
           ],
           "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Fade",
-                "+",
-                "0.1*TimeDelta()"
-              ],
-              "subInstructions": []
-            },
             {
               "type": {
                 "inverted": false,
@@ -512,7 +413,7 @@
               "parameters": [
                 "kenney",
                 "=",
-                "sin( Variable(Fade)*3.14159 )*255"
+                "lerp(kenney.Opacity(), 0, 0.02)"
               ],
               "subInstructions": []
             }
@@ -527,12 +428,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "VarScene"
+                "value": "VarSceneTxt"
               },
               "parameters": [
                 "Fade",
-                ">",
-                "1"
+                "=",
+                "\"FadeIn\""
               ],
               "subInstructions": []
             }
@@ -541,12 +442,110 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ModVarScene"
+                "value": "Opacity"
+              },
+              "parameters": [
+                "kenney",
+                "=",
+                "lerp(kenney.Opacity(), 255, 0.02)"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "If the opacity is greater than 240, fade is set to \"FadeOut\", making kenny fade out",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "kenney",
+                ">=",
+                "240"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarSceneTxt"
               },
               "parameters": [
                 "Fade",
                 "=",
-                "0"
+                "\"FadeOut\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "If the opacity is less than 10, fade is set to \"FadeIn\", making kenny fade in",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "kenney",
+                "<=",
+                "10"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "Fade",
+                "=",
+                "\"FadeIn\""
               ],
               "subInstructions": []
             }
@@ -653,7 +652,6 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "string": "The sprite fading in!",
           "font": "",
@@ -670,7 +668,6 @@
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
-          "effects": [],
           "behaviors": [],
           "animations": [
             {
@@ -709,21 +706,6 @@
         {
           "disabled": false,
           "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "As long the value of Fade is < 0.5, we are increasing the value of Fade and set the opacity using sinus. \nBecause at the beginning the value of Fade is 0, it makes the opacity of the sprite to be 0, and then it is fading in",
-          "comment2": ""
-        },
-        {
-          "disabled": false,
-          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -741,10 +723,10 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ModVarScene"
+                "value": "Opacity"
               },
               "parameters": [
-                "Fade",
+                "kenney",
                 "=",
                 "0"
               ],
@@ -756,34 +738,24 @@
         {
           "disabled": false,
           "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Lerp is used to smoothly fade in and out",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "VarScene"
-              },
-              "parameters": [
-                "Fade",
-                "<",
-                "0.5"
-              ],
-              "subInstructions": []
-            }
-          ],
+          "conditions": [],
           "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "Fade",
-                "+",
-                "0.1*TimeDelta()"
-              ],
-              "subInstructions": []
-            },
             {
               "type": {
                 "inverted": false,
@@ -792,7 +764,7 @@
               "parameters": [
                 "kenney",
                 "=",
-                "sin( Variable(Fade)*3.14159 )*255"
+                "lerp(kenney.Opacity(), 255, 0.02)"
               ],
               "subInstructions": []
             }
