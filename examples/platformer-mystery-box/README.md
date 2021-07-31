@@ -1,0 +1,1 @@
+This example shows you how to make a MysteryBox for Platformer game where players can bang their head to get items.
