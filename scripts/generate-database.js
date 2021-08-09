@@ -2,6 +2,7 @@
 const shell = require('shelljs');
 const path = require('path');
 const fs = require('fs').promises;
+const { constants } = require('fs');
 const crypto = require('crypto');
 const {
   readFileTree,
@@ -127,14 +128,48 @@ const updateResources = (gd, project, baseUrl) => {
 };
 
 /**
+ * Check that the resources in the project all have an existing file
+ * in the project folder.
+ * @param {gdProject} project
+ * @param {string} projectFolderPath
+ */
+const checkProjectResourceFiles = async (project, projectFolderPath) => {
+  /** @type {string[]} */
+  const errors = [];
+
+  const resourcesManager = project.getResourcesManager();
+  const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
+  await Promise.all(
+    allResourceNames.map(
+      /** @param {string} resourceName */
+      async (resourceName) => {
+        const resource = resourcesManager.getResource(resourceName);
+        const resourceFile = resource.getFile();
+
+        try {
+          await fs.access(
+            path.join(projectFolderPath, resourceFile),
+            constants.R_OK
+          );
+        } catch (error) {
+          errors.push(`${resourceFile} not found.`);
+        }
+      }
+    )
+  );
+
+  return errors;
+};
+
+/**
  * Extract the information about the example games from the examples folder.
  * @param {libGDevelop} gd
  * @param {Record<string, gdPlatformExtension>} platformExtensionsMap
  * @param {Object.<string, DreeWithMetadata>} allFiles
  * @param {DreeWithMetadata[]} allExampleFiles
- * @returns {{allExamples: Example[], allExampleTags: Set<string>, errors: Error[]}}
+ * @returns {Promise<{allExamples: Example[], allExampleTags: Set<string>, errors: Error[]}>}
  */
-const extractExamples = (
+const extractExamples = async (
   gd,
   platformExtensionsMap,
   allFiles,
@@ -146,12 +181,11 @@ const extractExamples = (
   /** @type {Set<string>} */
   const allExampleTags = new Set();
 
-  /** @type {Example[]} */
-  // @ts-ignore
-  const allExamples = allExampleFiles
-    .map(
+  /** @type {Array<Example | null>} */
+  const allExamplesOrNulls = await Promise.all(
+    allExampleFiles.map(
       /** @param {DreeWithMetadata} fileWithMetadata */
-      (fileWithMetadata) => {
+      async (fileWithMetadata) => {
         // Analyze the project
         const projectObject = fileWithMetadata.parsedContent;
         if (!projectObject) {
@@ -219,13 +253,30 @@ const extractExamples = (
         ];
         tags.forEach((tag) => allExampleTags.add(tag));
 
-        return {
+        const resourceErrors = await checkProjectResourceFiles(
+          project,
+          gameFolderPath
+        );
+        if (resourceErrors.length > 0) {
+          errors.push(
+            new Error(
+              `Resource errors in ${gameFolderPath}:\n\n${resourceErrors.join(
+                '\n\n'
+              )}`
+            )
+          );
+          return null;
+        }
+
+        /** @type {Example} */
+        const example = {
           id: getExampleUniqueId(fileWithMetadata.name, fileWithMetadata.tags),
           name: formatExampleName(
             path.basename(fileWithMetadata.name, '.json')
           ),
           shortDescription,
           description,
+          authors: [], // TODO: parse the authors from the project author field.
           tags,
           usedExtensions,
           eventsBasedExtensions,
@@ -236,11 +287,18 @@ const extractExamples = (
           projectFileUrl: getResourceUrl(fileWithMetadata.path),
           gdevelopVersion: '', //TODO: set to the GDevelop version used to author the example?
         };
+
+        return example;
       }
     )
-    .filter(Boolean);
+  );
 
-  return { allExamples, allExampleTags, errors };
+  return {
+    // @ts-ignore
+    allExamples: allExamplesOrNulls.filter(Boolean),
+    allExampleTags,
+    errors,
+  };
 };
 
 /**
@@ -367,7 +425,7 @@ const createPlatformExtensionsMap = (gd) => {
   const allExampleFiles = getAllExampleFiles(allFiles);
   const platformExtensionsMap = createPlatformExtensionsMap(gd);
 
-  const { allExamples, allExampleTags, errors } = extractExamples(
+  const { allExamples, allExampleTags, errors } = await extractExamples(
     gd,
     platformExtensionsMap,
     allFiles,

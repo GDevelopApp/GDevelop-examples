@@ -13,6 +13,9 @@ export interface Example {
   description: string;
   projectFileUrl: string;
   authors: string[];
+
+  usedExtensions: Array<{ name: string; fullName: string }>;
+  eventsBasedExtensions: Array<{ name: string; fullName: string }>;
 }
 
 /**
