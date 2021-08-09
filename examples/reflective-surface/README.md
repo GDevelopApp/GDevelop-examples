@@ -1,0 +1,1 @@
+A simple scene with reflection on water. Show how to use the Reflection extension.

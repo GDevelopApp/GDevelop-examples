@@ -1,1 +1,1 @@
-Show how to move a ball like if it's attracted by a magnet.
+2 scenes showing examples of how to use a magnetic attraction effect. One with a ball attracted by a magnet, one with a player who attracts coins.
