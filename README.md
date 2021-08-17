@@ -20,10 +20,8 @@ This repository hosts the example projects for GDevelop.
 If you've created an example with GDevelop, you can submit it to be shared with the rest of the community.
 
 1. **Create your game** with GDevelop.
-2. Ensure you have the basic requirements ready:
-    - The **game name** and **author name** are properly filled in the properties of the game.
-    - Create a `README.md` file and enter the description of what the example is doing/useful for.
-    - Create a `thumbnail.png` file containing the icon of your example.
+2. Make sure to follow the [requirements and best practices on this page](http://wiki.compilgames.net/doku.php/gdevelop5/community/guide-for-submitting-an-example).
+  > Note that for now, we're trying to keep a fairly high quality bar for examples, so you might be asked to adapt your game according to reviewer feedbacks. Don't feel bad about this! This is normal process and here to help making examples as good as possible for new users. If we take too much time to review your example, you can send a ping on the issue. ⏰
 3. **Export** your game and all its resources to a zip file (you can save it in a new folder and zip this folder).
 4. Submit it! You can either [submit it here](https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose), attaching the _zip file_.
 
