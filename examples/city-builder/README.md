@@ -1,1 +1,1 @@
-Show how to evaluate distance by roads to define rules for city builders
+Shows how to evaluate the distances between multiple types of objects such as roads or rivers to define rules for city builders.
