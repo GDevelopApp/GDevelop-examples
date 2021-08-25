@@ -1,0 +1,1 @@
+A simple minesweeper-like game where the player must place flags on suspected mine locations.
