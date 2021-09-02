@@ -1,0 +1,1 @@
+An example of Yarn dialogs, accept quests, custom avatars for NPCs, object picking and locked doors to open for help the princess.
