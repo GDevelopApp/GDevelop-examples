@@ -239,9 +239,12 @@ const extractExamples = async (
           );
           return null;
         }
-        const shortDescription =
-          readmeFileWithMetadata.parsedContent.split('\n\n')[0];
-        const description = readmeFileWithMetadata.parsedContent
+        const readmeFileContent = readmeFileWithMetadata.parsedContent.replace(
+          /\r\n/g,
+          '\n'
+        );
+        const shortDescription = readmeFileContent.split('\n\n')[0];
+        const description = readmeFileContent
           .split('\n\n')
           .slice(1)
           .join('\n\n');
