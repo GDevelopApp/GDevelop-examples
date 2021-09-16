@@ -1,0 +1,1 @@
+The example is a basic way to save and load checkpoints.
