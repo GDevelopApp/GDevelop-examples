@@ -7,12 +7,12 @@ export interface Example {
   shortDescription: string;
   license: string;
   tags: string[];
+  authorIds: string[];
   previewImageUrls: string[];
   gdevelopVersion: string;
 
   description: string;
   projectFileUrl: string;
-  authors: string[];
 
   usedExtensions: Array<{ name: string; fullName: string }>;
   eventsBasedExtensions: Array<{ name: string; fullName: string }>;
@@ -28,6 +28,7 @@ export interface ExampleShortHeader {
   shortDescription: string;
   license: string;
   tags: string[];
+  authorIds: string[];
   previewImageUrls: string[];
   gdevelopVersion: string;
 }

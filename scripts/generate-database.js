@@ -256,6 +256,8 @@ const extractExamples = async (
         ];
         tags.forEach((tag) => allExampleTags.add(tag));
 
+        const authorIds = project.getAuthorIds().toJSArray();
+
         const resourceErrors = await checkProjectResourceFiles(
           project,
           gameFolderPath
@@ -279,7 +281,7 @@ const extractExamples = async (
           ),
           shortDescription,
           description,
-          authors: [], // TODO: parse the authors from the project author field.
+          authorIds,
           tags,
           usedExtensions,
           eventsBasedExtensions,
@@ -356,6 +358,7 @@ const generateShortHeaders = (allExamples) => {
     shortDescription: example.shortDescription,
     license: example.license,
     previewImageUrls: example.previewImageUrls,
+    authorIds: example.authorIds,
     tags: example.tags,
     gdevelopVersion: example.gdevelopVersion,
   }));
