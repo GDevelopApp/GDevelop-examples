@@ -3319,6 +3319,21 @@
         {
           "disabled": false,
           "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "The Klondike Solitaire has several card stacks:\n- 4 Fundations that must contain ace to king of the same suite to win the game\n- 7 stacks that compose the Tableau, they are setup in the shape of a triangle\n- the Stock that contains remaining cards\n- the Deck that contains the cards picked from the stock (there is only one card in this example, but some variations have 3 cards)\n- the Discard where the card from the Deck goes if another one is picked from the Stock.\n\nSelection and Swap stacks only use is to move cards from one stack to another one in some situations.",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -4510,7 +4525,7 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "The card is flipped by the Flip3D behavior.\nSort the cards on z-order the other way around.\nThe intial z-order is: 1 + (PlayingCard::MaxValue() + 1) * Variable(fondationId) +  Card.PlayingCard::Value()\nAdding: PlayingCard::MaxValue() - 2 * Card.PlayingCard::Value()\nMake it: 1 + (PlayingCard::MaxValue() + 1) * Variable(fondationId) +  PlayingCard::MaxValue() - Card.PlayingCard::Value()\nSo Now, the king is at the lowest position and the ace at the highest one.",
+                  "comment": "The card is flipped by the Flip3D behavior.\nSort the cards on z-order the other way around.\nThe initial z-order is: 1 + (PlayingCard::MaxValue() + 1) * Variable(fondationId) +  Card.PlayingCard::Value()\nAdding: PlayingCard::MaxValue() - 2 * Card.PlayingCard::Value()\nMake it: 1 + (PlayingCard::MaxValue() + 1) * Variable(fondationId) +  PlayingCard::MaxValue() - Card.PlayingCard::Value()\nSo now, the king is at the lowest position and the ace at the highest one.",
                   "comment2": ""
                 },
                 {
@@ -6395,6 +6410,18 @@
                                         "\"Dragging Layer\""
                                       ],
                                       "subInstructions": []
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ActivateBehavior"
+                                      },
+                                      "parameters": [
+                                        "Card",
+                                        "Draggable",
+                                        ""
+                                      ],
+                                      "subInstructions": []
                                     }
                                   ],
                                   "events": []
@@ -6974,7 +7001,19 @@
                                           "folded": false,
                                           "type": "BuiltinCommonInstructions::ForEach",
                                           "object": "Card",
-                                          "conditions": [],
+                                          "conditions": [
+                                            {
+                                              "type": {
+                                                "inverted": true,
+                                                "value": "AnimationName"
+                                              },
+                                              "parameters": [
+                                                "Card",
+                                                "\"Back\""
+                                              ],
+                                              "subInstructions": []
+                                            }
+                                          ],
                                           "actions": [
                                             {
                                               "type": {
@@ -7022,6 +7061,18 @@
                                                 "Card",
                                                 "Sticker",
                                                 ""
+                                              ],
+                                              "subInstructions": []
+                                            },
+                                            {
+                                              "type": {
+                                                "inverted": false,
+                                                "value": "ActivateBehavior"
+                                              },
+                                              "parameters": [
+                                                "Card",
+                                                "Draggable",
+                                                "yes"
                                               ],
                                               "subInstructions": []
                                             }
@@ -7488,6 +7539,92 @@
                 }
               ],
               "parameters": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Release cards when several ones were moved together.",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CancellableDraggable::CancellableDraggable::DraggingIsCancelled"
+                  },
+                  "parameters": [
+                    "Card",
+                    "CancellableDragable",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AjoutObjConcern"
+                  },
+                  "parameters": [
+                    "",
+                    "Card"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Sticker::IsStuck"
+                  },
+                  "parameters": [
+                    "",
+                    "Card",
+                    "Sticker",
+                    "Glue",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Sticker::Sticker::Unstick"
+                  },
+                  "parameters": [
+                    "Card",
+                    "Sticker",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Card",
+                    "Draggable",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             }
           ],
           "parameters": []
@@ -10582,6 +10719,40 @@
                     }
                   ],
                   "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::HasFinished"
+                      },
+                      "parameters": [
+                        "Object",
+                        "TweenBehavior",
+                        "\"__CancellableDraggable\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::RemoveTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "TweenBehavior",
+                        "\"__CancellableDraggable\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
                 }
               ],
               "parameters": [
@@ -10727,7 +10898,7 @@
               "objectGroups": []
             },
             {
-              "description": "Dragging is cancelled, the object is returning to its original position.",
+              "description": "Dragging is cancelled, the object has returned to its original position.",
               "fullName": "Dragging is cancelled",
               "functionType": "Condition",
               "name": "DraggingIsCancelled",
