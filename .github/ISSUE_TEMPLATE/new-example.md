@@ -2,7 +2,7 @@
 name: New example
 about: Submit a new example to be added to the repository
 title: New example
-labels: ''
+labels: 'New example'
 assignees: ''
 
 ---
@@ -19,7 +19,7 @@ A clear and concise description of what the example is, how useful it is.
 ## Checklist
 
 - [ ] My game has a proper name in the game properties. 
-- [ ] My game package name behind with `com.example.`.
+- [ ] My game package name behind with `com.gdexample.`.
 - [ ] My game has all events unfolded.
 - [ ] I've added myself as the author in the game properties.
 - [ ] I've included a file called "README.md" with a description in proper English, explaining what this example is doing.
