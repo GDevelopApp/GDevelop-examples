@@ -18,6 +18,7 @@ A clear and concise description of what the example is, how useful it is.
 
 ## Checklist
 
+- [ ] I've followed all of [the best practices](http://wiki.compilgames.net/doku.php/gdevelop5/community/guide-for-submitting-an-example).
 - [ ] My game has a proper name in the game properties. 
 - [ ] My game package name behind with `com.example.`.
 - [ ] My game has all events unfolded.
