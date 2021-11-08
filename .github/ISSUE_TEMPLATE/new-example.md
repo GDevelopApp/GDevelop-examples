@@ -2,7 +2,7 @@
 name: New example
 about: Submit a new example to be added to the repository
 title: New example
-labels: ''
+labels: '✨ New example'
 assignees: ''
 
 ---
