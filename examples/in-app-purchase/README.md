@@ -1,0 +1,1 @@
+Example showing how to use the In-App Purchase extension in a game to sell items that can be consumable (health pack, extra ammo pack, new lives, etc...) or non consumable products (a ad-free version of your game, a premium version with unlocked levels, etc...).
