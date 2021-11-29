@@ -1,0 +1,1 @@
+This example shows how to link and create a hook/web between objects and how to draw it.
