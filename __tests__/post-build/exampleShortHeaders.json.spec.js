@@ -38,6 +38,7 @@ describe('filters.json post build checks', () => {
       ],
       tags: [
         'platformer',
+        'Starter',
         '',
         'Anchor',
         'Audio',

@@ -162,6 +162,28 @@ const checkProjectResourceFiles = async (project, projectFolderPath) => {
 };
 
 /**
+ * Computes a list of static tags to add to the example based on its name.
+ * @param {string} exampleName
+ * @returns {string[]}
+ */
+const getStaticTags = (exampleName) => {
+  const staticTags = [];
+  const starterNames = [
+    'Platformer',
+    'Space shooter',
+    'Particle effects demo',
+    'Isometric game',
+    'Downhill bike physics demo',
+    'Game feel demo',
+    'Geometry monster',
+    'Pairs',
+  ];
+  if (starterNames.includes(exampleName)) staticTags.push('Starter');
+
+  return staticTags;
+};
+
+/**
  * Extract the information about the example games from the examples folder.
  * @param {libGDevelop} gd
  * @param {Record<string, gdPlatformExtension>} platformExtensionsMap
@@ -243,6 +265,9 @@ const extractExamples = async (
           /\r\n/g,
           '\n'
         );
+        const exampleName = formatExampleName(
+          path.basename(fileWithMetadata.name, '.json')
+        );
         const shortDescription = readmeFileContent.split('\n\n')[0];
         const description = readmeFileContent
           .split('\n\n')
@@ -251,6 +276,7 @@ const extractExamples = async (
 
         const tags = [
           ...fileWithMetadata.tags,
+          ...getStaticTags(exampleName),
           ...usedExtensions.map(({ fullName }) => fullName),
           ...eventsBasedExtensions.map(({ fullName }) => fullName),
         ];
@@ -276,9 +302,7 @@ const extractExamples = async (
         /** @type {Example} */
         const example = {
           id: getExampleUniqueId(fileWithMetadata.name, fileWithMetadata.tags),
-          name: formatExampleName(
-            path.basename(fileWithMetadata.name, '.json')
-          ),
+          name: exampleName,
           shortDescription,
           description,
           authorIds,
