@@ -184,6 +184,21 @@ const getStaticTags = (exampleName) => {
 };
 
 /**
+ * @param {string} gameFolderPath
+ * @param {Object.<string, DreeWithMetadata>} allFiles
+ * @returns {string[]}
+ */
+const getPreviewImageUrls = (gameFolderPath, allFiles) => {
+  const imageUrls = [];
+  for (const imageName of ['preview.png', 'thumbnail.png']) {
+    const imagePath = path.join(gameFolderPath, imageName);
+    const hasImage = !!allFiles[imagePath];
+    if (hasImage) imageUrls.push(getResourceUrl(imagePath));
+  }
+  return imageUrls;
+};
+
+/**
  * Extract the information about the example games from the examples folder.
  * @param {libGDevelop} gd
  * @param {Record<string, gdPlatformExtension>} platformExtensionsMap
@@ -246,8 +261,6 @@ const extractExamples = async (
         // Extract example informations
         const gameFolderPath = path.dirname(fileWithMetadata.path);
         const readmePath = path.join(gameFolderPath, 'README.md');
-        const thumbnailPath = path.join(gameFolderPath, 'thumbnail.png');
-        const hasThumbnailFile = !!allFiles[thumbnailPath];
         const readmeFileWithMetadata = allFiles[readmePath];
         if (!readmeFileWithMetadata) {
           errors.push(new Error(`Expected a game README at ${readmePath}.`));
@@ -309,9 +322,7 @@ const extractExamples = async (
           tags,
           usedExtensions,
           eventsBasedExtensions,
-          previewImageUrls: hasThumbnailFile
-            ? [getResourceUrl(thumbnailPath)]
-            : [],
+          previewImageUrls: getPreviewImageUrls(gameFolderPath, allFiles),
           license: fileWithMetadata.license,
           projectFileUrl: getResourceUrl(fileWithMetadata.path),
           gdevelopVersion: '', //TODO: set to the GDevelop version used to author the example?
