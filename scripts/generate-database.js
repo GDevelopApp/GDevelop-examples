@@ -195,7 +195,7 @@ const getPreviewImageUrls = (gameFolderPath, allFiles) => {
     const hasImage = !!allFiles[imagePath];
     if (hasImage) imageUrls.push(getResourceUrl(imagePath));
   }
-  return imageUrls
+  return imageUrls;
 };
 
 /**
