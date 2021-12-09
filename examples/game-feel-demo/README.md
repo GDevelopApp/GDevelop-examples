@@ -1,3 +1,3 @@
 A demo showing how to enhance the "game feel" of your project: VFX, shot trail, ambient sounds and SFX, screenshake, wobble...
 
-Have you ever felt like you were actually inside a video game when playing it? Discover what GDevelop provides to immerse your future players in your video game!
+Have you ever felt like you were actually inside a video game when playing it? Discover GDevelop's capabilities and immerse future players in your next game!
