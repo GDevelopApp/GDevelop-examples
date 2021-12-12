@@ -1,1 +1,1 @@
-Split screen multiplayer in two events.
+A split screen multiplayer made in just two events.
