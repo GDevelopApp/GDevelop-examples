@@ -1,0 +1,1 @@
+Show how to use the "Marching Squares" extension to paint platforms and jump on them.
