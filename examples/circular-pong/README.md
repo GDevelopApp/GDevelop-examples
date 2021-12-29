@@ -1,0 +1,1 @@
+This example will show you how to make a circular pong game. This could be expanded into a high score type game, or be a minigame in another game.
