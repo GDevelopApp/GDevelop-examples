@@ -171,6 +171,7 @@ const getStaticTags = (exampleName) => {
   const starterNames = [
     'Platformer',
     'Space shooter',
+    'Space asteroids',
     'Particle effects demo',
     'Isometric game',
     'Downhill bike physics demo',
