@@ -1,0 +1,1 @@
+In this example you can test the Text Input object and few conditions/actions related to this object.
