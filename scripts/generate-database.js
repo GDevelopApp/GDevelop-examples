@@ -260,6 +260,7 @@ const extractExamples = async (
         }
 
         // Extract example informations
+        const slug = path.basename(fileWithMetadata.name, '.json');
         const gameFolderPath = path.dirname(fileWithMetadata.path);
         const readmePath = path.join(gameFolderPath, 'README.md');
         const readmeFileWithMetadata = allFiles[readmePath];
@@ -279,9 +280,7 @@ const extractExamples = async (
           /\r\n/g,
           '\n'
         );
-        const exampleName = formatExampleName(
-          path.basename(fileWithMetadata.name, '.json')
-        );
+        const exampleName = formatExampleName(slug);
         const shortDescription = readmeFileContent.split('\n\n')[0];
         const description = readmeFileContent
           .split('\n\n')
@@ -316,6 +315,7 @@ const extractExamples = async (
         /** @type {Example} */
         const example = {
           id: getExampleUniqueId(fileWithMetadata.name, fileWithMetadata.tags),
+          slug,
           name: exampleName,
           shortDescription,
           description,
@@ -391,6 +391,7 @@ const generateShortHeaders = (allExamples) => {
   return allExamples.map((example) => ({
     id: example.id,
     name: example.name,
+    slug: example.slug,
     shortDescription: example.shortDescription,
     license: example.license,
     previewImageUrls: example.previewImageUrls,

@@ -28,6 +28,7 @@ describe('filters.json post build checks', () => {
 
     expect(platformer).toEqual({
       id: '244c50f590aaef77fda8c883e95e64c728fc75be0825e42093b275b56320667f',
+      slug: 'platformer',
       name: 'Platformer',
       authorIds: [],
       shortDescription:
