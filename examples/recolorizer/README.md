@@ -1,0 +1,1 @@
+Show how to change objects colors with the "Recolorizer" extension.
