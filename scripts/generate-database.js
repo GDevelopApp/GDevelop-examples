@@ -161,25 +161,26 @@ const checkProjectResourceFiles = async (project, projectFolderPath) => {
   return errors;
 };
 
+const sortedStarterSlugs = new Set([
+  'platformer',
+  'space-shooter',
+  'downhill-bike-physics-demo',
+  'space-asteroids',
+  'geometry-monster',
+  'pairs',
+  'isometric-game',
+  'particle-effects-demo',
+  'game-feel-demo',
+]);
+
 /**
- * Computes a list of static tags to add to the example based on its name.
- * @param {string} exampleName
+ * Computes a list of static tags to add to the example based on its slug.
+ * @param {string} exampleSlug
  * @returns {string[]}
  */
-const getStaticTags = (exampleName) => {
+const getStaticTags = (exampleSlug) => {
   const staticTags = [];
-  const starterNames = [
-    'Platformer',
-    'Space shooter',
-    'Space asteroids',
-    'Particle effects demo',
-    'Isometric game',
-    'Downhill bike physics demo',
-    'Game feel demo',
-    'Geometry monster',
-    'Pairs',
-  ];
-  if (starterNames.includes(exampleName)) staticTags.push('Starter');
+  if (sortedStarterSlugs.has(exampleSlug)) staticTags.push('Starter');
 
   return staticTags;
 };
@@ -289,7 +290,7 @@ const extractExamples = async (
 
         const tags = [
           ...fileWithMetadata.tags,
-          ...getStaticTags(exampleName),
+          ...getStaticTags(slug),
           ...usedExtensions.map(({ fullName }) => fullName),
           ...eventsBasedExtensions.map(({ fullName }) => fullName),
         ];
@@ -383,12 +384,27 @@ const updateExampleFiles = async (gd, allExampleFiles) => {
 };
 
 /**
- * Generate the "short headers" for the examples.
+ * Generate the "short headers" for the examples, with starters
+ * listed first and in the order specified by `sortedStarterSlugs`.
  * @param {Example[]} allExamples
  * @return {ExampleShortHeader[]}
  */
-const generateShortHeaders = (allExamples) => {
-  return allExamples.map((example) => ({
+const generateSortedShortHeaders = (allExamples) => {
+  const starters = allExamples.filter(({ slug }) =>
+    sortedStarterSlugs.has(slug)
+  );
+  const nonStarters = allExamples.filter(
+    ({ slug }) => !sortedStarterSlugs.has(slug)
+  );
+  const sortedStarterSlugsArray = [...sortedStarterSlugs];
+  const sortedStarters = [...starters].sort((example1, example2) => {
+    return (
+      sortedStarterSlugsArray.indexOf(example1.slug) -
+      sortedStarterSlugsArray.indexOf(example2.slug)
+    );
+  });
+
+  return [...sortedStarters, ...nonStarters].map((example) => ({
     id: example.id,
     name: example.name,
     slug: example.slug,
@@ -500,7 +516,7 @@ const createPlatformExtensionsMap = (gd) => {
       )
     );
 
-    const exampleShortHeaders = generateShortHeaders(allExamples);
+    const exampleShortHeaders = generateSortedShortHeaders(allExamples);
     await fs.writeFile(
       path.join(databaseRootPath, 'exampleShortHeaders.json'),
       JSON.stringify(exampleShortHeaders)
