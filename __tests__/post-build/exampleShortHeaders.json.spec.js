@@ -35,6 +35,7 @@ describe('exampleShortHeaders.json post build checks', () => {
         'An example of a basic platformer (Mario-like) game. Jump around and collect as many coins as you can!',
       license: 'MIT',
       previewImageUrls: [
+        'https://resources.gdevelop-app.com/examples/platformer/preview.png',
         'https://resources.gdevelop-app.com/examples/platformer/thumbnail.png',
       ],
       tags: [
