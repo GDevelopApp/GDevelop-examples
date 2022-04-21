@@ -13,7 +13,7 @@ const getExampleShortHeaders = async () => {
   return exampleShortHeaders;
 };
 
-describe('filters.json post build checks', () => {
+describe('exampleShortHeaders.json post build checks', () => {
   test('defaultTags', async () => {
     const exampleShortHeaders = await getExampleShortHeaders();
 
@@ -30,36 +30,39 @@ describe('filters.json post build checks', () => {
       id: '244c50f590aaef77fda8c883e95e64c728fc75be0825e42093b275b56320667f',
       slug: 'platformer',
       name: 'Platformer',
-      authorIds: [],
+      authorIds: ['1vKGH4y6Y5Myz3MaqRdwpju3arq2'],
       shortDescription:
         'An example of a basic platformer (Mario-like) game. Jump around and collect as many coins as you can!',
       license: 'MIT',
       previewImageUrls: [
-        'https://resources.gdevelop-app.com/examples/platformer/preview.png',
         'https://resources.gdevelop-app.com/examples/platformer/thumbnail.png',
       ],
       tags: [
         'platformer',
         'Starter',
         '',
-        'Anchor',
+        'Event functions',
         'Sounds and musics',
         'Layers and cameras',
-        'Conversion',
         'Events and control flow',
-        'Keyboard',
+        'Storage',
+        'Mathematical tools',
         'Mouse and touch',
         'Objects',
         'Scene',
         'Variables',
-        'Game window and resolution',
+        'Particle system',
         'Platform behavior',
         'Sprite',
         'System information',
         'Text object',
         'Tiled Sprite Object',
-        'Tweening',
-        'Parallax for Tiled Sprite',
+        'Simple Checkpoints',
+        'Rectangular Movement',
+        'Animated Back and Forth Movement',
+        'Shake Object (position, angle, scale)',
+        'Smooth Camera Follow',
+        'Volume Falloff',
       ],
       gdevelopVersion: '',
     });
