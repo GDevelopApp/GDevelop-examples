@@ -794,6 +794,15 @@
         "name": "Dead-8.png",
         "smoothed": true,
         "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "assets/tutorialTouchScreen.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets/tutorialTouchScreen.png",
+        "smoothed": true,
+        "userAdded": false
       }
     ],
     "resourceFolders": []
@@ -844,7 +853,7 @@
           "name": "Swipe",
           "type": "Swipe::Swipe",
           "Time": 0.1,
-          "MinLength": 30,
+          "MinLength": 10,
           "PointStartX": 0,
           "PointStartY": 0,
           "PointEndX": 0,
@@ -2749,7 +2758,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 1,
+        "zoomFactor": 0.8382000000000001,
         "windowMask": false
       },
       "objectsGroups": [],
@@ -2805,8 +2814,8 @@
           "name": "Dino",
           "persistentUuid": "c6452db2-f400-455a-b412-46b40621372b",
           "width": 0,
-          "x": 64,
-          "y": 403,
+          "x": 54,
+          "y": 373,
           "zOrder": 3,
           "numberProperties": [],
           "stringProperties": [],
@@ -2828,7 +2837,7 @@
           "persistentUuid": "59a6a8b0-78a3-4661-85c0-62f4cc9ef72e",
           "width": 960,
           "x": 0,
-          "y": 512,
+          "y": 480,
           "zOrder": 4,
           "numberProperties": [],
           "stringProperties": [],
@@ -3049,7 +3058,7 @@
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "string": "Press any key to start running.",
+          "string": "Press space bar to start running.",
           "font": "Nathaniel-19.otf",
           "characterSize": 30,
           "color": {
@@ -3068,7 +3077,7 @@
           "behaviors": [],
           "animations": [
             {
-              "name": "",
+              "name": "Desktop",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -3078,6 +3087,35 @@
                     {
                       "hasCustomCollisionMask": false,
                       "image": "assets/tutorial.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "TouchScreen",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "assets/tutorialTouchScreen.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -3243,9 +3281,65 @@
                 "0"
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ActivateBehavior"
+              },
+              "parameters": [
+                "Dino",
+                "PlatformerObject",
+                ""
+              ],
+              "subInstructions": []
             }
           ],
-          "events": []
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SystemInfo::HasTouchScreen"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "ScoreText",
+                    "=",
+                    "\"Touch to start running.\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetAnimationName"
+                  },
+                  "parameters": [
+                    "TutorialSprite",
+                    "\"TouchScreen\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
         },
         {
           "disabled": false,
@@ -3269,21 +3363,6 @@
             {
               "disabled": false,
               "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Start the game. We need to start the timers and reset the score so as to not keep the old one if a player restarts.",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -3296,10 +3375,11 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "AnyKeyPressed"
+                        "value": "KeyPressed"
                       },
                       "parameters": [
-                        ""
+                        "",
+                        "Space"
                       ],
                       "subInstructions": []
                     },
@@ -3395,6 +3475,18 @@
                       "parameters": [
                         "Dino",
                         "\"Run\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ActivateBehavior"
+                      },
+                      "parameters": [
+                        "Dino",
+                        "PlatformerObject",
+                        "yes"
                       ],
                       "subInstructions": []
                     },
@@ -3940,7 +4032,7 @@
                           "parameters": [
                             "",
                             "CactusObstacle",
-                            "RandomInRange(ScreenWidth() + 125, ScreenWidth() + 175)",
+                            "RandomInRange(75, 125) + SceneWindowWidth()",
                             "Platform.BoundingBoxTop()",
                             ""
                           ],
@@ -4004,7 +4096,7 @@
                           "parameters": [
                             "",
                             "IslandObstacle",
-                            "RandomInRange(ScreenWidth() + 125, ScreenWidth() + 175)",
+                            "RandomInRange(75, 125) + SceneWindowWidth()",
                             "Platform.BoundingBoxTop() - 64",
                             ""
                           ],
@@ -4035,36 +4127,9 @@
                             "1"
                           ],
                           "subInstructions": []
-                        },
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "DebuggerTools::ConsoleLog"
-                          },
-                          "parameters": [
-                            "ToString(IslandObstacle.PointX(\"Origin\")) + \" \" + ToString(IslandObstacle.PointY(\"Origin\")) + \" \" + ToString(Platform.BoundingBoxTop())",
-                            "\"info\"",
-                            ""
-                          ],
-                          "subInstructions": []
                         }
                       ],
                       "events": [
-                        {
-                          "disabled": false,
-                          "folded": false,
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "For the Y position of the reward, we first get the Y position for a reward under the island (Platform.BoundingBoxTop() - BonusObject.Height()), then, depending on the value of the Reward variable of IslandObstacle (that can be either 1 or 0), we substract the gap between the top edge of the Island's bounding box and the top edge of the Platform's bounding box (Platform.BoundingBoxTop() - IslandObstacle.BoundingBoxTop()). Note that we substract because the Y index increases when we move objects down.",
-                          "comment2": ""
-                        },
                         {
                           "disabled": false,
                           "folded": false,
@@ -4244,7 +4309,7 @@
                               "parameters": [
                                 "",
                                 "CactusObstacle",
-                                "ScreenWidth()+100+Variable(SpawnedCactusInField)*70",
+                                "100 + SceneWindowWidth()+Variable(SpawnedCactusInField)*70",
                                 "Platform.BoundingBoxTop()",
                                 ""
                               ],
@@ -4650,10 +4715,6 @@
         {
           "name": "Swipe",
           "type": "Swipe::Swipe"
-        },
-        {
-          "name": "Tween",
-          "type": "Tween::TweenBehavior"
         }
       ]
     },
@@ -5868,7 +5929,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.4917999999999995,
+        "zoomFactor": 0.6047999999999996,
         "windowMask": false
       },
       "objectsGroups": [
@@ -7825,9 +7886,9 @@
                         "value": "BuiltinCommonInstructions::CompareNumbers"
                       },
                       "parameters": [
-                        "0",
+                        "Dino.Swipe::StartPointY() - Dino.Swipe::EndPointY()",
                         ">",
-                        "Dino.Swipe::DirectionY()"
+                        "0"
                       ],
                       "subInstructions": []
                     }
@@ -7858,9 +7919,9 @@
                         "value": "BuiltinCommonInstructions::CompareNumbers"
                       },
                       "parameters": [
-                        "0",
+                        "Dino.Swipe::StartPointY() - Dino.Swipe::EndPointY()",
                         "<",
-                        "Dino.Swipe::DirectionY()"
+                        "0"
                       ],
                       "subInstructions": []
                     }
@@ -7869,11 +7930,23 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "PlatformBehavior::SimulateDownKey"
+                        "value": "SetAnimationName"
                       },
                       "parameters": [
                         "Dino",
-                        "PlatformerObject"
+                        "\"Duck\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "DustParticles",
+                        "=",
+                        "Dino.BoundingBoxRight()"
                       ],
                       "subInstructions": []
                     }
