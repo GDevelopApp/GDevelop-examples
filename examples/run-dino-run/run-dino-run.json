@@ -902,6 +902,7 @@
           "type": "IsOnScreen::InOnScreen"
         },
         {
+          "ignoreDefaultControls": true,
           "name": "PlatformerObject",
           "type": "PlatformBehavior::PlatformerObjectBehavior",
           "gravity": 2300,
@@ -913,7 +914,6 @@
           "canGrabPlatforms": false,
           "canGrabWithoutMoving": false,
           "deceleration": 1500,
-          "ignoreDefaultControls": false,
           "ladderClimbingSpeed": 150,
           "maxSpeed": 200,
           "slopeMaxAngle": 60,
@@ -2839,9 +2839,9 @@
           "value": 0
         },
         {
-          "name": "GameRunning",
-          "type": "boolean",
-          "value": false
+          "name": "GameStatus",
+          "type": "string",
+          "value": "Preparing"
         },
         {
           "name": "PlayerName",
@@ -2867,11 +2867,6 @@
           "name": "SpawnedCactusInField",
           "type": "number",
           "value": 0
-        },
-        {
-          "name": "GameStarted",
-          "type": "boolean",
-          "value": false
         }
       ],
       "instances": [
@@ -3208,7 +3203,7 @@
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "string": "Press space bar to start running.",
+          "string": "Press any key to start running.",
           "font": "Nathaniel-19.otf",
           "characterSize": 30,
           "color": {
@@ -3738,11 +3733,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "SceneVariableAsBoolean"
+                "value": "VarSceneTxt"
               },
               "parameters": [
-                "GameRunning",
-                "False"
+                "GameStatus",
+                "=",
+                "\"Preparing\""
               ],
               "subInstructions": []
             }
@@ -3764,11 +3760,10 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "KeyPressed"
+                        "value": "AnyKeyPressed"
                       },
                       "parameters": [
-                        "",
-                        "Space"
+                        ""
                       ],
                       "subInstructions": []
                     },
@@ -3794,36 +3789,18 @@
                     "False"
                   ],
                   "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
                 }
               ],
               "actions": [
                 {
                   "type": {
                     "inverted": false,
-                    "value": "SetSceneVariableAsBoolean"
+                    "value": "ModVarSceneTxt"
                   },
                   "parameters": [
-                    "GameRunning",
-                    "True"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SetSceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "GameStarted",
-                    "True"
+                    "GameStatus",
+                    "=",
+                    "\"Playing\""
                   ],
                   "subInstructions": []
                 },
@@ -3916,57 +3893,6 @@
                   "target": "DustEmitterSetup"
                 }
               ]
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "AnimationName"
-                  },
-                  "parameters": [
-                    "Dino",
-                    "\"Dead\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "AnimationEnded"
-                  },
-                  "parameters": [
-                    "Dino"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Scene"
-                  },
-                  "parameters": [
-                    "",
-                    "\"GameOver\"",
-                    "yes"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
             }
           ]
         },
@@ -3978,11 +3904,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "SceneVariableAsBoolean"
+                "value": "VarSceneTxt"
               },
               "parameters": [
-                "GameRunning",
-                "True"
+                "GameStatus",
+                "=",
+                "\"Playing\""
               ],
               "subInstructions": []
             }
@@ -4043,7 +3970,7 @@
                   "parameters": [
                     "Background",
                     "+",
-                    "1 + (Variable(ObstacleSpeed)/500)*TimeDelta()"
+                    "(Variable(ObstacleSpeed)/500)*60*TimeDelta()"
                   ],
                   "subInstructions": []
                 }
@@ -4114,7 +4041,7 @@
               "include": {
                 "includeConfig": 0
               },
-              "target": "DinoAnimation"
+              "target": "DinoMovement"
             },
             {
               "colorB": 228,
@@ -4399,6 +4326,17 @@
                         "ObstacleType",
                         "=",
                         "RandomInRange(0,2)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ResetTimer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"obstacle_spawn\""
                       ],
                       "subInstructions": []
                     }
@@ -4764,26 +4702,6 @@
                           "events": []
                         }
                       ]
-                    },
-                    {
-                      "disabled": false,
-                      "folded": false,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "ResetTimer"
-                          },
-                          "parameters": [
-                            "",
-                            "\"obstacle_spawn\""
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "events": []
                     }
                   ]
                 }
@@ -4914,11 +4832,12 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "SetSceneVariableAsBoolean"
+                        "value": "ModVarSceneTxt"
                       },
                       "parameters": [
-                        "GameRunning",
-                        "False"
+                        "GameStatus",
+                        "=",
+                        "\"Dead\""
                       ],
                       "subInstructions": []
                     },
@@ -5044,6 +4963,79 @@
                 }
               ],
               "parameters": []
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "VarSceneTxt"
+              },
+              "parameters": [
+                "GameStatus",
+                "=",
+                "\"Dead\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AnimationName"
+                  },
+                  "parameters": [
+                    "Dino",
+                    "\"Dead\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AnimationEnded"
+                  },
+                  "parameters": [
+                    "Dino"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Scene"
+                  },
+                  "parameters": [
+                    "",
+                    "\"GameOver\"",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             }
           ]
         }
@@ -5683,18 +5675,6 @@
                 "LeaderboardMusic.mp3",
                 "yes",
                 "70",
-                ""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "DebuggerTools::ConsoleLog"
-              },
-              "parameters": [
-                "GlobalVariableString(PlayerName)",
-                "",
                 ""
               ],
               "subInstructions": []
@@ -7895,38 +7875,8 @@
     {
       "associatedLayout": "Game",
       "lastChangeTimeStamp": 0,
-      "name": "DinoAnimation",
+      "name": "DinoMovement",
       "events": [
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": [],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "PlatformBehavior::IgnoreDefaultControls"
-              },
-              "parameters": [
-                "Dino",
-                "PlatformerObject",
-                "yes"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
         {
           "disabled": false,
           "folded": false,
@@ -7959,14 +7909,6 @@
                   "parameters": [
                     "Dino"
                   ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
                   "subInstructions": []
                 }
               ],
