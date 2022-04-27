@@ -6885,7 +6885,7 @@
           "effects": [
             {
               "effectType": "Adjustment",
-              "name": "Status",
+              "name": "Disabled",
               "doubleParameters": {
                 "alpha": 1,
                 "blue": 1,
@@ -6894,7 +6894,7 @@
                 "gamma": 1,
                 "green": 1,
                 "red": 1,
-                "saturation": 1
+                "saturation": 0
               },
               "stringParameters": {},
               "booleanParameters": {}
@@ -7142,6 +7142,29 @@
                 ""
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetSceneVariableAsBoolean"
+              },
+              "parameters": [
+                "ScoreCanBeSaved",
+                "True"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "EnableEffect"
+              },
+              "parameters": [
+                "SubmitButton",
+                "\"Disabled\"",
+                "no"
+              ],
+              "subInstructions": []
             }
           ],
           "events": [
@@ -7196,7 +7219,7 @@
           "colorR": 100,
           "creationTime": 0,
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "name": "Visuals",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -7296,7 +7319,7 @@
           "colorR": 50,
           "creationTime": 0,
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "name": "Buttons",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -7369,12 +7392,23 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "ModVarScene"
+                        "value": "SetSceneVariableAsBoolean"
                       },
                       "parameters": [
-                        "LeaderboardScore",
-                        "=",
-                        "0"
+                        "ScoreCanBeSaved",
+                        "True"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "EnableEffect"
+                      },
+                      "parameters": [
+                        "SubmitButton",
+                        "\"Disabled\"",
+                        "no"
                       ],
                       "subInstructions": []
                     }
@@ -7417,12 +7451,11 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "VarSceneTxt"
+                        "value": "SceneVariableAsBoolean"
                       },
                       "parameters": [
-                        "LeaderboardScore",
-                        "=",
-                        "\"0\""
+                        "ScoreCanBeSaved",
+                        "True"
                       ],
                       "subInstructions": []
                     }
@@ -7438,7 +7471,7 @@
                         "\"2d7c1dd3-3cbc-4c0e-99bf-da35cc181d9d\"",
                         "GlobalVariable(Score)",
                         "PlayerNameInput.Text()",
-                        "LeaderboardScore",
+                        "",
                         ""
                       ],
                       "subInstructions": []
@@ -7452,6 +7485,17 @@
                         "PlayerName",
                         "=",
                         "PlayerNameInput.Text()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "ScoreCanBeSaved",
+                        "False"
                       ],
                       "subInstructions": []
                     }
@@ -7530,7 +7574,7 @@
           "colorR": 12,
           "creationTime": 0,
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "name": "Leaderboard",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -7558,22 +7602,11 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "Leaderboards::HasLastSaveSucceeded"
+                    "value": "SceneVariableAsBoolean"
                   },
                   "parameters": [
-                    "\"2d7c1dd3-3cbc-4c0e-99bf-da35cc181d9d\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarSceneTxt"
-                  },
-                  "parameters": [
-                    "LeaderboardScore",
-                    "!=",
-                    "\"0\""
+                    "ScoreCanBeSaved",
+                    "False"
                   ],
                   "subInstructions": []
                 },
@@ -7590,13 +7623,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "SetEffectDoubleParameter"
+                    "value": "EnableEffect"
                   },
                   "parameters": [
                     "SubmitButton",
-                    "\"Status\"",
-                    "\"saturation\"",
-                    "0"
+                    "\"Disabled\"",
+                    "yes"
                   ],
                   "subInstructions": []
                 }
@@ -7699,7 +7731,51 @@
                   "subInstructions": []
                 }
               ],
-              "events": []
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Leaderboards::HasLastSaveErrored"
+                      },
+                      "parameters": [
+                        "\"2d7c1dd3-3cbc-4c0e-99bf-da35cc181d9d\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "ScoreCanBeSaved",
+                        "True"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "EnableEffect"
+                      },
+                      "parameters": [
+                        "SubmitButton",
+                        "\"Disabled\"",
+                        "no"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
             }
           ],
           "parameters": []
@@ -7756,10 +7832,6 @@
         {
           "name": "PlatformerObject",
           "type": "PlatformBehavior::PlatformerObjectBehavior"
-        },
-        {
-          "name": "Swipe",
-          "type": "Swipe::Swipe"
         }
       ]
     },
