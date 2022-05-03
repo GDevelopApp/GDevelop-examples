@@ -17,8 +17,9 @@
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Multitouch",
+    "description": "This example shows how to create multiple markers when the player touches the screen.",
     "author": "",
     "windowWidth": 800,
     "windowHeight": 600,
@@ -44,6 +45,10 @@
       "showProgressBar": true
     },
     "authorIds": [],
+    "categories": [],
+    "playableDevices": [
+      "mobile"
+    ],
     "extensionProperties": [],
     "platforms": [
       {
@@ -56,7 +61,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "Pointer-Standard.png",
+        "file": "assets/Pointer-Standard.png",
         "kind": "image",
         "metadata": "",
         "name": "Pointer-Standard.png",
@@ -73,8 +78,8 @@
     {
       "b": 209,
       "disableInputWhenNotFocused": true,
-      "mangledName": "New_32scene",
-      "name": "New scene",
+      "mangledName": "Multitouch",
+      "name": "Multitouch",
       "oglFOV": 90,
       "oglZFar": 500,
       "oglZNear": 1,
@@ -216,7 +221,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "If a touch has started create a marker object at position 0,0 (top left corner of the screen) and store the ID of the touch in the TouchId variable of the Marker object",
+          "comment": "When a touch starts, a marker object is created.\nThe touch identifier is set in a variable (TouchId) of the Marker object to know which one to move later on.\nNote that the position where the object is created doesn't matter because it will be set in the next event anyway.",
           "comment2": ""
         },
         {
@@ -227,7 +232,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PopStartedTouch"
+                "value": "HasAnyTouchStarted"
               },
               "parameters": [
                 ""
@@ -239,32 +244,79 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Create"
+                "value": "ModVarScene"
               },
               "parameters": [
-                "",
-                "Marker",
-                "0",
-                "0",
-                ""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Marker",
-                "TouchId",
+                "index",
                 "=",
-                "LastTouchId()"
+                "0"
               ],
               "subInstructions": []
             }
           ],
-          "events": []
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "StartedTouchCount()",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Marker",
+                    "0",
+                    "0",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeScale"
+                  },
+                  "parameters": [
+                    "Marker",
+                    "=",
+                    "4"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Marker",
+                    "TouchId",
+                    "=",
+                    "StartedTouchId(Variable(index))"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "index",
+                    "+",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
         },
         {
           "disabled": false,
@@ -278,69 +330,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "In case a touch has ended, find the Marker object belonged to the touch by getting the ID of the last ended touch and compare it with the TouchId variable of each instance of the Marker object\nIf the Marker object with the touch ID is found, delete it",
-          "comment2": ""
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "infiniteLoopWarning": true,
-          "type": "BuiltinCommonInstructions::While",
-          "whileConditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "PopEndedTouch"
-              },
-              "parameters": [
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "VarObjet"
-              },
-              "parameters": [
-                "Marker",
-                "TouchId",
-                "=",
-                "LastEndedTouchId()"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Delete"
-              },
-              "parameters": [
-                "Marker",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "Set the position of each Marker object to be at the X and Y position of the touch they belong to",
+          "comment": "Move each Marker according to the current position of a touch.\nSeveral touches can happen at the same time. The TouchId vaiable is used to know which touch to follow.",
           "comment2": ""
         },
         {
@@ -365,7 +355,55 @@
               "subInstructions": []
             }
           ],
-          "events": []
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "A Marker is deleted as soon as a touch ends.",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "HasTouchEnded"
+                  },
+                  "parameters": [
+                    "",
+                    "Marker.Variable(TouchId)"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Marker",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
         }
       ],
       "layers": [
