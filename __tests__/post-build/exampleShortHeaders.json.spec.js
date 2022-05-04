@@ -30,7 +30,7 @@ describe('exampleShortHeaders.json post build checks', () => {
       id: '244c50f590aaef77fda8c883e95e64c728fc75be0825e42093b275b56320667f',
       slug: 'platformer',
       name: 'Platformer',
-      authorIds: ['1vKGH4y6Y5Myz3MaqRdwpju3arq2'],
+      authorIds: ['R0F5QGNCzgOY5w2cxGeKJOq2UaD2'],
       shortDescription:
         'An example of a basic platformer (Mario-like) game. Jump around and collect as many coins as you can!',
       license: 'MIT',
