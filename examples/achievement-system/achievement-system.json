@@ -522,6 +522,14 @@
                 "Left"
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
             }
           ],
           "actions": [],
@@ -547,11 +555,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PushScene"
+                    "value": "Scene"
                   },
                   "parameters": [
                     "",
-                    "\"GameScreen\""
+                    "\"GameScreen\"",
+                    "yes"
                   ],
                   "subInstructions": []
                 }
@@ -579,11 +588,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PushScene"
+                    "value": "Scene"
                   },
                   "parameters": [
                     "",
-                    "\"AchievementScreen\""
+                    "\"AchievementScreen\"",
+                    "yes"
                   ],
                   "subInstructions": []
                 }
@@ -1363,10 +1373,10 @@
           "effects": [],
           "behaviors": [
             {
-              "jumpSpeed": 800,
-              "maxFallingSpeed": 1000,
               "name": "PlatformerObject",
               "type": "PlatformBehavior::PlatformerObjectBehavior",
+              "jumpSpeed": 800,
+              "maxFallingSpeed": 1000,
               "acceleration": 1500,
               "canGoDownFromJumpthru": true,
               "canGrabPlatforms": false,
@@ -1710,19 +1720,6 @@
           "comment2": ""
         },
         {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "When the scene starts, save the position of the player in the checkpoint \"start\".",
-          "comment2": ""
-        },
-        {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -1736,24 +1733,210 @@
               "subInstructions": []
             }
           ],
-          "actions": [
+          "actions": [],
+          "events": [
             {
-              "type": {
-                "inverted": false,
-                "value": "Checkpoints::SaveCheckpoint"
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
               },
-              "parameters": [
-                "",
-                "Player",
-                "932",
-                "296",
-                "\"start\"",
-                ""
+              "comment": "Save the initial position of the player.",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Checkpoints::SaveCheckpoint"
+                  },
+                  "parameters": [
+                    "",
+                    "Player",
+                    "932",
+                    "296",
+                    "\"start\"",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
               ],
-              "subInstructions": []
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Display the stats values from a previous session",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "TimesDiedValue",
+                    "=",
+                    "GlobalVariableString(GameStatistics.TimesDied)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "CoinsCollectedValue",
+                    "=",
+                    "GlobalVariableString(GameStatistics.CoinsCollected)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "EnemiesKilledValue",
+                    "=",
+                    "GlobalVariableString(GameStatistics.EnemiesKilled)"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "When the player completed an achievement, a simple indicator telling the player that they have earned it will be shown.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarGlobal"
+                      },
+                      "parameters": [
+                        "GameStatistics.TimesDied",
+                        ">=",
+                        "GlobalVariable(GameStatistics.MaxTimesDied)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "TimesDiedValue",
+                        "+",
+                        "\" (Achievement Earned: DIE TRYING)\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarGlobal"
+                      },
+                      "parameters": [
+                        "GameStatistics.CoinsCollected",
+                        ">=",
+                        "GlobalVariable(GameStatistics.MaxCoinsCollected)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "CoinsCollectedValue",
+                        "+",
+                        "\" (Achievement Earned: COIN COLLECTOR)\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarGlobal"
+                      },
+                      "parameters": [
+                        "GameStatistics.EnemiesKilled",
+                        ">=",
+                        "GlobalVariable(GameStatistics.MaxEnemiesKilled)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "EnemiesKilledValue",
+                        "+",
+                        "\" (Achievement Earned: SERIAL KILLER)\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
             }
-          ],
-          "events": []
+          ]
         },
         {
           "type": "BuiltinCommonInstructions::Comment",
@@ -1765,63 +1948,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Updates to the player's gameplay statistics (scores) to track the player's progress for all achievements.",
-          "comment2": ""
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "TextObject::String"
-              },
-              "parameters": [
-                "CoinsCollectedValue",
-                "=",
-                "GlobalVariableString(GameStatistics.CoinsCollected)"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "TextObject::String"
-              },
-              "parameters": [
-                "EnemiesKilledValue",
-                "=",
-                "GlobalVariableString(GameStatistics.EnemiesKilled)"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "TextObject::String"
-              },
-              "parameters": [
-                "TimesDiedValue",
-                "=",
-                "GlobalVariableString(GameStatistics.TimesDied)"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "When the player dies (fall outside of screen), add 1 to the number of times the player died global variable then teleport the player to the \"start\" checkpoint.",
+          "comment": "When the player dies (fall outside of screen), teleports the player to the \"start\" checkpoint, then add 1 to the number of times the player died global variable.",
           "comment2": ""
         },
         {
@@ -1852,6 +1979,21 @@
             {
               "type": {
                 "inverted": false,
+                "value": "Checkpoints::LoadCheckpoint"
+              },
+              "parameters": [
+                "",
+                "Player",
+                "Player",
+                "\"start\"",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
                 "value": "ModVarGlobal"
               },
               "parameters": [
@@ -1864,33 +2006,17 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Checkpoints::LoadCheckpoint"
+                "value": "TextObject::String"
               },
               "parameters": [
-                "",
-                "Player",
-                "Player",
-                "\"start\"",
-                "",
-                ""
+                "TimesDiedValue",
+                "=",
+                "GlobalVariableString(GameStatistics.TimesDied)"
               ],
               "subInstructions": []
             }
           ],
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "When the player completed an achievement, a simple indicator telling the player that they have earned it will be shown.",
-              "comment2": ""
-            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -1911,10 +2037,10 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ModVarGlobalTxt"
+                    "value": "TextObject::String"
                   },
                   "parameters": [
-                    "GameStatistics.TimesDied",
+                    "TimesDiedValue",
                     "+",
                     "\" (Achievement Earned: DIE TRYING)\""
                   ],
@@ -1987,22 +2113,21 @@
                 "50"
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::String"
+              },
+              "parameters": [
+                "CoinsCollectedValue",
+                "=",
+                "GlobalVariableString(GameStatistics.CoinsCollected)"
+              ],
+              "subInstructions": []
             }
           ],
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "When the player completed an achievement, a simple indicator telling the player that they have earned it will be shown.",
-              "comment2": ""
-            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -2017,24 +2142,16 @@
                     "GlobalVariable(GameStatistics.MaxCoinsCollected)"
                   ],
                   "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
                 }
               ],
               "actions": [
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ModVarGlobalTxt"
+                    "value": "TextObject::String"
                   },
                   "parameters": [
-                    "GameStatistics.CoinsCollected",
+                    "CoinsCollectedValue",
                     "+",
                     "\" (Achievement Earned: COIN COLLECTOR)\""
                   ],
@@ -2107,22 +2224,21 @@
                 "1"
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::String"
+              },
+              "parameters": [
+                "EnemiesKilledValue",
+                "=",
+                "GlobalVariableString(GameStatistics.EnemiesKilled)"
+              ],
+              "subInstructions": []
             }
           ],
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "When the player completed an achievement, a simple indicator telling the player that they have earned it will be shown.",
-              "comment2": ""
-            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -2143,10 +2259,10 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ModVarGlobalTxt"
+                    "value": "TextObject::String"
                   },
                   "parameters": [
-                    "GameStatistics.EnemiesKilled",
+                    "EnemiesKilledValue",
                     "+",
                     "\" (Achievement Earned: SERIAL KILLER)\""
                   ],
@@ -2798,7 +2914,18 @@
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
           "actions": [
             {
               "type": {
@@ -3018,6 +3145,14 @@
                 ""
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
             }
           ],
           "actions": [
@@ -3112,7 +3247,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": " When the player clicks the BackButton text object, go back to the main screen.",
+          "comment": " When the player initiates an action to go back, switch back to the title screen.",
           "comment2": ""
         },
         {
@@ -3121,36 +3256,86 @@
             {
               "type": {
                 "inverted": false,
-                "value": "SourisSurObjet"
+                "value": "BuiltinCommonInstructions::Or"
               },
-              "parameters": [
-                "BackButton",
-                "",
-                "",
-                ""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "MouseButtonPressed"
-              },
-              "parameters": [
-                "",
-                "Left"
-              ],
-              "subInstructions": []
+              "parameters": [],
+              "subInstructions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::And"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MouseButtonPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "BackButton",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BackButton::onBackButtonPressed"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Escape"
+                  ],
+                  "subInstructions": []
+                }
+              ]
             }
           ],
           "actions": [
             {
               "type": {
                 "inverted": false,
-                "value": "PopScene"
+                "value": "Scene"
               },
               "parameters": [
-                ""
+                "",
+                "\"MainScreen\"",
+                "yes"
               ],
               "subInstructions": []
             }
@@ -3161,6 +3346,116 @@
     }
   ],
   "eventsFunctionsExtensions": [
+    {
+      "author": "Arthur Pacaud (arthuro555)",
+      "category": "",
+      "description": "Prevents the back button from quitting the game and provides a condition to check when it's pressed (to allow customising its behavior).",
+      "extensionNamespace": "",
+      "fullName": "Back button",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWtleWJvYXJkLWJhY2tzcGFjZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMSwxMUg2LjgzTDEwLjQxLDcuNDFMOSw2TDMsMTJMOSwxOEwxMC40MSwxNi41OEw2LjgzLDEzSDIxVjExWiIgLz48L3N2Zz4=",
+      "name": "BackButton",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/keyboard-backspace.svg",
+      "shortDescription": "Adds interactions with the back button.",
+      "version": "1.0.0",
+      "origin": {
+        "identifier": "BackButton",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "back",
+        "mobile",
+        "button",
+        "input"
+      ],
+      "authorIds": [
+        "ZgrsWuRTAkXgeuPV9bo0zuEcA2w1"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "",
+          "fullName": "",
+          "functionType": "Action",
+          "group": "",
+          "name": "onFirstSceneLoaded",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "gdjs.evtTools.back_button = {\n    triggered: false,\n    _popStateListener: (event) => {\n        gdjs.evtTools.back_button.triggered = true;\n        history.pushState(\"\", \"\"); // Push a new fake state as the old one was popped\n    }\n};\n\n// Handle back button on the web\nhistory.pushState(\"\", \"\"); // Push a fake state to prevent switching page when clicking on back\nwindow.addEventListener('popstate', gdjs.evtTools.back_button._popStateListener);\n\n// Handle back button on cordova\ndocument.addEventListener(\"backbutton\", e => {\n    e.preventDefault();\n    gdjs.evtTools.back_button.triggered = true;\n}, false); \n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Triggers whenever the player presses the back button.",
+          "fullName": "Back button is pressed",
+          "functionType": "Condition",
+          "group": "",
+          "name": "onBackButtonPressed",
+          "private": false,
+          "sentence": "Back button is pressed",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = gdjs.evtTools.back_button.triggered;\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "This simulates the normal action of the back button. \nThis action will quit the app when in a mobile app, and go back to the previous page when in a web browser.",
+          "fullName": "Trigger back button",
+          "functionType": "Action",
+          "group": "",
+          "name": "doDefault",
+          "private": false,
+          "sentence": "Simulate back button press",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "// Close the app on cordova, as this is the default behavior\nif (navigator.app) {\n    navigator.app.exitApp();\n} else if (navigator.device && navigator.device.exitApp) {\n    navigator.device.exitApp();\n} else {\n    // Go to previous page as it is the default on browsers\n    // Remove the listener so new fake states don't get pushed\n    window.removeEventListener('popstate', gdjs.evtTools.back_button._popStateListener);\n    history.back(); // Remove the state that prevents going back\n    history.back(); // Actually go back\n}\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "",
+          "fullName": "",
+          "functionType": "Action",
+          "group": "",
+          "name": "onScenePostEvents",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "gdjs.evtTools.back_button.triggered = false;\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": []
+    },
     {
       "author": "Elairyx, @Bouh",
       "category": "",
