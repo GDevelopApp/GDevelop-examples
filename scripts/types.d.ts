@@ -3,6 +3,7 @@
  */
 export interface Example {
   id: string;
+  slug: string;
   name: string;
   shortDescription: string;
   license: string;
@@ -24,6 +25,7 @@ export interface Example {
  */
 export interface ExampleShortHeader {
   id: string;
+  slug: string;
   name: string;
   shortDescription: string;
   license: string;

@@ -13,7 +13,7 @@ const getExampleShortHeaders = async () => {
   return exampleShortHeaders;
 };
 
-describe('filters.json post build checks', () => {
+describe('exampleShortHeaders.json post build checks', () => {
   test('defaultTags', async () => {
     const exampleShortHeaders = await getExampleShortHeaders();
 
@@ -28,8 +28,9 @@ describe('filters.json post build checks', () => {
 
     expect(platformer).toEqual({
       id: '244c50f590aaef77fda8c883e95e64c728fc75be0825e42093b275b56320667f',
+      slug: 'platformer',
       name: 'Platformer',
-      authorIds: [],
+      authorIds: ['R0F5QGNCzgOY5w2cxGeKJOq2UaD2'],
       shortDescription:
         'An example of a basic platformer (Mario-like) game. Jump around and collect as many coins as you can!',
       license: 'MIT',
@@ -41,24 +42,28 @@ describe('filters.json post build checks', () => {
         'platformer',
         'Starter',
         '',
-        'Anchor',
-        'Audio',
-        'Cameras and layers features',
-        'Standard Conversions',
-        'Builtin events',
-        'Keyboard features',
+        'Event functions',
+        'Sounds and musics',
+        'Layers and cameras',
+        'Events and control flow',
+        'Storage',
+        'Mathematical tools',
         'Mouse and touch',
-        'Features for all objects',
-        'Scene management features',
-        'Variable features',
-        'Window features',
-        'Platform Behavior',
+        'Objects',
+        'Scene',
+        'Variables',
+        'Particle system',
+        'Platform behavior',
         'Sprite',
         'System information',
         'Text object',
         'Tiled Sprite Object',
-        'Tweening',
-        'Parallax for Tiled Sprite',
+        'Simple Checkpoints',
+        'Rectangular Movement',
+        'Animated Back and Forth Movement',
+        'Shake Object (position, angle, scale)',
+        'Smooth Camera Follow',
+        'Volume Falloff',
       ],
       gdevelopVersion: '',
     });

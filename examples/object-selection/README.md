@@ -1,1 +1,1 @@
-Simple example showing how the engine of GDevelop select objects to be used in conditions and actions.
+Demonstrate how objects are selected by using a Basic and Advanced example.

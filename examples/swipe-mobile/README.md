@@ -1,0 +1,1 @@
+Show how to use the Swipe Detector extension, for touchscreen on mobile and PC.
