@@ -39,12 +39,19 @@ const gdevelopRootPath = path.resolve(
   args['gdevelop-root-path']
 );
 
+/** @param {string} fileOrFolderPath */
+const normalizePathSeparators = (fileOrFolderPath) => {
+  return fileOrFolderPath.replace(/\\/g, '/');
+};
+
 /**
  * Generate the URL used after deployment for a file in the examples folder.
  * @param {string} filePath
  */
 const getResourceUrl = (filePath) => {
-  const relativeFilePath = path.relative(examplesRootPath, filePath);
+  const relativeFilePath = normalizePathSeparators(
+    path.relative(examplesRootPath, filePath)
+  );
   return `https://resources.gdevelop-app.com/examples/${relativeFilePath}`;
 };
 
@@ -195,7 +202,9 @@ const getStaticTags = (exampleSlug) => {
 const getPreviewImageUrls = (gameFolderPath, allFiles) => {
   const imageUrls = [];
   for (const imageName of ['preview.png', 'thumbnail.png']) {
-    const imagePath = path.join(gameFolderPath, imageName);
+    const imagePath = normalizePathSeparators(
+      path.join(gameFolderPath, imageName)
+    );
     const hasImage = !!allFiles[imagePath];
     if (hasImage) imageUrls.push(getResourceUrl(imagePath));
   }
@@ -265,7 +274,9 @@ const extractExamples = async (
         // Extract example informations
         const slug = path.basename(fileWithMetadata.name, '.json');
         const gameFolderPath = path.dirname(fileWithMetadata.path);
-        const readmePath = path.join(gameFolderPath, 'README.md');
+        const readmePath = normalizePathSeparators(
+          path.join(gameFolderPath, 'README.md')
+        );
         const readmeFileWithMetadata = allFiles[readmePath];
         if (!readmeFileWithMetadata) {
           errors.push(new Error(`Expected a game README at ${readmePath}.`));
