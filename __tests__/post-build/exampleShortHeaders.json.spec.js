@@ -26,46 +26,29 @@ describe('exampleShortHeaders.json post build checks', () => {
     if (!platformer)
       throw new Error('Platformer not found in the example short headers');
 
-    expect(platformer).toEqual({
-      id: '244c50f590aaef77fda8c883e95e64c728fc75be0825e42093b275b56320667f',
-      slug: 'platformer',
-      name: 'Platformer',
-      authorIds: ['R0F5QGNCzgOY5w2cxGeKJOq2UaD2'],
-      shortDescription:
-        'An example of a basic platformer (Mario-like) game. Jump around and collect as many coins as you can!',
-      license: 'MIT',
-      previewImageUrls: [
-        'https://resources.gdevelop-app.com/examples/platformer/preview.png',
-        'https://resources.gdevelop-app.com/examples/platformer/thumbnail.png',
-      ],
-      tags: [
-        'platformer',
-        'Starter',
-        '',
-        'Event functions',
-        'Sounds and musics',
-        'Layers and cameras',
-        'Events and control flow',
-        'Storage',
-        'Mathematical tools',
-        'Mouse and touch',
-        'Objects',
-        'Scene',
-        'Variables',
-        'Particle system',
-        'Platform behavior',
-        'Sprite',
-        'System information',
-        'Text object',
-        'Tiled Sprite Object',
-        'Simple Checkpoints',
-        'Rectangular Movement',
-        'Animated Back and Forth Movement',
-        'Shake Object (position, angle, scale)',
-        'Smooth Camera Follow',
-        'Volume Falloff',
-      ],
-      gdevelopVersion: '',
-    });
+    expect(platformer).toEqual(
+      expect.objectContaining({
+        id: '244c50f590aaef77fda8c883e95e64c728fc75be0825e42093b275b56320667f',
+        slug: 'platformer',
+        name: 'Platformer',
+        authorIds: ['R0F5QGNCzgOY5w2cxGeKJOq2UaD2'],
+        shortDescription:
+          'An example of a basic platformer (Mario-like) game. Jump around and collect as many coins as you can!',
+        license: 'MIT',
+        previewImageUrls: [
+          'https://resources.gdevelop-app.com/examples/platformer/preview.png',
+          'https://resources.gdevelop-app.com/examples/platformer/thumbnail.png',
+        ],
+        tags: expect.arrayContaining([
+          'platformer',
+          'Starter',
+          'Mathematical tools',
+          'Platform behavior',
+          'Gamepads (controllers)',
+          'Simple Checkpoints',
+        ]),
+        gdevelopVersion: '',
+      })
+    );
   });
 });
