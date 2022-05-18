@@ -173,6 +173,7 @@ const sortedStarterSlugs = new Set([
   'run-dino-run',
   'space-shooter',
   'bounce-and-hook',
+  'duck-game',
   'downhill-bike-physics-demo',
   'space-asteroids',
   'geometry-monster',
