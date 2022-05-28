@@ -1,3 +1,1 @@
-A simple leaderboard made with Firestore queries.
-
-This is using Firebase to store an online leaderboard.
+Demonstrates how to use GDevelop leaderboards for two types of games: Highscore and Speedrun.
