@@ -18,7 +18,7 @@
     "useExternalSourceFiles": false,
     "version": "1.0.0",
     "name": "Parking Jam",
-    "description": "Swipe cars into the road to clear the parking lot.",
+    "description": "Swipe cars into the road to clear the parking lot.\n\nUse the speedrun mode to compete on the leaderboard!",
     "author": "",
     "windowWidth": 1080,
     "windowHeight": 1920,
@@ -1048,20 +1048,7 @@
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [],
-      "effects": [
-        {
-          "effectType": "Outline",
-          "name": "Effect",
-          "doubleParameters": {
-            "padding": 32,
-            "thickness": 5
-          },
-          "stringParameters": {
-            "color": "255;255;255"
-          },
-          "booleanParameters": {}
-        }
-      ],
+      "effects": [],
       "behaviors": [],
       "string": "Level 12",
       "font": "LuckiestGuy-Regular.ttf",
@@ -1254,7 +1241,7 @@
               "timeBetweenFrames": 0.08,
               "sprites": [
                 {
-                  "hasCustomCollisionMask": false,
+                  "hasCustomCollisionMask": true,
                   "image": "Asphalt003_2K_Color-9x162.jpg",
                   "points": [],
                   "originPoint": {
@@ -1268,13 +1255,65 @@
                     "x": 0,
                     "y": 0
                   },
-                  "customCollisionMask": []
+                  "customCollisionMask": [
+                    [
+                      {
+                        "x": 0,
+                        "y": 0
+                      },
+                      {
+                        "x": 1152,
+                        "y": 0
+                      },
+                      {
+                        "x": 1152,
+                        "y": 1000
+                      },
+                      {
+                        "x": 0,
+                        "y": 1000
+                      }
+                    ]
+                  ]
                 }
               ]
             }
           ]
         }
       ]
+    },
+    {
+      "bold": false,
+      "italic": false,
+      "name": "SpeedRunTime_Text",
+      "smoothed": true,
+      "tags": "",
+      "type": "TextObject::Text",
+      "underlined": false,
+      "variables": [],
+      "effects": [
+        {
+          "effectType": "Outline",
+          "name": "Effect",
+          "doubleParameters": {
+            "padding": 0,
+            "thickness": 2
+          },
+          "stringParameters": {
+            "color": "0;0;0"
+          },
+          "booleanParameters": {}
+        }
+      ],
+      "behaviors": [],
+      "string": "00.0 seconds",
+      "font": "LuckiestGuy-Regular.ttf",
+      "characterSize": 80,
+      "color": {
+        "b": 226,
+        "g": 144,
+        "r": 74
+      }
     }
   ],
   "objectsGroups": [],
@@ -1294,7 +1333,7 @@
       "title": "",
       "v": 0,
       "uiSettings": {
-        "grid": true,
+        "grid": false,
         "gridType": "rectangular",
         "gridWidth": 64,
         "gridHeight": 64,
@@ -1302,8 +1341,8 @@
         "gridOffsetY": 0,
         "gridColor": 4868682,
         "gridAlpha": 1,
-        "snap": true,
-        "zoomFactor": 0.6599999999999997,
+        "snap": false,
+        "zoomFactor": 0.47999999999999954,
         "windowMask": false
       },
       "objectsGroups": [
@@ -1484,7 +1523,7 @@
           "persistentUuid": "54f627a9-d551-49c2-83d0-38ee1eebd5a9",
           "width": 320,
           "x": 384,
-          "y": 1024,
+          "y": 960,
           "zOrder": 9,
           "numberProperties": [],
           "stringProperties": [],
@@ -1500,7 +1539,7 @@
           "persistentUuid": "aae0561c-d6c6-4640-8adb-c2bf053987e8",
           "width": 0,
           "x": 475,
-          "y": 1053,
+          "y": 989,
           "zOrder": 10,
           "numberProperties": [],
           "stringProperties": [],
@@ -1611,8 +1650,8 @@
           "name": "SpeedRun_Toggle",
           "persistentUuid": "d0829dd7-295c-4052-a08f-54a8300882c4",
           "width": 64,
-          "x": 416,
-          "y": 1248,
+          "x": 414,
+          "y": 1216,
           "zOrder": 11,
           "numberProperties": [],
           "stringProperties": [],
@@ -1627,8 +1666,8 @@
           "name": "SpeedrunMode_Text",
           "persistentUuid": "28b570c5-4bf1-453d-a8b9-d0413a7a988f",
           "width": 0,
-          "x": 512,
-          "y": 1216,
+          "x": 514,
+          "y": 1191,
           "zOrder": 12,
           "numberProperties": [],
           "stringProperties": [],
@@ -1974,36 +2013,69 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "AddForceAL"
+                        "value": "ModVarGlobal"
                       },
                       "parameters": [
-                        "Title",
-                        "-45",
-                        "100",
-                        "1"
+                        "CurrentLevel",
+                        "=",
+                        "0"
                       ],
                       "subInstructions": []
                     },
                     {
                       "type": {
                         "inverted": false,
-                        "value": "ActivateBehavior"
+                        "value": "ModVarGlobal"
                       },
                       "parameters": [
-                        "Title",
-                        "RectangularMovement",
+                        "SpeedrunTime",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Enable speedrun mode if it was previously activated",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "GlobalVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "SpeedrunEnabled",
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ToggleSwitch::ToggleSwitch::SetChecked"
+                      },
+                      "parameters": [
+                        "SpeedRun_Toggle",
+                        "ToggleSwitch",
+                        "yes",
                         ""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "TextObject::SetTextAlignment"
-                      },
-                      "parameters": [
-                        "SpeedrunMode_Text",
-                        "\"center\""
                       ],
                       "subInstructions": []
                     }
@@ -2016,39 +2088,118 @@
           "parameters": []
         },
         {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Bouncing text",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
-              "type": {
-                "inverted": false,
-                "value": "CollisionNP"
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
               },
-              "parameters": [
-                "Title",
-                "BounceObjects",
-                "",
-                "",
-                ""
+              "comment": "Make text bounce around screen",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
               ],
-              "subInstructions": []
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AddForceAL"
+                  },
+                  "parameters": [
+                    "Title",
+                    "-30",
+                    "100",
+                    "1"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Title",
+                    "RectangularMovement",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::SetTextAlignment"
+                  },
+                  "parameters": [
+                    "SpeedrunMode_Text",
+                    "\"center\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Title",
+                    "BounceObjects",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Bounce::Bounce::BounceOff"
+                  },
+                  "parameters": [
+                    "Title",
+                    "Bounce",
+                    "BounceObjects",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             }
           ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Bounce::Bounce::BounceOff"
-              },
-              "parameters": [
-                "Title",
-                "Bounce",
-                "BounceObjects",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
+          "parameters": []
         },
         {
           "colorB": 228,
@@ -2551,9 +2702,9 @@
           "parameters": []
         },
         {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
+          "colorB": 224,
+          "colorG": 16,
+          "colorR": 189,
           "creationTime": 0,
           "name": "End game logic",
           "source": "",
@@ -2771,6 +2922,49 @@
               "colorG": 176,
               "colorR": 74,
               "creationTime": 0,
+              "name": "Check for speedrun mode",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ToggleSwitch::ToggleSwitch::IsChecked"
+                      },
+                      "parameters": [
+                        "SpeedRun_Toggle",
+                        "ToggleSwitch",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetGlobalVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "SpeedrunEnabled",
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
               "name": "Change level",
               "source": "",
               "type": "BuiltinCommonInstructions::Group",
@@ -2908,7 +3102,7 @@
         "gridColor": 0,
         "gridAlpha": 1,
         "snap": true,
-        "zoomFactor": 0.3799999999999989,
+        "zoomFactor": 0.33999999999999897,
         "windowMask": false
       },
       "objectsGroups": [
@@ -3218,39 +3412,6 @@
           "string": "Drag cars into the road \nto clear the parking lot",
           "font": "LuckiestGuy-Regular.ttf",
           "characterSize": 50,
-          "color": {
-            "b": 255,
-            "g": 255,
-            "r": 255
-          }
-        },
-        {
-          "bold": false,
-          "italic": false,
-          "name": "SpeedRunTime_Text",
-          "smoothed": true,
-          "tags": "",
-          "type": "TextObject::Text",
-          "underlined": false,
-          "variables": [],
-          "effects": [
-            {
-              "effectType": "Outline",
-              "name": "Effect",
-              "doubleParameters": {
-                "padding": 0,
-                "thickness": 2
-              },
-              "stringParameters": {
-                "color": "0;0;0"
-              },
-              "booleanParameters": {}
-            }
-          ],
-          "behaviors": [],
-          "string": "00.0 seconds",
-          "font": "LuckiestGuy-Regular.ttf",
-          "characterSize": 80,
           "color": {
             "b": 255,
             "g": 255,
@@ -5813,7 +5974,36 @@
         "zoomFactor": 0.2999999999999994,
         "windowMask": false
       },
-      "objectsGroups": [],
+      "objectsGroups": [
+        {
+          "name": "FadeAwayText",
+          "objects": [
+            {
+              "name": "EndMessage_Text"
+            },
+            {
+              "name": "RestartGame_Text"
+            }
+          ]
+        },
+        {
+          "name": "CenteredObjects",
+          "objects": [
+            {
+              "name": "SpeedRunTime_Text"
+            },
+            {
+              "name": "RestartGame_Text"
+            },
+            {
+              "name": "SubmitScore_Text"
+            },
+            {
+              "name": "Playername_Input"
+            }
+          ]
+        }
+      ],
       "variables": [],
       "instances": [
         {
@@ -5822,12 +6012,76 @@
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "EndingText",
+          "name": "EndMessage_Text",
           "persistentUuid": "8b159862-41f5-4daa-9721-f95d3e5989ca",
           "width": 0,
-          "x": 115,
-          "y": 379,
+          "x": 112,
+          "y": 209,
           "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Speedrun",
+          "locked": false,
+          "name": "SpeedrunResults_Text",
+          "persistentUuid": "fd54826f-8938-44ca-ba1e-ec5c983d4062",
+          "width": 0,
+          "x": 218,
+          "y": 898,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "RestartGame_Text",
+          "persistentUuid": "d725f9c3-0f29-43c2-aeb6-86d2166fe797",
+          "width": 0,
+          "x": 388,
+          "y": 1669,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Speedrun",
+          "locked": false,
+          "name": "SubmitScore_Text",
+          "persistentUuid": "168f1176-ebaa-494b-956d-1ec588dcc5b5",
+          "width": 0,
+          "x": 409,
+          "y": 1181,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 127,
+          "layer": "Speedrun",
+          "locked": false,
+          "name": "Playername_Input",
+          "persistentUuid": "080fa437-a61e-45ec-ab39-de0a647c8078",
+          "width": 921,
+          "x": 94,
+          "y": 1022,
+          "zOrder": 6,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -5837,7 +6091,7 @@
         {
           "bold": false,
           "italic": false,
-          "name": "EndingText",
+          "name": "EndMessage_Text",
           "smoothed": true,
           "tags": "",
           "type": "TextObject::Text",
@@ -5863,13 +6117,101 @@
             "g": 255,
             "r": 255
           }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "SpeedrunResults_Text",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Time: 0.00 seconds",
+          "font": "LuckiestGuy-Regular.ttf",
+          "characterSize": 80,
+          "color": {
+            "b": 226,
+            "g": 144,
+            "r": 74
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "RestartGame_Text",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
+          "string": "Restart\nGame",
+          "font": "LuckiestGuy-Regular.ttf",
+          "characterSize": 80,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "SubmitScore_Text",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Submit\nScore",
+          "font": "LuckiestGuy-Regular.ttf",
+          "characterSize": 80,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
+          "name": "Playername_Input",
+          "tags": "",
+          "type": "TextInput::TextInputObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "initialValue": "",
+            "placeholder": "Enter Player Name",
+            "fontResourceName": "LuckiestGuy-Regular.ttf",
+            "fontSize": 80,
+            "inputType": "text",
+            "textColor": "0;0;0",
+            "fillColor": "255;255;255",
+            "fillOpacity": 255,
+            "borderColor": "74;144;226",
+            "borderOpacity": 255,
+            "borderWidth": 6,
+            "readOnly": false,
+            "disabled": false
+          }
         }
       ],
       "events": [
         {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
+          "colorB": 224,
+          "colorG": 16,
+          "colorR": 189,
           "creationTime": 0,
           "name": "UI",
           "source": "",
@@ -5903,135 +6245,369 @@
                     "1"
                   ],
                   "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Fade text and sound volume",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
+                },
                 {
                   "type": {
                     "inverted": false,
-                    "value": "MouseButtonReleased"
+                    "value": "TextObject::SetTextAlignment"
                   },
                   "parameters": [
-                    "",
-                    "Left"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Tween::AddObjectOpacityTween"
-                  },
-                  "parameters": [
-                    "EndingText",
-                    "Tween",
-                    "\"FadeOut\"",
-                    "0",
-                    "\"linear\"",
-                    "3000",
-                    "no"
+                    "RestartGame_Text",
+                    "\"center\""
                   ],
                   "subInstructions": []
                 },
                 {
                   "type": {
                     "inverted": false,
-                    "value": "FadeSoundVolume"
+                    "value": "SetCenterX"
                   },
                   "parameters": [
-                    "",
-                    "1",
-                    "0",
-                    "3"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Start over at title screen",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Tween::HasFinished"
-                  },
-                  "parameters": [
-                    "EndingText",
-                    "Tween",
-                    "\"FadeOut\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarGlobal"
-                  },
-                  "parameters": [
-                    "CurrentLevel",
+                    "CenteredObjects",
                     "=",
-                    "1"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Scene"
-                  },
-                  "parameters": [
-                    "",
-                    "\"Title Screen\"",
-                    ""
+                    "CameraX(\"\",0)"
                   ],
                   "subInstructions": []
                 }
               ],
               "events": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Restart scene",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Fade text and sound volume",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MouseButtonReleased"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "RestartGame_Text",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::AddObjectOpacityTween"
+                      },
+                      "parameters": [
+                        "FadeAwayText",
+                        "Tween",
+                        "\"FadeOut\"",
+                        "0",
+                        "\"linear\"",
+                        "1000",
+                        "no"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "FadeSoundVolume"
+                      },
+                      "parameters": [
+                        "",
+                        "1",
+                        "0",
+                        "1"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "PlaySound"
+                      },
+                      "parameters": [
+                        "",
+                        "Coin.wav",
+                        "",
+                        "50",
+                        "2"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Start over at title screen",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::HasFinished"
+                      },
+                      "parameters": [
+                        "EndMessage_Text",
+                        "Tween",
+                        "\"FadeOut\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarGlobal"
+                      },
+                      "parameters": [
+                        "CurrentLevel",
+                        "=",
+                        "1"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Scene"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Title Screen\"",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Hover over text",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "RestartGame_Text",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::ChangeColor"
+                      },
+                      "parameters": [
+                        "RestartGame_Text",
+                        "\"189;16;224\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "RestartGame_Text",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::ChangeColor"
+                      },
+                      "parameters": [
+                        "RestartGame_Text",
+                        "\"255;255;255\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "SubmitScore_Text",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::ChangeColor"
+                      },
+                      "parameters": [
+                        "SubmitScore_Text",
+                        "\"74;144;226\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "SubmitScore_Text",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::ChangeColor"
+                      },
+                      "parameters": [
+                        "SubmitScore_Text",
+                        "\"255;255;255\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": []
             }
           ],
           "parameters": []
@@ -6041,7 +6617,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Spawn cars",
+          "name": "Spawn cars into the air",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -6219,6 +6795,445 @@
             }
           ],
           "parameters": []
+        },
+        {
+          "colorB": 224,
+          "colorG": 16,
+          "colorR": 189,
+          "creationTime": 0,
+          "name": "Speedrun",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Hide speedrun objects if speedrun mode is not enabled",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "GlobalVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "SpeedrunEnabled",
+                    "False"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "HideLayer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Speedrun\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "GlobalVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "SpeedrunEnabled",
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "SpeedrunResults_Text",
+                        "=",
+                        "\"Time: \" + ExtendedMath::ToFixedString(GlobalVariable(SpeedrunTime),2) + \" seconds\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Leaderboard",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "MouseButtonReleased"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Visible"
+                          },
+                          "parameters": [
+                            "SubmitScore_Text"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SourisSurObjet"
+                          },
+                          "parameters": [
+                            "SubmitScore_Text",
+                            "",
+                            "",
+                            ""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Leaderboards::SavePlayerScore"
+                          },
+                          "parameters": [
+                            "",
+                            "\"35d5f56f-c09e-43bc-9204-d8480d1a657a\"",
+                            "GlobalVariable(SpeedrunTime)",
+                            "Playername_Input.Text()"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Leaderboards::SavePlayerScore"
+                          },
+                          "parameters": [
+                            "",
+                            "\"eaac235a-8cb6-4c01-982a-5eb99d8fd87d\"",
+                            "GlobalVariable(Score)",
+                            "Playername_Input.Text()"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "ScoreSubmitted",
+                            "True"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "TextInput::TextInputObject::SetDisabled"
+                          },
+                          "parameters": [
+                            "Playername_Input",
+                            "yes"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "PlaySound"
+                          },
+                          "parameters": [
+                            "",
+                            "Coin.wav",
+                            "",
+                            "50",
+                            "2"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "ScoreSubmitted",
+                            "True"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Hide submit button after score is submitted",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Leaderboards::IsSaving"
+                              },
+                              "parameters": [
+                                "\"35d5f56f-c09e-43bc-9204-d8480d1a657a\""
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": [],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Cache"
+                              },
+                              "parameters": [
+                                "SubmitScore_Text"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "Leaderboards::IsSaving"
+                              },
+                              "parameters": [
+                                "\"35d5f56f-c09e-43bc-9204-d8480d1a657a\""
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": [],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "If score submission failed, allow player to submit score again",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "Leaderboards::HasLastSaveErrored"
+                                  },
+                                  "parameters": [
+                                    "\"35d5f56f-c09e-43bc-9204-d8480d1a657a\""
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "Montre"
+                                  },
+                                  "parameters": [
+                                    "SubmitScore_Text",
+                                    ""
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SetSceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "ScoreSubmitted",
+                                    ""
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "TextInput::TextInputObject::SetDisabled"
+                                  },
+                                  "parameters": [
+                                    "Playername_Input",
+                                    "no"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "events": []
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "If score submission succeeded, show leaderboard and start title screen",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "Leaderboards::HasLastSaveSucceeded"
+                                  },
+                                  "parameters": [
+                                    "\"35d5f56f-c09e-43bc-9204-d8480d1a657a\""
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "Leaderboards::DisplayLeaderboard"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "\"35d5f56f-c09e-43bc-9204-d8480d1a657a\"",
+                                    "yes"
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "Scene"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "\"Title Screen\"",
+                                    "yes"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "events": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
         }
       ],
       "layers": [
@@ -6242,6 +7257,17 @@
               "width": 0
             }
           ],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 11212664,
+          "ambientLightColorG": 6040208,
+          "ambientLightColorR": 11078696,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "Speedrun",
+          "visibility": true,
+          "cameras": [],
           "effects": []
         }
       ],
@@ -6556,6 +7582,38 @@
                     "textG": 0,
                     "textR": 0
                   },
+                  "comment": "Update name of level",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "CurrentLevel_Text",
+                        "=",
+                        "\"Level \" + ToString(GlobalVariable(CurrentLevel))"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
                   "comment": "Prepare End Screen",
                   "comment2": ""
                 },
@@ -6588,158 +7646,8 @@
                     }
                   ],
                   "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Update name of level",
-                  "comment2": ""
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "TextObject::String"
-                      },
-                      "parameters": [
-                        "CurrentLevel_Text",
-                        "=",
-                        "\"Level \" + ToString(GlobalVariable(CurrentLevel))"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
                 }
               ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Manage speedrun timer",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Start timer when touching screen",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "TimerStarted",
-                    "False"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "MouseButtonPressed"
-                  },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ResetTimer"
-                  },
-                  "parameters": [
-                    "",
-                    "\"SpeedrunTimer\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SetSceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "TimerStarted",
-                    "True"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SceneInstancesCount"
-                  },
-                  "parameters": [
-                    "",
-                    "Car",
-                    ">",
-                    "0"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "SpeedRunTime_Text",
-                    "=",
-                    "ExtendedMath::ToFixedString((GlobalVariable(SpeedrunTime) + TimerElapsedTime(\"SpeedrunTimer\")),1) "
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
             }
           ],
           "parameters": []
@@ -7852,18 +8760,6 @@
                         "128"
                       ],
                       "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarGlobal"
-                      },
-                      "parameters": [
-                        "SpeedrunTime",
-                        "+",
-                        "TimerElapsedTime(\"SpeedrunTimer\")"
-                      ],
-                      "subInstructions": []
                     }
                   ],
                   "events": []
@@ -8194,6 +9090,422 @@
                     }
                   ],
                   "parameters": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Speedrun timer",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Hide timer if speedrun is not enabled",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "GlobalVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "SpeedrunEnabled",
+                    "False"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "SpeedRunTime_Text"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Only process logic if speedrun mode is enabled",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "GlobalVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "SpeedrunEnabled",
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Start timer when touching screen",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "TimerStarted",
+                        "False"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MouseButtonPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ResetTimer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"SpeedrunTimer\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "TimerStarted",
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Update timer text",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SceneInstancesCount"
+                      },
+                      "parameters": [
+                        "",
+                        "Car",
+                        ">",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "SpeedRunTime_Text",
+                        "=",
+                        "ExtendedMath::ToFixedString((GlobalVariable(SpeedrunTime) + TimerElapsedTime(\"SpeedrunTimer\")),1) + \" seconds\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Stop timer when cars are all gone",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SceneInstancesCount"
+                      },
+                      "parameters": [
+                        "",
+                        "Car",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "PauseTimer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"SpeedrunTimer\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarGlobal"
+                      },
+                      "parameters": [
+                        "SpeedrunTime",
+                        "+",
+                        "TimerElapsedTime(\"SpeedrunTimer\")"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 27,
+          "colorG": 2,
+          "colorR": 208,
+          "creationTime": 0,
+          "disabled": true,
+          "name": "DEBUG: Change level",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MouseButtonReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Right"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "PauseTimer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"SpeedrunTimer\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarGlobal"
+                      },
+                      "parameters": [
+                        "SpeedrunTime",
+                        "+",
+                        "TimerElapsedTime(\"SpeedrunTimer\")"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Save score to storage (so it will remain even after game restarts)",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "EcrireFichierExp"
+                      },
+                      "parameters": [
+                        "\"ParkingJam\"",
+                        "\"Score\"",
+                        "GlobalVariable(Score)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Head to the next level",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarGlobal"
+                      },
+                      "parameters": [
+                        "CurrentLevel",
+                        "+",
+                        "1"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Scene"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Level \" + ToString(GlobalVariable(CurrentLevel))",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
                 }
               ]
             }
@@ -27052,7 +28364,7 @@
                             "textG": 0,
                             "textR": 0
                           },
-                          "comment": "Delete the mouse joint",
+                          "comment": "Delete the mouse joint when released or if pressed and moved outside of screen",
                           "comment2": ""
                         },
                         {
@@ -27528,15 +28840,15 @@
         },
         {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
+          "customSize": true,
+          "height": 86,
           "layer": "",
           "locked": false,
           "name": "SpeedRunTime_Text",
           "persistentUuid": "a28d6daa-7c14-44fe-b5e8-9e0b29eb6121",
-          "width": 0,
-          "x": 256,
-          "y": 256,
+          "width": 505,
+          "x": 320,
+          "y": 192,
           "zOrder": 6,
           "numberProperties": [],
           "stringProperties": [],
@@ -27544,7 +28856,7 @@
         }
       ],
       "editionSettings": {
-        "grid": true,
+        "grid": false,
         "gridType": "rectangular",
         "gridWidth": 64,
         "gridHeight": 64,
@@ -27552,7 +28864,7 @@
         "gridOffsetY": 0,
         "gridColor": 4868682,
         "gridAlpha": 1,
-        "snap": true,
+        "snap": false,
         "zoomFactor": 0.3399999999999994,
         "windowMask": false
       }
