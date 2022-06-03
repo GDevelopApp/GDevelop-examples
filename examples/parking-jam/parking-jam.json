@@ -7192,6 +7192,18 @@
                     ""
                   ],
                   "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "SpeedrunResults_Text",
+                    "=",
+                    "\"Time: \" + ExtendedMath::ToFixedString(GlobalVariable(SpeedrunTime),2) + \" seconds\""
+                  ],
+                  "subInstructions": []
                 }
               ],
               "events": []
@@ -7397,18 +7409,6 @@
                         }
                       ],
                       "actions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "TextObject::String"
-                          },
-                          "parameters": [
-                            "SpeedrunResults_Text",
-                            "=",
-                            "\"Time: \" + ExtendedMath::ToFixedString(GlobalVariable(SpeedrunTime),2) + \" seconds\""
-                          ],
-                          "subInstructions": []
-                        },
                         {
                           "type": {
                             "inverted": false,
@@ -10160,7 +10160,20 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Only process logic if speedrun mode is enabled",
+              "comment": "Always keep track of time so user has choice to submit to leaderboard",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Start timer when touching screen",
               "comment2": ""
             },
             {
@@ -10169,213 +10182,181 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "GlobalVariableAsBoolean"
+                    "value": "SceneVariableAsBoolean"
                   },
                   "parameters": [
-                    "SpeedrunEnabled",
+                    "TimerStarted",
+                    "False"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MouseButtonPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ResetTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"SpeedrunTimer\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetSceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "TimerStarted",
                     "True"
                   ],
                   "subInstructions": []
                 }
               ],
-              "actions": [],
-              "events": [
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Update timer text",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
                 {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
+                  "type": {
+                    "inverted": false,
+                    "value": "SceneInstancesCount"
                   },
-                  "comment": "Start timer when touching screen",
-                  "comment2": ""
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "TimerStarted",
-                        "False"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MouseButtonPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
+                  "parameters": [
+                    "",
+                    "Car",
+                    ">",
+                    "0"
                   ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ResetTimer"
-                      },
-                      "parameters": [
-                        "",
-                        "\"SpeedrunTimer\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "TimerStarted",
-                        "True"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Update timer text",
-                  "comment2": ""
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SceneInstancesCount"
-                      },
-                      "parameters": [
-                        "",
-                        "Car",
-                        ">",
-                        "0"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "TextObject::String"
-                      },
-                      "parameters": [
-                        "SpeedRunTime_Text",
-                        "=",
-                        "ExtendedMath::ToFixedString((GlobalVariable(SpeedrunTime) + TimerElapsedTime(\"SpeedrunTimer\")),1) + \" seconds\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "TextObject::SetTextAlignment"
-                      },
-                      "parameters": [
-                        "SpeedRunTime_Text",
-                        "\"right\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Stop timer when cars are all gone",
-                  "comment2": ""
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SceneInstancesCount"
-                      },
-                      "parameters": [
-                        "",
-                        "Car",
-                        "=",
-                        "0"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "PauseTimer"
-                      },
-                      "parameters": [
-                        "",
-                        "\"SpeedrunTimer\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarGlobal"
-                      },
-                      "parameters": [
-                        "SpeedrunTime",
-                        "+",
-                        "TimerElapsedTime(\"SpeedrunTimer\")"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
+                  "subInstructions": []
                 }
-              ]
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "SpeedRunTime_Text",
+                    "=",
+                    "ExtendedMath::ToFixedString((GlobalVariable(SpeedrunTime) + TimerElapsedTime(\"SpeedrunTimer\")),1) + \" seconds\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::SetTextAlignment"
+                  },
+                  "parameters": [
+                    "SpeedRunTime_Text",
+                    "\"right\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Stop timer when cars are all gone",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SceneInstancesCount"
+                  },
+                  "parameters": [
+                    "",
+                    "Car",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "PauseTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"SpeedrunTimer\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "SpeedrunTime",
+                    "+",
+                    "TimerElapsedTime(\"SpeedrunTimer\")"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             }
           ],
           "parameters": []
