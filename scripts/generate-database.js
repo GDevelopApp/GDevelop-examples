@@ -172,6 +172,8 @@ const sortedStarterSlugs = new Set([
   'platformer',
   'run-dino-run',
   'space-shooter',
+  'conviction-of-gun-dude-desktop',
+  'parking-jam',
   'bounce-and-hook',
   'duck-game',
   'downhill-bike-physics-demo',
