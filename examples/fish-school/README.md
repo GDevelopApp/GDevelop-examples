@@ -1,0 +1,1 @@
+This example shows how to use the "Boids movement" extension to simulate a flock movement.
