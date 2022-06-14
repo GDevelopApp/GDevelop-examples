@@ -45,7 +45,6 @@ describe('exampleShortHeaders.json post build checks', () => {
           'Mathematical tools',
           'Platform behavior',
           'Gamepads (controllers)',
-          'Simple Checkpoints',
         ]),
         gdevelopVersion: '',
       })
