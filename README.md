@@ -29,7 +29,7 @@ If you've created an example with GDevelop, you can submit it to be shared with 
 
 If you know how to create *Pull Requests*, you can also clone this repository and add your example in the examples folder, and then open a PR. Examples are deployed automatically when pushed to the `main` branch: [![CircleCI](https://circleci.com/gh/GDevelopApp/GDevelop-examples/tree/main.svg?style=svg)](https://circleci.com/gh/GDevelopApp/GDevelop-examples/tree/main)
 
-## Developper
+## Developers
 To add a game to the homepage the game have to be listed in the `scripts/generate-database.js` file.
 
 ## License
