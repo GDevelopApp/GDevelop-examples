@@ -905,7 +905,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.4901844970703111,
+        "zoomFactor": 0.3801844970703111,
         "windowMask": false
       },
       "objectsGroups": [
@@ -7722,6 +7722,65 @@
               "type": "BuiltinCommonInstructions::Group",
               "events": [
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Save the position of the player at the beginning of the scene as the first checkpoint",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DepartScene"
+                      },
+                      "parameters": [
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Checkpoints::SaveCheckpoint"
+                      },
+                      "parameters": [
+                        "",
+                        "Player",
+                        "PlayerSpawn.X()",
+                        "PlayerSpawn.Y()",
+                        "\"Checkpoint\"",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "If the player collides with the checkpoint object and it is not active this will trigger",
+                  "comment2": ""
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
@@ -7735,6 +7794,17 @@
                         "",
                         "",
                         ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "AnimationName"
+                      },
+                      "parameters": [
+                        "Checkpoint",
+                        "\"Activate\""
                       ],
                       "subInstructions": []
                     },
@@ -7796,19 +7866,6 @@
                         {
                           "type": {
                             "inverted": false,
-                            "value": "SimpleCheckpoints::Checkpoint::SetActivated"
-                          },
-                          "parameters": [
-                            "Checkpoint",
-                            "Checkpoint",
-                            "False",
-                            ""
-                          ],
-                          "subInstructions": []
-                        },
-                        {
-                          "type": {
-                            "inverted": false,
                             "value": "SetEffectDoubleParameter"
                           },
                           "parameters": [
@@ -7816,6 +7873,17 @@
                             "\"Gray\"",
                             "\"saturation\"",
                             "0"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "Checkpoint",
+                            "\"InActive\""
                           ],
                           "subInstructions": []
                         }
@@ -7842,15 +7910,14 @@
                         {
                           "type": {
                             "inverted": false,
-                            "value": "SimpleCheckpoints::CheckpointPlayer::ActivateCheckpoint"
+                            "value": "Checkpoints::SaveCheckpoint"
                           },
                           "parameters": [
+                            "",
                             "Player",
-                            "CheckpointPlayer",
-                            "Checkpoint",
-                            "Checkpoint",
-                            "",
-                            "",
+                            "Checkpoint.X()",
+                            "Checkpoint.Y()",
+                            "\"Checkpoint\"",
                             ""
                           ],
                           "subInstructions": []
@@ -7865,6 +7932,17 @@
                             "\"Gray\"",
                             "\"saturation\"",
                             "1"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "Checkpoint",
+                            "\"Activate\""
                           ],
                           "subInstructions": []
                         }
@@ -8041,7 +8119,7 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "If player is dead, move back to spawn point ",
+                  "comment": "If player is dead, move back to the last saved checkpoint position",
                   "comment2": ""
                 },
                 {
@@ -8084,11 +8162,14 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::ToSpawn"
+                        "value": "Checkpoints::LoadCheckpoint"
                       },
                       "parameters": [
+                        "",
                         "Player",
-                        "CheckpointPlayer",
+                        "Player",
+                        "\"Checkpoint\"",
+                        "\"Checkpoint\"",
                         ""
                       ],
                       "subInstructions": []
@@ -10053,6 +10134,421 @@
   ],
   "externalEvents": [],
   "eventsFunctionsExtensions": [
+    {
+      "author": "Elairyx, @Bouh",
+      "category": "",
+      "description": "Allows to set up checkpoints for each instance.\nCheckpoint coordinates are dynamic values so can be object positions absolute/relative values and more.\nCheckpoints can then be used to move the same or even other instances to them.",
+      "extensionNamespace": "",
+      "fullName": "Checkpoints",
+      "helpPath": "http://elairyx.com/gdev-ext/checkpoints.html",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZsYWctdmFyaWFudCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik02LDNBMSwxIDAgMCwxIDcsNFY0Ljg4QzguMDYsNC40NCA5LjUsNCAxMSw0QzE0LDQgMTQsNiAxNiw2QzE5LDYgMjAsNCAyMCw0VjEyQzIwLDEyIDE5LDE0IDE2LDE0QzEzLDE0IDEzLDEyIDExLDEyQzgsMTIgNywxNCA3LDE0VjIxSDVWNEExLDEgMCAwLDEgNiwzWiIgLz48L3N2Zz4=",
+      "name": "Checkpoints",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/flag-variant.svg",
+      "shortDescription": "A position checkpoint for instances.",
+      "version": "1.0.0",
+      "origin": {
+        "identifier": "Checkpoints",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "position",
+        "checkpoint"
+      ],
+      "authorIds": [
+        "30b1QQoYi1gQQHzIjMlNY8aLyYV2",
+        "2OwwM8ToR9dx9RJ2sAKTcrLmCB92"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "Update a checkpoint of an object.",
+          "fullName": "Save checkpoint",
+          "functionType": "Action",
+          "group": "",
+          "name": "SaveCheckpoint",
+          "private": false,
+          "sentence": "Save checkpoint _PARAM4_ of _PARAM1_ to _PARAM2_ (x-axis), _PARAM3_ (y-axis)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "ToSaveObject",
+                    "__Checkpoints.Position[\"X\"+GetArgumentAsString(\"CheckpointName\")]",
+                    "=",
+                    "GetArgumentAsNumber(\"CoordinateX\")"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "ToSaveObject",
+                    "__Checkpoints.Position[\"Y\"+GetArgumentAsString(\"CheckpointName\")]",
+                    "=",
+                    "GetArgumentAsNumber(\"CoordinateY\")"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Save checkpoint of object",
+              "longDescription": "",
+              "name": "ToSaveObject",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "X position",
+              "longDescription": "",
+              "name": "CoordinateX",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Y position",
+              "longDescription": "",
+              "name": "CoordinateY",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Checkpoint name",
+              "longDescription": "",
+              "name": "CheckpointName",
+              "optional": false,
+              "supplementaryInformation": "[\"Primary\",\"Secondary\"]",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the position of the object to the saved checkpoint.",
+          "fullName": "Load checkpoint",
+          "functionType": "Action",
+          "group": "",
+          "name": "LoadCheckpoint",
+          "private": false,
+          "sentence": "Move _PARAM2_ to checkpoint _PARAM3_ of _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::And"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ObjectVariableChildExists"
+                          },
+                          "parameters": [
+                            "ToLoadObject",
+                            "__Checkpoints.Position",
+                            "\"X\" + GetArgumentAsString(\"CheckpointName\")"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ObjectVariableChildExists"
+                          },
+                          "parameters": [
+                            "ToLoadObject",
+                            "__Checkpoints.Position",
+                            "\"Y\" + GetArgumentAsString(\"CheckpointName\")"
+                          ],
+                          "subInstructions": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::And"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "StrEqual"
+                          },
+                          "parameters": [
+                            "GetArgumentAsString(\"SetIgnoreUndefined\")",
+                            "!=",
+                            "\"true\""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "ObjectVariableChildExists"
+                              },
+                              "parameters": [
+                                "ToLoadObject",
+                                "__Checkpoints.Position",
+                                "\"Y\" + GetArgumentAsString(\"CheckpointName\")"
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "ObjectVariableChildExists"
+                              },
+                              "parameters": [
+                                "ToLoadObject",
+                                "__Checkpoints.Position",
+                                "\"X\" + GetArgumentAsString(\"CheckpointName\")"
+                              ],
+                              "subInstructions": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "ToMoveObject",
+                    "=",
+                    "ToLoadObject.Variable(__Checkpoints.Position[\"X\" + GetArgumentAsString(\"CheckpointName\")])",
+                    "=",
+                    "ToLoadObject.Variable(__Checkpoints.Position[\"Y\" + GetArgumentAsString(\"CheckpointName\")])"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Load checkpoint from object",
+              "longDescription": "",
+              "name": "ToLoadObject",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Change position of object",
+              "longDescription": "",
+              "name": "ToMoveObject",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Checkpoint name",
+              "longDescription": "",
+              "name": "CheckpointName",
+              "optional": false,
+              "supplementaryInformation": "[\"Primary\",\"Secondary\"]",
+              "type": "string"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Ignore (possibly) empty checkpoints",
+              "longDescription": "Loading not yet saved checkpoints will (by default) set the position to the coordinate 0;0. Select \"yes\" to completely ignore non-existant checkpoints. To define an alternative checkpoint for it, create a new event and use the \"Checkpoint exists\" condition, save the wanted checkpoint as the action.",
+              "name": "SetIgnoreUndefined",
+              "optional": false,
+              "supplementaryInformation": "[\"Set to 0\",\"Ignore\",\"Reset to initial position\"]",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if a checkpoint has a position saved / does exist.",
+          "fullName": "Checkpoint exists",
+          "functionType": "Condition",
+          "group": "",
+          "name": "CheckpointExist",
+          "private": false,
+          "sentence": "Checkpoint _PARAM2_ of _PARAM1_ exists",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ObjectVariableChildExists"
+                  },
+                  "parameters": [
+                    "ToCheckObject",
+                    "__Checkpoints.Position",
+                    "\"Y\" + GetArgumentAsString(\"CheckpointName\")"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ObjectVariableChildExists"
+                  },
+                  "parameters": [
+                    "ToCheckObject",
+                    "__Checkpoints.Position",
+                    "\"X\" + GetArgumentAsString(\"CheckpointName\")"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "ObjectVariableChildExists"
+                      },
+                      "parameters": [
+                        "ToCheckObject",
+                        "__Checkpoints.Position",
+                        "\"X\" + GetArgumentAsString(\"CheckpointName\")"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "ObjectVariableChildExists"
+                      },
+                      "parameters": [
+                        "ToCheckObject",
+                        "__Checkpoints.Position",
+                        "\"Y\" + GetArgumentAsString(\"CheckpointName\")"
+                      ],
+                      "subInstructions": []
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "False"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Check checkpoint from object",
+              "longDescription": "",
+              "name": "ToCheckObject",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Checkpoint name",
+              "longDescription": "",
+              "name": "CheckpointName",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": []
+    },
     {
       "author": "Bouh",
       "category": "",
@@ -14373,1555 +14869,6 @@
               "extraInformation": [],
               "hidden": true,
               "name": "IsReleased"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "author": "",
-      "category": "General",
-      "description": "A simple implementation of checkpoint and player spawnpoints. Give checkpoint objects the \"Simple Checkpoint\" behavior, and player objects the \"Simple Checkpoint Player\" behavior. Then, use the \"Activate Checkpoint\" and \"Spawn Player\" actions to activate the player and send them to their last location, respectively.\n\nSaving to storage is also supported: either check the \"auto-save spawnpoint\" behavior property, or do so maually using the \"Write/Read Spawnpoint\" actions.",
-      "extensionNamespace": "",
-      "fullName": "Simple Checkpoints",
-      "helpPath": "",
-      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGc+DQoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTksMTUuMmM1LjYtMy4zLDguNCw0LjIsMTQsMWMwLTMuNywwLTUuNiwwLTkuM2MtNS42LDMuMy04LjQtNC4yLTE0LTFDOSw5LjYsOSwxMS41LDksMTUuMnoiLz4NCjwvZz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSI5IiB5MT0iMTUiIHgyPSI5IiB5Mj0iMjgiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yOSwyNy4xYy00LjEtMS40LTguNS0yLjEtMTMtMi4xcy04LjksMC44LTEzLDIuMSIvPg0KPC9zdmc+DQo=",
-      "name": "SimpleCheckpoints",
-      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Space/Space_moon_flag.svg",
-      "shortDescription": "Simple checkpoint & spawnpoint implementation",
-      "version": "1.0.0",
-      "tags": [
-        "checkpoint",
-        "spawnpoint",
-        "spawn"
-      ],
-      "authorIds": [
-        "1vKGH4y6Y5Myz3MaqRdwpju3arq2"
-      ],
-      "dependencies": [],
-      "eventsFunctions": [],
-      "eventsBasedBehaviors": [
-        {
-          "description": "Allow an object to be activated and decactived using the \"Activate checkpoint\" action.",
-          "fullName": "Simple Checkpoint",
-          "name": "Checkpoint",
-          "objectType": "Sprite",
-          "eventsFunctions": [
-            {
-              "description": "",
-              "fullName": "Set checkpoint activation status",
-              "functionType": "Action",
-              "group": "",
-              "name": "SetActivated",
-              "private": false,
-              "sentence": "Set checkpoint activated for _PARAM0_ to _PARAM2_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "GetArgumentAsBoolean"
-                      },
-                      "parameters": [
-                        "\"Active\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::SetPropertyActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::SetPropertyJustActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "GetArgumentAsBoolean"
-                      },
-                      "parameters": [
-                        "\"Active\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::SetPropertyActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::SetPropertyJustDeactivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::Checkpoint",
-                  "type": "behavior"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "True",
-                  "description": "Activated",
-                  "longDescription": "",
-                  "name": "Active",
-                  "optional": true,
-                  "supplementaryInformation": "",
-                  "type": "trueorfalse"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "",
-              "fullName": "",
-              "functionType": "Action",
-              "group": "",
-              "name": "doStepPreEvents",
-              "private": false,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ChangeAnimation"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.Behavior::PropertyAnimationActive()"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": [],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ChangeAnimation"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.Behavior::PropertyAnimationInactive()"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyJustActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::SetPropertyJustActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyJustDeactivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::SetPropertyJustDeactivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "no"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::Checkpoint",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "",
-              "fullName": "Checkpoint is activated",
-              "functionType": "Condition",
-              "group": "",
-              "name": "IsActivated",
-              "private": false,
-              "sentence": "Checkpoint _PARAM0_ is activated",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SetReturnBoolean"
-                      },
-                      "parameters": [
-                        "True"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SetReturnBoolean"
-                      },
-                      "parameters": [
-                        "False"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::Checkpoint",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "",
-              "fullName": "Activate checkpoint",
-              "functionType": "Action",
-              "group": "",
-              "name": "ToggleActivated",
-              "private": false,
-              "sentence": "Activate checkpoint _PARAM0_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::SetActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "True",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::Checkpoint",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "The checkpoint has just been activated",
-              "fullName": "Just activated",
-              "functionType": "Condition",
-              "group": "",
-              "name": "JustActivated",
-              "private": false,
-              "sentence": "Checkpoint _PARAM0_ has just been activated",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyJustActivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SetReturnBoolean"
-                      },
-                      "parameters": [
-                        "True"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::Checkpoint",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "The checkpoint has just been deactivated",
-              "fullName": "Just deactivated",
-              "functionType": "Condition",
-              "group": "",
-              "name": "JustDeactivated",
-              "private": false,
-              "sentence": "Checkpoint _PARAM0_ has just been deactivated",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::PropertyJustDeactivated"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SetReturnBoolean"
-                      },
-                      "parameters": [
-                        "True"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::Checkpoint",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            }
-          ],
-          "propertyDescriptors": [
-            {
-              "value": "",
-              "type": "Boolean",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "Activated"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "label": "Activated Animation",
-              "description": "",
-              "group": "Animations",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "AnimationActive"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "label": "Unactivated Animation",
-              "description": "",
-              "group": "Animations",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "AnimationInactive"
-            },
-            {
-              "value": "",
-              "type": "Boolean",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "JustActivated"
-            },
-            {
-              "value": "",
-              "type": "Boolean",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "JustDeactivated"
-            }
-          ]
-        },
-        {
-          "description": "Gives an object actions to interact with objects that have the checkpoint behavior. Spawnpoint can be set by using the \"Activate checkpoint\" action, and can then be saved/loaded automatically or manually by using the \"Read/Write spawnpoint\" actions.",
-          "fullName": "Simple Checkpoint Player",
-          "name": "CheckpointPlayer",
-          "objectType": "",
-          "eventsFunctions": [
-            {
-              "description": "",
-              "fullName": "Set player spawnpoint",
-              "functionType": "Action",
-              "group": "Spawnpoint",
-              "name": "SetSpawn",
-              "private": false,
-              "sentence": "Set player _PARAM0_ spawn point to _PARAM2_, _PARAM3_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::SetPropertySpawnPointX"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "GetArgumentAsNumber(\"X\")"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::SetPropertySpawnPointY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "GetArgumentAsNumber(\"Y\")"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::PropertyAutoSaveSpawnpoint"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::WriteSpawn"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::CheckpointPlayer",
-                  "type": "behavior"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Spawn Point X",
-                  "longDescription": "",
-                  "name": "X",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "expression"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Spawn Point Y",
-                  "longDescription": "",
-                  "name": "Y",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "",
-              "fullName": "Active a checkpoint",
-              "functionType": "Action",
-              "group": "",
-              "name": "ActivateCheckpoint",
-              "private": false,
-              "sentence": "Player _PARAM0_ actives checkpoint _PARAM2_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "SimpleCheckpoints::Checkpoint::IsActivated"
-                      },
-                      "parameters": [
-                        "CheckpointObject",
-                        "CheckpointObjectBehavior",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::Checkpoint::ToggleActivated"
-                      },
-                      "parameters": [
-                        "CheckpointObject",
-                        "CheckpointObjectBehavior",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "GetArgumentAsBoolean"
-                          },
-                          "parameters": [
-                            "\"SetSpawn\""
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "SimpleCheckpoints::CheckpointPlayer::SetSpawn"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "CheckpointObject.X()",
-                            "CheckpointObject.Y()",
-                            ""
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "events": []
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "GetArgumentAsBoolean"
-                      },
-                      "parameters": [
-                        "\"SetSpawnIfAlreadyActivated\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "GetArgumentAsBoolean"
-                      },
-                      "parameters": [
-                        "\"SetSpawn\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::SetSpawn"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "CheckpointObject.X()",
-                        "CheckpointObject.Y()",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::CheckpointPlayer",
-                  "type": "behavior"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Checkpoint",
-                  "longDescription": "",
-                  "name": "CheckpointObject",
-                  "optional": false,
-                  "supplementaryInformation": "Sprite",
-                  "type": "objectList"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Must be of checkpoint type",
-                  "longDescription": "",
-                  "name": "CheckpointObjectBehavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::Checkpoint",
-                  "type": "behavior"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "yes",
-                  "description": "Set spawn point",
-                  "longDescription": "",
-                  "name": "SetSpawn",
-                  "optional": true,
-                  "supplementaryInformation": "",
-                  "type": "yesorno"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Set spawn point even if checkpoint is already activated",
-                  "longDescription": "",
-                  "name": "SetSpawnIfAlreadyActivated",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "yesorno"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Spawn or respawn the player at latest spawn point",
-              "fullName": "Spawn player",
-              "functionType": "Action",
-              "group": "Spawnpoint",
-              "name": "ToSpawn",
-              "private": false,
-              "sentence": "Send player _PARAM0_ to spawn",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "MettreXY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.Behavior::PropertySpawnPointX()",
-                        "=",
-                        "Object.Behavior::PropertySpawnPointY()"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::CheckpointPlayer",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "",
-              "fullName": "Write current spawn location to a storage",
-              "functionType": "Action",
-              "group": "Spawnpoint",
-              "name": "WriteSpawn",
-              "private": false,
-              "sentence": "Write player _PARAM0_ spawn location to storage",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "__SimpleCheckpoints.TempStorageName",
-                        "=",
-                        "GetArgumentAsString(\"StorageName\")"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "__SimpleCheckpoints.TempStorageGroup",
-                        "=",
-                        "GetArgumentAsString(\"Group\")"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::CompareStrings"
-                      },
-                      "parameters": [
-                        "GetArgumentAsString(\"StorageName\")",
-                        "=",
-                        "\"\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "__SimpleCheckpoints.TempStorageName",
-                        "=",
-                        "Object.Behavior::PropertyDefaultSpawnpointStorageName()"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::CompareStrings"
-                      },
-                      "parameters": [
-                        "GetArgumentAsString(\"Group\")",
-                        "=",
-                        "\"\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "__SimpleCheckpoints.TempStorageGroup",
-                        "=",
-                        "Object.Behavior::PropertyDefaultSpawnpointStorageGroup()"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "EcrireFichierExp"
-                      },
-                      "parameters": [
-                        "VariableString(__SimpleCheckpoints.TempStorageName)",
-                        "VariableString(__SimpleCheckpoints.TempStorageGroup)+ \".SpawnX\"",
-                        "Object.Behavior::PropertySpawnPointX()"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "EcrireFichierExp"
-                      },
-                      "parameters": [
-                        "VariableString(__SimpleCheckpoints.TempStorageName)",
-                        "VariableString(__SimpleCheckpoints.TempStorageGroup)+ \".SpawnY\"",
-                        "Object.Behavior::PropertySpawnPointY()"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::CheckpointPlayer",
-                  "type": "behavior"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Storage",
-                  "longDescription": "Name of storage to write to",
-                  "name": "StorageName",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "string"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Storage Group",
-                  "longDescription": "Name of storage group to write to",
-                  "name": "Group",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "string"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "",
-              "fullName": "Read current spawn location from a storage",
-              "functionType": "Action",
-              "group": "Spawnpoint",
-              "name": "ReadSpawn",
-              "private": false,
-              "sentence": "Read player _PARAM0_ spawn location from storage",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "__SimpleCheckpoints.TempStorageName",
-                        "=",
-                        "GetArgumentAsString(\"StorageName\")"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "__SimpleCheckpoints.TempStorageGroup",
-                        "=",
-                        "GetArgumentAsString(\"Group\")"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::CompareStrings"
-                      },
-                      "parameters": [
-                        "GetArgumentAsString(\"StorageName\")",
-                        "=",
-                        "\"\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "__SimpleCheckpoints.TempStorageName",
-                        "=",
-                        "Object.Behavior::PropertyDefaultSpawnpointStorageName()"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "BuiltinCommonInstructions::CompareStrings"
-                      },
-                      "parameters": [
-                        "GetArgumentAsString(\"Group\")",
-                        "=",
-                        "\"\""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "__SimpleCheckpoints.TempStorageGroup",
-                        "=",
-                        "Object.Behavior::PropertyDefaultSpawnpointStorageGroup()"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "LireFichierExp"
-                      },
-                      "parameters": [
-                        "VariableString(__SimpleCheckpoints.TempStorageName)",
-                        "VariableString(__SimpleCheckpoints.TempStorageGroup)+ \".SpawnX\"",
-                        "",
-                        "__SimpleCheckpoints.TempSpawnX"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "LireFichierExp"
-                      },
-                      "parameters": [
-                        "VariableString(__SimpleCheckpoints.TempStorageName)",
-                        "VariableString(__SimpleCheckpoints.TempStorageGroup)+ \".SpawnY\"",
-                        "",
-                        "__SimpleCheckpoints.TempSpawnY"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::SetPropertySpawnPointX"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Variable(__SimpleCheckpoints.TempSpawnX)"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::SetPropertySpawnPointY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Variable(__SimpleCheckpoints.TempSpawnY)"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::CheckpointPlayer",
-                  "type": "behavior"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Storage",
-                  "longDescription": "Name of storage to read from",
-                  "name": "StorageName",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "string"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Storage Group",
-                  "longDescription": "Name of storage group to read from",
-                  "name": "Group",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "string"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "",
-              "fullName": "",
-              "functionType": "Action",
-              "group": "",
-              "name": "onCreated",
-              "private": false,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::PropertyAutoSaveSpawnpoint"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SimpleCheckpoints::CheckpointPlayer::ReadSpawn"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "",
-                        "",
-                        ""
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": []
-                }
-              ],
-              "parameters": [
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Object",
-                  "longDescription": "",
-                  "name": "Object",
-                  "optional": false,
-                  "supplementaryInformation": "",
-                  "type": "object"
-                },
-                {
-                  "codeOnly": false,
-                  "defaultValue": "",
-                  "description": "Behavior",
-                  "longDescription": "",
-                  "name": "Behavior",
-                  "optional": false,
-                  "supplementaryInformation": "SimpleCheckpoints::CheckpointPlayer",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            }
-          ],
-          "propertyDescriptors": [
-            {
-              "value": "",
-              "type": "Number",
-              "label": "Player Spawn Point X",
-              "description": "",
-              "group": "Spawn",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "SpawnPointX"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "Player Spawn Point Y",
-              "description": "",
-              "group": "Spawn",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "SpawnPointY"
-            },
-            {
-              "value": "",
-              "type": "Boolean",
-              "label": "Auto-save player spawnpoint",
-              "description": "",
-              "group": "Storage",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "AutoSaveSpawnpoint"
-            },
-            {
-              "value": "SpawnpointStorage",
-              "type": "String",
-              "label": "Default spawnpoint storage name",
-              "description": "",
-              "group": "Storage",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "DefaultSpawnpointStorageName"
-            },
-            {
-              "value": "Spawnpoint",
-              "type": "String",
-              "label": "Default spawnpoint storage group",
-              "description": "",
-              "group": "Storage",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "DefaultSpawnpointStorageGroup"
             }
           ]
         }
