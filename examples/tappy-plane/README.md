@@ -1,0 +1,2 @@
+Tappy Plane is a Flappy Bird-like game. Tap to keep your plane in the air and make your way through the cave system.
+Get as far as you can before you crash in to a wall, submit your score, and try again.
