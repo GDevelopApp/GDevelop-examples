@@ -1,0 +1,56 @@
+name: Comment with links to test the game(s) changed in a PR
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get changed files
+        id: changed-game-files
+        uses: tj-actions/changed-files@v23.1
+        with:
+          files: |
+            examples/**/*.json
+
+      - name: Output links to all changed game(s) as markdown
+        id: changed-games-markdown
+        run: |
+          CHANGED_GAMES_LINKS=""
+          for file in ${{ steps.changed-game-files.outputs.all_changed_files }}; do
+            CHANGED_GAMES_LINKS+="* https://editor.gdevelop.io?project=https://raw.githubusercontent.com/GDevelopApp/GDevelop-examples/$(echo ${GITHUB_HEAD_REF})/$file
+          "
+          done
+          [ -z "$CHANGED_GAMES_LINKS" ] && CHANGED_GAMES_LINKS="*No games are changed in this Pull Request.*"
+
+          # Support multiple lines
+          CHANGED_GAMES_LINKS="${CHANGED_GAMES_LINKS//'%'/'%25'}"
+          CHANGED_GAMES_LINKS="${CHANGED_GAMES_LINKS//$'\n'/'%0A'}"
+          CHANGED_GAMES_LINKS="${CHANGED_GAMES_LINKS//$'\r'/'%0D'}"
+
+          echo "::set-output name=changed-games-links::$CHANGED_GAMES_LINKS"
+
+      - name: Find the existing comment about games in the PR
+        uses: peter-evans/find-comment@v2
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: "### Preview the game(s) changed or added in this Pull Request"
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ### Preview the game(s) changed or added in this Pull Request
+
+            ${{ steps.changed-games-markdown.outputs.changed-games-links }}
+
+            ---
+            This is an automatic message displaying links to the games in this PR - double check the JSON in case of doubt.
+          edit-mode: replace
