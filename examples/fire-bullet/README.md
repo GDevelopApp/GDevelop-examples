@@ -1,0 +1,1 @@
+Test the fire bullet extension using sliders to modify rate of fire, accuracy, number of bullets, and firing arc.
