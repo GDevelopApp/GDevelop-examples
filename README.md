@@ -22,7 +22,7 @@ If you've created an example with GDevelop, you can submit it to be shared with 
 1. **Create your game** with GDevelop.
 2. Make sure to follow the [requirements and best practices on this page](http://wiki.compilgames.net/doku.php/gdevelop5/community/guide-for-submitting-an-example).
   > Note that for now, we're trying to keep a fairly high quality bar for examples, so you might be asked to adapt your game according to reviewer feedbacks. Don't feel bad about this! This is normal process and here to help making examples as good as possible for new users. If we take too much time to review your example, you can send a ping on the issue. ⏰
-3. Create a `preview.png` (case sensitive) 16:9 image for the thumbnail of the game example, and you can also add a `thumbnail.png` (case sensitive) with a 1:1 ratio to add a tiny thumbnail in the examples list of the game engine these assets are to add at the root of the game folder.
+3. Create a `preview.png` (case sensitive) 16:9 image that will let users see what the game looks like. You can also add a `thumbnail.png` (case sensitive) with a 1:1 ratio to add a tiny thumbnail in the examples list of the game engine.  Both of these images should be located at the root folder of the game.
 4. Create a new `README.md` file and write a short description of the game.
 5. **Export** your game and all its resources to a zip file (you can save it in a new folder and zip this folder).
 6. Submit it! You can either [submit it here](https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose), attaching the _zip file_.
