@@ -17,7 +17,7 @@
     "sizeOnStartupMode": "",
     "templateSlug": "",
     "useExternalSourceFiles": false,
-    "version": "1.0.2",
+    "version": "1.0.3",
     "name": "Parking Jam",
     "description": "Swipe cars into the road to clear the parking lot.  \nRelieve stress by crashing the cars into each other.\nEnable speedrun mode to compete on the leaderboard!",
     "author": "GDevelop",
@@ -2474,7 +2474,7 @@
                       "parameters": [
                         "DrivingSpeed",
                         "=",
-                        "300"
+                        "400"
                       ]
                     },
                     {
@@ -8134,6 +8134,12 @@
                         "",
                         ""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
                     }
                   ],
                   "actions": [
@@ -8233,13 +8239,12 @@
                         },
                         {
                           "type": {
-                            "value": "PlaySoundCanal"
+                            "value": "PlaySound"
                           },
                           "parameters": [
                             "",
                             "Coin.wav",
                             "2",
-                            "50",
                             "50",
                             "1"
                           ]
@@ -9994,7 +9999,7 @@
           "colorR": 0,
           "creationTime": 0,
           "disabled": true,
-          "name": "DEBUG: Change game levels with right click.  Enable this event group to use.",
+          "name": "DEBUG: Change game levels by pressing numbers on numpad.  Enable this event group to use.",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -10003,107 +10008,213 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "MouseButtonReleased"
+                    "value": "KeyReleased"
                   },
                   "parameters": [
                     "",
-                    "Right"
+                    "Numpad0"
                   ]
                 }
               ],
-              "actions": [],
-              "events": [
+              "actions": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PauseTimer"
-                      },
-                      "parameters": [
-                        "",
-                        "\"SpeedrunTimer\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarGlobal"
-                      },
-                      "parameters": [
-                        "SpeedrunTime",
-                        "+",
-                        "TimerElapsedTime(\"SpeedrunTimer\")"
-                      ]
-                    }
+                  "type": {
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "CurrentLevel",
+                    "=",
+                    "0"
                   ]
                 },
                 {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
+                  "type": {
+                    "value": "Scene"
                   },
-                  "comment": "Save score to storage (so it will remain even after game restarts)",
-                  "comment2": ""
-                },
+                  "parameters": [
+                    "",
+                    "\"Title Screen\"",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "EcrireFichierExp"
-                      },
-                      "parameters": [
-                        "\"ParkingJam\"",
-                        "\"Score\"",
-                        "GlobalVariable(Score)"
-                      ]
-                    }
+                  "type": {
+                    "value": "KeyReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Numpad1"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "CurrentLevel",
+                    "=",
+                    "1"
                   ]
                 },
                 {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
+                  "type": {
+                    "value": "Scene"
                   },
-                  "comment": "Head to the next level",
-                  "comment2": ""
+                  "parameters": [
+                    "",
+                    "\"Level \" + ToString(GlobalVariable(CurrentLevel))",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Numpad2"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "CurrentLevel",
+                    "=",
+                    "2"
+                  ]
                 },
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarGlobal"
-                      },
-                      "parameters": [
-                        "CurrentLevel",
-                        "+",
-                        "1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Scene"
-                      },
-                      "parameters": [
-                        "",
-                        "\"Level \" + ToString(GlobalVariable(CurrentLevel))",
-                        ""
-                      ]
-                    }
+                  "type": {
+                    "value": "Scene"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Level \" + ToString(GlobalVariable(CurrentLevel))",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Numpad3"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "CurrentLevel",
+                    "=",
+                    "3"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Level \" + ToString(GlobalVariable(CurrentLevel))",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Numpad4"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "CurrentLevel",
+                    "=",
+                    "4"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Level \" + ToString(GlobalVariable(CurrentLevel))",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Numpad5"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarGlobal"
+                  },
+                  "parameters": [
+                    "CurrentLevel",
+                    "=",
+                    "5"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Level \" + ToString(GlobalVariable(CurrentLevel))",
+                    ""
                   ]
                 }
               ]
