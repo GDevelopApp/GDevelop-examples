@@ -765,7 +765,7 @@
           "folded": true,
           "name": "PlayerSpeedDelta",
           "type": "number",
-          "value": 10
+          "value": 15
         },
         {
           "folded": true,
@@ -778,6 +778,12 @@
           "name": "MinimumSize",
           "type": "number",
           "value": 16
+        },
+        {
+          "folded": true,
+          "name": "DifficultyRatio",
+          "type": "number",
+          "value": 0.5
         }
       ],
       "instances": [
@@ -6474,6 +6480,19 @@
                           "comment2": ""
                         },
                         {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "The DifficultyRatio variable allows to cheat the physic laws and eject less matter for the same speed gain (PlayerSpeedDelta).",
+                          "comment2": ""
+                        },
+                        {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
                           "actions": [
@@ -6484,7 +6503,7 @@
                               "parameters": [
                                 "particleSize",
                                 "=",
-                                "sqrt(Player.Width() * Player.Width() * Variable(PlayerSpeedDelta) / Variable(ParticleSpeed))"
+                                "sqrt(Player.Width() * Player.Width() * Variable(DifficultyRatio) * Variable(PlayerSpeedDelta) / Variable(ParticleSpeed))"
                               ]
                             },
                             {
@@ -6599,7 +6618,7 @@
                                 "EmittedMaterial",
                                 "Physics2",
                                 "AngleBetweenPositions(Player.CenterX(), Player.CenterY(), MouseX(), MouseY())",
-                                "10 * pow(EmittedMaterial.Width(),3)",
+                                "Variable(ParticleSpeed) * EmittedMaterial.Physics2::Mass()",
                                 "EmittedMaterial.Physics2::MassCenterX()",
                                 "EmittedMaterial.Physics2::MassCenterY()"
                               ]
@@ -6672,6 +6691,19 @@
                       "type": "BuiltinCommonInstructions::Group",
                       "events": [
                         {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "",
+                          "comment2": ""
+                        },
+                        {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
                           "actions": [
@@ -6682,7 +6714,7 @@
                               "parameters": [
                                 "Player",
                                 "Physics2",
-                                "-1.5 *  Variable(PlayerSpeedDelta) * Player.Physics2::Mass()",
+                                "- Variable(PlayerSpeedDelta) * Player.Physics2::Mass()",
                                 "MouseX()",
                                 "MouseY()",
                                 "Player.Physics2::MassCenterX()",
@@ -7983,16 +8015,6 @@
                               "actions": [
                                 {
                                   "type": {
-                                    "value": "DebuggerTools::ConsoleLog"
-                                  },
-                                  "parameters": [
-                                    "\"Target: \" + ToString(SmartEnemyTargets.CenterX()) + \",\" + ToString(SmartEnemyTargets.CenterY())",
-                                    "\"info\"",
-                                    "\"\""
-                                  ]
-                                },
-                                {
-                                  "type": {
                                     "value": "ModVarObjet"
                                   },
                                   "parameters": [
@@ -8000,6 +8022,25 @@
                                     "MovementTargetAngle",
                                     "=",
                                     "SmartEnemyTargets.AngleToObject(SmartEnemy)"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "disabled": true,
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "DebuggerTools::ConsoleLog"
+                                      },
+                                      "parameters": [
+                                        "\"Target: \" + ToString(SmartEnemyTargets.CenterX()) + \",\" + ToString(SmartEnemyTargets.CenterY())",
+                                        "\"info\"",
+                                        "\"\""
+                                      ]
+                                    }
                                   ]
                                 }
                               ]
@@ -8043,16 +8084,6 @@
                               "actions": [
                                 {
                                   "type": {
-                                    "value": "DebuggerTools::ConsoleLog"
-                                  },
-                                  "parameters": [
-                                    "\"Target: \" + ToString(SmartEnemyTargets.CenterX()) + \",\" + ToString(SmartEnemyTargets.CenterY())",
-                                    "\"info\"",
-                                    "\"\""
-                                  ]
-                                },
-                                {
-                                  "type": {
                                     "value": "ModVarObjet"
                                   },
                                   "parameters": [
@@ -8060,6 +8091,25 @@
                                     "MovementTargetAngle",
                                     "=",
                                     "SmartEnemy.AngleToObject(SmartEnemyTargets)"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "disabled": true,
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "DebuggerTools::ConsoleLog"
+                                      },
+                                      "parameters": [
+                                        "\"Target: \" + ToString(SmartEnemyTargets.CenterX()) + \",\" + ToString(SmartEnemyTargets.CenterY())",
+                                        "\"info\"",
+                                        "\"\""
+                                      ]
+                                    }
                                   ]
                                 }
                               ]
@@ -8878,6 +8928,19 @@
           "sentence": "_PARAM1_ absorb _PARAM3_",
           "events": [
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "At the beginning, the 2 objects are overlapping each other.\nThe eaten object radius is shrinked to make the 2 objects until the 2 circles are tangant.\nAs the object will grow with the matter it eat, the objects are still overlapping each other.\nThis creates a chain reaction frame after frame until the 2 objects converge to an almost stable state.\nIt avoids complex calculus to eveluate the stable state and make a free animation,\nbut it has the disavantage of being frame rate dependent.\n\nThe mass conservation gives:\nobjectRadius(t)² + eatenRadius(t)² = objectRadius(t-1)² + eatenRadius(t-1)²\n\nAnd considering that the objects are cylinders, the mass is proporional to the square of the radius:\nobjectRadius(t)² + eatenRadius(t)² = objectRadius(t-1)² + eatenRadius(t-1)²\n\nWhich gives:\neatenRadius(t) = sqrt(objectRadius(t-1)² - objectRadius(t)² + eatenRadius(t-1)²)\n\nThe Object absobs some matter from the Eaten object.\nThe matter given to the Object has the velocity of the Eaten object.\nThe momentum conservation law must be used to evaluate the resultant speed to set to the Object.\n\nThe momentum conservation gives:\nobjectMass(t) * objectVelocity(t) = objectMass(t-1) * objectVelocity(t-1) + givenMass * eatenVelocity\n\nAnd considering that the objects are cylinders, the mass is proporional to the square of the radius:\nobjectRadius(t)² * objectVelocity(t) = objectRadius(t-1)² * objectVelocity(t-1) + (eatenRadius(t)² - eatenRadius(t-1)²) * eatenVelocity\n\nWhich gives:\nobjectVelocity(t) = (objectRadius(t-1)² * objectVelocity(t-1) + (eatenRadius(t)² - eatenRadius(t-1)²) * eatenVelocity) / objectRadius(t)²",
+              "comment2": ""
+            },
+            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
@@ -8886,7 +8949,7 @@
                     "value": "ModVarScene"
                   },
                   "parameters": [
-                    "shrinkSize",
+                    "shrinkedObjectSize",
                     "=",
                     "2 * max(0, Object.Distance(Eaten) - Object.Width() / 2)"
                   ]
@@ -8896,9 +8959,9 @@
                     "value": "ModVarScene"
                   },
                   "parameters": [
-                    "growSize",
+                    "givenMatter",
                     "=",
-                    "sqrt(Object.Width() * Object.Width() + Eaten.Width() * Eaten.Width() - Variable(shrinkSize) * Variable(shrinkSize))"
+                    "Eaten.Width() * Eaten.Width() - Variable(shrinkedObjectSize) * Variable(shrinkedObjectSize)"
                   ]
                 },
                 {
@@ -8906,9 +8969,9 @@
                     "value": "ModVarScene"
                   },
                   "parameters": [
-                    "lostMatter",
+                    "grownObjectSize",
                     "=",
-                    "Eaten.Width() * Eaten.Width() - Variable(shrinkSize) * Variable(shrinkSize)"
+                    "sqrt(Object.Width() * Object.Width() + Variable(givenMatter))"
                   ]
                 },
                 {
@@ -8919,7 +8982,7 @@
                     "Object",
                     "Physics2",
                     "=",
-                    "(Object.Width() * Object.Width() * Object.Physics2::LinearVelocityX() + 1.5 * Variable(lostMatter) * Eaten.Physics2::LinearVelocityX()) / (Object.Width() * Object.Width() + Variable(lostMatter))"
+                    "(Object.Width() * Object.Width() * Object.Physics2::LinearVelocityX() + Variable(givenMatter) * Eaten.Physics2::LinearVelocityX()) / (Variable(grownObjectSize) * Variable(grownObjectSize))"
                   ]
                 },
                 {
@@ -8930,7 +8993,7 @@
                     "Object",
                     "Physics2",
                     "=",
-                    "(Object.Width() * Object.Width() * Object.Physics2::LinearVelocityY() + 1.5 * Variable(lostMatter) * Eaten.Physics2::LinearVelocityY()) / (Object.Width() * Object.Width() + Variable(lostMatter))"
+                    "(Object.Width() * Object.Width() * Object.Physics2::LinearVelocityY() + Variable(givenMatter) * Eaten.Physics2::LinearVelocityY()) / (Variable(grownObjectSize) * Variable(grownObjectSize))"
                   ]
                 },
                 {
@@ -8939,8 +9002,8 @@
                   },
                   "parameters": [
                     "Object",
-                    "Variable(growSize)",
-                    "Variable(growSize)"
+                    "Variable(grownObjectSize)",
+                    "Variable(grownObjectSize)"
                   ]
                 },
                 {
@@ -8949,8 +9012,8 @@
                   },
                   "parameters": [
                     "Eaten",
-                    "Variable(shrinkSize)",
-                    "Variable(shrinkSize)"
+                    "Variable(shrinkedObjectSize)",
+                    "Variable(shrinkedObjectSize)"
                   ]
                 }
               ]
