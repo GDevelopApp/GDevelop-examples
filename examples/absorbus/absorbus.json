@@ -110,6 +110,7 @@
         "name": "assets\\audio\\Chord - Sorrowful (Space).aac",
         "preloadAsMusic": false,
         "preloadAsSound": true,
+        "preloadInCache": false,
         "userAdded": true
       },
       {
@@ -119,6 +120,7 @@
         "name": "assets\\audio\\Boom - Earth Core Ripper (Space).aac",
         "preloadAsMusic": false,
         "preloadAsSound": true,
+        "preloadInCache": false,
         "userAdded": true
       },
       {
@@ -128,6 +130,7 @@
         "name": "assets\\audio\\Pickup Magic.aac",
         "preloadAsMusic": false,
         "preloadAsSound": true,
+        "preloadInCache": false,
         "userAdded": true
       },
       {
@@ -137,6 +140,7 @@
         "name": "assets\\audio\\Bluezone_BC0271_debris_falling_rock_dust_002.aac",
         "preloadAsMusic": false,
         "preloadAsSound": true,
+        "preloadInCache": false,
         "userAdded": true
       },
       {
@@ -146,6 +150,7 @@
         "name": "assets\\audio\\audio - Bluezone BC0268 switch button click high tech interface 001.aac",
         "preloadAsMusic": false,
         "preloadAsSound": true,
+        "preloadInCache": false,
         "userAdded": false
       },
       {
@@ -155,6 +160,7 @@
         "name": "assets\\audio\\audio - impact - wet - hard - 49.aac",
         "preloadAsMusic": false,
         "preloadAsSound": true,
+        "preloadInCache": false,
         "userAdded": true
       },
       {
@@ -164,6 +170,7 @@
         "name": "assets\\audio\\Braam - This One Is Massive (Space).aac",
         "preloadAsMusic": false,
         "preloadAsSound": true,
+        "preloadInCache": false,
         "userAdded": false
       },
       {
@@ -173,6 +180,7 @@
         "name": "assets\\audio\\audio - magic space.aac",
         "preloadAsMusic": false,
         "preloadAsSound": true,
+        "preloadInCache": false,
         "userAdded": false
       },
       {
@@ -6453,6 +6461,19 @@
                       "type": "BuiltinCommonInstructions::Group",
                       "events": [
                         {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "The player ejects some matter to move according to the momentum conservation law.\nThe momentum is the mass multiplied with the velocity.\n\nIn our case, the shrinked player momentum + the ejected matter momentum = the momentum of the player befor the ejection.\nplayerMass(t) * playerVelocity(t) + ejectedMatterMass * ejectedMatterVelocity = playerMass(t - 1) * playerVelocity(t - 1)\n\nThe ejected matter is usually really small relatively to the player.\nTo simplify the formula, we make the approximation that the player doesn't change.\nWhich gives:\nplayerMass * playerVelocity(t) + ejectedMatterMass * ejectedMatterVelocity = playerMass * playerVelocity(t - 1)\n\nConsidering that the objects are cylinders, the mass is proporional to the square of the radius and we found:\nejectedMatterRadius² * ejectedMatterVelocity = - playerRadius² * (playerVelocity(t) - playerMass * playerVelocity(t - 1)) ",
+                          "comment2": ""
+                        },
+                        {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
                           "actions": [
@@ -6533,8 +6554,8 @@
                               },
                               "parameters": [
                                 "EmittedMaterial",
-                                "0.1 * Player.Width()",
-                                "0.1 * Player.Height()"
+                                "Variable(particleSize)",
+                                "Variable(particleSize)"
                               ]
                             },
                             {
@@ -6577,7 +6598,7 @@
                               "parameters": [
                                 "EmittedMaterial",
                                 "Physics2",
-                                "atan2(MouseY() - Player.CenterY(), MouseX() - Player.CenterX()) * 180 / ExtendedMath::Pi()",
+                                "AngleBetweenPositions(Player.CenterX(), Player.CenterY(), MouseX(), MouseY())",
                                 "10 * pow(EmittedMaterial.Width(),3)",
                                 "EmittedMaterial.Physics2::MassCenterX()",
                                 "EmittedMaterial.Physics2::MassCenterY()"
@@ -8175,7 +8196,7 @@
                     "",
                     "\"\"",
                     "0",
-                    "25",
+                    "1.1",
                     "False",
                     "0.35",
                     "2",
@@ -8190,7 +8211,7 @@
                     "",
                     "\"Texture\"",
                     "0",
-                    "25",
+                    "1.1",
                     "False",
                     "0.35",
                     "2",
@@ -12664,7 +12685,7 @@
           "group": "",
           "name": "ZoomWithMouseWheel",
           "private": false,
-          "sentence": "Change camera zoom with mouse wheel (Layer: _PARAM1_, Zoom speed: _PARAM3_, Min zoom: _PARAM5_, Max zoom: _PARAM6_, Zoom towards cursor: _PARAM4_)",
+          "sentence": "Change camera zoom with mouse wheel (Layer: _PARAM1_, Zoom multiplier: _PARAM3_, Min zoom: _PARAM5_, Max zoom: _PARAM6_, Zoom towards cursor: _PARAM4_)",
           "events": [
             {
               "colorB": 224,
@@ -12724,14 +12745,13 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "CameraZoom::ZoomWithSpeed"
+                                "value": "ZoomCamera"
                               },
                               "parameters": [
                                 "",
-                                "max(1,pow(GetArgumentAsNumber(\"ZoomSpeed\"),2))",
+                                "CameraZoom(GetArgumentAsString(\"Layer\"), GetArgumentAsNumber(\"Camera\")) * max(1, GetArgumentAsNumber(\"ZoomMultiplier\"))",
                                 "GetArgumentAsString(\"Layer\")",
-                                "GetArgumentAsNumber(\"Camera\")",
-                                "MouseX(GetArgumentAsString(\"Layer\"),GetArgumentAsNumber(\"Camera\"))"
+                                "GetArgumentAsNumber(\"Camera\")"
                               ]
                             }
                           ]
@@ -12773,14 +12793,13 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "CameraZoom::ZoomWithSpeed"
+                                "value": "ZoomCamera"
                               },
                               "parameters": [
                                 "",
-                                "1/max(1,pow(GetArgumentAsNumber(\"ZoomSpeed\"),2))",
+                                "CameraZoom(GetArgumentAsString(\"Layer\"), GetArgumentAsNumber(\"Camera\")) / max(1, GetArgumentAsNumber(\"ZoomMultiplier\"))",
                                 "GetArgumentAsString(\"Layer\")",
-                                "GetArgumentAsNumber(\"Camera\")",
-                                "MouseX(GetArgumentAsString(\"Layer\"),GetArgumentAsNumber(\"Camera\"))"
+                                "GetArgumentAsNumber(\"Camera\")"
                               ]
                             }
                           ]
@@ -12850,11 +12869,11 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "CameraZoom::ZoomWithSpeedAndAnchor"
+                                "value": "CameraZoom::ZoomWithAnchor"
                               },
                               "parameters": [
                                 "",
-                                "max(1,pow(GetArgumentAsNumber(\"ZoomSpeed\"),2))",
+                                "CameraZoom(GetArgumentAsString(\"Layer\"), GetArgumentAsNumber(\"Camera\")) * max(1, GetArgumentAsNumber(\"ZoomMultiplier\"))",
                                 "GetArgumentAsString(\"Layer\")",
                                 "GetArgumentAsNumber(\"Camera\")",
                                 "MouseX(GetArgumentAsString(\"Layer\"),GetArgumentAsNumber(\"Camera\"))",
@@ -12901,11 +12920,11 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "CameraZoom::ZoomWithSpeedAndAnchor"
+                                "value": "CameraZoom::ZoomWithAnchor"
                               },
                               "parameters": [
                                 "",
-                                "1/max(1,pow(GetArgumentAsNumber(\"ZoomSpeed\"),2))",
+                                "CameraZoom(GetArgumentAsString(\"Layer\"), GetArgumentAsNumber(\"Camera\")) / max(1, GetArgumentAsNumber(\"ZoomMultiplier\"))",
                                 "GetArgumentAsString(\"Layer\")",
                                 "GetArgumentAsNumber(\"Camera\")",
                                 "MouseX(GetArgumentAsString(\"Layer\"),GetArgumentAsNumber(\"Camera\"))",
@@ -12966,7 +12985,7 @@
                       },
                       "parameters": [
                         "",
-                        "clamp(CameraZoom(GetArgumentAsString(\"Layer\"),GetArgumentAsNumber(\"Camera\")),GetArgumentAsNumber(\"MinZoom\"),GetArgumentAsNumber(\"MaxZoom\"))",
+                        "clamp(CameraZoom(GetArgumentAsString(\"Layer\"), GetArgumentAsNumber(\"Camera\")), GetArgumentAsNumber(\"MinZoom\"), GetArgumentAsNumber(\"MaxZoom\"))",
                         "GetArgumentAsString(\"Layer\")",
                         "GetArgumentAsNumber(\"Camera\")"
                       ]
@@ -13001,9 +13020,9 @@
             {
               "codeOnly": false,
               "defaultValue": "",
-              "description": "Zoom speed (Range: 1 to infinity)",
+              "description": "Zoom multiplier (Range: 1 to infinity)",
               "longDescription": "",
-              "name": "ZoomSpeed",
+              "name": "ZoomMultiplier",
               "optional": false,
               "supplementaryInformation": "",
               "type": "expression"
@@ -13089,7 +13108,7 @@
                       },
                       "parameters": [
                         "",
-                        "max(1,pow(GetArgumentAsNumber(\"ZoomSpeed\"),2))",
+                        "max(1, GetArgumentAsNumber(\"ZoomSpeed\"))",
                         "GetArgumentAsString(\"Layer\")",
                         "GetArgumentAsNumber(\"Camera\")",
                         "MouseX(GetArgumentAsString(\"Layer\"),GetArgumentAsNumber(\"Camera\"))"
@@ -13139,7 +13158,7 @@
                       },
                       "parameters": [
                         "",
-                        "1/max(1,pow(GetArgumentAsNumber(\"ZoomSpeed\"),2))",
+                        "1 / max(1, GetArgumentAsNumber(\"ZoomSpeed\"))",
                         "GetArgumentAsString(\"Layer\")",
                         "GetArgumentAsNumber(\"Camera\")",
                         "MouseX(GetArgumentAsString(\"Layer\"),GetArgumentAsNumber(\"Camera\"))"
