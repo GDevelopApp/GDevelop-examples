@@ -8875,9 +8875,19 @@
                         "value": "ModVarScene"
                       },
                       "parameters": [
+                        "SuperPowerUpBalls",
+                        "=",
+                        "7"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
                         "ExtraBallChance",
                         "=",
-                        "0.1"
+                        "0.25"
                       ]
                     },
                     {
@@ -8887,17 +8897,7 @@
                       "parameters": [
                         "SuperPowerUpChance",
                         "=",
-                        "0.1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "SuperPowerUpBalls",
-                        "=",
-                        "7"
+                        "0.20"
                       ]
                     },
                     {
@@ -8917,7 +8917,7 @@
                       "parameters": [
                         "MinBlockUpgradesPerLevel",
                         "=",
-                        "3"
+                        "2"
                       ]
                     }
                   ]
@@ -9100,6 +9100,8 @@
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
+                  "disabled": true,
+                  "folded": true,
                   "name": "Create Blocks",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
@@ -9605,7 +9607,687 @@
                                         "BlockGenerator",
                                         "RandomValue",
                                         ">",
-                                        "1 - Variable(ExtraBallChance)"
+                                        "1 - Variable(SuperPowerUpChance)"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "Create"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "Block",
+                                        "BlockGenerator.X()",
+                                        "BlockGenerator.Y()",
+                                        "\"\""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ChangePlan"
+                                      },
+                                      "parameters": [
+                                        "Block",
+                                        "=",
+                                        "TopWall.ZOrder()-2"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetCenter"
+                                      },
+                                      "parameters": [
+                                        "Block",
+                                        "=",
+                                        "BlockGenerator.CenterX()",
+                                        "=",
+                                        "BlockGenerator.CenterY()"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Block",
+                                        "BlockStrength",
+                                        "=",
+                                        "1"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "BlockGenerator",
+                                        "SuperPowerup",
+                                        "True"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "Block",
+                                        "SuperPowerup",
+                                        "True"
+                                      ]
+                                    }
+                                  ],
+                                  "events": [
+                                    {
+                                      "type": "BuiltinCommonInstructions::Comment",
+                                      "color": {
+                                        "b": 109,
+                                        "g": 230,
+                                        "r": 255,
+                                        "textB": 0,
+                                        "textG": 0,
+                                        "textR": 0
+                                      },
+                                      "comment": "Create powerup to show inside of the block",
+                                      "comment2": ""
+                                    },
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "Create"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            "SuperPowerUp",
+                                            "Block.X()",
+                                            "Block.Y()",
+                                            "\"\""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "SetCenter"
+                                          },
+                                          "parameters": [
+                                            "SuperPowerUp",
+                                            "=",
+                                            "Block.CenterX()",
+                                            "=",
+                                            "Block.CenterY()"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "ChangePlan"
+                                          },
+                                          "parameters": [
+                                            "SuperPowerUp",
+                                            "=",
+                                            "Block.ZOrder()+1"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "Sticker::Sticker::Stick"
+                                          },
+                                          "parameters": [
+                                            "SuperPowerUp",
+                                            "Sticker",
+                                            "Block",
+                                            ""
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "parameters": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Blocks start with outline disabled (it is activated when a ball hits a block)",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "EnableEffect"
+                          },
+                          "parameters": [
+                            "Block",
+                            "\"Outline\"",
+                            "no"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Link",
+                      "include": {
+                        "includeConfig": 0
+                      },
+                      "target": "ApplyColorToBlocks"
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Create Blocks",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Reset values of block generators",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "BlockGenerator",
+                            "BlockStrength",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Pick the number of blocks to create",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "BlocksToCreate",
+                            "=",
+                            "RandomInRange(Variable(MinBlockUpgradesPerLevel),Variable(MaxBlockUpgradesPerLevel))"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Pick a random block generator and increase the strength based on the current level (some might be picked more than once and will get extra strength)",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "Variable(BlocksToCreate)",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "AjoutHasard"
+                          },
+                          "parameters": [
+                            "",
+                            "BlockGenerator"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "BlockGenerator",
+                            "BlockStrength",
+                            "+",
+                            "Variable(CurrentLevel)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Create blocks based on strength of generator",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "BlockGenerator",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "BlockGenerator",
+                                "BlockStrength",
+                                ">",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "Block",
+                                "BlockGenerator.X()",
+                                "BlockGenerator.Y()",
+                                "\"\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangePlan"
+                              },
+                              "parameters": [
+                                "Block",
+                                "=",
+                                "TopWall.ZOrder()-2"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetCenter"
+                              },
+                              "parameters": [
+                                "Block",
+                                "=",
+                                "BlockGenerator.CenterX()",
+                                "=",
+                                "BlockGenerator.CenterY()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Block",
+                                "BlockStrength",
+                                "=",
+                                "BlockGenerator.Variable(BlockStrength)"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Create text to show inside of the block",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Create"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "BlockStrength_Text",
+                                    "Block.X()",
+                                    "Block.Y()",
+                                    "\"\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "TextObject::String"
+                                  },
+                                  "parameters": [
+                                    "BlockStrength_Text",
+                                    "=",
+                                    "ToString(Block.Variable(BlockStrength))"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SetCenter"
+                                  },
+                                  "parameters": [
+                                    "BlockStrength_Text",
+                                    "=",
+                                    "Block.CenterX()",
+                                    "=",
+                                    "Block.CenterY()"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ChangePlan"
+                                  },
+                                  "parameters": [
+                                    "BlockStrength_Text",
+                                    "=",
+                                    "Block.ZOrder()+1"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Sticker::Sticker::Stick"
+                                  },
+                                  "parameters": [
+                                    "BlockStrength_Text",
+                                    "Sticker",
+                                    "Block",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Add powerups on block generators with no blocks (based on a random chance)",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "BlockGenerator",
+                                "BlockStrength",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "colorB": 228,
+                              "colorG": 176,
+                              "colorR": 74,
+                              "creationTime": 0,
+                              "name": "Extra ball powerup",
+                              "source": "",
+                              "type": "BuiltinCommonInstructions::Group",
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "ObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "BlockGenerator",
+                                        "SuperPowerup",
+                                        "False"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "Variable(ExtraBallChance)",
+                                        ">",
+                                        "RandomFloatInRange(0,1)"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "Create"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "Block",
+                                        "BlockGenerator.X()",
+                                        "BlockGenerator.Y()",
+                                        "\"\""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ChangePlan"
+                                      },
+                                      "parameters": [
+                                        "Block",
+                                        "=",
+                                        "TopWall.ZOrder()-2"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetCenter"
+                                      },
+                                      "parameters": [
+                                        "Block",
+                                        "=",
+                                        "BlockGenerator.CenterX()",
+                                        "=",
+                                        "BlockGenerator.CenterY()"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "Block",
+                                        "BlockStrength",
+                                        "=",
+                                        "1"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "BlockGenerator",
+                                        "ExtraBall",
+                                        "True"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "Block",
+                                        "ExtraBall",
+                                        "True"
+                                      ]
+                                    }
+                                  ],
+                                  "events": [
+                                    {
+                                      "type": "BuiltinCommonInstructions::Comment",
+                                      "color": {
+                                        "b": 109,
+                                        "g": 230,
+                                        "r": 255,
+                                        "textB": 0,
+                                        "textG": 0,
+                                        "textR": 0
+                                      },
+                                      "comment": "Create powerup to show inside of the block",
+                                      "comment2": ""
+                                    },
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "Create"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            "ExtraBall",
+                                            "Block.X()",
+                                            "Block.Y()",
+                                            "\"\""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "SetCenter"
+                                          },
+                                          "parameters": [
+                                            "ExtraBall",
+                                            "=",
+                                            "Block.CenterX()",
+                                            "=",
+                                            "Block.CenterY()"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "ChangePlan"
+                                          },
+                                          "parameters": [
+                                            "ExtraBall",
+                                            "=",
+                                            "Block.ZOrder()+1"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "Sticker::Sticker::Stick"
+                                          },
+                                          "parameters": [
+                                            "ExtraBall",
+                                            "Sticker",
+                                            "Block",
+                                            ""
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "parameters": []
+                            },
+                            {
+                              "colorB": 228,
+                              "colorG": 176,
+                              "colorR": 74,
+                              "creationTime": 0,
+                              "name": "Super powerup",
+                              "source": "",
+                              "type": "BuiltinCommonInstructions::Group",
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "ObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "BlockGenerator",
+                                        "ExtraBall",
+                                        "False"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "Variable(SuperPowerUpChance)",
+                                        ">",
+                                        "1 - RandomFloatInRange(0,1)"
                                       ]
                                     }
                                   ],
@@ -10104,7 +10786,7 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "If direction is downward, choose the correct horizontal angle",
+                  "comment": "Restrict horizontal angles",
                   "comment2": ""
                 },
                 {
@@ -11255,7 +11937,7 @@
                                           "parameters": [
                                             "SuperPowerUpAngle",
                                             "=",
-                                            "-30"
+                                            "-35"
                                           ]
                                         }
                                       ]
