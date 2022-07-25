@@ -1209,9 +1209,9 @@
                         "value": "ModVarScene"
                       },
                       "parameters": [
-                        "TweenDuration",
+                        "PickupBall_Duration",
                         "=",
-                        "200"
+                        "125"
                       ]
                     },
                     {
@@ -1219,9 +1219,19 @@
                         "value": "ModVarScene"
                       },
                       "parameters": [
-                        "DropTweenDuration",
+                        "MoveBall_Duration",
                         "=",
-                        "250"
+                        "150"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "DropBall_Duration",
+                        "=",
+                        "150"
                       ]
                     },
                     {
@@ -1520,7 +1530,7 @@
                                 "\"PickupBall\"",
                                 "Cup.Y() - 1.1 * BallObjects.Height()",
                                 "\"easeInQuad\"",
-                                "150",
+                                "Variable(PickupBall_Duration)",
                                 ""
                               ]
                             },
@@ -1604,7 +1614,7 @@
                                         "value": "Wait"
                                       },
                                       "parameters": [
-                                        ".150"
+                                        "Variable(PickupBall_Duration)/1000"
                                       ]
                                     }
                                   ],
@@ -1791,36 +1801,6 @@
                         "lerp(BallObjects.X(),MouseX() - Variable(HoverOffsetX),0.3)",
                         "=",
                         "lerp(BallObjects.Y(),MouseY() - Variable(HoverOffsetY),0.3)"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "ObjectVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "BallObjects",
-                        "PickedUp",
-                        "True"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetCenter"
-                      },
-                      "parameters": [
-                        "BallObjects",
-                        "=",
-                        "MouseX() - Variable(HoverOffsetX)",
-                        "=",
-                        "MouseY() - Variable(HoverOffsetY)"
                       ]
                     }
                   ]
@@ -2070,7 +2050,7 @@
                                 "Cup.CenterX()",
                                 "Cup.Y() - (1.5 * BallObjects.Height())",
                                 "\"linear\"",
-                                "200",
+                                "Variable(MoveBall_Duration)",
                                 ""
                               ]
                             },
@@ -2079,7 +2059,7 @@
                                 "value": "Wait"
                               },
                               "parameters": [
-                                "0.200"
+                                "Variable(MoveBall_Duration)/1000"
                               ]
                             },
                             {
@@ -2102,7 +2082,7 @@
                                 "Cup.CenterX()",
                                 "Cup.Y() + (Variable(MaxBallsPerCup) - Cup.Variable(Balls) - 1) * BallObjects.Height()",
                                 "\"linear\"",
-                                "200",
+                                "Variable(DropBall_Duration)",
                                 ""
                               ]
                             },
@@ -2176,7 +2156,7 @@
                                 "Cup.CenterX()",
                                 "Cup.Y() - (1.5 * BallObjects.Height())",
                                 "\"linear\"",
-                                "200",
+                                "Variable(MoveBall_Duration)",
                                 ""
                               ]
                             },
@@ -2185,7 +2165,7 @@
                                 "value": "Wait"
                               },
                               "parameters": [
-                                "0.200"
+                                "Variable(MoveBall_Duration)/1000"
                               ]
                             },
                             {
@@ -2199,7 +2179,7 @@
                                 "Cup.CenterX()",
                                 "Cup.Y() + (Variable(MaxBallsPerCup) - Cup.Variable(Balls) - 1) * BallObjects.Height()",
                                 "\"linear\"",
-                                "200",
+                                "Variable(DropBall_Duration)",
                                 ""
                               ]
                             },
@@ -2284,322 +2264,416 @@
                                 "value": "Wait"
                               },
                               "parameters": [
-                                "0.400"
+                                "(Variable(MoveBall_Duration) + Variable(DropBall_Duration))/1000"
                               ]
-                            }
-                          ],
-                          "events": [
+                            },
                             {
-                              "colorB": 228,
-                              "colorG": 176,
-                              "colorR": 74,
-                              "creationTime": 0,
-                              "name": "Check if level is complete",
-                              "source": "",
-                              "type": "BuiltinCommonInstructions::Group",
-                              "events": [
-                                {
-                                  "type": "BuiltinCommonInstructions::Standard",
-                                  "conditions": [],
-                                  "actions": [
-                                    {
-                                      "type": {
-                                        "value": "SetSceneVariableAsBoolean"
-                                      },
-                                      "parameters": [
-                                        "LevelComplete",
-                                        "True"
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "colorB": 228,
-                                  "colorG": 176,
-                                  "colorR": 74,
-                                  "creationTime": 0,
-                                  "name": "Test all possible colors to see if any cup is NOT full with the same color",
-                                  "source": "",
-                                  "type": "BuiltinCommonInstructions::Group",
-                                  "events": [
-                                    {
-                                      "type": "BuiltinCommonInstructions::ForEach",
-                                      "object": "Cup",
-                                      "conditions": [],
-                                      "actions": [],
-                                      "events": [
-                                        {
-                                          "type": "BuiltinCommonInstructions::Standard",
-                                          "conditions": [
-                                            {
-                                              "type": {
-                                                "value": "CollisionNP"
-                                              },
-                                              "parameters": [
-                                                "WhiteBall",
-                                                "Cup",
-                                                "",
-                                                "",
-                                                "yes"
-                                              ]
-                                            },
-                                            {
-                                              "type": {
-                                                "value": "BuiltinCommonInstructions::CompareNumbers"
-                                              },
-                                              "parameters": [
-                                                "PickedInstancesCount(WhiteBall)",
-                                                "!=",
-                                                "Variable(MaxBallsPerCup)"
-                                              ]
-                                            }
-                                          ],
-                                          "actions": [
-                                            {
-                                              "type": {
-                                                "value": "SetSceneVariableAsBoolean"
-                                              },
-                                              "parameters": [
-                                                "LevelComplete",
-                                                "False"
-                                              ]
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "BuiltinCommonInstructions::Standard",
-                                          "conditions": [
-                                            {
-                                              "type": {
-                                                "value": "CollisionNP"
-                                              },
-                                              "parameters": [
-                                                "PurpleBall",
-                                                "Cup",
-                                                "",
-                                                "",
-                                                "yes"
-                                              ]
-                                            },
-                                            {
-                                              "type": {
-                                                "value": "BuiltinCommonInstructions::CompareNumbers"
-                                              },
-                                              "parameters": [
-                                                "PickedInstancesCount(PurpleBall)",
-                                                "!=",
-                                                "Variable(MaxBallsPerCup)"
-                                              ]
-                                            }
-                                          ],
-                                          "actions": [
-                                            {
-                                              "type": {
-                                                "value": "SetSceneVariableAsBoolean"
-                                              },
-                                              "parameters": [
-                                                "LevelComplete",
-                                                "False"
-                                              ]
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "BuiltinCommonInstructions::Standard",
-                                          "conditions": [
-                                            {
-                                              "type": {
-                                                "value": "CollisionNP"
-                                              },
-                                              "parameters": [
-                                                "BlueBall",
-                                                "Cup",
-                                                "",
-                                                "",
-                                                "yes"
-                                              ]
-                                            },
-                                            {
-                                              "type": {
-                                                "value": "BuiltinCommonInstructions::CompareNumbers"
-                                              },
-                                              "parameters": [
-                                                "PickedInstancesCount(BlueBall)",
-                                                "!=",
-                                                "Variable(MaxBallsPerCup)"
-                                              ]
-                                            }
-                                          ],
-                                          "actions": [
-                                            {
-                                              "type": {
-                                                "value": "SetSceneVariableAsBoolean"
-                                              },
-                                              "parameters": [
-                                                "LevelComplete",
-                                                "False"
-                                              ]
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "BuiltinCommonInstructions::Standard",
-                                          "conditions": [
-                                            {
-                                              "type": {
-                                                "value": "CollisionNP"
-                                              },
-                                              "parameters": [
-                                                "MagentaBall",
-                                                "Cup",
-                                                "",
-                                                "",
-                                                "yes"
-                                              ]
-                                            },
-                                            {
-                                              "type": {
-                                                "value": "BuiltinCommonInstructions::CompareNumbers"
-                                              },
-                                              "parameters": [
-                                                "PickedInstancesCount(MagentaBall)",
-                                                "!=",
-                                                "Variable(MaxBallsPerCup)"
-                                              ]
-                                            }
-                                          ],
-                                          "actions": [
-                                            {
-                                              "type": {
-                                                "value": "SetSceneVariableAsBoolean"
-                                              },
-                                              "parameters": [
-                                                "LevelComplete",
-                                                "False"
-                                              ]
-                                            }
-                                          ]
-                                        },
-                                        {
-                                          "type": "BuiltinCommonInstructions::Standard",
-                                          "conditions": [
-                                            {
-                                              "type": {
-                                                "value": "CollisionNP"
-                                              },
-                                              "parameters": [
-                                                "GreenBall",
-                                                "Cup",
-                                                "",
-                                                "",
-                                                "yes"
-                                              ]
-                                            },
-                                            {
-                                              "type": {
-                                                "value": "BuiltinCommonInstructions::CompareNumbers"
-                                              },
-                                              "parameters": [
-                                                "PickedInstancesCount(GreenBall)",
-                                                "!=",
-                                                "Variable(MaxBallsPerCup)"
-                                              ]
-                                            }
-                                          ],
-                                          "actions": [
-                                            {
-                                              "type": {
-                                                "value": "SetSceneVariableAsBoolean"
-                                              },
-                                              "parameters": [
-                                                "LevelComplete",
-                                                "False"
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ],
-                                  "parameters": []
-                                },
-                                {
-                                  "type": "BuiltinCommonInstructions::Standard",
-                                  "conditions": [
-                                    {
-                                      "type": {
-                                        "value": "SceneVariableAsBoolean"
-                                      },
-                                      "parameters": [
-                                        "LevelComplete",
-                                        "True"
-                                      ]
-                                    }
-                                  ],
-                                  "actions": [
-                                    {
-                                      "type": {
-                                        "value": "SceneBackground"
-                                      },
-                                      "parameters": [
-                                        "",
-                                        "\"189;16;224\""
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "ModVarSceneTxt"
-                                      },
-                                      "parameters": [
-                                        "GameState",
-                                        "=",
-                                        "\"LevelComplete\""
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "BuiltinCommonInstructions::Standard",
-                                  "conditions": [
-                                    {
-                                      "type": {
-                                        "value": "SceneVariableAsBoolean"
-                                      },
-                                      "parameters": [
-                                        "LevelComplete",
-                                        "False"
-                                      ]
-                                    }
-                                  ],
-                                  "actions": [
-                                    {
-                                      "type": {
-                                        "value": "SceneBackground"
-                                      },
-                                      "parameters": [
-                                        "",
-                                        "\"80;227;194\""
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "ModVarSceneTxt"
-                                      },
-                                      "parameters": [
-                                        "GameState",
-                                        "=",
-                                        "\"Idle\""
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ],
-                              "parameters": []
+                              "type": {
+                                "value": "ModVarSceneTxt"
+                              },
+                              "parameters": [
+                                "GameState",
+                                "=",
+                                "\"CheckIfComplete\""
+                              ]
                             }
                           ]
                         }
                       ],
                       "parameters": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "GameState: CheckIfComplete",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "GameState",
+                    "=",
+                    "\"CheckIfComplete\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "LevelComplete",
+                        "True"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Test all possible colors to see if any cup is NOT full with the same color",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "Cup",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CollisionNP"
+                              },
+                              "parameters": [
+                                "WhiteBall",
+                                "Cup",
+                                "",
+                                "",
+                                "no"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "PickedInstancesCount(WhiteBall)",
+                                "!=",
+                                "Variable(MaxBallsPerCup)"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "LevelComplete",
+                                "False"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CollisionNP"
+                              },
+                              "parameters": [
+                                "PurpleBall",
+                                "Cup",
+                                "",
+                                "",
+                                "no"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "PickedInstancesCount(PurpleBall)",
+                                "!=",
+                                "Variable(MaxBallsPerCup)"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "LevelComplete",
+                                "False"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CollisionNP"
+                              },
+                              "parameters": [
+                                "BlueBall",
+                                "Cup",
+                                "",
+                                "",
+                                "no"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "PickedInstancesCount(BlueBall)",
+                                "!=",
+                                "Variable(MaxBallsPerCup)"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "LevelComplete",
+                                "False"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CollisionNP"
+                              },
+                              "parameters": [
+                                "MagentaBall",
+                                "Cup",
+                                "",
+                                "",
+                                "no"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "PickedInstancesCount(MagentaBall)",
+                                "!=",
+                                "Variable(MaxBallsPerCup)"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "LevelComplete",
+                                "False"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CollisionNP"
+                              },
+                              "parameters": [
+                                "GreenBall",
+                                "Cup",
+                                "",
+                                "",
+                                "no"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "PickedInstancesCount(GreenBall)",
+                                "!=",
+                                "Variable(MaxBallsPerCup)"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "LevelComplete",
+                                "False"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Transition",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "LevelComplete",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SceneBackground"
+                          },
+                          "parameters": [
+                            "",
+                            "\"189;16;224\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "GameState",
+                            "=",
+                            "\"LevelComplete\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "LevelComplete",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SceneBackground"
+                          },
+                          "parameters": [
+                            "",
+                            "\"80;227;194\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "GameState",
+                            "=",
+                            "\"Idle\""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "GameState: LevelComplete",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "GameState",
+                    "=",
+                    "\"LevelComplete\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonReleased"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarSceneTxt"
+                      },
+                      "parameters": [
+                        "GameState",
+                        "=",
+                        "\"Idle\""
+                      ]
                     }
                   ]
                 }
