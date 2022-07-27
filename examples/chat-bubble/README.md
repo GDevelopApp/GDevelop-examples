@@ -1,0 +1,1 @@
+A demo for using the chat bubble extension.
