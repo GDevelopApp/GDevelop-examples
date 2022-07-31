@@ -534,7 +534,13 @@
           "updateIfNotVisible": false,
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "AutoTiling",
+              "type": "AutoTiling::AutoTiling",
+              "IsCreated": true
+            }
+          ],
           "animations": [
             {
               "name": "TilledDirt-1",
@@ -1054,61 +1060,9 @@
                 "",
                 "Right"
               ]
-            },
-            {
-              "type": {
-                "value": "AutoTiling::CheckTileExist"
-              },
-              "parameters": [
-                "",
-                "CursorOutline.X()",
-                "CursorOutline.Y()",
-                ""
-              ]
             }
           ],
-          "actions": [
-            {
-              "type": {
-                "value": "SetSceneVariableAsBoolean"
-              },
-              "parameters": [
-                "__TileScan.Scan",
-                "True"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "__TileScan.X",
-                "=",
-                "CursorOutline.X()"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "__TileScan.Y",
-                "=",
-                "CursorOutline.Y()"
-              ]
-            },
-            {
-              "type": {
-                "value": "AutoTiling::RemoveTileFromSet"
-              },
-              "parameters": [
-                "",
-                "CursorOutline.X()",
-                "CursorOutline.Y()",
-                ""
-              ]
-            }
-          ],
+          "actions": [],
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -1159,61 +1113,9 @@
                 "",
                 "Left"
               ]
-            },
-            {
-              "type": {
-                "inverted": true,
-                "value": "AutoTiling::CheckTileExist"
-              },
-              "parameters": [
-                "",
-                "CursorOutline.X()",
-                "CursorOutline.Y()",
-                ""
-              ]
             }
           ],
           "actions": [
-            {
-              "type": {
-                "value": "AutoTiling::AddPositionToTileSet"
-              },
-              "parameters": [
-                "",
-                "CursorOutline.X()",
-                "CursorOutline.Y()",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "SetSceneVariableAsBoolean"
-              },
-              "parameters": [
-                "__TileScan.Scan",
-                "True"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "__TileScan.X",
-                "=",
-                "CursorOutline.X()"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "__TileScan.Y",
-                "=",
-                "CursorOutline.Y()"
-              ]
-            },
             {
               "type": {
                 "value": "Create"
@@ -1243,13 +1145,7 @@
                 "=",
                 "MouseY()"
               ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
+            },
             {
               "type": {
                 "value": "SnapToGrid::SnapObjectToVirtualGrid"
@@ -1263,42 +1159,15 @@
                 "0",
                 ""
               ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "SceneVariableAsBoolean"
-              },
-              "parameters": [
-                "__TileScan.Scan",
-                "True"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "SetSceneVariableAsBoolean"
-              },
-              "parameters": [
-                "__TileScan.Scan",
-                "False"
-              ]
             },
             {
               "type": {
-                "value": "AutoTiling::UpdateFrames"
+                "value": "TextObject::String"
               },
               "parameters": [
-                "",
-                "Sand",
-                "Variable(__TileScan.X)",
-                "Variable(__TileScan.Y)",
-                ""
+                "Instructions",
+                "=",
+                "ToString(SceneInstancesCount(Sand))"
               ]
             }
           ]
@@ -1350,7 +1219,12 @@
           "effects": []
         }
       ],
-      "behaviorsSharedData": []
+      "behaviorsSharedData": [
+        {
+          "name": "AutoTiling",
+          "type": "AutoTiling::AutoTiling"
+        }
+      ]
     }
   ],
   "externalEvents": [],
@@ -1516,7 +1390,7 @@
             },
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "let TileMapInstance;\n\nconst TileMap = function() {\n    if(TileMapInstance)\n        return TileMapInstance;\n    TileMapInstance = new Set();\n    return TileMapInstance;\n};\n\ngdjs.__AutoTiling = {\n    TileMap\n};\n",
+              "inlineCode": "let TileMapInstance, TileObjectReferencesInstance;\n\nconst TileMap = function() {\n    if(TileMapInstance)\n        return TileMapInstance;\n    TileMapInstance = new Set();\n    return TileMapInstance;\n};\n\nconst TileObjectReferences = function() {\n    if(TileObjectReferencesInstance)\n        return TileObjectReferencesInstance;\n    TileObjectReferencesInstance = new Set();\n    return TileObjectReferencesInstance;\n};\n\ngdjs.__AutoTiling = {\n    TileMap,\n    TileObjectReferences\n};\n",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -1531,7 +1405,7 @@
           "functionType": "Condition",
           "group": "AutoTiling",
           "name": "CheckTileExist",
-          "private": false,
+          "private": true,
           "sentence": "Check if a tile exist using positions _PARAM1_, _PARAM2_",
           "events": [
             {
@@ -1577,7 +1451,7 @@
           "functionType": "Action",
           "group": "AutoTiling",
           "name": "AddPositionToTileSet",
-          "private": false,
+          "private": true,
           "sentence": "Add tilemap positions using _PARAM1_, _PARAM2_",
           "events": [
             {
@@ -1618,7 +1492,7 @@
           "functionType": "Action",
           "group": "AutoTiling",
           "name": "RemoveTileFromSet",
-          "private": false,
+          "private": true,
           "sentence": "Remove tilemap position using _PARAM1_, _PARAM2_",
           "events": [
             {
@@ -1654,58 +1528,385 @@
           "objectGroups": []
         },
         {
-          "description": "Update sprite frames",
-          "fullName": "Update sprite frames",
+          "description": "Add Object Reference.",
+          "fullName": "Add Object Reference",
           "functionType": "Action",
           "group": "AutoTiling",
-          "name": "UpdateFrames",
-          "private": false,
-          "sentence": "Update animation frames of _PARAM1_ and its adjacents sprites from position _PARAM2_, _PARAM3_.",
+          "name": "AddObjectReference",
+          "private": true,
+          "sentence": "Add Object Reference _PARAM1_",
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "const TileMap = new gdjs.__AutoTiling.TileMap();\n\nfunction checkMap(x,y) {\n    return TileMap.has([\n        'x',x,\n        'y',y\n    ].join(''))*1;\n\n}\n\n// Only scan changedTiles and its adjacent tiles\nconst TileScan = {\n    X: eventsFunctionContext.getArgument('X'),\n    Y: eventsFunctionContext.getArgument('Y')\n};\n\nconst dimension = objects[0].getWidth();\n\nlet toScanCoordinates = {};\n\ntoScanCoordinates[[\n    'x',TileScan.X,\n    'y',TileScan.Y\n].join('')] = true;\n\ntoScanCoordinates[[\n    'x',TileScan.X+dimension,\n    'y',TileScan.Y\n].join('')] = true;\n\ntoScanCoordinates[[\n    'x',TileScan.X-dimension,\n    'y',TileScan.Y\n].join('')] = true;\n\ntoScanCoordinates[[\n    'x',TileScan.X,\n    'y',TileScan.Y+dimension\n].join('')] = true;\n\ntoScanCoordinates[[\n    'x',TileScan.X,\n    'y',TileScan.Y-dimension\n].join('')] = true;\n\nobjects.forEach(SpriteObject => {\n\n    // filter only adjacent tiles\n    if(toScanCoordinates[[\n        'x',SpriteObject.getX(),\n        'y',SpriteObject.getY()\n    ].join('')] == undefined) return;\n\n    let frame = 0;\n\n    // Check Down\n    frame += checkMap(SpriteObject.getX(),SpriteObject.getY()+dimension)*8;\n\n    // Check left\n    frame += checkMap(SpriteObject.getX()-dimension,SpriteObject.getY())*4;\n    \n    // Check Up\n    frame += checkMap(SpriteObject.getX(),SpriteObject.getY()-dimension)*2;\n\n    // Check Right\n    frame += checkMap(SpriteObject.getX()+dimension,SpriteObject.getY())*1;\n\n    // Change tile to the appropriate map\n    SpriteObject.setAnimationFrame(frame);\n});",
-              "parameterObjects": "SpriteObject",
+              "inlineCode": "const TileObjectReferences = new gdjs.__AutoTiling.TileObjectReferences();\n\nTileObjectReferences.add(objects[0]);",
+              "parameterObjects": "ObjectReference",
               "useStrict": true,
-              "eventsSheetExpanded": true
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
             {
               "codeOnly": false,
               "defaultValue": "",
-              "description": "Sprite Object",
+              "description": "Object Reference",
               "longDescription": "",
-              "name": "SpriteObject",
+              "name": "ObjectReference",
               "optional": false,
               "supplementaryInformation": "Sprite",
               "type": "objectList"
-            },
-            {
-              "codeOnly": false,
-              "defaultValue": "",
-              "description": "X Position",
-              "longDescription": "",
-              "name": "X",
-              "optional": false,
-              "supplementaryInformation": "",
-              "type": "expression"
-            },
-            {
-              "codeOnly": false,
-              "defaultValue": "",
-              "description": "Y Position",
-              "longDescription": "",
-              "name": "Y",
-              "optional": false,
-              "supplementaryInformation": "",
-              "type": "expression"
             }
           ],
           "objectGroups": []
+        },
+        {
+          "description": "Remove Object Reference.",
+          "fullName": "Remove Object Reference",
+          "functionType": "Action",
+          "group": "AutoTiling",
+          "name": "RemoveObjectReference",
+          "private": true,
+          "sentence": "Remove Object Reference _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const TileObjectReferences = new gdjs.__AutoTiling.TileObjectReferences();\n\nTileObjectReferences.delete(objects[0]);",
+              "parameterObjects": "ObjectReference",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object Reference",
+              "longDescription": "",
+              "name": "ObjectReference",
+              "optional": false,
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "",
+          "fullName": "",
+          "functionType": "Action",
+          "group": "",
+          "name": "onScenePostEvents",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "__AutoTiling.Scan",
+                    "True"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetSceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "__AutoTiling.Scan",
+                    "False"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const objects = Array.from(new gdjs.__AutoTiling.TileObjectReferences());\n\nif(objects.size == 0) return;\n\nconst SceneVariables = runtimeScene.getVariables().get('__AutoTiling').getAllChildren();\nconst TileMap = new gdjs.__AutoTiling.TileMap();\n\nfunction checkMap(x,y) {\n    return TileMap.has([\n        'x',x,\n        'y',y\n    ].join(''))*1;\n\n}\n\n// Only scan changedTiles and its adjacent tiles\nconst TileScan = {\n    X: SceneVariables.X.getAsNumber(),\n    Y: SceneVariables.Y.getAsNumber()\n};\n\nconst dimension = objects[0].getWidth();\n\nlet toScanCoordinates = {};\n\ntoScanCoordinates[[\n    'x',TileScan.X,\n    'y',TileScan.Y\n].join('')] = true;\n\ntoScanCoordinates[[\n    'x',TileScan.X+dimension,\n    'y',TileScan.Y\n].join('')] = true;\n\ntoScanCoordinates[[\n    'x',TileScan.X-dimension,\n    'y',TileScan.Y\n].join('')] = true;\n\ntoScanCoordinates[[\n    'x',TileScan.X,\n    'y',TileScan.Y+dimension\n].join('')] = true;\n\ntoScanCoordinates[[\n    'x',TileScan.X,\n    'y',TileScan.Y-dimension\n].join('')] = true;\n\nobjects.forEach(SpriteObject => {\n\n    // filter only adjacent tiles\n    if(toScanCoordinates[[\n        'x',SpriteObject.getX(),\n        'y',SpriteObject.getY()\n    ].join('')] == undefined) return;\n\n    let frame = 0;\n\n    // Check Down\n    frame += checkMap(SpriteObject.getX(),SpriteObject.getY()+dimension)*8;\n\n    // Check left\n    frame += checkMap(SpriteObject.getX()-dimension,SpriteObject.getY())*4;\n    \n    // Check Up\n    frame += checkMap(SpriteObject.getX(),SpriteObject.getY()-dimension)*2;\n\n    // Check Right\n    frame += checkMap(SpriteObject.getX()+dimension,SpriteObject.getY())*1;\n\n    // Change tile to the appropriate map\n    SpriteObject.setAnimationFrame(frame);\n});",
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ]
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
         }
       ],
-      "eventsBasedBehaviors": []
+      "eventsBasedBehaviors": [
+        {
+          "description": "Automatically changes sprite frames according to its adjacent sprites",
+          "fullName": "AutoTiling",
+          "name": "AutoTiling",
+          "objectType": "Sprite",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "group": "",
+              "name": "doStepPostEvents",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "AutoTiling::AutoTiling::PropertyIsCreated"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AutoTiling::AutoTiling::SetPropertyIsCreated"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "AutoTiling::CheckTileExist"
+                          },
+                          "parameters": [
+                            "",
+                            "Object.X()",
+                            "Object.Y()",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "Object",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "AutoTiling::CheckTileExist"
+                          },
+                          "parameters": [
+                            "",
+                            "Object.X()",
+                            "Object.Y()",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "AutoTiling::AddPositionToTileSet"
+                          },
+                          "parameters": [
+                            "",
+                            "Object.X()",
+                            "Object.Y()",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "AutoTiling::AddObjectReference"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "__AutoTiling.Scan",
+                            "True"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__AutoTiling.X",
+                            "=",
+                            "Object.X()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__AutoTiling.Y",
+                            "=",
+                            "Object.Y()"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "AutoTiling::AutoTiling",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "group": "",
+              "name": "onDestroy",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "__AutoTiling.Scan",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__AutoTiling.X",
+                        "=",
+                        "Object.X()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "__AutoTiling.Y",
+                        "=",
+                        "Object.Y()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "AutoTiling::RemoveTileFromSet"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.X()",
+                        "Object.Y()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "AutoTiling::RemoveObjectReference"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "AutoTiling::AutoTiling",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Is Created",
+              "description": "",
+              "group": "AutoTiling",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "IsCreated"
+            }
+          ]
+        }
+      ]
     }
   ],
   "externalLayouts": [],
