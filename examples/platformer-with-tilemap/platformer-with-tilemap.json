@@ -272,12 +272,12 @@
               "TargetDirectionY": 0
             },
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "gravity": 250,
               "jumpSpeed": 150,
               "jumpSustainTime": 0.2,
               "maxFallingSpeed": 200,
-              "name": "PlatformerObject",
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "ladderClimbingSpeed": 100,
               "yGrabOffset": 0,
               "maxSpeed": 100,
@@ -648,6 +648,16 @@
           "actions": [
             {
               "type": {
+                "value": "SmoothCamera::SmoothCamera::Follow"
+              },
+              "parameters": [
+                "Hero",
+                "SmoothCamera",
+                ""
+              ]
+            },
+            {
+              "type": {
                 "value": "CopyCameraSettings::CopyCameraSettings"
               },
               "parameters": [
@@ -1000,7 +1010,7 @@
       "name": "SmoothCamera",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_camcoder_gopro_go_pro_camera.svg",
       "shortDescription": "Smoothly scroll to follow an object.",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "origin": {
         "identifier": "SmoothCamera",
         "name": "gdevelop-extension-store"
@@ -1227,6 +1237,140 @@
               "name": "doStepPreEvents",
               "private": false,
               "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SmoothCamera::SmoothCamera::PropertyIsCalledManually"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::DoFollow"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Move the camera toward the object. This action must be called after the object has moved for the frame.",
+              "fullName": "Be followed by the camera",
+              "functionType": "Action",
+              "group": "",
+              "name": "Follow",
+              "private": false,
+              "sentence": "Move the camera toward _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "The camera following is called with an action, disable the call from doStepPreEvents.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::SetPropertyIsCalledManually"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::DoFollow"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Move the camera toward the object. This action must be called after the object has moved for the frame.",
+              "fullName": "Do follow",
+              "functionType": "Action",
+              "group": "",
+              "name": "DoFollow",
+              "private": true,
+              "sentence": "Do move the camera toward _PARAM0_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Comment",
@@ -6149,6 +6293,16 @@
               "extraInformation": [],
               "hidden": true,
               "name": "OldY"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "IsCalledManually"
             }
           ]
         },
