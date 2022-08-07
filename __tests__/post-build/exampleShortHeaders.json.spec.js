@@ -37,7 +37,7 @@ describe('exampleShortHeaders.json post build checks', () => {
         license: 'MIT',
         previewImageUrls: [
           'https://resources.gdevelop-app.com/examples/platformer/preview.png',
-          'https://resources.gdevelop-app.com/examples/platformer/thumbnail.png',
+          'https://resources.gdevelop-app.com/examples/platformer/square-icon.png',
         ],
         tags: expect.arrayContaining([
           'platformer',

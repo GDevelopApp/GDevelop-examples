@@ -170,6 +170,7 @@ const checkProjectResourceFiles = async (project, projectFolderPath) => {
 
 const sortedStarterSlugs = new Set([
   'platformer',
+  'spherez',
   'absorbus',
   'tappy-plane',
   'parking-jam',
@@ -206,7 +207,7 @@ const getStaticTags = (exampleSlug) => {
  */
 const getPreviewImageUrls = (gameFolderPath, allFiles) => {
   const imageUrls = [];
-  for (const imageName of ['preview.png', 'thumbnail.png']) {
+  for (const imageName of ['thumbnail.png', 'preview.png', 'square-icon.png']) {
     const imagePath = normalizePathSeparators(
       path.join(gameFolderPath, imageName)
     );

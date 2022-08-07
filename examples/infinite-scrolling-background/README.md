@@ -1,1 +1,1 @@
-Learn twi differents ways to create a background that is scolling infinitely.
+Learn two different ways to create a background that is scrolling infinitely.
