@@ -6974,12 +6974,12 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Health::Health::SetShieldPoints"
+                        "value": "Health::Health::ActivateShield"
                       },
                       "parameters": [
                         "Ship",
                         "Health",
-                        "Ship.Health::MaxShield()",
+                        "200",
                         "",
                         ""
                       ]
@@ -25541,7 +25541,7 @@
     {
       "author": "@4ian",
       "category": "General",
-      "description": "Manage health (life) points including a protective shield and armor. Health can be assigned to players, enemies, NPCs, or even inanimate objects such as breaking doors and mining rocks.\n\nDamage calculations are performed in this order order:\n\nIncoming Damage -> Chance to Dodge -> Flat Damage Reduction -> Percent Damage Reduction -> Damage to Shield -> Damage to Health\n\nHow to use:\n\n- Set desired values in behavior properties\n- To apply damage use “Apply damage to an object”\n- To heal health, use “Heal object” action\n- To activate the shield, use “Activate Shield” action\n- Health and shield regeneration will happen automatically based on properties\n \nTips:\n\n- While damage cooldown is active, no damage will be applied to health or shield (the object is invincible)\n- Try using the “Blink” extension while damage cooldown is active\n- Use the “Is just damaged” or \"Is just healed\" condition to trigger audio and visual effects\n\nHealth properties:\n\n- Starting health (life) points\n- Maximum health (points) Use \"0\" for no maximum\n- Damage cooldown (seconds) Use \"0\" for no cooldown\n- Rate of health regeneration (points per second)\n- Health regeneration delay after being hit (seconds)\n- Allow heals to increase health above max health (regen will never exceed max health)\n\nShield properties:\n\n- Starting points when shield is activated\n- Max shield points\n- Duration of shield (seconds) Use \"0\" to make shield permanent\n- Rate of shield regeneration (points per second)\n- Block excess damage when shield is broken\n- Delay before shield regeneration starts after being hit (seconds)\n- Regenerate shield when broken",
+      "description": "Manage health (life) points including a protective shield and armor. Health can be assigned to players, enemies, NPCs, or even inanimate objects such as breaking doors and mining rocks.\n\nDamage calculations are performed in this order:\n\nIncoming Damage -> Is Damage Cooldown active -> Chance to Dodge -> Flat Damage Reduction -> Percent Damage Reduction -> Damage to Shield -> Damage to Health\n\nHow to use:\n\n- Set desired values in behavior properties\n- To apply damage use “Apply damage to an object”\n- To heal health, use “Heal object” action\n- To activate the shield, use “Change shield points” action\n- Health and shield regeneration will happen automatically based on properties\n \nTips:\n\n- While damage cooldown is active, no damage will be applied to health or shield (the object is invincible)\n- Try using the “Blink” extension while damage cooldown is active\n- Use the “Is just damaged” or \"Is just healed\" condition to trigger audio and visual effects\n\nHealth properties:\n\n- Starting health (life) points\n- Maximum health (points) Use \"0\" for no maximum\n- Damage cooldown (seconds) Use \"0\" for no cooldown\n- Rate of health regeneration (points per second)\n- Health regeneration delay after being hit (seconds)\n- Allow heals to increase health above max health (regen will never exceed max health)\n\nShield properties:\n\n- Starting points when shield is activated\n- Max shield points\n- Duration of shield (seconds) Use \"0\" to make shield permanent\n- Rate of shield regeneration (points per second)\n- Block excess damage when shield is broken\n- Delay before shield regeneration starts after being hit (seconds)\n- Regenerate shield when broken",
       "extensionNamespace": "",
       "fullName": "Health (life) points and shield",
       "helpPath": "",
@@ -26133,7 +26133,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "HealthBehavior",
+                            "Behavior",
                             ""
                           ]
                         }
@@ -26647,7 +26647,7 @@
                                   },
                                   "parameters": [
                                     "Object",
-                                    "HealthBehavior",
+                                    "Behavior",
                                     "yes",
                                     ""
                                   ]
@@ -26674,8 +26674,8 @@
                                       },
                                       "parameters": [
                                         "Object",
-                                        "HealthBehavior",
-                                        "Object.HealthBehavior::Health() - Object.Behavior::PropertyDamageToBeApplied()",
+                                        "Behavior",
+                                        "Object.Behavior::PropertyCurrentHealth() - Object.Behavior::PropertyDamageToBeApplied()",
                                         ""
                                       ]
                                     }
@@ -28834,7 +28834,7 @@
               "fullName": "Shield points",
               "functionType": "Action",
               "group": "Shield configuration",
-              "name": "SeShieldPoints",
+              "name": "SetShieldPoints",
               "private": false,
               "sentence": "Set shield on _PARAM0_ to _PARAM2_ points",
               "events": [
@@ -29123,13 +29123,13 @@
               "objectGroups": []
             },
             {
-              "description": "Change shield points and optionally renew the shield duration.",
-              "fullName": "Shield points",
+              "description": "Activate the shield by setting the shield points and renewing the shield duration (optional).",
+              "fullName": "Activate shield",
               "functionType": "Action",
               "group": "Shield",
-              "name": "SetShieldPoints",
+              "name": "ActivateShield",
               "private": false,
-              "sentence": "Change shield points on _PARAM0_ to _PARAM2_ points (Renew Shield Duration: _PARAM3_)",
+              "sentence": "Activate shield on _PARAM0_ with _PARAM2_ points (Renew shield duration: _PARAM3_)",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -29144,6 +29144,36 @@
                         "Behavior",
                         "=",
                         "GetArgumentAsNumber(\"ShieldPoints\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Health::Health::PropertyMaxShieldPoints"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Health::Health::SetPropertyCurrentShieldPoints"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "min(GetArgumentAsNumber(\"ShieldPoints\"),Object.Behavior::MaxShield())"
                       ]
                     }
                   ]
@@ -30178,28 +30208,6 @@
             },
             {
               "value": "",
-              "type": "Behavior",
-              "label": "Health Behavior (required)",
-              "description": "",
-              "group": "",
-              "extraInformation": [
-                "Health::Health"
-              ],
-              "hidden": false,
-              "name": "HealthBehavior"
-            },
-            {
-              "value": "100",
-              "type": "Number",
-              "label": "Starting points when shield is activated",
-              "description": "",
-              "group": "Shield",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "StartingShieldPoints"
-            },
-            {
-              "value": "",
               "type": "Number",
               "label": "Current shield points",
               "description": "",
@@ -30209,9 +30217,9 @@
               "name": "CurrentShieldPoints"
             },
             {
-              "value": "100",
+              "value": "0",
               "type": "Number",
-              "label": "Max shield points",
+              "label": "Maximum shield (points) Use \"0\" for no maximum",
               "description": "",
               "group": "Shield",
               "extraInformation": [],
