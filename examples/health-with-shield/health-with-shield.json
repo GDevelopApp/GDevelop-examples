@@ -19,7 +19,7 @@
     "useExternalSourceFiles": false,
     "version": "1.0.0",
     "name": "Extension: Health (with shield)",
-    "description": "Demonstrate the Health extension including a shield, regeneration, healing, and applying damage.",
+    "description": "Demonstrate the Health extension including a shield, armor, regeneration, healing, and applying damage.",
     "author": "Victris Games",
     "windowWidth": 1920,
     "windowHeight": 1080,
@@ -6973,18 +6973,6 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Health::Health::ActivateShield"
-                      },
-                      "parameters": [
-                        "Ship",
-                        "Health",
-                        "200",
-                        "",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
                         "value": "PlaySound"
                       },
                       "parameters": [
@@ -6993,6 +6981,18 @@
                         "",
                         "40",
                         "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Health::Health::ActivateShield"
+                      },
+                      "parameters": [
+                        "Ship",
+                        "Health",
+                        "Ship.Health::MaxShield()",
+                        "",
+                        ""
                       ]
                     }
                   ],
@@ -7808,7 +7808,7 @@
                 },
                 {
                   "type": {
-                    "value": "Health::Health::SetHealth"
+                    "value": "Health::Health::SetCurrentHealth"
                   },
                   "parameters": [
                     "Ship",
@@ -25540,14 +25540,14 @@
     {
       "author": "@4ian",
       "category": "General",
-      "description": "Manage health (life) points including a protective shield and armor. Health can be assigned to players, enemies, NPCs, or even inanimate objects such as breaking doors and mining rocks.\n\nDamage calculations are performed in this order:\n\nIncoming Damage -> Is Damage Cooldown active -> Chance to Dodge -> Flat Damage Reduction -> Percent Damage Reduction -> Damage to Shield -> Damage to Health\n\nHow to use:\n\n- Set desired values in behavior properties\n- To apply damage use “Apply damage to an object”\n- To heal health, use “Heal object” action\n- To activate the shield, use “Change shield points” action\n- Health and shield regeneration will happen automatically based on properties\n \nTips:\n\n- While damage cooldown is active, no damage will be applied to health or shield (the object is invincible)\n- Try using the “Blink” extension while damage cooldown is active\n- Use the “Is just damaged” or \"Is just healed\" condition to trigger audio and visual effects\n\nHealth properties:\n\n- Starting health (life) points\n- Maximum health (points) Use \"0\" for no maximum\n- Damage cooldown (seconds) Use \"0\" for no cooldown\n- Rate of health regeneration (points per second)\n- Health regeneration delay after being hit (seconds)\n- Allow heals to increase health above max health (regen will never exceed max health)\n\nShield properties:\n\n- Starting points when shield is activated\n- Max shield points\n- Duration of shield (seconds) Use \"0\" to make shield permanent\n- Rate of shield regeneration (points per second)\n- Block excess damage when shield is broken\n- Delay before shield regeneration starts after being hit (seconds)\n- Regenerate shield when broken",
+      "description": "Manage health points including a protective shield and armor. Health can be assigned to players, enemies, NPCs, or even inanimate objects such as breaking doors and mining rocks.\n\nDamage calculations are performed in this order:\n\nIncoming Damage -> Is Damage Cooldown active? -> Chance to Dodge -> Flat Damage Reduction -> Percent Damage Reduction -> Damage to Shield -> Damage to Health\n\nHow to use:\n\n- Set desired values in behavior properties\n- To apply damage use “Apply damage to an object”\n- To heal health, use “Heal object” action\n- To activate the shield, use “Activate shield” action\n- Health and shield regeneration will happen automatically based on properties\n \nTips:\n\n- While damage cooldown is active, no damage will be applied to health or shield (the object is invincible)\n- Try using the “Blink” extension while damage cooldown is active\n- Use the “Is just damaged” or \"Is just healed\" conditions to trigger sound and visual effects\n\nHealth properties:\n\n- Starting health points\n- Maximum health points. Use \"0\" for no maximum\n- Damage cooldown (seconds) Use \"0\" for no cooldown\n- Rate of health regeneration (points per second)\n- Delay before health regeneration starts after being hit (seconds)\n- Allow heals to increase health above max health (regen will never exceed max health)\n\nShield properties:\n\n- Max shield points. Use \"0\" for no maximum\n- Duration of shield (seconds) Use \"0\" to make shield permanent\n- Rate of shield regeneration (points per second)\n- Delay before shield regeneration starts after being hit (seconds)\n- Block excess damage when shield is broken (yes/no)",
       "extensionNamespace": "",
-      "fullName": "Health (life) points and shield",
+      "fullName": "Health points and damage",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWhlYXJ0LWhhbGYtZnVsbCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNi41LDVDMTUsNSAxMy41OCw1LjkxIDEzLDcuMlYxNy43NEMxNy4yNSwxMy44NyAyMCwxMS4yIDIwLDguNUMyMCw2LjUgMTguNSw1IDE2LjUsNU0xNi41LDNDMTkuNTgsMyAyMiw1LjQxIDIyLDguNUMyMiwxMi4yNyAxOC42LDE1LjM2IDEzLjQ1LDIwLjAzTDEyLDIxLjM1TDEwLjU1LDIwLjAzQzUuNCwxNS4zNiAyLDEyLjI3IDIsOC41QzIsNS40MSA0LjQyLDMgNy41LDNDOS4yNCwzIDEwLjkxLDMuODEgMTIsNS4wOEMxMy4wOSwzLjgxIDE0Ljc2LDMgMTYuNSwzWiIgLz48L3N2Zz4=",
       "name": "Health",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/heart-half-full.svg",
-      "shortDescription": "Manage health (life) points including a protective shield and armor.",
+      "shortDescription": "Manage health points and damage, including a protective shield and armor.",
       "version": "0.1.0",
       "origin": {
         "identifier": "Health",
@@ -25601,7 +25601,7 @@
                     },
                     {
                       "type": {
-                        "value": "Health::Health::SetHealth"
+                        "value": "Health::Health::SetCurrentHealth"
                       },
                       "parameters": [
                         "Object",
@@ -26669,7 +26669,7 @@
                                   "actions": [
                                     {
                                       "type": {
-                                        "value": "Health::Health::SetHealth"
+                                        "value": "Health::Health::SetCurrentHealth"
                                       },
                                       "parameters": [
                                         "Object",
@@ -26746,13 +26746,13 @@
               "objectGroups": []
             },
             {
-              "description": "Change health points. This is not considered damage or healing.",
+              "description": "Change the health points of the object. This is not considered damage or healing.",
               "fullName": "Change health points",
               "functionType": "Action",
               "group": "Health configuration",
-              "name": "SetHealth",
+              "name": "SetCurrentHealth",
               "private": false,
-              "sentence": "Set health of _PARAM0_ to _PARAM2_ points",
+              "sentence": "Change the health of _PARAM0_ to _PARAM2_ points",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -26770,6 +26770,19 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "If MaxHealth is set, prevent health from going above it",
+                  "comment2": ""
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -26836,7 +26849,7 @@
               "objectGroups": []
             },
             {
-              "description": "Heal the object by increasing its life points.",
+              "description": "Heal the object by increasing its health points.",
               "fullName": "Heal object",
               "functionType": "Action",
               "group": "Health",
@@ -26918,7 +26931,7 @@
                           "parameters": [
                             "Object",
                             "Behavior",
-                            "!=",
+                            ">",
                             "0"
                           ]
                         },
@@ -27051,7 +27064,7 @@
               "group": "Health configuration",
               "name": "SetMaxHealth",
               "private": false,
-              "sentence": "Set maximum health of _PARAM0_ to _PARAM2_ points",
+              "sentence": "Change the maximum health of _PARAM0_ to _PARAM2_ points",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -27066,6 +27079,48 @@
                         "Behavior",
                         "=",
                         "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Make sure Current Health does not exceed new Max Health",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Health::Health::PropertyCurrentHealth"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "Object.Behavior::MaxHealth()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Health::Health::SetPropertyCurrentHealth"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Behavior::MaxHealth()"
                       ]
                     }
                   ]
@@ -27106,13 +27161,13 @@
               "objectGroups": []
             },
             {
-              "description": "Change rate of health regeneration.",
+              "description": "Change the rate of health regeneration.",
               "fullName": "Rate of health regeneration",
               "functionType": "Action",
               "group": "Health configuration",
               "name": "SetHealthRegenRate",
               "private": false,
-              "sentence": "Set rate of health regen of _PARAM0_ to _PARAM2_ points per second",
+              "sentence": "Change the rate of health regen of _PARAM0_ to _PARAM2_ points per second",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -27167,13 +27222,13 @@
               "objectGroups": []
             },
             {
-              "description": "Change duration of damage cooldown (seconds).",
+              "description": "Change the duration of damage cooldown (seconds).",
               "fullName": "Damage cooldown",
               "functionType": "Action",
               "group": "Health configuration",
               "name": "SetCooldownDuration",
               "private": false,
-              "sentence": "Set duration of damage cooldown on _PARAM0_ to _PARAM2_ seconds",
+              "sentence": "Change the duration of damage cooldown on _PARAM0_ to _PARAM2_ seconds",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -27228,13 +27283,13 @@
               "objectGroups": []
             },
             {
-              "description": "Change delay before health regeneration starts after being hit.",
+              "description": "Change the delay before health regeneration starts after being hit.",
               "fullName": "Health regeneration delay",
               "functionType": "Action",
               "group": "Health configuration",
               "name": "SetHealthRegenDelay",
               "private": false,
-              "sentence": "Set health regeneration delay on _PARAM0_ to _PARAM2_ seconds",
+              "sentence": "Change the health regeneration delay on _PARAM0_ to _PARAM2_ seconds",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -27295,7 +27350,7 @@
               "group": "Health configuration",
               "name": "SetChanceToDodge",
               "private": false,
-              "sentence": "Set chance to dodge on _PARAM0_ to _PARAM2_",
+              "sentence": "Change the chance to dodge on _PARAM0_ to _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -27356,7 +27411,7 @@
               "group": "Health configuration",
               "name": "SetFlatDamageReduction",
               "private": false,
-              "sentence": "Set flat damage reduction from armor on _PARAM0_ to _PARAM2_ points",
+              "sentence": "Change the flat damage reduction from armor on _PARAM0_ to _PARAM2_ points",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -27417,7 +27472,7 @@
               "group": "Health configuration",
               "name": "SetPercentDamageReduction",
               "private": false,
-              "sentence": "Set percent damage reduction from armor on _PARAM0_ to _PARAM2_",
+              "sentence": "Change the percent damage reduction from armor on _PARAM0_ to _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -27733,7 +27788,7 @@
               "group": "Health",
               "name": "TriggerDamageCooldown",
               "private": false,
-              "sentence": "Trigger damage cooldown on _PARAM0_",
+              "sentence": "Trigger the damage cooldown on _PARAM0_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Comment",
@@ -28311,7 +28366,7 @@
               "objectGroups": []
             },
             {
-              "description": "Health points of the object.",
+              "description": "Current health points of the object.",
               "fullName": "Health points",
               "functionType": "Expression",
               "group": "Health",
@@ -28576,8 +28631,8 @@
               "objectGroups": []
             },
             {
-              "description": "Chance to dodge damage.",
-              "fullName": "Chance to dodge damage",
+              "description": "Chance to dodge incoming damage.",
+              "fullName": "Chance to dodge incoming damage",
               "functionType": "Expression",
               "group": "Health",
               "name": "ChanceToDodge",
@@ -28768,13 +28823,13 @@
               "objectGroups": []
             },
             {
-              "description": "Change the object maximum shield points.",
+              "description": "Change the maximum shield points of the object.",
               "fullName": "Maximum shield points",
               "functionType": "Action",
               "group": "Shield configuration",
               "name": "SetMaxShield",
               "private": false,
-              "sentence": "Set maximum shield of _PARAM0_ to _PARAM2_ points",
+              "sentence": "Change the maximum shield of _PARAM0_ to _PARAM2_ points",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -28835,7 +28890,7 @@
               "group": "Shield configuration",
               "name": "SetShieldPoints",
               "private": false,
-              "sentence": "Set shield on _PARAM0_ to _PARAM2_ points",
+              "sentence": "Change the shield on _PARAM0_ to _PARAM2_ points",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -28896,7 +28951,7 @@
               "group": "Shield configuration",
               "name": "SetShieldRegenRate",
               "private": false,
-              "sentence": "Set shield regeneration rate of _PARAM0_ to _PARAM2_ points per second",
+              "sentence": "Change the shield regeneration rate of _PARAM0_ to _PARAM2_ points per second",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -28957,7 +29012,7 @@
               "group": "Shield configuration",
               "name": "SetShieldRegenDelay",
               "private": false,
-              "sentence": "Set shield regeneration delay on _PARAM0_ to _PARAM2_ seconds",
+              "sentence": "Change the shield regeneration delay on _PARAM0_ to _PARAM2_ seconds",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -29018,7 +29073,7 @@
               "group": "Shield configuration",
               "name": "SetShieldDuration",
               "private": false,
-              "sentence": "Set duration of shield on _PARAM0_ to _PARAM2_ seconds",
+              "sentence": "Change the duration of shield on _PARAM0_ to _PARAM2_ seconds",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -29079,7 +29134,7 @@
               "group": "Shield configuration",
               "name": "RenewShieldDuration",
               "private": false,
-              "sentence": "Renew shield duration on _PARAM0_",
+              "sentence": "Renew the shield duration on _PARAM0_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -29128,7 +29183,7 @@
               "group": "Shield",
               "name": "ActivateShield",
               "private": false,
-              "sentence": "Activate shield on _PARAM0_ with _PARAM2_ points (Renew shield duration: _PARAM3_)",
+              "sentence": "Activate the shield on _PARAM0_ with _PARAM2_ points (Renew shield duration: _PARAM3_)",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -29148,7 +29203,6 @@
                   ]
                 },
                 {
-                  "disabled": true,
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
@@ -29254,7 +29308,7 @@
               "group": "Shield configuration",
               "name": "SetMaxShieldPoints",
               "private": false,
-              "sentence": "Set max shield of _PARAM0_ to _PARAM2_ points",
+              "sentence": "Change the maximum shield points on _PARAM0_ to _PARAM2_ points",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -29466,13 +29520,13 @@
               "objectGroups": []
             },
             {
-              "description": "Check if damage was just dodged.",
+              "description": "Check if incoming damage was just dodged.",
               "fullName": "Damage was just dodged",
               "functionType": "Condition",
               "group": "Health",
               "name": "IsJustDodged",
               "private": false,
-              "sentence": "_PARAM0_ just dodged damage",
+              "sentence": "_PARAM0_ just dodged incoming damage",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -29742,7 +29796,7 @@
               "objectGroups": []
             },
             {
-              "description": "Duration of shield (seconds).",
+              "description": "Duration of the shield (seconds).",
               "fullName": "Duration of shield",
               "functionType": "Expression",
               "group": "Shield",
@@ -29886,8 +29940,8 @@
               "objectGroups": []
             },
             {
-              "description": "Time before shield ends (seconds).",
-              "fullName": "Time before shield ends",
+              "description": "Time before the shield duration ends (seconds).",
+              "fullName": "Time before shield duration ends",
               "functionType": "Expression",
               "group": "Shield",
               "name": "ShieldTimeRemaining",
@@ -29960,7 +30014,7 @@
               "objectGroups": []
             },
             {
-              "description": "Shield points of the object.",
+              "description": "Current shield points of the object.",
               "fullName": "Shield points",
               "functionType": "Expression",
               "group": "Shield",
@@ -30118,7 +30172,7 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Health (life) points",
+              "label": "Current health (life) points",
               "description": "",
               "group": "Health",
               "extraInformation": [],
@@ -30168,7 +30222,7 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Health regeneration delay after being hit (seconds)",
+              "label": "Delay before health regeneration starts after being hit (seconds)",
               "description": "",
               "group": "Health regeneration",
               "extraInformation": [],
