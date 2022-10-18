@@ -2491,7 +2491,7 @@
               "name": "DraggableSliderControl",
               "type": "DraggableSliderControl::DraggableSliderControl",
               "ValueMin": -180,
-              "ValueMax": 0,
+              "ValueMax": 180,
               "TickSpacing": 0,
               "ThumbShape": "circle",
               "ThumbWidth": 20,
@@ -3371,7 +3371,6 @@
               ],
               "events": [
                 {
-                  "folded": true,
                   "type": "BuiltinCommonInstructions::ForEach",
                   "object": "JointConnector",
                   "conditions": [],
@@ -3622,7 +3621,7 @@
             },
             {
               "type": "BuiltinCommonInstructions::ForEach",
-              "object": "BodyParts",
+              "object": "JointConnector",
               "conditions": [],
               "actions": [],
               "events": [
@@ -3637,7 +3636,7 @@
                       "parameters": [
                         "BodyParts",
                         "Physics2",
-                        "BodyParts.Variable(JointID)",
+                        "JointConnector.Variable(JointID)",
                         ""
                       ]
                     },
@@ -3648,7 +3647,7 @@
                       "parameters": [
                         "BodyParts",
                         "Physics2",
-                        "BodyParts.Variable(JointID)",
+                        "JointConnector.Variable(JointID)",
                         ""
                       ]
                     }
@@ -3676,7 +3675,7 @@
                       "parameters": [
                         "BodyParts",
                         "Physics2",
-                        "BodyParts.Variable(JointID)",
+                        "JointConnector.Variable(JointID)",
                         "yes"
                       ]
                     }
@@ -3704,7 +3703,7 @@
                       "parameters": [
                         "BodyParts",
                         "Physics2",
-                        "BodyParts.Variable(JointID)",
+                        "JointConnector.Variable(JointID)",
                         "yes"
                       ]
                     }
@@ -3721,7 +3720,7 @@
                       "parameters": [
                         "BodyParts",
                         "Physics2",
-                        "BodyParts.Variable(JointID)",
+                        "JointConnector.Variable(JointID)",
                         "MinAngle_Slider.DraggableSliderControl::Value()",
                         "MaxAngle_Slider.DraggableSliderControl::Value()"
                       ]
@@ -3733,7 +3732,7 @@
                       "parameters": [
                         "BodyParts",
                         "Physics2",
-                        "BodyParts.Variable(JointID)",
+                        "JointConnector.Variable(JointID)",
                         "=",
                         "MotorSpeed_Slider.DraggableSliderControl::Value()"
                       ]
@@ -3745,9 +3744,54 @@
                       "parameters": [
                         "BodyParts",
                         "Physics2",
-                        "BodyParts.Variable(JointID)",
+                        "JointConnector.Variable(JointID)",
                         "=",
                         "MotorTorque_Slider.DraggableSliderControl::Value()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Checkbox::Checkbox::IsChecked"
+                      },
+                      "parameters": [
+                        "Breakable_Checkbox",
+                        "Checkbox",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "BodyParts.Physics2::JointReactionForce(JointConnector.Variable(JointID))",
+                            "<",
+                            "BreakingForce_Slider.DraggableSliderControl::Value()"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::Remove joint"
+                          },
+                          "parameters": [
+                            "BodyParts",
+                            "Physics2",
+                            "JointConnector.Variable(JointID)"
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -19701,7 +19745,7 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "const getProperty = function (propertyName) {\n    return this._behaviorData[propertyName];\n}\n\ngdjs.behaviorsTypes.items['JointConnector::RevoluteJoint'].prototype.getProperty = getProperty;\n\nconst behaviorName = eventsFunctionContext.getBehaviorName(\"Physics\");\nconst jointObjects = eventsFunctionContext.getObjects(\"Joint\");\nconst jointBehavior = jointObjects[0].getBehavior(\"RevoluteJoint\");\n\nconst enableLimit = jointBehavior.getProperty(\"AngleLimitsEnabled\");\nconst lowerAngle = jointBehavior.getProperty(\"CounterClockwiseAngleLimit\");\nconst upperAngle = jointBehavior.getProperty(\"ClockwiseAngleLimit\");\nconst enableMotor = jointBehavior.getProperty(\"MotorEnabled\");\nconst motorSpeed = jointBehavior.getProperty(\"MotorSpeed\");\nconst maxMotorTorque = jointBehavior.getProperty(\"MotorTorque\");\n\nconst referenceAngle = 0;\nconst collideConnected = false;\n\nfor (const jointObject of jointObjects) {\n    const x = jointObject.getX();\n    const y = jointObject.getY();\n    /** @type {gdjs.RuntimeObject} */\n    let firstObject = null;\n    for (const object of objects) {\n        if (object.isCollidingWithPoint(x, y)) {\n            if (!firstObject) {\n                console.log(\"firstObject\");\n                firstObject = object;\n            }\n            else {\n                console.log(\"addRevoluteJointBetweenTwoBodies\");\n                /** @type {gdjs.Physics2RuntimeBehavior} */\n                const physicsBehavior = firstObject.getBehavior(behaviorName);\n                const jointIdsVariable = firstObject.getVariables().get(\"JointId\");\n                const jointIdVariable = jointIdsVariable.getChild(jointIdsVariable.getChildrenCount());\n                physicsBehavior.addRevoluteJointBetweenTwoBodies(\n                        x,\n                        y,\n                        object,\n                        x,\n                        y,\n                        enableLimit,\n                        referenceAngle,\n                        lowerAngle,\n                        upperAngle,\n                        enableMotor,\n                        motorSpeed,\n                        maxMotorTorque,\n                        collideConnected,\n                        firstObject.getVariables().get('JointID'));\n                const otherJointIdsVariable = object.getVariables().get(\"JointId\");\n                const otherJointIdVariable = otherJointIdsVariable.getChild(otherJointIdsVariable.getChildrenCount());\n                otherJointIdVariable.setNumber(jointIdVariable.getAsNumber());\n                break;\n            }\n        }\n    }\n}\n",
+              "inlineCode": "const getProperty = function (propertyName) {\n    return this._behaviorData[propertyName];\n}\n\ngdjs.behaviorsTypes.items['JointConnector::RevoluteJoint'].prototype.getProperty = getProperty;\n\nconst behaviorName = eventsFunctionContext.getBehaviorName(\"Physics\");\nconst jointObjects = eventsFunctionContext.getObjects(\"Joint\");\nconst jointBehavior = jointObjects[0].getBehavior(\"RevoluteJoint\");\n\nconst enableLimit = jointBehavior.getProperty(\"AngleLimitsEnabled\");\nconst lowerAngle = jointBehavior.getProperty(\"CounterClockwiseAngleLimit\");\nconst upperAngle = jointBehavior.getProperty(\"ClockwiseAngleLimit\");\nconst enableMotor = jointBehavior.getProperty(\"MotorEnabled\");\nconst motorSpeed = jointBehavior.getProperty(\"MotorSpeed\");\nconst maxMotorTorque = jointBehavior.getProperty(\"MotorTorque\");\n\nconst referenceAngle = 0;\nconst collideConnected = false;\n\nfor (const jointObject of jointObjects) {\n    const x = jointObject.getX();\n    const y = jointObject.getY();\n    /** @type {gdjs.RuntimeObject} */\n    let firstObject = null;\n    for (const object of objects) {\n        if (object.isCollidingWithPoint(x, y)) {\n            if (!firstObject) {\n                console.log(\"firstObject\");\n                firstObject = object;\n            }\n            else {\n                console.log(\"addRevoluteJointBetweenTwoBodies\");\n                /** @type {gdjs.Physics2RuntimeBehavior} */\n                const physicsBehavior = firstObject.getBehavior(behaviorName);\n                const jointIdsVariable = firstObject.getVariables().get(\"JointId\");\n                const jointIdVariable = jointIdsVariable.getChild(jointIdsVariable.getChildrenCount());\n                physicsBehavior.addRevoluteJointBetweenTwoBodies(\n                        x,\n                        y,\n                        object,\n                        x,\n                        y,\n                        enableLimit,\n                        referenceAngle,\n                        lowerAngle,\n                        upperAngle,\n                        enableMotor,\n                        motorSpeed,\n                        maxMotorTorque,\n                        collideConnected,\n                        jointObject.getVariables().get('JointID'));\n                const otherJointIdsVariable = object.getVariables().get(\"JointId\");\n                const otherJointIdVariable = otherJointIdsVariable.getChild(otherJointIdsVariable.getChildrenCount());\n                otherJointIdVariable.setNumber(jointIdVariable.getAsNumber());\n                break;\n            }\n        }\n    }\n}\n",
               "parameterObjects": "Object",
               "useStrict": true,
               "eventsSheetExpanded": true
@@ -19948,7 +19992,7 @@
                       "parameters": [
                         "ObjectWithJoint",
                         "PhysicsBehavior",
-                        "Object.Behavior::PropertyJointID()",
+                        "Object.Variable(JointID)",
                         ">=",
                         "Object.Behavior::PropertyBreakingForce()"
                       ]
@@ -19962,7 +20006,7 @@
                       "parameters": [
                         "ObjectWithJoint",
                         "PhysicsBehavior",
-                        "Object.Behavior::PropertyJointID()"
+                        "Object.Variable(JointID)"
                       ]
                     }
                   ]
