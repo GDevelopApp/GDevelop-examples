@@ -790,7 +790,7 @@
                 "RedEnemy1",
                 "SpeedPathMovement",
                 "0",
-                "-400 * sign(RedEnemy1.SpeedPathMovement::Speed())",
+                "-200 * sign(RedEnemy1.SpeedPathMovement::Speed())",
                 ""
               ]
             }
@@ -2260,7 +2260,7 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "\n/**\n * @param {number[]} array \n * @param {number} value\n */\nconst findLowerIndex = function (array, value) {\n  let low = 0;\n  let high = array.length - 1;\n  let index = 0;\n  while (low < high) {\n    index = low + (((high - low) / 2) | 0);\n    if (array[index] < value) {\n      low = index + 1;\n    } else {\n      high = index;\n    }\n  }\n  if (array[index] > value) {\n    index--;\n  }\n  return index;\n};\n\nconst CurvedPath = /** @class */ (function () {\n  function CurvedPath() {\n    /**\n     * @type {CubicBezierCurve[]}\n     */\n    this.curves = [];\n    /**\n     * @type {number[]}\n     */\n    this.curvePreviousLengths = [0];\n  };\n\n  CurvedPath.prototype.getCurvePreviousLengths = function () {\n    if (this.curvePreviousLengths.length === 0) {\n      let lengthSum = 0;\n      this.curvePreviousLengths.push(0);\n      for (const curve of this.curves) {\n        lengthSum += this.curves[i].getLength();\n        this.curvePreviousLengths.push(lengthSum);\n      }\n    }\n    return this.curvePreviousLengths;\n  }\n\n  CurvedPath.prototype.clone = function () {\n    const clone = new CurvedPath();\n    clone.curves = this.curves.map(curve => curve.clone());\n    clone.curvePreviousLengths = [...this.curvePreviousLengths];\n    return clone;\n  };\n\n  /**\n   * @param {CubicBezierCurve} curve\n   */\n  CurvedPath.prototype.add = function (curve) {\n    this.curves.push(curve);\n    if (this.curvePreviousLengths.length > 0) {\n      this.curvePreviousLengths.push(this.getLength() + curve.getLength());\n    }\n  };\n\n  /**\n   * @param {number} firstControlX\n   * @param {number} firstControlY\n   * @param {number} secondControlX\n   * @param {number} secondControlY\n   * @param {number} destinationX\n   * @param {number} destinationY\n   * @param {boolean} isRelative\n   */\n  CurvedPath.prototype.addCurve = function (\n    firstControlX,\n    firstControlY,\n    secondControlX,\n    secondControlY,\n    destinationX,\n    destinationY,\n    isRelative) {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    if (isRelative) {\n      firstControlX += endX;\n      firstControlY += endY;\n      secondControlX += endX;\n      secondControlY += endY;\n      destinationX += endX;\n      destinationY += endY;\n    }\n    this.add(new gdjs.__curvedMovementExtension.CubicBezierCurve(\n      endX,\n      endY,\n      firstControlX,\n      firstControlY,\n      secondControlX,\n      secondControlY,\n      destinationX,\n      destinationY\n    ));\n  }\n\n  /**\n   * @param {number} secondControlX\n   * @param {number} secondControlY\n   * @param {number} destinationX\n   * @param {number} destinationY\n   * @param {boolean} isRelative\n   */\n  CurvedPath.prototype.addSmoothCurve = function (\n    secondControlX,\n    secondControlY,\n    destinationX,\n    destinationY,\n    isRelative) {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    if (isRelative) {\n      secondControlX += endX;\n      secondControlY += endY;\n      destinationX += endX;\n      destinationY += endY;\n    }\n    const lastControlX = this.getLastControlX();\n    const lastControlY = this.getLastControlY();\n    let firstControlX = 2 * endX - lastControlX;\n    let firstControlY = 2 * endY - lastControlY;\n\n    this.add(new gdjs.__curvedMovementExtension.CubicBezierCurve(\n      endX,\n      endY,\n      firstControlX,\n      firstControlY,\n      secondControlX,\n      secondControlY,\n      destinationX,\n      destinationY\n    ));\n  }\n\n\n  /**\n   * @param {number} destinationX\n   * @param {number} destinationY\n   * @param {boolean} isRelative\n   */\n  CurvedPath.prototype.addLine = function (\n    destinationX,\n    destinationY,\n    isRelative) {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    const lengthX = destinationX - endX;\n    const lengthY = destinationY - endY;\n\n    // TODO Optimize it with an object dedicated to lines.\n    this.add(new gdjs.__curvedMovementExtension.CubicBezierCurve(\n      endX,\n      endY,\n      endX + lengthX / 3,\n      endY + lengthY / 3,\n      endX + lengthX * 2 / 3,\n      endY + lengthY * 2 / 3,\n      destinationX,\n      destinationY\n    ));\n  }\n\n  CurvedPath.prototype.close = function () {\n    if (this.curves.length === 0) {\n      return;\n    }\n    const firstCurve = this.curves[0];\n    this.addLine(firstCurve.getOriginX(), firstCurve.getOriginY(), false);\n  }\n\n  /**\n   * @param {CurvedPath} path\n   */\n  CurvedPath.prototype.append = function (path) {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    for (const curve of path.curves) {\n      const clone = curve.clone();\n      for (const point of clone.points) {\n        point[0] += endX;\n        point[1] += endY;\n      }\n      this.add(clone);\n    }\n  };\n\n  /**\n   * @param {CurvedPath} path\n   * @param {boolean} shouldFlip\n   */\n  CurvedPath.prototype.appendRotatedPath = function (path, shouldFlip) {\n    const startAngle = Math.atan2(path.curves[0].getFirstControlY(), path.curves[0].getFirstControlX());\n    const rotatedPath = path.clone();\n    rotatedPath.rotate(this.getEndAngle() - startAngle);\n    if (shouldFlip) {\n      rotatedPath.flip();\n    }\n    this.append(rotatedPath, false);\n  };\n\n  CurvedPath.prototype.clear = function () {\n    this.curves.length = 0;\n    this.curvePreviousLengths.length = 1;\n    this.curvePreviousLengths[0] = 0;\n  };\n\n  CurvedPath.prototype.getLength = function () {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    return curvePreviousLengths[curvePreviousLengths.length - 1];\n  };\n\n  CurvedPath.prototype.isClosed = function () {\n    if (this.curves.length === 0) {\n      return false;\n    }\n    const firstCurve = this.curves[0];\n    const lastCurve = this.curves[this.curves.length - 1];\n    return firstCurve.getOriginX() === lastCurve.getTargetX() &&\n      firstCurve.getOriginY() === lastCurve.getTargetY();\n  };\n\n  /**\n   * @param {number} length\n   */\n  CurvedPath.prototype.getCurveIndex = function (length) {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    return Math.min(this.curves.length - 1, findLowerIndex(curvePreviousLengths, length));\n  };\n\n  /**\n   * @param {number} length\n   */\n  CurvedPath.prototype.getX = function (length) {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    if (length >= this.getLength()) {\n      return this.getEndX();\n    }\n    const curveIndex = this.getCurveIndex(length);\n    const curve = this.curves[curveIndex];\n    const curveStartLength = curvePreviousLengths[curveIndex];\n    const u = (length - curveStartLength) / curve.getLength();\n    return curve.getX(u);\n  };\n\n  /**\n   * @param {number} length\n   */\n  CurvedPath.prototype.getY = function (length) {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    if (length >= this.getLength()) {\n      return this.getEndY();\n    }\n    const curveIndex = this.getCurveIndex(length);\n    const curve = this.curves[curveIndex];\n    const curveStartLength = curvePreviousLengths[curveIndex];\n    const u = (length - curveStartLength) / curve.getLength();\n    return curve.getY(u);\n  };\n\n  /**\n   * @param {number} length\n   */\n  CurvedPath.prototype.getAngle = function (length) {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    if (this.curves.length === 0) {\n      return 0;\n    }\n    const curveIndex = this.getCurveIndex(length);\n    const curve = this.curves[curveIndex];\n    const curveStartLength = curvePreviousLengths[curveIndex];\n    const u = (length - curveStartLength) / curve.getLength();\n    return curve.getAngle(u);\n  };\n\n  CurvedPath.prototype.getEndX = function () {\n    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getTargetX();\n  };\n\n  CurvedPath.prototype.getEndY = function () {\n    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getTargetY();\n  };\n\n  CurvedPath.prototype.getEndAngle = function () {\n    if (this.curves.length === 0) {\n      return 0;\n    }\n    const lastCurve = this.curves[this.curves.length - 1];\n    return Math.atan2(\n      lastCurve.getTargetY() - lastCurve.getSecondControlY(),\n      lastCurve.getTargetX() - lastCurve.getSecondControlX());\n  };\n\n  CurvedPath.prototype.getLastControlX = function () {\n    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getSecondControlX();\n  };\n\n  CurvedPath.prototype.getLastControlY = function () {\n    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getSecondControlY();\n  };\n\n  /**\n   * @param {number} translationX\n   * @param {number} translationY\n   */\n  CurvedPath.prototype.translate = function (translationX, translationY) {\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        point[0] += translationX;\n        point[1] += translationY;\n      }\n    }\n  };\n\n  /**\n   * @param {number} scaleX\n   * @param {number} scaleY\n   */\n  CurvedPath.prototype.scale = function (scaleX, scaleY) {\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        point[0] *= scaleX;\n        point[1] *= scaleY;\n      }\n      curve.arcLengths.length = 0;\n    }\n    this.curvePreviousLengths.length = 0;\n  };\n\n  /**\n   * @param {number} angle\n   */\n  CurvedPath.prototype.rotate = function (angle) {\n    console.log(angle);\n    const cos = Math.cos(angle);\n    const sin = Math.sin(angle);\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        const x = point[0];\n        const y = point[1];\n        point[0] = x * cos - y * sin;\n        point[1] = x * sin + y * cos;\n      }\n      curve.arcLengths.length = 0;\n    }\n    this.curvePreviousLengths.length = 0;\n  };\n\n  CurvedPath.prototype.invert = function () {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        point[0] = point[0] - endX;\n        point[1] = point[1] - endY;\n      }\n      curve.points.reverse();\n      curve.arcLengths.length = 0;\n    }\n    this.curves.reverse();\n    this.curvePreviousLengths.length = 0;\n  };\n\n  /**\n   * Do a symetry around the first control vector.\n   */\n  CurvedPath.prototype.flip = function () {\n    const axisX = this.curves[0].getFirstControlX();\n    const axisY = this.curves[0].getFirstControlY();\n    const axisLength = Math.hypot(axisX, axisY);\n    const ux = axisX / axisLength;\n    const uy = axisY / axisLength;\n\n    console.log(axisX + \" \" + axisY);\n\n    const sx = 2 * ux * ux - 1;\n    const sy = 2 * uy * uy - 1;\n    const rx = 2 * uy * ux;\n    const ry = rx;\n    console.log(\" \");\n    console.log(sx + \" \" + rx);\n    console.log(ry + \" \" + sy);\n    console.log(\" \");\n\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        const x = point[0];\n        const y = point[1];\n        point[0] = x * sx + y * rx;\n        point[1] = x * ry + y * sy;\n        console.log(x + \" \" + y + \" --> \" + point[0] + \" \" + point[1]);\n      }\n      curve.arcLengths.length = 0;\n    }\n    this.curvePreviousLengths.length = 0;\n  };\n\n  return CurvedPath;\n})();\n\n/**\n * @param {number} t\n * @param {number} a\n * @param {number} b\n * @param {number} c\n * @param {number} d\n */\nconst interpolateCubicCurve = function (t, a, b, c, d) {\n  return (\n    (1 - t) ** 3 * a +\n    3 * (1 - t) ** 2 * t * b +\n    3 * (1 - t) * t ** 2 * c +\n    t ** 3 * d\n  );\n};\n/**\n * @param {number} t\n * @param {number} a\n * @param {number} b\n * @param {number} c\n * @param {number} d\n */\nconst interpolateCubicCurveDirection = function (t, a, b, c, d) {\n  return (\n    3 * (1 - t) ** 2 * (b - a) +\n    6 * (1 - t) * t * (c - b) +\n    3 * t ** 2 * (d - c)\n  );\n};\n\n\nconst CubicBezierCurve = /** @class */ (function () {\n  /**\n   * @param {number} aX\n   * @param {number} aY\n   * @param {number} bX\n   * @param {number} bY\n   * @param {number} cX\n   * @param {number} cY\n   * @param {number} dX\n   * @param {number} dY\n   */\n  function CubicBezierCurve(aX, aY, bX, bY, cX, cY, dX, dY) {\n    /** @type {[FloatPoint, FloatPoint, FloatPoint, FloatPoint]} */\n    this.points = [[aX, aY], [bX, bY], [cX, cY], [dX, dY]];\n\n    /** @type {number[]} */\n    this.arcLengths = [];\n  };\n\n  CubicBezierCurve.prototype.clone = function () {\n    const clone = new CubicBezierCurve();\n    clone.points = this.points.map(point => [...point]);\n    clone.arcLengths = [...this.arcLengths];\n    return clone;\n  }\n\n  CubicBezierCurve.prototype.getArcLengths = function () {\n    if (this.arcLengths.length === 0) {\n      const segmentsCount = 100;\n      this.arcLengths.length = segmentsCount + 1;\n      this.arcLengths[0] = 0;\n\n      const aX = this.points[0][0];\n      const aY = this.points[0][1];\n      const bX = this.points[1][0];\n      const bY = this.points[1][1];\n      const cX = this.points[2][0];\n      const cY = this.points[2][1];\n      const dX = this.points[3][0];\n      const dY = this.points[3][1];\n\n      let oldX = aX;\n      let oldY = aY;\n      let currentLength = 0;\n      for (let i = 1; i <= segmentsCount; i += 1) {\n        const x = interpolateCubicCurve(i * 0.01, aX, bX, cX, dX);\n        const y = interpolateCubicCurve(i * 0.01, aY, bY, cY, dY);\n        currentLength += Math.hypot(x - oldX, y - oldY);\n        this.arcLengths[i] = currentLength;\n        oldX = x;\n        oldY = y;\n      }\n    }\n    return this.arcLengths;\n  };\n\n  /**\n   * @param {number} u\n   */\n  CubicBezierCurve.prototype.reparametrizeByArcLength = function (u) {\n    const arcLengths = this.getArcLengths();\n    const segmentsCount = arcLengths.length - 1;\n    const targetLength = u * arcLengths[segmentsCount];\n    const index = findLowerIndex(arcLengths, targetLength);\n\n    const lengthBefore = arcLengths[index];\n    if (lengthBefore === targetLength) {\n      return index / segmentsCount;\n    } else {\n      return (\n        (index +\n          (targetLength - lengthBefore) /\n          (arcLengths[index + 1] - lengthBefore)) /\n        segmentsCount\n      );\n    }\n  };\n\n  /**\n   * @param {number} u\n   */\n  CubicBezierCurve.prototype.getX = function (u) {\n    return interpolateCubicCurve(\n      this.reparametrizeByArcLength(u),\n      this.points[0][0],\n      this.points[1][0],\n      this.points[2][0],\n      this.points[3][0]\n    );\n  };\n\n  /**\n   * @param {number} u\n   */\n  CubicBezierCurve.prototype.getY = function (u) {\n    return interpolateCubicCurve(\n      this.reparametrizeByArcLength(u),\n      this.points[0][1],\n      this.points[1][1],\n      this.points[2][1],\n      this.points[3][1]\n    );\n  };\n\n  /**\n   * @param {number} u\n   */\n  CubicBezierCurve.prototype.getAngle = function (u) {\n    const t = this.reparametrizeByArcLength(u);\n    const directionX = interpolateCubicCurveDirection(\n      t,\n      this.points[0][0],\n      this.points[1][0],\n      this.points[2][0],\n      this.points[3][0]\n    );\n    const directionY = interpolateCubicCurveDirection(\n      t,\n      this.points[0][1],\n      this.points[1][1],\n      this.points[2][1],\n      this.points[3][1]\n    );\n    return Math.atan2(directionY, directionX);\n  };\n\n  CubicBezierCurve.prototype.getLength = function () {\n    const arcLengths = this.getArcLengths();\n    return arcLengths[arcLengths.length - 1];\n  };\n\n  CubicBezierCurve.prototype.getOriginX = function () {\n    return this.points[0][0];\n  };\n\n  CubicBezierCurve.prototype.getOriginY = function () {\n    return this.points[0][1];\n  };\n\n  CubicBezierCurve.prototype.getFirstControlX = function () {\n    return this.points[1][0];\n  };\n\n  CubicBezierCurve.prototype.getFirstControlY = function () {\n    return this.points[1][1];\n  };\n\n  CubicBezierCurve.prototype.getSecondControlX = function () {\n    return this.points[2][0];\n  };\n\n  CubicBezierCurve.prototype.getSecondControlY = function () {\n    return this.points[2][1];\n  };\n\n  CubicBezierCurve.prototype.getTargetX = function () {\n    return this.points[3][0];\n  };\n\n  CubicBezierCurve.prototype.getTargetY = function () {\n    return this.points[3][1];\n  };\n\n  return CubicBezierCurve;\n})();\n\n// const number = '(-?\\\\d+(?:\\\\.\\\\d+)?)';\n// const point = '(?:' + number + ',' + number + ')';\n// const pointSeparator = '\\\\s';\n// const curve = '(?:([Cc])' + point + pointSeparator + point + pointSeparator + point + ')';\n// const smooth = '(?:([Ss])' + point + pointSeparator + point + ')';\n// const line = '(?:([Ll])' + point + ')';\n// const pathElement = '(?:' + curve + '|' + smooth + '|' + line + ')';\n// // const elementSeparator = '(:?\\\\s|$)';\n// // const pathRegex = new RegExp('^(?:M0,0)?(?:' + pathElement + elementSeparator + ')+', 'g');\n// const pathRegex = new RegExp(pathElement, 'g');\n\n// const curveActionIndex = 1;\n// const smoothActionIndex = 8;\n// const lineActionIndex = 13;\n\n// /**\n//  * @param {string} svgComandsString\n//  */\n// CurvedPath.parsePath = function (svgComandsString) {\n//   const regExpResults = svgComandsString.matchAll(pathRegex);\n//   if (!regExpResults) {\n//     return null;\n//   }\n//   const path = new CurvedPath();\n//   for (const regExpResult of regExpResults) {\n//     if (regExpResult[curveActionIndex]) {\n//       path.addCurve(\n//           Number.parseFloat(regExpResult[curveActionIndex + 1]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 2]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 3]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 4]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 5]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 6]),\n//           regExpResult[curveActionIndex] === \"c\");\n//     }\n//     else if (regExpResult[smoothActionIndex]) {\n//       path.addSmoothCurve(\n//           Number.parseFloat(regExpResult[smoothActionIndex + 1]),\n//           Number.parseFloat(regExpResult[smoothActionIndex + 2]),\n//           Number.parseFloat(regExpResult[smoothActionIndex + 3]),\n//           Number.parseFloat(regExpResult[smoothActionIndex + 4]),\n//           regExpResult[smoothActionIndex] === \"s\");\n//     }\n//     else if (regExpResult[lineActionIndex]) {\n//       path.addLine(\n//           Number.parseFloat(regExpResult[lineActionIndex + 1]),\n//           Number.parseFloat(regExpResult[lineActionIndex + 2]),\n//           regExpResult[lineActionIndex] === \"l\");\n//     }\n//   }\n//   console.log(path);\n//   return path;\n// }\n\nconst pathRegex = /[CcSsLlMmHhVvZz]|(?:-?\\d+(?:\\.\\d+)?)/g;\nconst svgActions = [\"c\", \"s\", \"l\", \"m\", \"v\", \"h\", \"z\"];\n\n/**\n * @param {string} svgComandsString\n */\nCurvedPath.parsePath = function (svgComandsString) {\n  const regExpResults = svgComandsString.match(pathRegex);\n  if (!regExpResults) {\n    return null;\n  }\n  const path = new CurvedPath();\n  let currentAction = \"\";\n  let isRelative = false;\n  let originX = 0;\n  let originY = 0;\n  for (let index = 0; index < regExpResults.length; index++) {\n    const regExpResult = regExpResults[index];\n    if (regExpResult.length === 1) {\n      const lowerCaseRegExpResult = regExpResult.toLowerCase();\n      if (svgActions.indexOf(lowerCaseRegExpResult) >= 0) {\n        currentAction = lowerCaseRegExpResult;\n        isRelative = lowerCaseRegExpResult === regExpResult;\n        index++;\n      }\n    }\n    switch (currentAction) {\n      case \"c\":\n        {\n          if (regExpResults.length < index + 5) {\n            break;\n          }\n          const firstControlX = Number.parseFloat(regExpResults[index + 0]);\n          const firstControlY = Number.parseFloat(regExpResults[index + 1]);\n          const secondControlX = Number.parseFloat(regExpResults[index + 2]);\n          const secondControlY = Number.parseFloat(regExpResults[index + 3]);\n          const destinationX = Number.parseFloat(regExpResults[index + 4]);\n          const destinationY = Number.parseFloat(regExpResults[index + 5]);\n          index += 5;\n          if (isRelative) {\n            path.addCurve(\n              firstControlX,\n              firstControlY,\n              secondControlX,\n              secondControlY,\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addCurve(\n              -originX + firstControlX,\n              -originY + firstControlY,\n              -originX + secondControlX,\n              -originY + secondControlY,\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"s\":\n        {\n          if (regExpResults.length < index + 3) {\n            break;\n          }\n          const secondControlX = Number.parseFloat(regExpResults[index + 0]);\n          const secondControlY = Number.parseFloat(regExpResults[index + 1]);\n          const destinationX = Number.parseFloat(regExpResults[index + 2]);\n          const destinationY = Number.parseFloat(regExpResults[index + 3]);\n          index += 3;\n          if (isRelative) {\n            path.addSmoothCurve(\n              secondControlX,\n              secondControlY,\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addSmoothCurve(\n              -originX + secondControlX,\n              -originY + secondControlY,\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"l\":\n        {\n          if (regExpResults.length < index + 1) {\n            break;\n          }\n          const destinationX = Number.parseFloat(regExpResults[index + 0]);\n          const destinationY = Number.parseFloat(regExpResults[index + 1]);\n          index++;\n          if (isRelative) {\n            path.addLine(\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addLine(\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"m\":\n        {\n          if (regExpResults.length < index + 1) {\n            break;\n          }\n          if (index === 1) {\n            originX = Number.parseFloat(regExpResults[index + 0]) || 0;\n            originY = Number.parseFloat(regExpResults[index + 1]) || 0;\n          }\n          index++;\n          break;\n        }\n      case \"h\":\n        {\n          if (regExpResults.length < index) {\n            break;\n          }\n          const destinationX = Number.parseFloat(regExpResults[index + 0]);\n          const destinationY = 0;\n          index++;\n          if (isRelative) {\n            path.addLine(\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addLine(\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"v\":\n        {\n          if (regExpResults.length < index) {\n            break;\n          }\n          const destinationX = 0;\n          const destinationY = Number.parseFloat(regExpResults[index + 0]);\n          index++;\n          if (isRelative) {\n            path.addLine(\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addLine(\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"z\":\n        {\n          path.close();\n          break;\n        }\n      default:\n        break;\n    }\n  }\n//  if (originX !== 0 && originY !== 0) {\n//    path.translate(-originX, -originY);\n//    path.curves[0].getOriginX = 0;\n//  }\n  return path;\n}\n\n/**\n * @param {CurvedPath} path\n */\nCurvedPath.toSvg = function (path) {\n  let svgString = 'C';\n  for (const curve of path.curves) {\n    for (const point of curve.points) {\n      svgString += `${point[0]},${point[0]}`;\n    }\n    svgString += ' ';\n  }\n  return path;\n}\n\ngdjs.__curvedMovementExtension = gdjs.__curvedMovementExtension || {};\ngdjs.__curvedMovementExtension.CurvedPath = CurvedPath;\ngdjs.__curvedMovementExtension.CubicBezierCurve = CubicBezierCurve;\n\n",
+              "inlineCode": "\n/**\n * @param {number[]} array \n * @param {number} value\n */\nconst findLowerIndex = function (array, value) {\n  let low = 0;\n  let high = array.length - 1;\n  let index = 0;\n  while (low < high) {\n    index = low + (((high - low) / 2) | 0);\n    if (array[index] < value) {\n      low = index + 1;\n    } else {\n      high = index;\n    }\n  }\n  if (array[index] > value) {\n    index--;\n  }\n  return index;\n};\n\nconst CurvedPath = /** @class */ (function () {\n  function CurvedPath() {\n    /**\n     * @type {CubicBezierCurve[]}\n     */\n    this.curves = [];\n    /**\n     * @type {number[]}\n     */\n    this.curvePreviousLengths = [0];\n  };\n\n  CurvedPath.prototype.getCurvePreviousLengths = function () {\n    if (this.curvePreviousLengths.length === 0) {\n      let lengthSum = 0;\n      this.curvePreviousLengths.push(0);\n      for (const curve of this.curves) {\n        lengthSum += this.curves[i].getLength();\n        this.curvePreviousLengths.push(lengthSum);\n      }\n    }\n    return this.curvePreviousLengths;\n  }\n\n  CurvedPath.prototype.clone = function () {\n    const clone = new CurvedPath();\n    clone.curves = this.curves.map(curve => curve.clone());\n    clone.curvePreviousLengths = [...this.curvePreviousLengths];\n    return clone;\n  };\n\n  /**\n   * @param {CubicBezierCurve} curve\n   */\n  CurvedPath.prototype.add = function (curve) {\n    this.curves.push(curve);\n    if (this.curvePreviousLengths.length > 0) {\n      this.curvePreviousLengths.push(this.getLength() + curve.getLength());\n    }\n  };\n\n  /**\n   * @param {number} firstControlX\n   * @param {number} firstControlY\n   * @param {number} secondControlX\n   * @param {number} secondControlY\n   * @param {number} destinationX\n   * @param {number} destinationY\n   * @param {boolean} isRelative\n   */\n  CurvedPath.prototype.addCurve = function (\n    firstControlX,\n    firstControlY,\n    secondControlX,\n    secondControlY,\n    destinationX,\n    destinationY,\n    isRelative) {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    if (isRelative) {\n      firstControlX += endX;\n      firstControlY += endY;\n      secondControlX += endX;\n      secondControlY += endY;\n      destinationX += endX;\n      destinationY += endY;\n    }\n    this.add(new gdjs.__curvedMovementExtension.CubicBezierCurve(\n      endX,\n      endY,\n      firstControlX,\n      firstControlY,\n      secondControlX,\n      secondControlY,\n      destinationX,\n      destinationY\n    ));\n  }\n\n  /**\n   * @param {number} secondControlX\n   * @param {number} secondControlY\n   * @param {number} destinationX\n   * @param {number} destinationY\n   * @param {boolean} isRelative\n   */\n  CurvedPath.prototype.addSmoothCurve = function (\n    secondControlX,\n    secondControlY,\n    destinationX,\n    destinationY,\n    isRelative) {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    if (isRelative) {\n      secondControlX += endX;\n      secondControlY += endY;\n      destinationX += endX;\n      destinationY += endY;\n    }\n    const lastControlX = this.getLastControlX();\n    const lastControlY = this.getLastControlY();\n    let firstControlX = 2 * endX - lastControlX;\n    let firstControlY = 2 * endY - lastControlY;\n\n    this.add(new gdjs.__curvedMovementExtension.CubicBezierCurve(\n      endX,\n      endY,\n      firstControlX,\n      firstControlY,\n      secondControlX,\n      secondControlY,\n      destinationX,\n      destinationY\n    ));\n  }\n\n\n  /**\n   * @param {number} destinationX\n   * @param {number} destinationY\n   * @param {boolean} isRelative\n   */\n  CurvedPath.prototype.addLine = function (\n    destinationX,\n    destinationY,\n    isRelative) {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    const lengthX = destinationX - endX;\n    const lengthY = destinationY - endY;\n\n    // TODO Optimize it with an object dedicated to lines.\n    this.add(new gdjs.__curvedMovementExtension.CubicBezierCurve(\n      endX,\n      endY,\n      endX + lengthX / 3,\n      endY + lengthY / 3,\n      endX + lengthX * 2 / 3,\n      endY + lengthY * 2 / 3,\n      destinationX,\n      destinationY\n    ));\n  }\n\n  CurvedPath.prototype.close = function () {\n    if (this.curves.length === 0) {\n      return;\n    }\n    const firstCurve = this.curves[0];\n    this.addLine(firstCurve.getOriginX(), firstCurve.getOriginY(), false);\n  }\n\n  /**\n   * @param {CurvedPath} path\n   */\n  CurvedPath.prototype.append = function (path) {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    for (const curve of path.curves) {\n      const clone = curve.clone();\n      for (const point of clone.points) {\n        point[0] += endX;\n        point[1] += endY;\n      }\n      this.add(clone);\n    }\n  };\n\n  /**\n   * @param {CurvedPath} path\n   * @param {boolean} shouldFlip\n   */\n  CurvedPath.prototype.appendRotatedPath = function (path, shouldFlip) {\n    const startAngle = Math.atan2(path.curves[0].getFirstControlY(), path.curves[0].getFirstControlX());\n    const rotatedPath = path.clone();\n    rotatedPath.rotate(this.getEndAngle() - startAngle);\n    if (shouldFlip) {\n      rotatedPath.flip();\n    }\n    this.append(rotatedPath, false);\n  };\n\n  CurvedPath.prototype.clear = function () {\n    this.curves.length = 0;\n    this.curvePreviousLengths.length = 1;\n    this.curvePreviousLengths[0] = 0;\n  };\n\n  CurvedPath.prototype.getLength = function () {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    return curvePreviousLengths[curvePreviousLengths.length - 1];\n  };\n\n  CurvedPath.prototype.isClosed = function () {\n    if (this.curves.length === 0) {\n      return true;\n    }\n    const firstCurve = this.curves[0];\n    const lastCurve = this.curves[this.curves.length - 1];\n    return firstCurve.getOriginX() === lastCurve.getTargetX() &&\n      firstCurve.getOriginY() === lastCurve.getTargetY();\n  };\n\n  /**\n   * @param {number} length\n   */\n  CurvedPath.prototype.getCurveIndex = function (length) {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    return Math.min(this.curves.length - 1, findLowerIndex(curvePreviousLengths, length));\n  };\n\n  /**\n   * @param {number} length\n   */\n  CurvedPath.prototype.getX = function (length) {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    if (length >= this.getLength()) {\n      return this.getEndX();\n    }\n    const curveIndex = this.getCurveIndex(length);\n    const curve = this.curves[curveIndex];\n    const curveStartLength = curvePreviousLengths[curveIndex];\n    const u = (length - curveStartLength) / curve.getLength();\n    return curve.getX(u);\n  };\n\n  /**\n   * @param {number} length\n   */\n  CurvedPath.prototype.getY = function (length) {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    if (length >= this.getLength()) {\n      return this.getEndY();\n    }\n    const curveIndex = this.getCurveIndex(length);\n    const curve = this.curves[curveIndex];\n    const curveStartLength = curvePreviousLengths[curveIndex];\n    const u = (length - curveStartLength) / curve.getLength();\n    return curve.getY(u);\n  };\n\n  /**\n   * @param {number} length\n   */\n  CurvedPath.prototype.getAngle = function (length) {\n    const curvePreviousLengths = this.getCurvePreviousLengths();\n    if (this.curves.length === 0) {\n      return 0;\n    }\n    const curveIndex = this.getCurveIndex(length);\n    const curve = this.curves[curveIndex];\n    const curveStartLength = curvePreviousLengths[curveIndex];\n    const u = (length - curveStartLength) / curve.getLength();\n    return curve.getAngle(u);\n  };\n\n  CurvedPath.prototype.getEndX = function () {\n    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getTargetX();\n  };\n\n  CurvedPath.prototype.getEndY = function () {\n    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getTargetY();\n  };\n\n  CurvedPath.prototype.getEndAngle = function () {\n    if (this.curves.length === 0) {\n      return 0;\n    }\n    const lastCurve = this.curves[this.curves.length - 1];\n    return Math.atan2(\n      lastCurve.getTargetY() - lastCurve.getSecondControlY(),\n      lastCurve.getTargetX() - lastCurve.getSecondControlX());\n  };\n\n  CurvedPath.prototype.getLastControlX = function () {\n    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getSecondControlX();\n  };\n\n  CurvedPath.prototype.getLastControlY = function () {\n    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getSecondControlY();\n  };\n\n  /**\n   * @param {number} translationX\n   * @param {number} translationY\n   */\n  CurvedPath.prototype.translate = function (translationX, translationY) {\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        point[0] += translationX;\n        point[1] += translationY;\n      }\n    }\n  };\n\n  /**\n   * @param {number} scaleX\n   * @param {number} scaleY\n   */\n  CurvedPath.prototype.scale = function (scaleX, scaleY) {\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        point[0] *= scaleX;\n        point[1] *= scaleY;\n      }\n      curve.arcLengths.length = 0;\n    }\n    this.curvePreviousLengths.length = 0;\n  };\n\n  /**\n   * @param {number} angle\n   */\n  CurvedPath.prototype.rotate = function (angle) {\n    console.log(angle);\n    const cos = Math.cos(angle);\n    const sin = Math.sin(angle);\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        const x = point[0];\n        const y = point[1];\n        point[0] = x * cos - y * sin;\n        point[1] = x * sin + y * cos;\n      }\n      curve.arcLengths.length = 0;\n    }\n    this.curvePreviousLengths.length = 0;\n  };\n\n  CurvedPath.prototype.invert = function () {\n    const endX = this.getEndX();\n    const endY = this.getEndY();\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        point[0] = point[0] - endX;\n        point[1] = point[1] - endY;\n      }\n      curve.points.reverse();\n      curve.arcLengths.length = 0;\n    }\n    this.curves.reverse();\n    this.curvePreviousLengths.length = 0;\n  };\n\n  /**\n   * Do a symetry around the first control vector.\n   */\n  CurvedPath.prototype.flip = function () {\n    const axisX = this.curves[0].getFirstControlX();\n    const axisY = this.curves[0].getFirstControlY();\n    const axisLength = Math.hypot(axisX, axisY);\n    const ux = axisX / axisLength;\n    const uy = axisY / axisLength;\n\n    console.log(axisX + \" \" + axisY);\n\n    const sx = 2 * ux * ux - 1;\n    const sy = 2 * uy * uy - 1;\n    const rx = 2 * uy * ux;\n    const ry = rx;\n    console.log(\" \");\n    console.log(sx + \" \" + rx);\n    console.log(ry + \" \" + sy);\n    console.log(\" \");\n\n    for (const curve of this.curves) {\n      for (const point of curve.points) {\n        const x = point[0];\n        const y = point[1];\n        point[0] = x * sx + y * rx;\n        point[1] = x * ry + y * sy;\n        console.log(x + \" \" + y + \" --> \" + point[0] + \" \" + point[1]);\n      }\n      curve.arcLengths.length = 0;\n    }\n    this.curvePreviousLengths.length = 0;\n  };\n\n  return CurvedPath;\n})();\n\n/**\n * @param {number} t\n * @param {number} a\n * @param {number} b\n * @param {number} c\n * @param {number} d\n */\nconst interpolateCubicCurve = function (t, a, b, c, d) {\n  return (\n    (1 - t) ** 3 * a +\n    3 * (1 - t) ** 2 * t * b +\n    3 * (1 - t) * t ** 2 * c +\n    t ** 3 * d\n  );\n};\n/**\n * @param {number} t\n * @param {number} a\n * @param {number} b\n * @param {number} c\n * @param {number} d\n */\nconst interpolateCubicCurveDirection = function (t, a, b, c, d) {\n  return (\n    3 * (1 - t) ** 2 * (b - a) +\n    6 * (1 - t) * t * (c - b) +\n    3 * t ** 2 * (d - c)\n  );\n};\n\n\nconst CubicBezierCurve = /** @class */ (function () {\n  /**\n   * @param {number} aX\n   * @param {number} aY\n   * @param {number} bX\n   * @param {number} bY\n   * @param {number} cX\n   * @param {number} cY\n   * @param {number} dX\n   * @param {number} dY\n   */\n  function CubicBezierCurve(aX, aY, bX, bY, cX, cY, dX, dY) {\n    /** @type {[FloatPoint, FloatPoint, FloatPoint, FloatPoint]} */\n    this.points = [[aX, aY], [bX, bY], [cX, cY], [dX, dY]];\n\n    /** @type {number[]} */\n    this.arcLengths = [];\n  };\n\n  CubicBezierCurve.prototype.clone = function () {\n    const clone = new CubicBezierCurve();\n    clone.points = this.points.map(point => [...point]);\n    clone.arcLengths = [...this.arcLengths];\n    return clone;\n  }\n\n  CubicBezierCurve.prototype.getArcLengths = function () {\n    if (this.arcLengths.length === 0) {\n      const segmentsCount = 100;\n      this.arcLengths.length = segmentsCount + 1;\n      this.arcLengths[0] = 0;\n\n      const aX = this.points[0][0];\n      const aY = this.points[0][1];\n      const bX = this.points[1][0];\n      const bY = this.points[1][1];\n      const cX = this.points[2][0];\n      const cY = this.points[2][1];\n      const dX = this.points[3][0];\n      const dY = this.points[3][1];\n\n      let oldX = aX;\n      let oldY = aY;\n      let currentLength = 0;\n      for (let i = 1; i <= segmentsCount; i += 1) {\n        const x = interpolateCubicCurve(i * 0.01, aX, bX, cX, dX);\n        const y = interpolateCubicCurve(i * 0.01, aY, bY, cY, dY);\n        currentLength += Math.hypot(x - oldX, y - oldY);\n        this.arcLengths[i] = currentLength;\n        oldX = x;\n        oldY = y;\n      }\n    }\n    return this.arcLengths;\n  };\n\n  /**\n   * @param {number} u\n   */\n  CubicBezierCurve.prototype.reparametrizeByArcLength = function (u) {\n    const arcLengths = this.getArcLengths();\n    const segmentsCount = arcLengths.length - 1;\n    const targetLength = u * arcLengths[segmentsCount];\n    const index = findLowerIndex(arcLengths, targetLength);\n\n    const lengthBefore = arcLengths[index];\n    if (lengthBefore === targetLength) {\n      return index / segmentsCount;\n    } else {\n      return (\n        (index +\n          (targetLength - lengthBefore) /\n          (arcLengths[index + 1] - lengthBefore)) /\n        segmentsCount\n      );\n    }\n  };\n\n  /**\n   * @param {number} u\n   */\n  CubicBezierCurve.prototype.getX = function (u) {\n    return interpolateCubicCurve(\n      this.reparametrizeByArcLength(u),\n      this.points[0][0],\n      this.points[1][0],\n      this.points[2][0],\n      this.points[3][0]\n    );\n  };\n\n  /**\n   * @param {number} u\n   */\n  CubicBezierCurve.prototype.getY = function (u) {\n    return interpolateCubicCurve(\n      this.reparametrizeByArcLength(u),\n      this.points[0][1],\n      this.points[1][1],\n      this.points[2][1],\n      this.points[3][1]\n    );\n  };\n\n  /**\n   * @param {number} u\n   */\n  CubicBezierCurve.prototype.getAngle = function (u) {\n    const t = this.reparametrizeByArcLength(u);\n    const directionX = interpolateCubicCurveDirection(\n      t,\n      this.points[0][0],\n      this.points[1][0],\n      this.points[2][0],\n      this.points[3][0]\n    );\n    const directionY = interpolateCubicCurveDirection(\n      t,\n      this.points[0][1],\n      this.points[1][1],\n      this.points[2][1],\n      this.points[3][1]\n    );\n    return Math.atan2(directionY, directionX);\n  };\n\n  CubicBezierCurve.prototype.getLength = function () {\n    const arcLengths = this.getArcLengths();\n    return arcLengths[arcLengths.length - 1];\n  };\n\n  CubicBezierCurve.prototype.getOriginX = function () {\n    return this.points[0][0];\n  };\n\n  CubicBezierCurve.prototype.getOriginY = function () {\n    return this.points[0][1];\n  };\n\n  CubicBezierCurve.prototype.getFirstControlX = function () {\n    return this.points[1][0];\n  };\n\n  CubicBezierCurve.prototype.getFirstControlY = function () {\n    return this.points[1][1];\n  };\n\n  CubicBezierCurve.prototype.getSecondControlX = function () {\n    return this.points[2][0];\n  };\n\n  CubicBezierCurve.prototype.getSecondControlY = function () {\n    return this.points[2][1];\n  };\n\n  CubicBezierCurve.prototype.getTargetX = function () {\n    return this.points[3][0];\n  };\n\n  CubicBezierCurve.prototype.getTargetY = function () {\n    return this.points[3][1];\n  };\n\n  return CubicBezierCurve;\n})();\n\n// const number = '(-?\\\\d+(?:\\\\.\\\\d+)?)';\n// const point = '(?:' + number + ',' + number + ')';\n// const pointSeparator = '\\\\s';\n// const curve = '(?:([Cc])' + point + pointSeparator + point + pointSeparator + point + ')';\n// const smooth = '(?:([Ss])' + point + pointSeparator + point + ')';\n// const line = '(?:([Ll])' + point + ')';\n// const pathElement = '(?:' + curve + '|' + smooth + '|' + line + ')';\n// // const elementSeparator = '(:?\\\\s|$)';\n// // const pathRegex = new RegExp('^(?:M0,0)?(?:' + pathElement + elementSeparator + ')+', 'g');\n// const pathRegex = new RegExp(pathElement, 'g');\n\n// const curveActionIndex = 1;\n// const smoothActionIndex = 8;\n// const lineActionIndex = 13;\n\n// /**\n//  * @param {string} svgComandsString\n//  */\n// CurvedPath.parsePath = function (svgComandsString) {\n//   const regExpResults = svgComandsString.matchAll(pathRegex);\n//   if (!regExpResults) {\n//     return null;\n//   }\n//   const path = new CurvedPath();\n//   for (const regExpResult of regExpResults) {\n//     if (regExpResult[curveActionIndex]) {\n//       path.addCurve(\n//           Number.parseFloat(regExpResult[curveActionIndex + 1]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 2]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 3]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 4]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 5]),\n//           Number.parseFloat(regExpResult[curveActionIndex + 6]),\n//           regExpResult[curveActionIndex] === \"c\");\n//     }\n//     else if (regExpResult[smoothActionIndex]) {\n//       path.addSmoothCurve(\n//           Number.parseFloat(regExpResult[smoothActionIndex + 1]),\n//           Number.parseFloat(regExpResult[smoothActionIndex + 2]),\n//           Number.parseFloat(regExpResult[smoothActionIndex + 3]),\n//           Number.parseFloat(regExpResult[smoothActionIndex + 4]),\n//           regExpResult[smoothActionIndex] === \"s\");\n//     }\n//     else if (regExpResult[lineActionIndex]) {\n//       path.addLine(\n//           Number.parseFloat(regExpResult[lineActionIndex + 1]),\n//           Number.parseFloat(regExpResult[lineActionIndex + 2]),\n//           regExpResult[lineActionIndex] === \"l\");\n//     }\n//   }\n//   console.log(path);\n//   return path;\n// }\n\nconst pathRegex = /[CcSsLlMmHhVvZz]|(?:-?\\d+(?:\\.\\d+)?)/g;\nconst svgActions = [\"c\", \"s\", \"l\", \"m\", \"v\", \"h\", \"z\"];\n\n/**\n * @param {string} svgComandsString\n */\nCurvedPath.parsePath = function (svgComandsString) {\n  const regExpResults = svgComandsString.match(pathRegex);\n  if (!regExpResults) {\n    return null;\n  }\n  const path = new CurvedPath();\n  let currentAction = \"\";\n  let isRelative = false;\n  let originX = 0;\n  let originY = 0;\n  for (let index = 0; index < regExpResults.length; index++) {\n    const regExpResult = regExpResults[index];\n    if (regExpResult.length === 1) {\n      const lowerCaseRegExpResult = regExpResult.toLowerCase();\n      if (svgActions.indexOf(lowerCaseRegExpResult) >= 0) {\n        currentAction = lowerCaseRegExpResult;\n        isRelative = lowerCaseRegExpResult === regExpResult;\n        index++;\n      }\n    }\n    switch (currentAction) {\n      case \"c\":\n        {\n          if (regExpResults.length < index + 5) {\n            break;\n          }\n          const firstControlX = Number.parseFloat(regExpResults[index + 0]);\n          const firstControlY = Number.parseFloat(regExpResults[index + 1]);\n          const secondControlX = Number.parseFloat(regExpResults[index + 2]);\n          const secondControlY = Number.parseFloat(regExpResults[index + 3]);\n          const destinationX = Number.parseFloat(regExpResults[index + 4]);\n          const destinationY = Number.parseFloat(regExpResults[index + 5]);\n          index += 5;\n          if (isRelative) {\n            path.addCurve(\n              firstControlX,\n              firstControlY,\n              secondControlX,\n              secondControlY,\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addCurve(\n              -originX + firstControlX,\n              -originY + firstControlY,\n              -originX + secondControlX,\n              -originY + secondControlY,\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"s\":\n        {\n          if (regExpResults.length < index + 3) {\n            break;\n          }\n          const secondControlX = Number.parseFloat(regExpResults[index + 0]);\n          const secondControlY = Number.parseFloat(regExpResults[index + 1]);\n          const destinationX = Number.parseFloat(regExpResults[index + 2]);\n          const destinationY = Number.parseFloat(regExpResults[index + 3]);\n          index += 3;\n          if (isRelative) {\n            path.addSmoothCurve(\n              secondControlX,\n              secondControlY,\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addSmoothCurve(\n              -originX + secondControlX,\n              -originY + secondControlY,\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"l\":\n        {\n          if (regExpResults.length < index + 1) {\n            break;\n          }\n          const destinationX = Number.parseFloat(regExpResults[index + 0]);\n          const destinationY = Number.parseFloat(regExpResults[index + 1]);\n          index++;\n          if (isRelative) {\n            path.addLine(\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addLine(\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"m\":\n        {\n          if (regExpResults.length < index + 1) {\n            break;\n          }\n          if (index === 1) {\n            originX = Number.parseFloat(regExpResults[index + 0]) || 0;\n            originY = Number.parseFloat(regExpResults[index + 1]) || 0;\n          }\n          index++;\n          break;\n        }\n      case \"h\":\n        {\n          if (regExpResults.length < index) {\n            break;\n          }\n          const destinationX = Number.parseFloat(regExpResults[index + 0]);\n          const destinationY = 0;\n          index++;\n          if (isRelative) {\n            path.addLine(\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addLine(\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"v\":\n        {\n          if (regExpResults.length < index) {\n            break;\n          }\n          const destinationX = 0;\n          const destinationY = Number.parseFloat(regExpResults[index + 0]);\n          index++;\n          if (isRelative) {\n            path.addLine(\n              destinationX,\n              destinationY,\n              isRelative);\n          }\n          else {\n            // Movement paths always start at (0;0).\n            path.addLine(\n              -originX + destinationX,\n              -originY + destinationY,\n              isRelative);\n          }\n          break;\n        }\n      case \"z\":\n        {\n          path.close();\n          break;\n        }\n      default:\n        break;\n    }\n  }\n//  if (originX !== 0 && originY !== 0) {\n//    path.translate(-originX, -originY);\n//    path.curves[0].getOriginX = 0;\n//  }\n  return path;\n}\n\n/**\n * @param {CurvedPath} path\n */\nCurvedPath.toSvg = function (path) {\n  let svgString = 'C';\n  for (const curve of path.curves) {\n    for (const point of curve.points) {\n      svgString += `${point[0]},${point[0]}`;\n    }\n    svgString += ' ';\n  }\n  return path;\n}\n\ngdjs.__curvedMovementExtension = gdjs.__curvedMovementExtension || {};\ngdjs.__curvedMovementExtension.CurvedPath = CurvedPath;\ngdjs.__curvedMovementExtension.CubicBezierCurve = CubicBezierCurve;\n\n",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": true
@@ -2305,7 +2305,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "First control point X",
@@ -2366,7 +2367,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Second Control point X",
@@ -2417,7 +2419,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Destination point X",
@@ -2458,7 +2461,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -2482,11 +2486,13 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "SVG commands",
               "name": "SvgCommandsString",
+              "supplementaryInformation": "scene",
               "type": "string"
             }
           ],
@@ -2514,7 +2520,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -2538,7 +2545,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -2562,12 +2570,14 @@
             {
               "description": "Name of the path to modify",
               "name": "ModifiedPathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Name of the path to add to the first one",
               "name": "AddedPathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -2591,12 +2601,14 @@
             {
               "description": "Name of the path to modify",
               "name": "ModifiedPathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Name of the path to add to the first one",
               "name": "AddedPathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Flip the appended path",
@@ -2626,7 +2638,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -2751,7 +2764,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Scale on X axis",
@@ -2786,7 +2800,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Rotation angle",
@@ -2815,7 +2830,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -2842,7 +2858,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Length on the path",
@@ -2874,7 +2891,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Length on the path",
@@ -2906,7 +2924,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Length on the path",
@@ -2938,7 +2957,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -2965,7 +2985,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -2992,7 +3013,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -3020,7 +3042,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -3048,7 +3071,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Curve index",
@@ -3081,7 +3105,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Curve index",
@@ -3114,7 +3139,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Curve index",
@@ -3147,7 +3173,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Curve index",
@@ -3180,7 +3207,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Curve index",
@@ -3213,7 +3241,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Curve index",
@@ -3246,7 +3275,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Curve index",
@@ -3279,7 +3309,8 @@
             {
               "description": "Path name",
               "name": "PathName",
-              "type": "string"
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             },
             {
               "description": "Curve index",
@@ -3997,7 +4028,8 @@
                   "description": "Path name",
                   "longDescription": "The path can be define with the \"Append curve\" action.",
                   "name": "PathName",
-                  "type": "string"
+                  "supplementaryInformation": "sceneBezierCurve",
+                  "type": "identifier"
                 },
                 {
                   "description": "Number of repetitions",
@@ -4147,7 +4179,8 @@
                   "description": "Path name",
                   "longDescription": "The path can be define with the \"Append curve\" action.",
                   "name": "PathName",
-                  "type": "string"
+                  "supplementaryInformation": "sceneBezierCurve",
+                  "type": "identifier"
                 },
                 {
                   "description": "Number of repetitions",
@@ -4339,7 +4372,8 @@
                   "description": "Path name",
                   "longDescription": "The path can be define with the \"Append curve\" action.",
                   "name": "PathName",
-                  "type": "string"
+                  "supplementaryInformation": "sceneBezierCurve",
+                  "type": "identifier"
                 },
                 {
                   "description": "Number of repetitions",
@@ -4477,7 +4511,8 @@
                   "description": "Path name",
                   "longDescription": "The path can be define with the \"Append curve\" action.",
                   "name": "PathName",
-                  "type": "string"
+                  "supplementaryInformation": "sceneBezierCurve",
+                  "type": "identifier"
                 },
                 {
                   "description": "Number of repetitions",
@@ -6260,6 +6295,62 @@
                     }
                   ],
                   "parameters": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::PropertySpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "<",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPropertyIsLookingBack"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::PropertySpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPropertyIsLookingBack"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "no"
+                      ]
+                    }
+                  ]
                 }
               ],
               "parameters": [
@@ -6307,7 +6398,7 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "GetArgumentAsNumber(\"RepetitionCount\")"
+                        "min(1, GetArgumentAsNumber(\"RepetitionCount\"))"
                       ]
                     }
                   ]
@@ -6446,7 +6537,8 @@
                   "description": "Path name",
                   "longDescription": "The path can be define with the \"Append curve\" action.",
                   "name": "PathName",
-                  "type": "string"
+                  "supplementaryInformation": "sceneBezierCurve",
+                  "type": "identifier"
                 },
                 {
                   "description": "Number of repetitions",
@@ -6469,79 +6561,17 @@
               "sentence": "_PARAM0_ move to _PARAM5_ ; _PARAM6_ on the path: _PARAM2_ repeated _PARAM3_ times and loop: _PARAM4_",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CurvedMovement::IsClosed"
-                      },
-                      "parameters": [
-                        "",
-                        "GetArgumentAsString(\"PathName\")",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "GetArgumentAsBoolean"
-                          },
-                          "parameters": [
-                            "\"ShouldLoop\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "GetArgumentAsString(\"PathName\")",
-                            "GetArgumentAsNumber(\"RepetitionCount\")",
-                            "",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "GetArgumentAsBoolean"
-                          },
-                          "parameters": [
-                            "\"ShouldLoop\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "GetArgumentAsString(\"PathName\")",
-                            "GetArgumentAsNumber(\"RepetitionCount\")",
-                            "yes",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
-                  ]
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "When the path is close or empty, there is no way to reach a destination",
+                  "comment2": ""
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -6583,9 +6613,25 @@
                             "Object",
                             "Behavior",
                             "=",
-                            "GetArgumentAsNumber(\"RepetitionCount\")"
+                            "min(1, GetArgumentAsNumber(\"RepetitionCount\"))"
                           ]
-                        },
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "GetArgumentAsBoolean"
+                          },
+                          "parameters": [
+                            "\"ShouldLoop\""
+                          ]
+                        }
+                      ],
+                      "actions": [
                         {
                           "type": {
                             "value": "CurvedMovement::SpeedPathMovement::SetPropertyShouldLoop"
@@ -6594,6 +6640,31 @@
                             "Object",
                             "Behavior",
                             "no"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "GetArgumentAsBoolean"
+                          },
+                          "parameters": [
+                            "\"ShouldLoop\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::SetPropertyShouldLoop"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "yes"
                           ]
                         }
                       ]
@@ -6649,7 +6720,7 @@
                             "Object",
                             "Behavior",
                             "=",
-                            "DistanceBetweenPositions(Object.X(), Object.Y(), GetArgumentAsNumber(\"DestinationX\"), GetArgumentAsNumber(\"DestinationY\")) / DistanceBetweenPositions(0, 0, Object.Behavior::PathEndX(), Object.Behavior::PathEndY()) / GetArgumentAsNumber(\"RepetitionCount\")"
+                            "DistanceBetweenPositions(Object.X(), Object.Y(), GetArgumentAsNumber(\"DestinationX\"), GetArgumentAsNumber(\"DestinationY\")) / DistanceBetweenPositions(0, 0, Object.Behavior::PathEndX(), Object.Behavior::PathEndY()) / Object.Behavior::PropertyRepetitionCount()"
                           ]
                         }
                       ]
@@ -6689,7 +6760,8 @@
                   "description": "Path name",
                   "longDescription": "The path can be define with the \"Append curve\" action.",
                   "name": "PathName",
-                  "type": "string"
+                  "supplementaryInformation": "sceneBezierCurve",
+                  "type": "identifier"
                 },
                 {
                   "description": "Number of repetitions",
@@ -8259,13 +8331,30 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::PropertySpeed"
+                        "value": "BuiltinCommonInstructions::Or"
                       },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "<",
-                        "0"
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::PropertySpeed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "<",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::PropertyIsLookingBack"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ]
+                        }
                       ]
                     }
                   ],
@@ -8500,6 +8589,16 @@
               "extraInformation": [],
               "hidden": true,
               "name": "CurrentLength"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "IsLookingBack"
             }
           ]
         }
