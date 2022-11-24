@@ -817,21 +817,6 @@
           "customSize": false,
           "height": 0,
           "layer": "",
-          "name": "SwipeValid_Text",
-          "persistentUuid": "e83a6c5e-22ab-4217-9b94-91709e305d51",
-          "width": 0,
-          "x": 32,
-          "y": 448,
-          "zOrder": 108,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
           "name": "SwipeHasJustEnded_Text",
           "persistentUuid": "1bb84774-b976-43e5-8010-030c5d7c404a",
           "width": 0,
@@ -2295,26 +2280,6 @@
                     "value": "TextObject::String"
                   },
                   "parameters": [
-                    "MinDistance_Text",
-                    "=",
-                    "\"Min Distance: \" + ToString(SwipeGesture::MinDistance())"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "MaxDuration_Text",
-                    "=",
-                    "\"Max Duration: \" + ToString(SwipeGesture::MaxDuration())"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
                     "StartX_Text",
                     "=",
                     "\"Start X: \" + ToString(round(SwipeGesture::StartX()))"
@@ -2359,58 +2324,25 @@
                     "=",
                     "\"Layer: \" + SwipeGesture::Layer()"
                   ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "SwipeGesture::IsSwipeValid"
-                  },
-                  "parameters": [
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
+                },
                 {
                   "type": {
                     "value": "TextObject::String"
                   },
                   "parameters": [
-                    "SwipeValid_Text",
+                    "MinDistance_Text",
                     "=",
-                    "\"Swipe is valid\""
+                    "\"Min distance: \" + ToString(MinDistance_Slider.DraggableSliderControl::Value())"
                   ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "SwipeGesture::IsSwipeValid"
-                  },
-                  "parameters": [
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
+                },
                 {
                   "type": {
                     "value": "TextObject::String"
                   },
                   "parameters": [
-                    "SwipeValid_Text",
+                    "MaxDuration_Text",
                     "=",
-                    "\"Swipe is NOT valid!\""
+                    "\"Max duration: \" + ToString(MaxDuration_Slider.DraggableSliderControl::Value())"
                   ]
                 }
               ]
@@ -2517,34 +2449,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SwipeGesture::SetMaxDuration"
-                  },
-                  "parameters": [
-                    "",
-                    "=",
-                    "MaxDuration_Slider.DraggableSliderControl::Value()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SwipeGesture::SetMinDistance"
-                  },
-                  "parameters": [
-                    "",
-                    "=",
-                    "MinDistance_Slider.DraggableSliderControl::Value()",
-                    ""
-                  ]
-                }
-              ]
             }
           ],
           "parameters": []
@@ -2579,7 +2483,7 @@
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "name": "Bounce",
+                  "name": "Shake jar",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
@@ -2720,6 +2624,108 @@
                           "type": "BuiltinCommonInstructions::Group",
                           "events": [
                             {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Define a valid swipe",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetSceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "IsValidSwipe",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "SwipeGesture::Distance"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        ">",
+                                        "MinDistance_Slider.DraggableSliderControl::Value()",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "MinDistance_Slider.DraggableSliderControl::Value()",
+                                        "=",
+                                        "0"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "SwipeGesture::Duration"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "<",
+                                        "MaxDuration_Slider.DraggableSliderControl::Value()",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "MaxDuration_Slider.DraggableSliderControl::Value()",
+                                        "=",
+                                        "0"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetSceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "IsValidSwipe",
+                                    "True"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
                               "type": "BuiltinCommonInstructions::Standard",
                               "conditions": [
                                 {
@@ -2733,11 +2739,11 @@
                                 },
                                 {
                                   "type": {
-                                    "value": "SwipeGesture::IsSwipeValid"
+                                    "value": "SceneVariableAsBoolean"
                                   },
                                   "parameters": [
-                                    "",
-                                    ""
+                                    "IsValidSwipe",
+                                    "True"
                                   ]
                                 },
                                 {
@@ -2828,6 +2834,84 @@
                             }
                           ],
                           "parameters": []
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Change swipe color",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Red",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "PrimitiveDrawing::OutlineColor"
+                                  },
+                                  "parameters": [
+                                    "DrawSwipe",
+                                    "\"208;2;27\""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Green",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "SceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "IsValidSwipe",
+                                    "True"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "PrimitiveDrawing::OutlineColor"
+                                  },
+                                  "parameters": [
+                                    "DrawSwipe",
+                                    "\"61;255;27\""
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
                         }
                       ]
                     }
@@ -2888,11 +2972,11 @@
                             },
                             {
                               "type": {
-                                "value": "SwipeGesture::IsSwipeValid"
+                                "value": "SceneVariableAsBoolean"
                               },
                               "parameters": [
-                                "",
-                                ""
+                                "IsValidSwipe",
+                                "True"
                               ]
                             }
                           ],
@@ -7382,7 +7466,7 @@
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gesture-swipe-right.svg",
       "shortDescription": "Detect swipe gestures based on their distance and duration.",
       "version": "1.0.0",
-      "description": "Use the \"Enable swipe detection\" action at the beginning of your scene.\n\nNote: This extension does NOT support multitouch.\n\nExpressions:\n\n- `StartX`, `StartY`: Position where the swipe started\n- `EndX`, `EndY`: Position where the swipe ended\n- `Distance`: Length of the swipe, in pixels\n- `DistanceX`, `DistanceY`: Distance the swipe moved in each axis\n- `Angle`: Direction the swipe moved towards. Range (-180, 180)\n- `Layer`: Layer used to detect swipe gestures\n\nConditions:\n\n- `Is swipe detection enabled`\n- `Is swipe in progress?` - A swipe starts when the mouse click or touch begins\n- `Is swipe valid?` - A swipe is valid if it passes the distance and duration restrictions\n- `Has swipe just ended?` - When the mouse or touch is released, this condition is true for one frame \n- `Swipe moved in a direction (4-way movement)` - the direction value for 4 sides (UP, DOWN, LEFT, RIGHT). In this case, the “circle” is divided into 4 segments of 90 degrees\n- `Swipe moved in a direction (8-way movement)` - the direction value for 8 sides (UP, DOWN, LEFT, RIGHT, UP-LEFT, UP-RIGHT, DOWN-LEFT, DOWN-RIGHT). In this case, the “circle” is divided into 8 segments of 45 degrees.",
+      "description": "Use the \"Enable swipe detection\" action at the beginning of your scene.\n\nNote: This extension does NOT support multitouch.\n\nExpressions:\n\n- `StartX`, `StartY`: Position where the swipe started\n- `EndX`, `EndY`: Position where the swipe ended\n- `Distance`: Length of the swipe, in pixels\n- `DistanceX`, `DistanceY`: Distance the swipe moved in each axis\n- `Angle`: Direction the swipe moved towards. Range (-180, 180)\n- `Layer`: Layer used to detect swipe gestures\n\nConditions:\n\n- `Is swipe detection enabled`\n- `Is swipe in progress?` - A swipe starts when the mouse click or touch begins\n- `Has swipe just ended?` - When the mouse or touch is released, this condition is true for one frame \n- `Swipe moved in a direction (4-way movement)` - the direction value for 4 sides (UP, DOWN, LEFT, RIGHT). In this case, the “circle” is divided into 4 segments of 90 degrees\n- `Swipe moved in a direction (8-way movement)` - the direction value for 8 sides (UP, DOWN, LEFT, RIGHT, UP-LEFT, UP-RIGHT, DOWN-LEFT, DOWN-RIGHT). In this case, the “circle” is divided into 8 segments of 45 degrees.",
       "origin": {
         "identifier": "SwipeGesture",
         "name": "gdevelop-extension-store"
@@ -7400,64 +7484,6 @@
       ],
       "dependencies": [],
       "eventsFunctions": [
-        {
-          "fullName": "",
-          "functionType": "Action",
-          "name": "onSceneLoaded",
-          "sentence": "",
-          "events": [
-            {
-              "colorB": 228,
-              "colorG": 176,
-              "colorR": 74,
-              "creationTime": 0,
-              "name": "Set default values",
-              "source": "",
-              "type": "BuiltinCommonInstructions::Group",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SwipeGesture::SetMinDistance"
-                      },
-                      "parameters": [
-                        "",
-                        "0",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SwipeGesture::SetMaxDuration"
-                      },
-                      "parameters": [
-                        "",
-                        "0",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SwipeGesture::SetLayer"
-                      },
-                      "parameters": [
-                        "",
-                        "\"\"",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": []
-            }
-          ],
-          "parameters": [],
-          "objectGroups": []
-        },
         {
           "fullName": "",
           "functionType": "Action",
@@ -8101,57 +8127,6 @@
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SwipeGesture::IsSwipeValid"
-                          },
-                          "parameters": [
-                            "",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "PrimitiveDrawing::OutlineColor"
-                          },
-                          "parameters": [
-                            "ShapePainterObject",
-                            "\"20;255;59\""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "SwipeGesture::IsSwipeValid"
-                          },
-                          "parameters": [
-                            "",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "PrimitiveDrawing::OutlineColor"
-                          },
-                          "parameters": [
-                            "ShapePainterObject",
-                            "\"208;2;27\""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
                         {
@@ -8215,74 +8190,6 @@
               "description": "Layer",
               "name": "Layer",
               "type": "layer"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Change the minimum distance a swipe must travel to be considered valid.  Use \"0\" to disable distance restriction.",
-          "fullName": "Swipe minimum distance (pixels)",
-          "functionType": "ActionWithOperator",
-          "getterName": "MinDistance",
-          "name": "SetMinDistance",
-          "sentence": "Change the swipe minimum distance to _PARAM1_ pixels",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "__SwipeGesture.MinimumDistance",
-                    "=",
-                    "GetArgumentAsNumber(\"Value\")"
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Minimum distance (pixels)",
-              "name": "Value",
-              "type": "expression"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Change the maximum duration a swipe can exist and still be considered valid.  Use \"0\" to disable time restriction.",
-          "fullName": "Swipe maximum duration (seconds)",
-          "functionType": "ActionWithOperator",
-          "getterName": "MaxDuration",
-          "name": "SetMaxDuration",
-          "sentence": "Change the swipe maximum duration to _PARAM1_ seconds",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "__SwipeGesture.MaximumDuration",
-                    "=",
-                    "GetArgumentAsNumber(\"Value\")"
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Maximum duration (seconds)",
-              "name": "Value",
-              "type": "expression"
             }
           ],
           "objectGroups": []
@@ -8564,158 +8471,6 @@
           "expressionType": {
             "type": "expression"
           },
-          "parameters": [],
-          "objectGroups": []
-        },
-        {
-          "description": "the maximum duration a swipe can exist and still be considered valid.  Use \"0\" to disable this time restriction.",
-          "fullName": "Maximum duration of swipe (seconds)",
-          "functionType": "ExpressionAndCondition",
-          "name": "MaxDuration",
-          "sentence": "the maximum duration a swipe can exist and still be considered valid",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetReturnNumber"
-                  },
-                  "parameters": [
-                    "Variable(__SwipeGesture.MaximumDuration)"
-                  ]
-                }
-              ]
-            }
-          ],
-          "expressionType": {
-            "type": "expression"
-          },
-          "parameters": [],
-          "objectGroups": []
-        },
-        {
-          "description": "the minimum distance a swipe must travel to be considered valid.  Use \"0\" to disable this distance restriction.",
-          "fullName": "Minimum distance of swipe (pixels)",
-          "functionType": "ExpressionAndCondition",
-          "name": "MinDistance",
-          "sentence": "the minimum distance a swipe must travel to be considered valid",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetReturnNumber"
-                  },
-                  "parameters": [
-                    "Variable(__SwipeGesture.MinimumDistance)"
-                  ]
-                }
-              ]
-            }
-          ],
-          "expressionType": {
-            "type": "expression"
-          },
-          "parameters": [],
-          "objectGroups": []
-        },
-        {
-          "description": "Check if the swipe is valid based on distance and time restrictions (if they are used).",
-          "fullName": "Swipe is valid",
-          "functionType": "Condition",
-          "name": "IsSwipeValid",
-          "sentence": "Swipe is valid",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Check distance and time restrictions (when the restrictions are not set to 0)",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Or"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::CompareNumbers"
-                      },
-                      "parameters": [
-                        "SwipeGesture::MinDistance()",
-                        "=",
-                        "0"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::CompareNumbers"
-                      },
-                      "parameters": [
-                        "SwipeGesture::Distance()",
-                        ">",
-                        "SwipeGesture::MinDistance()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Or"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::CompareNumbers"
-                      },
-                      "parameters": [
-                        "SwipeGesture::MaxDuration()",
-                        "=",
-                        "0"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "CompareTimer"
-                      },
-                      "parameters": [
-                        "",
-                        "\"__SwipeGesture.TouchDuration\"",
-                        "<",
-                        "SwipeGesture::MaxDuration()"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetReturnBoolean"
-                  },
-                  "parameters": [
-                    "True"
-                  ]
-                }
-              ]
-            }
-          ],
           "parameters": [],
           "objectGroups": []
         },
