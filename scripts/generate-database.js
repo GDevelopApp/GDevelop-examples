@@ -170,6 +170,7 @@ const checkProjectResourceFiles = async (project, projectFolderPath) => {
 
 const sortedStarterSlugs = new Set([
   'platformer',
+  'top-down-rpg',
   'ball-cup-boom',
   'spherez',
   'absorbus',
