@@ -180,6 +180,7 @@ const sortedStarterSlugs = new Set([
   'tappy-plane',
   'parking-jam',
   'conviction-of-gun-dude-desktop',
+  'platformer',
   'space-shooter',
   'run-dino-run',
   'bounce-and-hook',
