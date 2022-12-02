@@ -169,17 +169,17 @@ const checkProjectResourceFiles = async (project, projectFolderPath) => {
 };
 
 const sortedStarterSlugs = new Set([
-  'particle-effects-demo',
-  'game-feel-demo',
   'top-down-rpg',
   'plinko',
+  'platformer',
+  'particle-effects-demo',
+  'game-feel-demo',
   'ball-cup-boom',
   'spherez',
   'absorbus',
   'tappy-plane',
   'parking-jam',
   'conviction-of-gun-dude-desktop',
-  'platformer',
   'space-shooter',
   'run-dino-run',
   'bounce-and-hook',
