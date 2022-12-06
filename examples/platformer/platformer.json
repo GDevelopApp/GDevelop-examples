@@ -901,7 +901,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.4301844818115231,
+        "zoomFactor": 0.6435178222656253,
         "windowMask": false
       },
       "objectsGroups": [
@@ -3738,24 +3738,7 @@
               "value": false
             }
           ],
-          "effects": [
-            {
-              "effectType": "Adjustment",
-              "name": "Gray",
-              "doubleParameters": {
-                "alpha": 1,
-                "blue": 1,
-                "brightness": 1,
-                "contrast": 1,
-                "gamma": 1,
-                "green": 1,
-                "red": 1,
-                "saturation": 0
-              },
-              "stringParameters": {},
-              "booleanParameters": {}
-            }
-          ],
+          "effects": [],
           "behaviors": [
             {
               "name": "Checkpoint",
@@ -6351,25 +6334,6 @@
                       ]
                     }
                   ]
-                },
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Player::PlaySounds"
-                      },
-                      "parameters": [
-                        "",
-                        "Player",
-                        "PlatformerObject",
-                        "GrassParticle",
-                        ""
-                      ]
-                    }
-                  ]
                 }
               ],
               "parameters": []
@@ -6507,17 +6471,6 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "SetEffectDoubleParameter"
-                          },
-                          "parameters": [
-                            "Checkpoint",
-                            "\"Gray\"",
-                            "\"saturation\"",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
                             "value": "SetAnimationName"
                           },
                           "parameters": [
@@ -6555,17 +6508,6 @@
                             "Checkpoint.Y()",
                             "\"Checkpoint\"",
                             ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetEffectDoubleParameter"
-                          },
-                          "parameters": [
-                            "Checkpoint",
-                            "\"Gray\"",
-                            "\"saturation\"",
-                            "1"
                           ]
                         },
                         {
@@ -6718,6 +6660,201 @@
           "colorG": 16,
           "colorR": 189,
           "creationTime": 0,
+          "name": "Fly enemy",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Player collides with Fly",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Ennemy::IsFlyDead"
+                      },
+                      "parameters": [
+                        "",
+                        "Fly",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Fly",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "The player kill ennemies when it falls on them.",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::IsFalling"
+                          },
+                          "parameters": [
+                            "Player",
+                            "PlatformerObject"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Ennemy::KillFly"
+                          },
+                          "parameters": [
+                            "",
+                            "Fly",
+                            "RectangularMovement",
+                            "ShakeObject_PositionAngle",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Player::Bounce"
+                          },
+                          "parameters": [
+                            "",
+                            "Player",
+                            "PlatformerObject",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "Score",
+                            "+",
+                            "50"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "PlatformBehavior::IsFalling"
+                          },
+                          "parameters": [
+                            "Player",
+                            "PlatformerObject"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Player::BeKilled"
+                          },
+                          "parameters": [
+                            "",
+                            "Player",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Cleanup objects",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "When a Fly falls below background it is deleted. (This is just a good house keeping practice)",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PosY"
+                      },
+                      "parameters": [
+                        "Fly",
+                        ">",
+                        "BackgroundPlants.BoundingBoxBottom()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "Fly",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 224,
+          "colorG": 16,
+          "colorR": 189,
+          "creationTime": 0,
           "name": "Monster enemy",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -6750,6 +6887,46 @@
                   "actions": [],
                   "events": [
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "The player always dies when the ennemy is on fire.",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Ennemy::MonterEnnemy::IsOnFire"
+                          },
+                          "parameters": [
+                            "Monster",
+                            "MonterEnnemy",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Player::BeKilled"
+                          },
+                          "parameters": [
+                            "",
+                            "Player",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
@@ -6766,19 +6943,6 @@
                       ],
                       "actions": [],
                       "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "If player falls on enemy then enemy is defeated",
-                          "comment2": ""
-                        },
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
@@ -6838,19 +7002,6 @@
                           ]
                         },
                         {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "Otherwise, the player is defeated",
-                          "comment2": ""
-                        },
-                        {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
                             {
@@ -6877,271 +7028,6 @@
                             }
                           ]
                         }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Player always dies if the fire animation is showing",
-                      "comment2": ""
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Ennemy::MonterEnnemy::IsOnFire"
-                          },
-                          "parameters": [
-                            "Monster",
-                            "MonterEnnemy",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Player::BeKilled"
-                          },
-                          "parameters": [
-                            "",
-                            "Player",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": []
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 224,
-          "colorG": 16,
-          "colorR": 189,
-          "creationTime": 0,
-          "name": "Fly enemy",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "colorB": 228,
-              "colorG": 176,
-              "colorR": 74,
-              "creationTime": 0,
-              "name": "Player collides with Fly",
-              "source": "",
-              "type": "BuiltinCommonInstructions::Group",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "Ennemy::IsFlyDead"
-                      },
-                      "parameters": [
-                        "",
-                        "Fly",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "CollisionNP"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Fly",
-                        "",
-                        "",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "colorB": 228,
-                      "colorG": 176,
-                      "colorR": 74,
-                      "creationTime": 0,
-                      "name": "Fly defeated",
-                      "source": "",
-                      "type": "BuiltinCommonInstructions::Group",
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "If player falls on enemy then enemy is defeated",
-                          "comment2": ""
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "PlatformBehavior::IsFalling"
-                              },
-                              "parameters": [
-                                "Player",
-                                "PlatformerObject"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Ennemy::KillFly"
-                              },
-                              "parameters": [
-                                "",
-                                "Fly",
-                                "RectangularMovement",
-                                "ShakeObject_PositionAngle",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Player::Bounce"
-                              },
-                              "parameters": [
-                                "",
-                                "Player",
-                                "PlatformerObject",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarScene"
-                              },
-                              "parameters": [
-                                "Score",
-                                "+",
-                                "50"
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "parameters": []
-                    },
-                    {
-                      "colorB": 228,
-                      "colorG": 176,
-                      "colorR": 74,
-                      "creationTime": 0,
-                      "name": "Player defeated",
-                      "source": "",
-                      "type": "BuiltinCommonInstructions::Group",
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "PlatformBehavior::IsFalling"
-                              },
-                              "parameters": [
-                                "Player",
-                                "PlatformerObject"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Player::BeKilled"
-                              },
-                              "parameters": [
-                                "",
-                                "Player",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "parameters": []
-                    }
-                  ]
-                }
-              ],
-              "parameters": []
-            },
-            {
-              "colorB": 228,
-              "colorG": 176,
-              "colorR": 74,
-              "creationTime": 0,
-              "name": "Cleanup objects",
-              "source": "",
-              "type": "BuiltinCommonInstructions::Group",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "When a Fly falls below background it is deleted. (This is just a good house keeping practice)",
-                  "comment2": ""
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "PosY"
-                      },
-                      "parameters": [
-                        "Fly",
-                        ">",
-                        "BackgroundPlants.BoundingBoxBottom()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Delete"
-                      },
-                      "parameters": [
-                        "Fly",
-                        ""
                       ]
                     }
                   ]
@@ -7293,55 +7179,14 @@
                         },
                         {
                           "type": {
-                            "value": "Tween::AddObjectPositionTween"
+                            "value": "Player::AnimateFallingIntoPortal"
                           },
                           "parameters": [
+                            "",
                             "Player",
                             "Tween",
-                            "\"MoveIntoPortal\"",
-                            "Portal.CenterX() + Player.Width() / 2",
-                            "Portal.CenterY()",
-                            "\"linear\"",
-                            "1000",
-                            "no"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Tween::AddObjectAngleTween"
-                          },
-                          "parameters": [
-                            "Player",
-                            "Tween",
-                            "\"RotateIntoPortal\"",
-                            "360",
-                            "\"linear\"",
-                            "1000",
-                            "no"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Wait"
-                          },
-                          "parameters": [
-                            "1"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Tween::AddObjectScaleTween"
-                          },
-                          "parameters": [
-                            "Player",
-                            "Tween",
-                            "\"ShrinkIntoPortal\"",
-                            "0",
-                            "0",
-                            "\"linear\"",
-                            "1000",
-                            "no",
-                            "yes"
+                            "Portal",
+                            "Portal"
                           ]
                         }
                       ]
@@ -7487,22 +7332,17 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "TiledSpriteObject::Width"
+                            "value": "UserInterface::StretchToFillScreen"
                           },
                           "parameters": [
+                            "",
                             "EndScreenBackground",
-                            "=",
-                            "CameraWidth(\"EndScreen\", 0)"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "TiledSpriteObject::Height"
-                          },
-                          "parameters": [
-                            "EndScreenBackground",
-                            "=",
-                            "CameraHeight(\"EndScreen\", 0)"
+                            "EndScreenBestText",
+                            "EndScreenChallengeText",
+                            "EndScreenHeader",
+                            "EndScreenRetryText",
+                            "EndScreenSubHeader",
+                            ""
                           ]
                         },
                         {
@@ -7512,7 +7352,7 @@
                           "parameters": [
                             "EndScreenObjects",
                             "=",
-                            "CameraX(\"EndScreen\", 0)"
+                            "CameraX(\"EndScreen\")"
                           ]
                         }
                       ]
@@ -25852,7 +25692,7 @@
       "eventsFunctions": [
         {
           "description": "Kill a fly ennemy.",
-          "fullName": "Kill fly",
+          "fullName": "Kill the fly",
           "functionType": "Action",
           "name": "KillFly",
           "sentence": "Kill _PARAM1_",
@@ -25917,7 +25757,7 @@
                   },
                   "parameters": [
                     "Fly",
-                    "dead",
+                    "Dead",
                     "True"
                   ]
                 }
@@ -25948,7 +25788,7 @@
         },
         {
           "description": "Check if a fly ennemy is dead.",
-          "fullName": "Is fly dead",
+          "fullName": "Is the fly dead",
           "functionType": "Condition",
           "name": "IsFlyDead",
           "sentence": "_PARAM1_ is dead",
@@ -25962,7 +25802,7 @@
                   },
                   "parameters": [
                     "Fly",
-                    "dead",
+                    "Dead",
                     "True"
                   ]
                 }
@@ -26255,6 +26095,95 @@
       "dependencies": [],
       "eventsFunctions": [
         {
+          "description": "Animate the character to make it fall into the portal.",
+          "fullName": "Fall into the portal",
+          "functionType": "Action",
+          "name": "AnimateFallingIntoPortal",
+          "sentence": "_PARAM1_ fall into _PARAM3_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Tween::AddObjectPositionTween"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Tween",
+                    "\"MoveIntoPortal\"",
+                    "Portal.CenterX() + Player.Width() / 2",
+                    "Portal.CenterY()",
+                    "\"linear\"",
+                    "1000",
+                    "no"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::AddObjectAngleTween"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Tween",
+                    "\"RotateIntoPortal\"",
+                    "360",
+                    "\"linear\"",
+                    "1000",
+                    "no"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Wait"
+                  },
+                  "parameters": [
+                    "1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::AddObjectScaleTween"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Tween",
+                    "\"ShrinkIntoPortal\"",
+                    "0",
+                    "0",
+                    "\"linear\"",
+                    "1000",
+                    "no",
+                    "yes"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "",
+              "name": "Player",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "",
+              "name": "Tween",
+              "supplementaryInformation": "Tween::TweenBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "",
+              "name": "Portal",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
           "description": "Make the charcter bounce on an ennemy.",
           "fullName": "Bounce",
           "functionType": "Action",
@@ -26303,7 +26232,7 @@
           "objectGroups": []
         },
         {
-          "description": "The character is being killed.",
+          "description": "Kill the character.",
           "fullName": "Kill character",
           "functionType": "Action",
           "name": "BeKilled",
@@ -26359,141 +26288,6 @@
               "description": "",
               "name": "Player",
               "supplementaryInformation": "Sprite",
-              "type": "objectList"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Play sounds according to the character movement",
-          "fullName": "Play sounds",
-          "functionType": "Action",
-          "name": "PlaySounds",
-          "sentence": "Play sounds according to _PARAM1_ movement",
-          "events": [
-            {
-              "colorB": 228,
-              "colorG": 176,
-              "colorR": 74,
-              "creationTime": 0,
-              "name": "Sound and visual effects",
-              "source": "",
-              "type": "BuiltinCommonInstructions::Group",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "PlatformBehavior::IsJumping"
-                      },
-                      "parameters": [
-                        "Player",
-                        "PlatformerObject"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PlaySound"
-                      },
-                      "parameters": [
-                        "",
-                        "jump.mp3",
-                        "",
-                        "50",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Player::IsSteppingOnFloor"
-                      },
-                      "parameters": [
-                        "",
-                        "Player",
-                        "PlatformerObject",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PlaySoundCanal"
-                      },
-                      "parameters": [
-                        "",
-                        "assets/audio/grass.mp3",
-                        "1",
-                        "",
-                        "20",
-                        "RandomFloatInRange(0.7, 1.2)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Create"
-                      },
-                      "parameters": [
-                        "",
-                        "GrassParticle",
-                        "Player.PointX(\"GrassParticle\")",
-                        "Player.PointY(\"GrassParticle\")",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ChangePlan"
-                      },
-                      "parameters": [
-                        "GrassParticle",
-                        "=",
-                        "-1"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": []
-            }
-          ],
-          "parameters": [
-            {
-              "description": "",
-              "name": "Player",
-              "supplementaryInformation": "Sprite",
-              "type": "objectList"
-            },
-            {
-              "description": "",
-              "name": "PlatformerObject",
-              "supplementaryInformation": "PlatformBehavior::PlatformerObjectBehavior",
-              "type": "behavior"
-            },
-            {
-              "description": "",
-              "name": "GrassParticle",
-              "supplementaryInformation": "ParticleSystem::ParticleEmitter",
               "type": "objectList"
             }
           ],
@@ -26917,7 +26711,7 @@
         },
         {
           "description": "Move the character according to gamepad inputs.",
-          "fullName": "Move character with gamepad",
+          "fullName": "Move with gamepad",
           "functionType": "Action",
           "name": "MoveWithGamepad",
           "sentence": "Move _PARAM1_ according to gamepad inputs",
@@ -27400,6 +27194,94 @@
             }
           ],
           "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": []
+    },
+    {
+      "author": "",
+      "category": "",
+      "extensionNamespace": "",
+      "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "UserInterface",
+      "previewIconUrl": "",
+      "shortDescription": "",
+      "version": "",
+      "description": "",
+      "tags": [],
+      "authorIds": [],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "Stretch the object to fill the screen",
+          "fullName": "Stretch to fill the screen",
+          "functionType": "Action",
+          "name": "StretchToFillScreen",
+          "sentence": "Stretch _PARAM1_ to fill the screen",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::Width"
+                  },
+                  "parameters": [
+                    "EndScreenBackground",
+                    "=",
+                    "CameraWidth(EndScreenBackground.Layer())"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::Height"
+                  },
+                  "parameters": [
+                    "EndScreenBackground",
+                    "=",
+                    "CameraHeight(EndScreenBackground.Layer())"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "",
+              "name": "EndScreenBackground",
+              "supplementaryInformation": "TiledSpriteObject::TiledSprite",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": [
+            {
+              "name": "EndScreenObjects",
+              "objects": [
+                {
+                  "name": "EndScreenBackground"
+                },
+                {
+                  "name": "EndScreenHeader"
+                },
+                {
+                  "name": "EndScreenSubHeader"
+                },
+                {
+                  "name": "EndScreenBestText"
+                },
+                {
+                  "name": "EndScreenChallengeText"
+                },
+                {
+                  "name": "EndScreenRetryText"
+                }
+              ]
+            }
+          ]
         }
       ],
       "eventsBasedBehaviors": [],
