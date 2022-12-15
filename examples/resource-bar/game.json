@@ -869,7 +869,9 @@
           "content": {
             "UnitWidth": 26,
             "BarLeftPadding": 38,
-            "BarRightPadding": 38
+            "BarRightPadding": 38,
+            "MaxValue": 3,
+            "InitialValue": 3
           },
           "childrenContent": {
             "Background": {
@@ -2546,6 +2548,35 @@
                     "textG": 0,
                     "textR": 0
                   },
+                  "comment": "This allows to detect a change of \"intitial value\" on hot reload.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TiledUnitsBar::TiledUnitsBar::SetPropertyPreviousInitialValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyInitialValue()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
                   "comment": "Create one background instance for of each state.\nOnly the instance for the current state is shown.",
                   "comment2": ""
                 },
@@ -2700,6 +2731,87 @@
             {
               "fullName": "",
               "functionType": "Action",
+              "name": "onHotReloading",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TiledUnitsBar::TiledUnitsBar::CenterBar"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TiledUnitsBar::TiledUnitsBar::SetMaxValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyMaxValue()",
+                        "Object.PropertyMaxValue()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "TiledUnitsBar::TiledUnitsBar::PropertyInitialValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "!=",
+                        "Object.PropertyPreviousInitialValue()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TiledUnitsBar::TiledUnitsBar::SetPropertyPreviousInitialValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyInitialValue()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TiledUnitsBar::TiledUnitsBar::SetValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyInitialValue()",
+                        "Object.PropertyInitialValue()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TiledUnitsBar::TiledUnitsBar",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
               "name": "doStepPostEvents",
               "sentence": "",
               "events": [
@@ -2741,7 +2853,7 @@
                               "parameters": [
                                 "Object.Width()",
                                 "!=",
-                                "max(Background.Width(), Label.Width())"
+                                "max(Background.BoundingBoxRight(), Bar.BoundingBoxRight()) - min(Background.BoundingBoxLeft(), Bar.BoundingBoxLeft())"
                               ]
                             },
                             {
@@ -2751,7 +2863,7 @@
                               "parameters": [
                                 "Object.Height()",
                                 "!=",
-                                "max(Background.Height(), Label.Height())"
+                                "max(Background.BoundingBoxBottom(), Bar.BoundingBoxBottom()) - min(Background.BoundingBoxTop(), Bar.BoundingBoxTop())"
                               ]
                             }
                           ]
@@ -3206,6 +3318,16 @@
               "name": "InitialValue"
             },
             {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "description": "It's used to detect a change at hot reload.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "PreviousInitialValue"
+            },
+            {
               "value": "24",
               "type": "Number",
               "label": "Unit width",
@@ -3257,7 +3379,7 @@
               "value": "Center",
               "type": "String",
               "label": "",
-              "description": "Only used by the scene editor",
+              "description": "Only used by the scene editor.",
               "group": "",
               "extraInformation": [
                 "Resource",
@@ -3270,7 +3392,7 @@
               "value": "Center",
               "type": "String",
               "label": "",
-              "description": "Only used by the scene editor",
+              "description": "Only used by the scene editor.",
               "group": "",
               "extraInformation": [
                 "Background"
@@ -4266,6 +4388,35 @@
                     "textG": 0,
                     "textR": 0
                   },
+                  "comment": "This allows to detect a change of \"intitial value\" on hot reload.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TiledContinuousBar::TiledContinuousBar::SetPropertyPreviousInitialValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyInitialValue()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
                   "comment": "Create one background instance for of each state.\nOnly the instance for the current state is shown.",
                   "comment2": ""
                 },
@@ -4510,6 +4661,124 @@
             {
               "fullName": "",
               "functionType": "Action",
+              "name": "onHotReloading",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TiledContinuousBar::TiledContinuousBar::UpdateLayout"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TiledContinuousBar::TiledContinuousBar::SetMaxValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyMaxValue()",
+                        "Object.PropertyMaxValue()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "TiledContinuousBar::TiledContinuousBar::PropertyInitialValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "!=",
+                        "Object.PropertyPreviousInitialValue()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TiledContinuousBar::TiledContinuousBar::SetPropertyPreviousInitialValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyInitialValue()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TiledContinuousBar::TiledContinuousBar::SetValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyInitialValue()",
+                        "Object.PropertyInitialValue()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TiledContinuousBar::TiledContinuousBar::SetPreviousValueDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.PropertyPreviousHighValueDuration()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::RemoveTween"
+                      },
+                      "parameters": [
+                        "Resource",
+                        "Tween",
+                        "\"ChangeValue\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TiledSpriteObject::Width"
+                      },
+                      "parameters": [
+                        "Resource",
+                        "=",
+                        "Object.WidthForValue()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TiledContinuousBar::TiledContinuousBar",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
               "name": "doStepPostEvents",
               "sentence": "",
               "events": [
@@ -4532,7 +4801,7 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "Children instances must be resized when the button size change:\n- backgrounds for each state are resized to take the full dimensions of the button\n- the label is put back at the center of the button\n\nThe scale is set back to 1 because it means that the parent instance has the same dimensions as the union of its children instances.",
+                      "comment": "Children instances must be resized when the parent size change:\n- backgrounds is resized to take the full dimensions of the button\n- the label is put back at the center of the bar\n\nThe scale is set back to 1 because it means that the parent instance has the same dimensions as the union of its children instances.",
                       "comment2": ""
                     },
                     {
@@ -4551,7 +4820,7 @@
                               "parameters": [
                                 "Object.Width()",
                                 "!=",
-                                "max(Background.Width(), Label.Width())"
+                                "max(Background.BoundingBoxRight(), Label.BoundingBoxRight()) - min(Background.BoundingBoxLeft(), Label.BoundingBoxLeft())"
                               ]
                             },
                             {
@@ -4561,7 +4830,7 @@
                               "parameters": [
                                 "Object.Height()",
                                 "!=",
-                                "max(Background.Height(), Label.Height())"
+                                "max(Background.BoundingBoxBottom(), Label.BoundingBoxBottom()) - min(Background.BoundingBoxTop(), Label.BoundingBoxTop())"
                               ]
                             }
                           ]
@@ -4880,12 +5149,11 @@
                     },
                     {
                       "type": {
-                        "value": "TextObject::String"
+                        "value": "TiledContinuousBar::TiledContinuousBar::UpdateLabel"
                       },
                       "parameters": [
-                        "Label",
-                        "=",
-                        "ToString(round(Object.Value())) + \" / \" + ToString(Object.MaxValue())"
+                        "Object",
+                        ""
                       ]
                     }
                   ]
@@ -5024,6 +5292,15 @@
                         "ResourceBar",
                         "=",
                         "GetArgumentAsNumber(\"Value\")",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TiledContinuousBar::TiledContinuousBar::UpdateLabel"
+                      },
+                      "parameters": [
+                        "Object",
                         ""
                       ]
                     },
@@ -5517,6 +5794,41 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "Update the text that display the current value and maximum value.",
+              "fullName": "Update label",
+              "functionType": "Action",
+              "name": "UpdateLabel",
+              "private": true,
+              "sentence": "Update label of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "Label",
+                        "=",
+                        "ToString(round(Object.Value())) + \" / \" + ToString(Object.MaxValue())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TiledContinuousBar::TiledContinuousBar",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "propertyDescriptors": [
@@ -5595,6 +5907,16 @@
               "extraInformation": [],
               "hidden": false,
               "name": "InitialValue"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "description": "It's used to detect a change at hot reload.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "PreviousInitialValue"
             },
             {
               "value": "1",
