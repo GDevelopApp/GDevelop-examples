@@ -562,7 +562,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.1,
         "snap": true,
-        "zoomFactor": 0.36999999999999983,
+        "zoomFactor": 0.22999999999999982,
         "windowMask": false
       },
       "objectsGroups": [
@@ -1419,6 +1419,21 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Title_Text",
+          "persistentUuid": "af924191-e23f-4f76-b419-d511fadaeb83",
+          "width": 0,
+          "x": -576,
+          "y": -1966,
+          "zOrder": 37,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -3176,10 +3191,10 @@
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "string": "Extension: Joint Connector",
+          "string": "Distance Joints",
           "font": "",
           "textAlignment": "",
-          "characterSize": 40,
+          "characterSize": 200,
           "color": {
             "b": 255,
             "g": 255,
@@ -3622,7 +3637,7 @@
                 },
                 {
                   "type": {
-                    "value": "JointConnector::JointOverlappingObject"
+                    "value": "JointConnector::CreateRevoluteJoints"
                   },
                   "parameters": [
                     "",
@@ -3679,7 +3694,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "JointConnector::DistanceJointOverlappingObject"
+                        "value": "JointConnector::CreateDistanceJoints"
                       },
                       "parameters": [
                         "",
@@ -4288,7 +4303,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.1,
         "snap": true,
-        "zoomFactor": 0.36999999999999983,
+        "zoomFactor": 0.15000000000000005,
         "windowMask": false
       },
       "objectsGroups": [
@@ -5134,6 +5149,21 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Title_Text",
+          "persistentUuid": "114d3b39-2b88-4f5c-9ddf-bfe858726700",
+          "width": 0,
+          "x": -320,
+          "y": -1982,
+          "zOrder": 37,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -6905,10 +6935,10 @@
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "string": "Extension: Joint Connector",
+          "string": "Weld Joint",
           "font": "",
           "textAlignment": "",
-          "characterSize": 40,
+          "characterSize": 200,
           "color": {
             "b": 255,
             "g": 255,
@@ -7351,7 +7381,7 @@
                 },
                 {
                   "type": {
-                    "value": "JointConnector::JointOverlappingObject"
+                    "value": "JointConnector::CreateRevoluteJoints"
                   },
                   "parameters": [
                     "",
@@ -7408,7 +7438,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "JointConnector::WeldJointOverlappingObject"
+                        "value": "JointConnector::CreateWeldJoints"
                       },
                       "parameters": [
                         "",
@@ -11003,7 +11033,7 @@
                 },
                 {
                   "type": {
-                    "value": "JointConnector::JointOverlappingObject"
+                    "value": "JointConnector::CreateRevoluteJoints"
                   },
                   "parameters": [
                     "",
@@ -11073,7 +11103,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "JointConnector::JointOverlappingObject"
+                        "value": "JointConnector::CreateRevoluteJoints"
                       },
                       "parameters": [
                         "",
@@ -11593,6 +11623,42 @@
             }
           ],
           "parameters": []
+        },
+        {
+          "disabled": true,
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "JointConnector",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "BodyParts",
+                    "JointConnector",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ChangeColor"
+                  },
+                  "parameters": [
+                    "BodyParts",
+                    "\"208;2;27\""
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ],
       "layers": [
@@ -27657,11 +27723,11 @@
       "dependencies": [],
       "eventsFunctions": [
         {
-          "description": "Connect overlapping objects with a joint.",
-          "fullName": "Connect overlapping objects with a joint",
+          "description": "Connect overlapping physics objects with a revolute joint.",
+          "fullName": "Connect overlapping objects with a revolute joint",
           "functionType": "Action",
-          "name": "JointOverlappingObject",
-          "sentence": "Connect overlapping _PARAM1_ with a joint located at _PARAM3_",
+          "name": "CreateRevoluteJoints",
+          "sentence": "Connect overlapping _PARAM1_ with a revolute joint located at the center of _PARAM3_",
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
@@ -27686,6 +27752,8 @@
                 "const referenceAngle = 0;",
                 "const collideConnected = false;",
                 "",
+                "const linkManager = gdjs.LinksManager.getManager(runtimeScene);",
+                "",
                 "for (const jointObject of jointObjects) {",
                 "    const x = jointObject.getCenterXInScene();",
                 "    const y = jointObject.getCenterYInScene();",
@@ -27696,6 +27764,7 @@
                 "            if (!firstObject) {",
                 "                console.log(\"firstObject\");",
                 "                firstObject = object;",
+                "                linkManager.linkObjects(firstObject, jointObject);",
                 "            }",
                 "            else {",
                 "                console.log(\"addRevoluteJointBetweenTwoBodies\");",
@@ -27721,6 +27790,7 @@
                 "                const otherJointIdsVariable = object.getVariables().get(\"JointId\");",
                 "                const otherJointIdVariable = otherJointIdsVariable.getChild(otherJointIdsVariable.getChildrenCount());",
                 "                otherJointIdVariable.setNumber(jointIdVariable.getAsNumber());",
+                "                linkManager.linkObjects(object, jointObject);",
                 "                break;",
                 "            }",
                 "        }",
@@ -27768,11 +27838,11 @@
           "objectGroups": []
         },
         {
-          "description": "Connect overlapping objects with a weld joint.",
+          "description": "Connect overlapping physics objects with a weld joint.",
           "fullName": "Connect overlapping objects with a weld joint",
           "functionType": "Action",
-          "name": "WeldJointOverlappingObject",
-          "sentence": "Connect overlapping _PARAM1_ with a weld joint located at _PARAM3_",
+          "name": "CreateWeldJoints",
+          "sentence": "Connect overlapping _PARAM1_ with a weld joint located at the center of _PARAM3_",
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
@@ -27789,6 +27859,8 @@
                 "const dampingRatio = 1;",
                 "const collideConnected = false;",
                 "",
+                "const linkManager = gdjs.LinksManager.getManager(runtimeScene);",
+                "",
                 "for (const jointObject of jointObjects) {",
                 "    const x = jointObject.getCenterXInScene();",
                 "    const y = jointObject.getCenterYInScene();",
@@ -27799,6 +27871,7 @@
                 "            if (!firstObject) {",
                 "                console.log(\"firstObject\");",
                 "                firstObject = object;",
+                "                linkManager.linkObjects(firstObject, jointObject);",
                 "            }",
                 "            else {",
                 "                console.log(\"addWeldJoint\");",
@@ -27820,6 +27893,7 @@
                 "                const otherJointIdsVariable = object.getVariables().get(\"JointId\");",
                 "                const otherJointIdVariable = otherJointIdsVariable.getChild(otherJointIdsVariable.getChildrenCount());",
                 "                otherJointIdVariable.setNumber(jointIdVariable.getAsNumber());",
+                "                linkManager.linkObjects(object, jointObject);",
                 "                break;",
                 "            }",
                 "        }",
@@ -27867,11 +27941,11 @@
           "objectGroups": []
         },
         {
-          "description": "Connect two objects with a distance joint when the joint connector is over the center point of both objects",
+          "description": "Connect physics objects with a distance joint when the joint connector covers the center point of both objects",
           "fullName": "Connect overlapping objects with a distance joint",
           "functionType": "Action",
-          "name": "DistanceJointOverlappingObject",
-          "sentence": "Connect _PARAM1_ with a distance joint when _PARAM3_ is over the center point of both objects",
+          "name": "CreateDistanceJoints",
+          "sentence": "Connect _PARAM1_ with a distance joint when _PARAM3_ covers the center point of both objects",
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
@@ -27888,21 +27962,21 @@
                 "const dampingRatio = 1;",
                 "const collideConnected = false;",
                 "",
+                "const linkManager = gdjs.LinksManager.getManager(runtimeScene);",
+                "",
                 "// Create a distance joint when the center point of two physics objects ",
                 "// are both inside a distance joint connector object",
                 "for (const jointObject of jointObjects) {",
-                "//    const x = jointObject.getX();",
-                "//    const y = jointObject.getY();",
                 "    /** @type {gdjs.RuntimeObject} */",
                 "    let firstObject = null;",
                 "    for (const object of objects) {",
-                "//        if (jointObject.isCollidingWithPoint(x, y)) {",
                 "            if (!firstObject) {",
                 "                console.log(\"firstObject\");",
                 "                var x1 = object.getCenterXInScene();",
                 "                var y1 = object.getCenterYInScene();",
                 "                if (jointObject.isCollidingWithPoint(x1, y1)) {",
                 "                    firstObject = object;",
+                "                //    linkManager.linkObjects(firstobject, jointObject);",
                 "                }",
                 "            }",
                 "            else {",
@@ -27928,10 +28002,10 @@
                 "                    const otherJointIdsVariable = object.getVariables().get(\"JointId\");",
                 "                    const otherJointIdVariable = otherJointIdsVariable.getChild(otherJointIdsVariable.getChildrenCount());",
                 "                    otherJointIdVariable.setNumber(jointIdVariable.getAsNumber());",
+                "                    //linkManager.linkObjects(object, jointObject);",
                 "                    break;",
                 "                }",
                 "            }",
-                "//        }",
                 "    }",
                 "}",
                 ""
@@ -27978,8 +28052,8 @@
       ],
       "eventsBasedBehaviors": [
         {
-          "description": "Create and manage hinge (revolute) joints between two objects.",
-          "fullName": "Hinge (revolute) joint connector",
+          "description": "Create and manage revolute joints between two objects.\nAlso known as a hinge joint because the objects act like they are connected with a hinge that pivots.",
+          "fullName": "Revolute joint connector",
           "name": "RevoluteJoint",
           "objectType": "",
           "eventsFunctions": [
@@ -28602,21 +28676,73 @@
           "sharedPropertyDescriptors": []
         },
         {
-          "description": "",
-          "fullName": "",
+          "description": "Create and manage weld joints between two objects.\nAlso known as a static joint because the objects stay stuck in the same relative position to each other.",
+          "fullName": "Weld joint connector",
           "name": "WeldJoint",
           "objectType": "",
           "eventsFunctions": [],
-          "propertyDescriptors": [],
+          "propertyDescriptors": [
+            {
+              "value": "20",
+              "type": "Number",
+              "label": "Frequency",
+              "description": "Set a number between 0 and 60. Higher numbers represent a stronger bond.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Frequency"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "Damping ratio",
+              "description": "Set a number between 0 and 60. Higher numbers represent a stronger bond.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "DampingRatio"
+            }
+          ],
           "sharedPropertyDescriptors": []
         },
         {
-          "description": "",
-          "fullName": "",
+          "description": "Create and manage weld joints between two objects.\nAlso known as a spring joint because the objects try to always stay the same distance apart.",
+          "fullName": "Distance joint connector",
           "name": "DistanceJoint",
           "objectType": "",
           "eventsFunctions": [],
-          "propertyDescriptors": [],
+          "propertyDescriptors": [
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "Distance between objects (pixels)",
+              "description": "Set this to 0 to keep the objects at their current distance.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Distance"
+            },
+            {
+              "value": "20",
+              "type": "Number",
+              "label": "Frequency",
+              "description": "Set a number between 0 and 60. Higher numbers represent a stiffer spring.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Frequency"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "Damping ratio",
+              "description": "Set a number between 0 and 1. Higher numbers represent a stiffer spring.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "DampingRatio"
+            }
+          ],
           "sharedPropertyDescriptors": []
         }
       ],
