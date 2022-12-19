@@ -5224,9 +5224,9 @@
         "ammo"
       ],
       "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
         "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
-        "q8ubdigLvIRXLxsJDDTaokO41mc2",
-        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+        "q8ubdigLvIRXLxsJDDTaokO41mc2"
       ],
       "dependencies": [],
       "eventsFunctions": [],
@@ -6836,7 +6836,10 @@
         "ui",
         "widget"
       ],
-      "authorIds": [],
+      "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+        "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+      ],
       "dependencies": [],
       "eventsFunctions": [
         {
@@ -8567,6 +8570,55 @@
               "objectGroups": []
             },
             {
+              "description": "Check if the button is currently being pressed outside with mouse or touch.",
+              "fullName": "Is held outside",
+              "functionType": "Condition",
+              "name": "IsPressedOutside",
+              "sentence": "_PARAM0_ is held outside",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PanelSpriteSlider::ButtonFSM::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"PressedOutside\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PanelSpriteSlider::ButtonFSM",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "fullName": "Should check mouse position",
               "functionType": "Condition",
               "name": "ShouldCheckMousePosition",
@@ -9078,12 +9130,30 @@
                         },
                         {
                           "type": {
-                            "value": "PanelSpriteSlider::ButtonFSM::IsClicked"
+                            "value": "BuiltinCommonInstructions::Or"
                           },
-                          "parameters": [
-                            "Background",
-                            "ButtonFSM",
-                            ""
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "PanelSpriteSlider::ButtonFSM::IsPressed"
+                              },
+                              "parameters": [
+                                "Background",
+                                "ButtonFSM",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PanelSpriteSlider::ButtonFSM::IsPressedOutside"
+                              },
+                              "parameters": [
+                                "Background",
+                                "ButtonFSM",
+                                ""
+                              ]
+                            }
                           ]
                         }
                       ],
@@ -10634,9 +10704,9 @@
         "ammo"
       ],
       "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
         "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
-        "q8ubdigLvIRXLxsJDDTaokO41mc2",
-        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+        "q8ubdigLvIRXLxsJDDTaokO41mc2"
       ],
       "dependencies": [],
       "eventsFunctions": [],
@@ -11885,6 +11955,57 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PanelSpriteObject::Width"
+                      },
+                      "parameters": [
+                        "Resource",
+                        "<",
+                        "Buffer.Width()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Montre"
+                      },
+                      "parameters": [
+                        "Buffer",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PanelSpriteObject::Width"
+                      },
+                      "parameters": [
+                        "Resource",
+                        ">=",
+                        "Buffer.Width()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "Buffer"
+                      ]
+                    }
+                  ]
                 }
               ],
               "parameters": [
@@ -12129,31 +12250,6 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PanelSpriteObject::Width"
-                      },
-                      "parameters": [
-                        "Resource",
-                        ">=",
-                        "Buffer.Width()"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Cache"
-                      },
-                      "parameters": [
-                        "Buffer"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
                         "value": "PanelSpriteContinuousBar::ResourceBar::IsChanging"
                       },
                       "parameters": [
@@ -12172,15 +12268,6 @@
                         "Buffer",
                         "=",
                         "round(Object.FullBarWidth() * Resource.ResourceBar::PreviousHighValue() / Resource.ResourceBar::MaxValue())"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Montre"
-                      },
-                      "parameters": [
-                        "Buffer",
-                        ""
                       ]
                     }
                   ]
@@ -13067,7 +13154,10 @@
         "toggle",
         "switch"
       ],
-      "authorIds": [],
+      "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+        "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+      ],
       "dependencies": [],
       "eventsFunctions": [
         {
