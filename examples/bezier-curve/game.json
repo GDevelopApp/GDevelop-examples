@@ -5372,7 +5372,10 @@
                 "};",
                 "",
                 "const CurvedPath = /** @class */ (function () {",
-                "  function CurvedPath() {",
+                "  /**",
+                "   * @param {number} speedScaleY Set it to 0.5 for pixel isometry.",
+                "   */",
+                "  function CurvedPath(speedScaleY = 1) {",
                 "    /**",
                 "     * @type {CubicBezierCurve[]}",
                 "     */",
@@ -5381,6 +5384,10 @@
                 "     * @type {number[]}",
                 "     */",
                 "    this.curvePreviousLengths = [0];",
+                "    /**",
+                "     * Set it to 0.5 for pixel isometry.",
+                "     */",
+                "    this.speedScaleY = speedScaleY;",
                 "  };",
                 "",
                 "  CurvedPath.prototype.getCurvePreviousLengths = function () {",
@@ -5403,9 +5410,20 @@
                 "  };",
                 "",
                 "  /**",
+                "   * @param {number} speedScaleY Set it to 0.5 for pixel isometry.",
+                "   */",
+                "  CurvedPath.prototype.setSpeedScaleY = function (speedScaleY) {",
+                "    if (this.speedScaleY === speedScaleY) {",
+                "      return;",
+                "    }",
+                "    this.scale(1, this.speedScaleY / speedScaleY);",
+                "    this.speedScaleY = speedScaleY;",
+                "  };",
+                "",
+                "  /**",
                 "   * @param {CubicBezierCurve} curve",
                 "   */",
-                "  CurvedPath.prototype.add = function (curve) {",
+                "  CurvedPath.prototype._add = function (curve) {",
                 "    this.curves.push(curve);",
                 "    if (this.curvePreviousLengths.length > 0) {",
                 "      this.curvePreviousLengths.push(this.getLength() + curve.getLength());",
@@ -5439,15 +5457,15 @@
                 "      destinationX += endX;",
                 "      destinationY += endY;",
                 "    }",
-                "    this.add(new CubicBezierCurve(",
+                "    this._add(new CubicBezierCurve(",
                 "      endX,",
-                "      endY,",
+                "      endY / this.speedScaleY,",
                 "      firstControlX,",
-                "      firstControlY,",
+                "      firstControlY / this.speedScaleY,",
                 "      secondControlX,",
-                "      secondControlY,",
+                "      secondControlY / this.speedScaleY,",
                 "      destinationX,",
-                "      destinationY",
+                "      destinationY / this.speedScaleY",
                 "    ));",
                 "  }",
                 "",
@@ -5477,15 +5495,15 @@
                 "    let firstControlX = 2 * endX - lastControlX;",
                 "    let firstControlY = 2 * endY - lastControlY;",
                 "",
-                "    this.add(new CubicBezierCurve(",
+                "    this._add(new CubicBezierCurve(",
                 "      endX,",
-                "      endY,",
+                "      endY / this.speedScaleY,",
                 "      firstControlX,",
-                "      firstControlY,",
+                "      firstControlY / this.speedScaleY,",
                 "      secondControlX,",
-                "      secondControlY,",
+                "      secondControlY / this.speedScaleY,",
                 "      destinationX,",
-                "      destinationY",
+                "      destinationY / this.speedScaleY",
                 "    ));",
                 "  }",
                 "",
@@ -5505,15 +5523,15 @@
                 "    const lengthY = destinationY - endY;",
                 "",
                 "    // TODO Optimize it with an object dedicated to lines.",
-                "    this.add(new CubicBezierCurve(",
+                "    this._add(new CubicBezierCurve(",
                 "      endX,",
-                "      endY,",
+                "      endY / this.speedScaleY,",
                 "      endX + lengthX / 3,",
-                "      endY + lengthY / 3,",
+                "      (endY + lengthY / 3) / this.speedScaleY,",
                 "      endX + lengthX * 2 / 3,",
-                "      endY + lengthY * 2 / 3,",
+                "      (endY + lengthY * 2 / 3) / this.speedScaleY,",
                 "      destinationX,",
-                "      destinationY",
+                "      destinationY / this.speedScaleY",
                 "    ));",
                 "  }",
                 "",
@@ -5536,6 +5554,7 @@
                 "      const clone = curve.clone();",
                 "      for (const point of clone.points) {",
                 "        point[0] += endX;",
+                "        point[1] *= path.scaleY / this.speedScaleY;",
                 "        point[1] += endY;",
                 "      }",
                 "      this.add(clone);",
@@ -5613,7 +5632,35 @@
                 "    const curve = this.curves[curveIndex];",
                 "    const curveStartLength = curvePreviousLengths[curveIndex];",
                 "    const u = (length - curveStartLength) / curve.getLength();",
-                "    return curve.getY(u);",
+                "    return curve.getY(u) * this.speedScaleY;",
+                "  };",
+                "",
+                "  const workingPoint = [0, 0];",
+                "  /**",
+                "   * @param {number} length",
+                "   * @param {gdjs.AffineTransformation} transformation",
+                "   * @param {[number, number]} transformation",
+                "   */",
+                "  CurvedPath.prototype.getTransformedPosition = function (length, transformation, result) {",
+                "    if (!result) {",
+                "      result = workingPoint;",
+                "    }",
+                "    const curvePreviousLengths = this.getCurvePreviousLengths();",
+                "    if (length >= this.getLength()) {",
+                "      return this.getEndX();",
+                "    }",
+                "    const curveIndex = this.getCurveIndex(length);",
+                "    const curve = this.curves[curveIndex];",
+                "    const curveStartLength = curvePreviousLengths[curveIndex];",
+                "    const u = (length - curveStartLength) / curve.getLength();",
+                "    const x = curve.getX(u);",
+                "    const y = curve.getY(u);",
+                "",
+                "    result[0] = x;",
+                "    result[1] = y;",
+                "    transformation.transform(result, result);",
+                "    result[1] *= this.speedScaleY;",
+                "    return result;",
                 "  };",
                 "",
                 "  /**",
@@ -5636,7 +5683,7 @@
                 "  };",
                 "",
                 "  CurvedPath.prototype.getEndY = function () {",
-                "    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getTargetY();",
+                "    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getTargetY() * this.speedScaleY;",
                 "  };",
                 "",
                 "  CurvedPath.prototype.getEndAngle = function () {",
@@ -5654,7 +5701,7 @@
                 "  };",
                 "",
                 "  CurvedPath.prototype.getLastControlY = function () {",
-                "    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getSecondControlY();",
+                "    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getSecondControlY() * this.speedScaleY;",
                 "  };",
                 "",
                 "  /**",
@@ -5665,7 +5712,7 @@
                 "    for (const curve of this.curves) {",
                 "      for (const point of curve.points) {",
                 "        point[0] += translationX;",
-                "        point[1] += translationY;",
+                "        point[1] += translationY / this.speedScaleY;",
                 "      }",
                 "    }",
                 "  };",
@@ -6660,6 +6707,47 @@
           "objectGroups": []
         },
         {
+          "description": "Change the speed scale on Y axis. This allows to change the view point of a path.",
+          "fullName": "Speed scale Y",
+          "functionType": "Action",
+          "group": "Path transformation",
+          "name": "SetSpeedScaleY",
+          "sentence": "Change the speed scale Y of the path _PARAM1_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const pathName = eventsFunctionContext.getArgument(\"PathName\");",
+                "/** @type {Map<string, gdjs.__curvedMovementExtension.CurvedPath>} */",
+                "const curvedPaths = runtimeScene.__curvedMovementExtension.curvedPaths;",
+                "",
+                "let curvedPath = curvedPaths.get(pathName);",
+                "if (curvedPath) {",
+                "    const scaleY = eventsFunctionContext.getArgument(\"ScaleY\");",
+                "    curvedPath.setSpeedScaleY(scaleY);",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Path name",
+              "name": "PathName",
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
+            },
+            {
+              "description": "Speed scale on Y axis (0.5 for pixel isometry)",
+              "name": "ScaleY",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
           "description": "Invert a path, the end becomes the beginning.",
           "fullName": "Invert a path",
           "functionType": "Action",
@@ -7578,106 +7666,6 @@
           "objectGroups": []
         },
         {
-          "description": "Create a path for an isometric movement.",
-          "fullName": "Create isometric path",
-          "functionType": "Action",
-          "name": "CreateIsometricPath",
-          "private": true,
-          "sentence": "Create isometric path for _PARAM1_",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "CurvedMovement::PathExists"
-                  },
-                  "parameters": [
-                    "",
-                    "CurvedMovement::IsometricPathName(GetArgumentAsString(\"PathName\"))",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "CurvedMovement::AppendPath"
-                  },
-                  "parameters": [
-                    "",
-                    "CurvedMovement::IsometricPathName(GetArgumentAsString(\"PathName\"))",
-                    "GetArgumentAsString(\"PathName\")",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::ScalePath"
-                  },
-                  "parameters": [
-                    "",
-                    "\"__Isometric\" + GetArgumentAsString(\"PathName\")",
-                    "1",
-                    "2",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "CurvedMovement::DeletePath"
-                  },
-                  "parameters": [
-                    "",
-                    "CurvedMovement::IsometricPathName(GetArgumentAsString(\"PathName\"))",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::AppendPath"
-                  },
-                  "parameters": [
-                    "",
-                    "CurvedMovement::IsometricPathName(GetArgumentAsString(\"PathName\"))",
-                    "GetArgumentAsString(\"PathName\")",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::ScalePath"
-                  },
-                  "parameters": [
-                    "",
-                    "\"__Isometric\" + GetArgumentAsString(\"PathName\")",
-                    "1",
-                    "2",
-                    ""
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Path name",
-              "name": "PathName",
-              "supplementaryInformation": "sceneBezierCurve",
-              "type": "identifier"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
           "description": "Path exists.",
           "fullName": "Path exists",
           "functionType": "Condition",
@@ -7700,42 +7688,6 @@
               "eventsSheetExpanded": true
             }
           ],
-          "parameters": [
-            {
-              "description": "Path name",
-              "name": "PathName",
-              "supplementaryInformation": "sceneBezierCurve",
-              "type": "identifier"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Retuurn the Isometric path name.",
-          "fullName": "Isometric path name",
-          "functionType": "StringExpression",
-          "name": "IsometricPathName",
-          "private": true,
-          "sentence": "Create isometric path for _PARAM1_",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetReturnString"
-                  },
-                  "parameters": [
-                    "\"__Isometric\" + GetArgumentAsString(\"PathName\")"
-                  ]
-                }
-              ]
-            }
-          ],
-          "expressionType": {
-            "type": "string"
-          },
           "parameters": [
             {
               "description": "Path name",
@@ -10846,19 +10798,7 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::PropertyViewpoint"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "\"Top-down\""
-                      ]
-                    }
-                  ],
+                  "conditions": [],
                   "actions": [
                     {
                       "type": {
@@ -10884,6 +10824,35 @@
                         "Object",
                         "Behavior",
                         "=",
+                        "\"Top-down\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SetSpeedScaleY"
+                      },
+                      "parameters": [
+                        "",
+                        "GetArgumentAsString(\"PathName\")",
+                        "1",
+                        "0.5"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::PropertyViewpoint"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
                         "\"Isometry 2:1 (26.565°)\""
                       ]
                     }
@@ -10891,23 +10860,13 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "CurvedMovement::CreateIsometricPath"
+                        "value": "CurvedMovement::SetSpeedScaleY"
                       },
                       "parameters": [
                         "",
                         "GetArgumentAsString(\"PathName\")",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::SetPropertyPathName"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "CurvedMovement::IsometricPathName(GetArgumentAsString(\"PathName\"))"
+                        "0.5",
+                        "0.5"
                       ]
                     }
                   ]
@@ -11342,71 +11301,12 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::SetPropertyX"
+                        "value": "CurvedMovement::SpeedPathMovement::UpdatePosition"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "=",
-                        "Object.Behavior::RepetitionDone() * Object.Behavior::PathEndX() + CurvedMovement::PathX(Object.Behavior::PropertyPathName(), Object.Behavior::RepeatedPathPosition())"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::SetPropertyY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Object.Behavior::RepetitionDone() * Object.Behavior::PathEndY() + CurvedMovement::PathY(Object.Behavior::PropertyPathName(), Object.Behavior::RepeatedPathPosition())"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::PropertyViewpoint"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "\"Isometry 2:1 (26.565°)\""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::SetPropertyY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "/",
-                        "2"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "MettreXY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.Behavior::TransformedX(Object.Behavior::PropertyX(), Object.Behavior::PropertyY())",
-                        "=",
-                        "Object.Behavior::TransformedY(Object.Behavior::PropertyX(), Object.Behavior::PropertyY())"
+                        ""
                       ]
                     }
                   ]
@@ -11454,6 +11354,71 @@
                   "description": "Length",
                   "name": "Length",
                   "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set the the object on the path according to the current length.",
+              "fullName": "Update position",
+              "functionType": "Action",
+              "name": "UpdatePosition",
+              "private": true,
+              "sentence": "Update the position of _PARAM0_ on the path",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = object.getBehavior(behaviorName);",
+                    "",
+                    "/** @type {string} */",
+                    "const pathName = behavior._getPathName();",
+                    "/** @type {Map<string, gdjs.__curvedMovementExtension.CurvedPath>} */",
+                    "const curvedPaths = runtimeScene.__curvedMovementExtension.curvedPaths;",
+                    "const curvedPath = curvedPaths.get(pathName);",
+                    "if (!curvedPath) {",
+                    "    return;",
+                    "}",
+                    "",
+                    "behavior.workingTransformation = behavior.workingTransformation || new gdjs.AffineTransformation();",
+                    "/** @type {gdjs.AffineTransformation} */",
+                    "const transformation = behavior.workingTransformation;",
+                    "",
+                    "const repetitionDone = behavior.RepetitionDone();",
+                    "transformation.setToTranslation(",
+                    "    repetitionDone * behavior.PathEndX(),",
+                    "    repetitionDone * behavior.PathEndY()",
+                    ");",
+                    "transformation.concatenate(behavior.curvedMovementTransformation);",
+                    "",
+                    "/** @type {number} */",
+                    "const length = behavior.RepeatedPathPosition();",
+                    "/** @type {[number, number]} */",
+                    "const point = curvedPath.getTransformedPosition(length, transformation);",
+                    "const x = point[0];",
+                    "const y = point[1];",
+                    "",
+                    "object.setPosition(x, y);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
                 }
               ],
               "objectGroups": []
