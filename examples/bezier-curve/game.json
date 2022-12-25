@@ -3153,7 +3153,7 @@
                     "",
                     "Locomotive",
                     "645",
-                    "199",
+                    "300",
                     ""
                   ]
                 },
@@ -3195,6 +3195,23 @@
               ]
             },
             {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "CurvedMovement::SpeedPathMovement::DrawDebug"
+                  },
+                  "parameters": [
+                    "Locomotive",
+                    "SpeedPathMovement",
+                    "Trajectory",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
               "type": "BuiltinCommonInstructions::Repeat",
               "repeatExpression": "12",
               "conditions": [],
@@ -3207,7 +3224,7 @@
                     "",
                     "Wagon",
                     "645",
-                    "199",
+                    "300",
                     ""
                   ]
                 },
@@ -3244,26 +3261,6 @@
                     "=",
                     "6 + 48 * SceneInstancesCount(Wagon)",
                     ""
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::DrawDebug"
-                      },
-                      "parameters": [
-                        "Locomotive",
-                        "SpeedPathMovement",
-                        "Trajectory",
-                        ""
-                      ]
-                    }
                   ]
                 }
               ]
@@ -5680,12 +5677,52 @@
                 "    return curve.getAngle(u);",
                 "  };",
                 "",
+                "  CurvedPath.prototype.getOriginX = function (curveIndex) {",
+                "    return this.curves.length === 0 ? 0 : this.curves[curveIndex].getOriginX();",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getOriginY = function (curveIndex) {",
+                "    return this.curves.length === 0 ? 0 : this.curves[curveIndex].getOriginY() * this.speedScaleY;",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getFirstControlX = function (curveIndex) {",
+                "    return this.curves.length === 0 ? 0 : this.curves[curveIndex].getFirstControlX();",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getFirstControlY = function (curveIndex) {",
+                "    return this.curves.length === 0 ? 0 : this.curves[curveIndex].getFirstControlY() * this.speedScaleY;",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getSecondControlX = function (curveIndex) {",
+                "    return this.curves.length === 0 ? 0 : this.curves[curveIndex].getSecondControlX();",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getSecondControlY = function (curveIndex) {",
+                "    return this.curves.length === 0 ? 0 : this.curves[curveIndex].getSecondControlY() * this.speedScaleY;",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getTargetX = function (curveIndex) {",
+                "    return this.curves.length === 0 ? 0 : this.curves[curveIndex].getTargetX();",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getTargetY = function (curveIndex) {",
+                "    return this.curves.length === 0 ? 0 : this.curves[curveIndex].getTargetY() * this.speedScaleY;",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getLastControlX = function () {",
+                "    return this.getSecondControlX(this.curves.length - 1);",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getLastControlY = function () {",
+                "    return this.getSecondControlY(this.curves.length - 1);",
+                "  };",
+                "",
                 "  CurvedPath.prototype.getEndX = function () {",
-                "    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getTargetX();",
+                "    return this.getTargetX(this.curves.length - 1);",
                 "  };",
                 "",
                 "  CurvedPath.prototype.getEndY = function () {",
-                "    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getTargetY() * this.speedScaleY;",
+                "    return this.getTargetY(this.curves.length - 1);",
                 "  };",
                 "",
                 "  CurvedPath.prototype.getEndAngle = function () {",
@@ -5696,14 +5733,6 @@
                 "    return Math.atan2(",
                 "      lastCurve.getTargetY() - lastCurve.getSecondControlY(),",
                 "      lastCurve.getTargetX() - lastCurve.getSecondControlX());",
-                "  };",
-                "",
-                "  CurvedPath.prototype.getLastControlX = function () {",
-                "    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getSecondControlX();",
-                "  };",
-                "",
-                "  CurvedPath.prototype.getLastControlY = function () {",
-                "    return this.curves.length === 0 ? 0 : this.curves[this.curves.length - 1].getSecondControlY() * this.speedScaleY;",
                 "  };",
                 "",
                 "  /**",
@@ -7312,7 +7341,7 @@
                 "\r",
                 "eventsFunctionContext.returnValue = (\r",
                 "  (curvedPath && curvedPath && index >= 0 && index < curvedPath.curves.length)\r",
-                "  ? curvedPath.curves[index].getOriginX() : 0);\r",
+                "  ? curvedPath.getOriginX(index) : 0);\r",
                 ""
               ],
               "parameterObjects": "Object",
@@ -7360,7 +7389,7 @@
                 "\r",
                 "eventsFunctionContext.returnValue = (\r",
                 "  (curvedPath && index >= 0 && index < curvedPath.curves.length)\r",
-                "  ? curvedPath.curves[index].getOriginY() : 0);"
+                "  ? curvedPath.getOriginY(index) : 0);"
               ],
               "parameterObjects": "Object",
               "useStrict": true,
@@ -7407,7 +7436,7 @@
                 "\r",
                 "eventsFunctionContext.returnValue = (\r",
                 "  (curvedPath && index >= 0 && index < curvedPath.curves.length)\r",
-                "  ? curvedPath.curves[index].getFirstControlX() : 0);"
+                "  ? curvedPath.getFirstControlX(index) : 0);"
               ],
               "parameterObjects": "Object",
               "useStrict": true,
@@ -7454,7 +7483,7 @@
                 "\r",
                 "eventsFunctionContext.returnValue = (\r",
                 "  (curvedPath && index >= 0 && index < curvedPath.curves.length)\r",
-                "  ? curvedPath.curves[index].getFirstControlY() : 0);"
+                "  ? curvedPath.getFirstControlY(index) : 0);"
               ],
               "parameterObjects": "Object",
               "useStrict": true,
@@ -7501,7 +7530,7 @@
                 "\r",
                 "eventsFunctionContext.returnValue = (\r",
                 "  (curvedPath && index >= 0 && index < curvedPath.curves.length)\r",
-                "  ? curvedPath.curves[index].getSecondControlX() : 0);"
+                "  ? curvedPath.getSecondControlX(index) : 0);"
               ],
               "parameterObjects": "Object",
               "useStrict": true,
@@ -7548,7 +7577,7 @@
                 "\r",
                 "eventsFunctionContext.returnValue = (\r",
                 "  (curvedPath && index >= 0 && index < curvedPath.curves.length)\r",
-                "  ? curvedPath.curves[index].getSecondControlY() : 0);"
+                "  ? curvedPath.getSecondControlY(index) : 0);"
               ],
               "parameterObjects": "Object",
               "useStrict": true,
@@ -7595,7 +7624,7 @@
                 "\r",
                 "eventsFunctionContext.returnValue = (\r",
                 "  (curvedPath && index >= 0 && index < curvedPath.curves.length)\r",
-                "  ? curvedPath.curves[index].getTargetX() : 0);"
+                "  ? curvedPath.getTargetX(index) : 0);"
               ],
               "parameterObjects": "Object",
               "useStrict": true,
@@ -7642,7 +7671,7 @@
                 "\r",
                 "eventsFunctionContext.returnValue = (\r",
                 "  (curvedPath && index >= 0 && index < curvedPath.curves.length)\r",
-                "  ? curvedPath.curves[index].getTargetY() : 0);"
+                "  ? curvedPath.getTargetY(index) : 0);"
               ],
               "parameterObjects": "Object",
               "useStrict": true,
