@@ -3187,6 +3187,7 @@
                   "parameters": [
                     "Locomotive",
                     "SpeedPathMovement",
+                    "=",
                     "0",
                     ""
                   ]
@@ -3240,6 +3241,7 @@
                   "parameters": [
                     "Wagon",
                     "SpeedPathMovement",
+                    "=",
                     "6 + 48 * SceneInstancesCount(Wagon)",
                     ""
                   ]
@@ -10594,92 +10596,7 @@
                             "textG": 0,
                             "textR": 0
                           },
-                          "comment": "Update the position on the path (the current length)",
-                          "comment2": ""
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetPropertyCurrentLength"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "+",
-                                "(Object.Behavior::PropertyPreviousSpeed() + Object.Behavior::PropertySpeed()) * TimeDelta() / 2"
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::PropertyShouldLoop"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetPropertyCurrentLength"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "mod(Object.Behavior::PropertyCurrentLength(), Object.Behavior::TotalLength())"
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "CurvedMovement::SpeedPathMovement::PropertyShouldLoop"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetPropertyCurrentLength"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "clamp(Object.Behavior::PropertyCurrentLength(), 0, Object.Behavior::TotalLength())"
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "Actually move the object",
+                          "comment": "Update the position on the path (the current length) with a Verlet integration.",
                           "comment2": ""
                         },
                         {
@@ -10693,7 +10610,8 @@
                               "parameters": [
                                 "Object",
                                 "Behavior",
-                                "Object.Behavior::PropertyCurrentLength()",
+                                "+",
+                                "(Object.Behavior::PropertyPreviousSpeed() + Object.Behavior::PropertySpeed()) * TimeDelta() / 2",
                                 ""
                               ]
                             }
@@ -11089,7 +11007,71 @@
                             "=",
                             "GetArgumentAsString(\"PathName\")"
                           ]
-                        },
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::PropertyViewpoint"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Top-down\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SetSpeedScaleY"
+                          },
+                          "parameters": [
+                            "",
+                            "GetArgumentAsString(\"PathName\")",
+                            "1",
+                            "0.5"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::PropertyViewpoint"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Isometry 2:1 (26.565°)\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SetSpeedScaleY"
+                          },
+                          "parameters": [
+                            "",
+                            "GetArgumentAsString(\"PathName\")",
+                            "0.5",
+                            "0.5"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
                         {
                           "type": {
                             "value": "CurvedMovement::SpeedPathMovement::SetPropertyRepetitionCount"
@@ -11272,15 +11254,67 @@
               "objectGroups": []
             },
             {
+              "description": "the length between the trajectory origin and the current position.",
+              "fullName": "Position on the path",
+              "functionType": "ExpressionAndCondition",
+              "name": "PositionOnPath",
+              "sentence": "the length from the trajectory origin",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyCurrentLength()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "Change the position of the object on the path.",
               "fullName": "Position on the path",
-              "functionType": "Action",
+              "functionType": "ActionWithOperator",
+              "getterName": "PositionOnPath",
               "name": "SetPositionOnPath",
               "sentence": "Change the position of _PARAM0_ on the path at the length _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "CurvedMovement::SpeedPathMovement::PropertyShouldLoop"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
@@ -11290,7 +11324,34 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "GetArgumentAsNumber(\"Length\")"
+                        "clamp(GetArgumentAsNumber(\"Value\"), 0, Object.Behavior::TotalLength())"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::PropertyShouldLoop"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPropertyCurrentLength"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "mod(GetArgumentAsNumber(\"Value\"), Object.Behavior::TotalLength())"
                       ]
                     }
                   ]
@@ -11408,46 +11469,6 @@
                   "eventsSheetExpanded": true
                 }
               ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Return the length from the trajectory origin.",
-              "fullName": "Position on the path",
-              "functionType": "Expression",
-              "name": "PositionOnPath",
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "Object.Behavior::PropertyCurrentLength()"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
               "parameters": [
                 {
                   "description": "Object",
