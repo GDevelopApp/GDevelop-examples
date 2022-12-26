@@ -5542,7 +5542,6 @@
                 "   * @param {CurvedPath} path",
                 "   */",
                 "  CurvedPath.prototype.append = function (path) {",
-                "    console.log(\"append\");",
                 "    const endX = this.getEndX();",
                 "    const endY = this.getEndY();",
                 "    for (const curve of path.curves) {",
@@ -5554,7 +5553,6 @@
                 "      }",
                 "      this.add(clone);",
                 "    }",
-                "    console.log(this);",
                 "  };",
                 "",
                 "  /**",
@@ -5642,17 +5640,17 @@
                 "    }",
                 "    const curvePreviousLengths = this.getCurvePreviousLengths();",
                 "    if (length >= this.getLength()) {",
-                "      return this.getEndX();",
+                "      result[0] = this.getEndX();",
+                "      result[1] = this.getEndY();",
                 "    }",
-                "    const curveIndex = this.getCurveIndex(length);",
-                "    const curve = this.curves[curveIndex];",
-                "    const curveStartLength = curvePreviousLengths[curveIndex];",
-                "    const u = (length - curveStartLength) / curve.getLength();",
-                "    const x = curve.getX(u);",
-                "    const y = curve.getY(u);",
-                "",
-                "    result[0] = x;",
-                "    result[1] = y;",
+                "    else {",
+                "      const curveIndex = this.getCurveIndex(length);",
+                "      const curve = this.curves[curveIndex];",
+                "      const curveStartLength = curvePreviousLengths[curveIndex];",
+                "      const u = (length - curveStartLength) / curve.getLength();",
+                "      result[0] = curve.getX(u);",
+                "      result[1] = curve.getY(u);",
+                "    }",
                 "    transformation.transform(result, result);",
                 "    result[1] *= this.speedScaleY;",
                 "    return result;",
@@ -6672,7 +6670,6 @@
                 "    if (!modifiedPath) {",
                 "        modifiedPath = new gdjs.__curvedMovementExtension.CurvedPath();",
                 "        curvedPaths.set(modifiedPathName, modifiedPath);",
-                "        console.log(\"create: \" + modifiedPathName);",
                 "    }",
                 "    modifiedPath.append(addedPath);",
                 "}"
@@ -11502,7 +11499,6 @@
                     "const point = curvedPath.getTransformedPosition(length, transformation);",
                     "const x = point[0] + behavior._getPathOriginX();",
                     "const y = point[1] + behavior._getPathOriginY();",
-                    "",
                     "object.setPosition(x, y);",
                     ""
                   ],
@@ -12297,7 +12293,6 @@
                     "      secondControlY + originY,",
                     "      targetX + originX,",
                     "      targetY + originY);",
-                    "    console.log((targetX + originX) + \" \" + (targetY + originY));",
                     "  }",
                     "  originX = curvedPath.getEndX();",
                     "  originY = curvedPath.getEndY();",
@@ -12326,6 +12321,76 @@
                   "name": "ShapePainter",
                   "supplementaryInformation": "PrimitiveDrawing::Drawer",
                   "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the transformation to apply to the path.",
+              "fullName": "Path transformation",
+              "functionType": "Action",
+              "name": "SetTransformation",
+              "private": true,
+              "sentence": "Change the path trasformation of _PARAM0_ to origin _PARAM2_; _PARAM3_ scale by _PARAM4_ and a rotation of _PARAM5_°",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "",
+                    "const originX = eventsFunctionContext.getArgument(\"OriginX\");",
+                    "const originY = eventsFunctionContext.getArgument(\"OriginY\");",
+                    "const scale = eventsFunctionContext.getArgument(\"Scale\");",
+                    "const angle = eventsFunctionContext.getArgument(\"Angle\");",
+                    "",
+                    "const transformation = new gdjs.AffineTransformation();",
+                    "transformation.scale(scale, scale);",
+                    "transformation.rotate(angle / 180 * Math.PI);",
+                    "",
+                    "behavior.curvedMovementTransformation = transformation;"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Origin X",
+                  "name": "OriginX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Origin Y",
+                  "name": "OriginY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Scale",
+                  "name": "Scale",
+                  "type": "expression"
+                },
+                {
+                  "description": "Angle",
+                  "name": "Angle",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -12675,219 +12740,6 @@
                   "name": "Behavior",
                   "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
                   "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Change the transformation to apply to the path.",
-              "fullName": "Path transformation",
-              "functionType": "Action",
-              "name": "SetTransformation",
-              "private": true,
-              "sentence": "Change the path trasformation of _PARAM0_ to origin _PARAM2_; _PARAM3_ scale by _PARAM4_ and a rotation of _PARAM5_°",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
-                    "const behavior = objects[0].getBehavior(behaviorName);",
-                    "",
-                    "const originX = eventsFunctionContext.getArgument(\"OriginX\");",
-                    "const originY = eventsFunctionContext.getArgument(\"OriginY\");",
-                    "const scale = eventsFunctionContext.getArgument(\"Scale\");",
-                    "const angle = eventsFunctionContext.getArgument(\"Angle\");",
-                    "",
-                    "const transformation = new gdjs.AffineTransformation();",
-                    "//transformation.translate(originX, originY);",
-                    "transformation.scale(scale, scale);",
-                    "transformation.rotate(angle / 180 * Math.PI);",
-                    "",
-                    "behavior.curvedMovementTransformation = transformation;"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Origin X",
-                  "name": "OriginX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Origin Y",
-                  "name": "OriginY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Scale",
-                  "name": "Scale",
-                  "type": "expression"
-                },
-                {
-                  "description": "Angle",
-                  "name": "Angle",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Return the X coordinate rotated and scaled according to the transformation.",
-              "fullName": "Transformed X",
-              "functionType": "Expression",
-              "name": "TransformedX",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
-                    "const behavior = objects[0].getBehavior(behaviorName);",
-                    "",
-                    "/** @type {string} */",
-                    "const pathName = behavior._getPathName();",
-                    "/** @type {Map<string, gdjs.__curvedMovementExtension.CurvedPath>} */",
-                    "const curvedPaths = runtimeScene.__curvedMovementExtension.curvedPaths;",
-                    "const curvedPath = curvedPaths.get(pathName);",
-                    "if (!curvedPath) {",
-                    "    return 0;",
-                    "}",
-                    "",
-                    "const x = eventsFunctionContext.getArgument(\"X\");",
-                    "const y = eventsFunctionContext.getArgument(\"Y\");",
-                    "",
-                    "/** @type {gdjs.AffineTransformation} */",
-                    "const transformation = behavior.curvedMovementTransformation;",
-                    "let point = behavior.curvedMovementWorkingPoint || [0, 0];",
-                    "point[0] = x;",
-                    "point[1] = y;",
-                    "",
-                    "if (transformation) {",
-                    "  point = curvedPath.transformPosition(x, y, transformation, point);",
-                    "}",
-                    "",
-                    "eventsFunctionContext.returnValue = point[0] + behavior._getPathOriginX();"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
-                  "type": "behavior"
-                },
-                {
-                  "description": "",
-                  "name": "X",
-                  "type": "expression"
-                },
-                {
-                  "description": "",
-                  "name": "Y",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Return the Y coordinate rotated and scaled according to the transformation.",
-              "fullName": "Transformed Y",
-              "functionType": "Expression",
-              "name": "TransformedY",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
-                    "const behavior = objects[0].getBehavior(behaviorName);",
-                    "",
-                    "/** @type {string} */",
-                    "const pathName = behavior._getPathName();",
-                    "/** @type {Map<string, gdjs.__curvedMovementExtension.CurvedPath>} */",
-                    "const curvedPaths = runtimeScene.__curvedMovementExtension.curvedPaths;",
-                    "const curvedPath = curvedPaths.get(pathName);",
-                    "if (!curvedPath) {",
-                    "    return 0;",
-                    "}",
-                    "",
-                    "const x = eventsFunctionContext.getArgument(\"X\");",
-                    "const y = eventsFunctionContext.getArgument(\"Y\");",
-                    "",
-                    "/** @type {gdjs.AffineTransformation} */",
-                    "const transformation = behavior.curvedMovementTransformation;",
-                    "let point = behavior.curvedMovementWorkingPoint || [0, 0];",
-                    "point[0] = x;",
-                    "point[1] = y;",
-                    "",
-                    "if (transformation) {",
-                    "  point = curvedPath.transformPosition(x, y, transformation, point);",
-                    "}",
-                    "",
-                    "eventsFunctionContext.returnValue = point[1] + behavior._getPathOriginY();"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
-                  "type": "behavior"
-                },
-                {
-                  "description": "",
-                  "name": "X",
-                  "type": "expression"
-                },
-                {
-                  "description": "",
-                  "name": "Y",
-                  "type": "expression"
                 }
               ],
               "objectGroups": []
