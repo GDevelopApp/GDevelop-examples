@@ -8208,36 +8208,12 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "CurvedMovement::TweenPathMovement::SetPropertyX"
+                                "value": "CurvedMovement::TweenPathMovement::UpdatePosition"
                               },
                               "parameters": [
                                 "Object",
                                 "Behavior",
-                                "=",
-                                "Object.Behavior::RepetitionDone() * Object.Behavior::PathEndX() + CurvedMovement::PathX(Object.Behavior::PropertyPathName(), Object.Behavior::PathPosition())"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CurvedMovement::TweenPathMovement::SetPropertyY"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "Object. Behavior::RepetitionDone() * Object.Behavior::PathEndY() + CurvedMovement::PathY(Object.Behavior::PropertyPathName(), Object.Behavior::PathPosition())"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "MettreXY"
-                              },
-                              "parameters": [
-                                "Object",
-                                "=",
-                                "Object.Behavior::TransformedX(Object.Behavior::PropertyX(), Object.Behavior::PropertyY())",
-                                "=",
-                                "Object.Behavior::TransformedY(Object.Behavior::PropertyX(), Object.Behavior::PropertyY())"
+                                ""
                               ]
                             }
                           ]
@@ -8263,7 +8239,7 @@
                               "parameters": [
                                 "Object",
                                 "=",
-                                "Object.Behavior::PropertyPathAngle() + CurvedMovement::PathAngle(Object.Behavior::PropertyPathName(), Object.Behavior::PathPosition()) + Object.Behavior::PropertyRotationOffset() + Object.Behavior::BackOrForthAngle()"
+                                "Object.Behavior::PropertyPathAngle() + CurvedMovement::PathAngle(Object.Behavior::PropertyPathName(), Object.Behavior::RepeatedPathPosition()) + Object.Behavior::PropertyRotationOffset() + Object.Behavior::BackOrForthAngle()"
                               ]
                             }
                           ]
@@ -8272,6 +8248,71 @@
                     }
                   ],
                   "parameters": []
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "CurvedMovement::TweenPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set the the object on the path according to the current length.",
+              "fullName": "Update position",
+              "functionType": "Action",
+              "name": "UpdatePosition",
+              "private": true,
+              "sentence": "Update the position of _PARAM0_ on the path",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = object.getBehavior(behaviorName);",
+                    "",
+                    "/** @type {string} */",
+                    "const pathName = behavior._getPathName();",
+                    "/** @type {Map<string, gdjs.__curvedMovementExtension.CurvedPath>} */",
+                    "const curvedPaths = runtimeScene.__curvedMovementExtension.curvedPaths;",
+                    "const curvedPath = curvedPaths.get(pathName);",
+                    "if (!curvedPath) {",
+                    "    return;",
+                    "}",
+                    "",
+                    "behavior.workingTransformation = behavior.workingTransformation || new gdjs.AffineTransformation();",
+                    "/** @type {gdjs.AffineTransformation} */",
+                    "const transformation = behavior.workingTransformation;",
+                    "",
+                    "const repetitionDone = behavior.RepetitionDone();",
+                    "transformation.setToTranslation(",
+                    "    repetitionDone * behavior.PathEndX(),",
+                    "    repetitionDone * behavior.PathEndY()",
+                    ");",
+                    "transformation.concatenate(behavior.curvedMovementTransformation);",
+                    "",
+                    "/** @type {number} */",
+                    "const length = behavior.RepeatedPathPosition();",
+                    "/** @type {[number, number]} */",
+                    "const point = curvedPath.getTransformedPosition(length, transformation);",
+                    "const x = point[0] + behavior._getPathOriginX();",
+                    "const y = point[1] + behavior._getPathOriginY();",
+                    "object.setPosition(x, y);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
                 }
               ],
               "parameters": [
@@ -9148,49 +9189,7 @@
                       },
                       "parameters": [
                         "ShapePainter",
-                        "yes"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "PrimitiveDrawing::SetRotationCenter"
-                      },
-                      "parameters": [
-                        "ShapePainter",
-                        "0",
-                        "0"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "MettreXY"
-                      },
-                      "parameters": [
-                        "ShapePainter",
-                        "=",
-                        "Object.Behavior::PropertyPathOriginX()",
-                        "=",
-                        "Object.Behavior::PropertyPathOriginY()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetAngle"
-                      },
-                      "parameters": [
-                        "ShapePainter",
-                        "=",
-                        "Object.Behavior::PropertyPathAngle()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "PrimitiveDrawing::Scale"
-                      },
-                      "parameters": [
-                        "ShapePainter",
-                        "=",
-                        "Object.Behavior::PropertyPathScale()"
+                        "no"
                       ]
                     },
                     {
@@ -9210,36 +9209,6 @@
                         "=",
                         "0"
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "As the shape painter is scaled, the stroke width is adapted to keep it the same visually.",
-                  "comment2": ""
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "CurvedMovement::TweenPathMovement::SetPropertyDebugLineStrokeWidth"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "ShapePainter.OutlineSize()"
-                      ]
                     },
                     {
                       "type": {
@@ -9248,324 +9217,82 @@
                       "parameters": [
                         "ShapePainter",
                         "=",
-                        "Object.Behavior::PropertyDebugLineStrokeWidth() / Object.Behavior::PropertyPathScale()"
+                        "1"
                       ]
                     }
                   ]
                 },
                 {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Control point tangents",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingPathOriginX"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingPathOriginY"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PrimitiveDrawing::OutlineOpacity"
-                          },
-                          "parameters": [
-                            "ShapePainter",
-                            "=",
-                            "128"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Repeat",
-                      "repeatExpression": "Object.Behavior::PropertyRepetitionCount()",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingElementIndex"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "CurvedMovement::ElementCount(Object.Behavior::PropertyPathName())",
-                          "conditions": [],
-                          "actions": [],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "PrimitiveDrawing::LineV2"
-                                  },
-                                  "parameters": [
-                                    "ShapePainter",
-                                    "Object.Behavior::PropertyDrawingPathOriginX() + CurvedMovement::OriginX(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginY() + CurvedMovement::OriginY(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginX() + CurvedMovement::FirstControlX(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginY() + CurvedMovement::FirstControlY(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "ShapePainter.OutlineSize() / 2"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "PrimitiveDrawing::LineV2"
-                                  },
-                                  "parameters": [
-                                    "ShapePainter",
-                                    "Object.Behavior::PropertyDrawingPathOriginX() + CurvedMovement::TargetX(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginY() + CurvedMovement::TargetY(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginX() + CurvedMovement::SecondControlX(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginY() + CurvedMovement::SecondControlY(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "ShapePainter.OutlineSize() / 2"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingElementIndex"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "+",
-                                    "1"
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingPathOriginX"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "+",
-                                "Object.Behavior::PathEndX()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingPathOriginY"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "+",
-                                "Object.Behavior::PathEndY()"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "",
+                    "/** @type {gdjs.ShapePainterRuntimeObject} */",
+                    "const shapePainter = eventsFunctionContext.getObjects(\"ShapePainter\")[0];",
+                    "if (!shapePainter) {",
+                    "    return ;",
+                    "}",
+                    "",
+                    "/** @type {string} */",
+                    "const pathName = behavior._getPathName();",
+                    "/** @type {Map<string, gdjs.__curvedMovementExtension.CurvedPath>} */",
+                    "const curvedPaths = runtimeScene.__curvedMovementExtension.curvedPaths;",
+                    "const curvedPath = curvedPaths.get(pathName);",
+                    "if (!curvedPath) {",
+                    "    return ;",
+                    "}",
+                    "",
+                    "/** @type {gdjs.AffineTransformation} */",
+                    "const transformation = behavior.curvedMovementTransformation;",
+                    "let point = behavior.curvedMovementWorkingPoint || [0, 0];",
+                    "",
+                    "let originX = behavior._getPathOriginX();",
+                    "let originY = behavior._getPathOriginY();",
+                    "shapePainter.drawPathMoveTo(originX, originY);",
+                    "const repetitionCount = behavior._getRepetitionCount();",
+                    "for (let repetitionIndex = 0; repetitionIndex < repetitionCount; repetitionIndex++) {",
+                    "  for (let curveIndex = 0; curveIndex < curvedPath.curves.length; curveIndex++) {",
+                    "    point[0] = curvedPath.getFirstControlX(curveIndex);",
+                    "    point[1] = curvedPath.getFirstControlY(curveIndex);",
+                    "    if (transformation) {",
+                    "      point = curvedPath.transformPosition(point[0], point[1], transformation, point);",
+                    "    }",
+                    "    const firstControlX = point[0];",
+                    "    const firstControlY = point[1];",
+                    "",
+                    "    point[0] = curvedPath.getSecondControlX(curveIndex);",
+                    "    point[1] = curvedPath.getSecondControlY(curveIndex);",
+                    "    if (transformation) {",
+                    "      point = curvedPath.transformPosition(point[0], point[1], transformation, point);",
+                    "    }",
+                    "    const secondControlX = point[0];",
+                    "    const secondControlY = point[1];",
+                    "",
+                    "    point[0] = curvedPath.getTargetX(curveIndex);",
+                    "    point[1] = curvedPath.getTargetY(curveIndex);",
+                    "    if (transformation) {",
+                    "      point = curvedPath.transformPosition(point[0], point[1], transformation, point);",
+                    "    }",
+                    "    const targetX = point[0];",
+                    "    const targetY = point[1];",
+                    "",
+                    "    shapePainter.drawPathBezierCurveTo(",
+                    "      firstControlX + originX,",
+                    "      firstControlY + originY,",
+                    "      secondControlX + originX,",
+                    "      secondControlY + originY,",
+                    "      targetX + originX,",
+                    "      targetY + originY);",
+                    "  }",
+                    "  originX = curvedPath.getEndX();",
+                    "  originY = curvedPath.getEndY();",
+                    "}",
+                    ""
                   ],
-                  "parameters": []
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Trajectory",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingPathOriginX"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingPathOriginY"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PrimitiveDrawing::OutlineOpacity"
-                          },
-                          "parameters": [
-                            "ShapePainter",
-                            "=",
-                            "255"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Repeat",
-                      "repeatExpression": "Object.Behavior::PropertyRepetitionCount()",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingElementIndex"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "CurvedMovement::ElementCount(Object.Behavior::PropertyPathName())",
-                          "conditions": [],
-                          "actions": [],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "PrimitiveDrawing::PathBezierCurveTo"
-                                  },
-                                  "parameters": [
-                                    "ShapePainter",
-                                    "Object.Behavior::PropertyDrawingPathOriginX() + CurvedMovement::FirstControlX(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginY() + CurvedMovement::FirstControlY(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginX() + CurvedMovement::SecondControlX(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginY() + CurvedMovement::SecondControlY(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginX() + CurvedMovement::TargetX(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())",
-                                    "Object.Behavior::PropertyDrawingPathOriginY() + CurvedMovement::TargetY(Object.Behavior::PropertyPathName(), Object.Behavior::PropertyDrawingElementIndex())"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingElementIndex"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "+",
-                                    "1"
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingPathOriginX"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "+",
-                                "Object.Behavior::PathEndX()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CurvedMovement::TweenPathMovement::SetPropertyDrawingPathOriginY"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "+",
-                                "Object.Behavior::PathEndY()"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "parameters": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PrimitiveDrawing::OutlineSize"
-                      },
-                      "parameters": [
-                        "ShapePainter",
-                        "=",
-                        "Object.Behavior::PropertyDebugLineStrokeWidth()"
-                      ]
-                    }
-                  ]
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
                 }
               ],
               "parameters": [
@@ -9733,10 +9460,10 @@
               "objectGroups": []
             },
             {
-              "description": "Return the position on one repeated path.",
-              "fullName": "Path position",
+              "description": "Return the number of repetitions between the current position and the origin.",
+              "fullName": "Repetition done",
               "functionType": "Expression",
-              "name": "PathPosition",
+              "name": "RepetitionDone",
               "private": true,
               "sentence": "",
               "events": [
@@ -9749,7 +9476,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.Behavior::PathLength() * mod(Object.Behavior::Progress(), 1 / Object.Behavior::PropertyRepetitionCount()) * Object.Behavior::PropertyRepetitionCount()"
+                        "floor(Object.Behavior::Progress() * Object.Behavior::PropertyRepetitionCount())"
                       ]
                     }
                   ]
@@ -9775,10 +9502,10 @@
               "objectGroups": []
             },
             {
-              "description": "Return the number of repetitions between the current position and the origin.",
-              "fullName": "Repetition done",
+              "description": "Return the position on one repeated path.",
+              "fullName": "Path position",
               "functionType": "Expression",
-              "name": "RepetitionDone",
+              "name": "RepeatedPathPosition",
               "private": true,
               "sentence": "",
               "events": [
@@ -9791,7 +9518,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "floor(Object.Behavior::Progress() * Object.Behavior::PropertyRepetitionCount())"
+                        "Object.Behavior::PathLength() * mod(Object.Behavior::Progress(), 1 / Object.Behavior::PropertyRepetitionCount()) * Object.Behavior::PropertyRepetitionCount()"
                       ]
                     }
                   ]
@@ -9925,7 +9652,6 @@
                     "const angle = eventsFunctionContext.getArgument(\"Angle\");",
                     "",
                     "const transformation = new gdjs.AffineTransformation();",
-                    "transformation.translate(originX, originY);",
                     "transformation.scale(scale, scale);",
                     "transformation.rotate(angle / 180 * Math.PI);",
                     "",
@@ -9967,126 +9693,6 @@
                 {
                   "description": "Angle",
                   "name": "Angle",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Return the X coordinate rotated and scaled according to the transformation.",
-              "fullName": "Transformed X",
-              "functionType": "Expression",
-              "name": "TransformedX",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
-                    "const behavior = objects[0].getBehavior(behaviorName);",
-                    "",
-                    "const x = eventsFunctionContext.getArgument(\"X\");",
-                    "const y = eventsFunctionContext.getArgument(\"Y\");",
-                    "",
-                    "/** @type {gdjs.AffineTransformation} */",
-                    "const transformation = behavior.curvedMovementTransformation;",
-                    "const point = behavior.curvedMovementWorkingPoint || [0, 0];",
-                    "point[0] = x;",
-                    "point[1] = y;",
-                    "",
-                    "transformation.transform(point, point);",
-                    "eventsFunctionContext.returnValue = point[0];"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "CurvedMovement::TweenPathMovement",
-                  "type": "behavior"
-                },
-                {
-                  "description": "",
-                  "name": "X",
-                  "type": "expression"
-                },
-                {
-                  "description": "",
-                  "name": "Y",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Return the Y coordinate rotated and scaled according to the transformation.",
-              "fullName": "Transformed Y",
-              "functionType": "Expression",
-              "name": "TransformedY",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
-                    "const behavior = objects[0].getBehavior(behaviorName);",
-                    "",
-                    "const x = eventsFunctionContext.getArgument(\"X\");",
-                    "const y = eventsFunctionContext.getArgument(\"Y\");",
-                    "",
-                    "/** @type {gdjs.AffineTransformation} */",
-                    "const transformation = behavior.curvedMovementTransformation;",
-                    "const point = behavior.curvedMovementWorkingPoint || [0, 0];",
-                    "point[0] = x;",
-                    "point[1] = y;",
-                    "",
-                    "transformation.transform(point, point);",
-                    "eventsFunctionContext.returnValue = point[1];"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "CurvedMovement::TweenPathMovement",
-                  "type": "behavior"
-                },
-                {
-                  "description": "",
-                  "name": "X",
-                  "type": "expression"
-                },
-                {
-                  "description": "",
-                  "name": "Y",
                   "type": "expression"
                 }
               ],
