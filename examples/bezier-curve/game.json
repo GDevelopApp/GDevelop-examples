@@ -4476,8 +4476,8 @@
           "name": "Enemy",
           "persistentUuid": "1b9bcd99-0eaf-4e44-b7b7-5634d57641a4",
           "width": 0,
-          "x": 172,
-          "y": 133,
+          "x": 378,
+          "y": 275,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -4539,7 +4539,7 @@
               "Index": 0,
               "FlipToGoBack": true,
               "FlipYToGoBack": false,
-              "Viewpoint": "Top-Down"
+              "Viewpoint": "Isometry 2:1 (26.565°)"
             }
           ],
           "animations": [
@@ -5044,6 +5044,40 @@
                 "yes",
                 "0.5"
               ]
+            },
+            {
+              "type": {
+                "value": "CurvedMovement::ScalePath"
+              },
+              "parameters": [
+                "",
+                "\"MyPath\"",
+                "1",
+                "0.5",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "CurvedMovement::SetSpeedScaleY"
+              },
+              "parameters": [
+                "",
+                "\"MyPath\"",
+                "0.5",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "CurvedMovement::RotatePath"
+              },
+              "parameters": [
+                "",
+                "\"MyPath\"",
+                "0",
+                ""
+              ]
             }
           ]
         },
@@ -5404,6 +5438,10 @@
                 "    clone.curves = this.curves.map(curve => curve.clone());",
                 "    clone.curvePreviousLengths = [...this.curvePreviousLengths];",
                 "    return clone;",
+                "  };",
+                "",
+                "  CurvedPath.prototype.getSpeedScaleY = function () {",
+                "    return this.speedScaleY;",
                 "  };",
                 "",
                 "  /**",
@@ -6745,6 +6783,43 @@
               "description": "Flip the appended path",
               "name": "ShouldFlip",
               "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the speed scale on Y axis. This allows to change the view point of a path.",
+          "fullName": "Speed scale Y",
+          "functionType": "Expression",
+          "group": "Path transformation",
+          "name": "SpeedScaleY",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const pathName = eventsFunctionContext.getArgument(\"PathName\");",
+                "/** @type {Map<string, gdjs.__curvedMovementExtension.CurvedPath>} */",
+                "const curvedPaths = runtimeScene.__curvedMovementExtension.curvedPaths;",
+                "",
+                "const curvedPath = curvedPaths.get(pathName);",
+                "eventsFunctionContext.returnValue = curvedPath ? curvedPath.getSpeedScaleY() : 0;",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Path name",
+              "name": "PathName",
+              "supplementaryInformation": "sceneBezierCurve",
+              "type": "identifier"
             }
           ],
           "objectGroups": []
@@ -8299,7 +8374,7 @@
                     "const repetitionDone = behavior.RepetitionDone();",
                     "transformation.setToTranslation(",
                     "    repetitionDone * behavior.PathEndX(),",
-                    "    repetitionDone * behavior.PathEndY()",
+                    "    repetitionDone * behavior.PathEndY() / behavior.PathSpeedScaleY()",
                     ");",
                     "transformation.preConcatenate(behavior.curvedMovementTransformation);",
                     "",
@@ -9842,6 +9917,48 @@
                       },
                       "parameters": [
                         "CurvedMovement::PathEndY(Object.Behavior::PropertyPathName())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "CurvedMovement::TweenPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the speed scale on Y axis of the path.",
+              "fullName": "Path speed scale Y",
+              "functionType": "Expression",
+              "name": "PathSpeedScaleY",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CurvedMovement::SpeedScaleY(Object.Behavior::PropertyPathName())"
                       ]
                     }
                   ]
