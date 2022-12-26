@@ -628,6 +628,21 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Skip",
+          "persistentUuid": "34da1e28-5297-4d37-8b82-18476ed611ef",
+          "width": 0,
+          "x": 600,
+          "y": 22,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -2628,35 +2643,31 @@
             "g": 226,
             "r": 226
           }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Skip",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Press Space to skip",
+          "font": "",
+          "textAlignment": "",
+          "characterSize": 20,
+          "color": {
+            "b": 226,
+            "g": 226,
+            "r": 226
+          }
         }
       ],
       "events": [
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": true,
-                "value": "BuiltinCommonInstructions::Always"
-              },
-              "parameters": [
-                ""
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "DebuggerTools::ConsoleLog"
-              },
-              "parameters": [
-                "\"\"",
-                "",
-                ""
-              ]
-            }
-          ]
-        },
         {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
@@ -2696,53 +2707,182 @@
           ],
           "events": [
             {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Build the train",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Locomotive",
+                        "645",
+                        "250",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeScale"
+                      },
+                      "parameters": [
+                        "Locomotive",
+                        "=",
+                        "0.5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                      },
+                      "parameters": [
+                        "Locomotive",
+                        "SpeedPathMovement",
+                        "\"Incoming\"",
+                        "1",
+                        "yes",
+                        "300"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
+                      },
+                      "parameters": [
+                        "Locomotive",
+                        "SpeedPathMovement",
+                        "=",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::DrawDebug"
+                      },
+                      "parameters": [
+                        "Locomotive",
+                        "SpeedPathMovement",
+                        "Trajectory",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "11",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Wagon",
+                        "645",
+                        "250",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeScale"
+                      },
+                      "parameters": [
+                        "Wagon",
+                        "=",
+                        "0.5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                      },
+                      "parameters": [
+                        "Wagon",
+                        "SpeedPathMovement",
+                        "\"Incoming\"",
+                        "1",
+                        "yes",
+                        "300"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
+                      },
+                      "parameters": [
+                        "Wagon",
+                        "SpeedPathMovement",
+                        "=",
+                        "6 + 48 * SceneInstancesCount(Wagon)",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "TrainPart",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ChangeAnimation"
+                      },
+                      "parameters": [
+                        "TrainPart",
+                        "=",
+                        "mod(round((180 + TrainPart.SpeedPathMovement::MovementAngle()) * 32 / 360), 32)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            }
+          ]
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Drive the train",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
                 {
                   "type": {
-                    "value": "Create"
+                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
                   },
                   "parameters": [
-                    "",
-                    "Locomotive",
-                    "645",
-                    "250",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ChangeScale"
-                  },
-                  "parameters": [
-                    "Locomotive",
-                    "=",
-                    "0.5"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                  },
-                  "parameters": [
-                    "Locomotive",
+                    "TrainPart",
                     "SpeedPathMovement",
-                    "\"Incoming\"",
-                    "1",
-                    "yes",
-                    "300"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
-                  },
-                  "parameters": [
-                    "Locomotive",
-                    "SpeedPathMovement",
-                    "=",
                     "0",
+                    "-25 * sign(Locomotive.SpeedPathMovement::Speed())",
                     ""
                   ]
                 }
@@ -2750,230 +2890,163 @@
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Right"
+                  ]
+                }
+              ],
               "actions": [
                 {
                   "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::DrawDebug"
+                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
                   },
                   "parameters": [
-                    "Locomotive",
+                    "TrainPart",
                     "SpeedPathMovement",
-                    "Trajectory",
+                    "-300",
+                    "-100",
                     ""
                   ]
                 }
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::Repeat",
-              "repeatExpression": "11",
-              "conditions": [],
-              "actions": [
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
                 {
                   "type": {
-                    "value": "Create"
+                    "value": "KeyPressed"
                   },
                   "parameters": [
                     "",
-                    "Wagon",
-                    "645",
-                    "250",
-                    ""
+                    "Left"
                   ]
-                },
+                }
+              ],
+              "actions": [
                 {
                   "type": {
-                    "value": "ChangeScale"
+                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
                   },
                   "parameters": [
-                    "Wagon",
-                    "=",
-                    "0.5"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                  },
-                  "parameters": [
-                    "Wagon",
+                    "TrainPart",
                     "SpeedPathMovement",
-                    "\"Incoming\"",
-                    "1",
-                    "yes",
-                    "300"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
-                  },
-                  "parameters": [
-                    "Wagon",
-                    "SpeedPathMovement",
-                    "=",
-                    "6 + 48 * SceneInstancesCount(Wagon)",
+                    "300",
+                    "100",
                     ""
                   ]
                 }
               ]
-            },
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Rotate the train",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
               "type": "BuiltinCommonInstructions::ForEach",
               "object": "TrainPart",
               "conditions": [],
-              "actions": [
+              "actions": [],
+              "events": [
                 {
-                  "type": {
-                    "value": "ChangeAnimation"
-                  },
-                  "parameters": [
-                    "TrainPart",
-                    "=",
-                    "mod(round((180 + TrainPart.SpeedPathMovement::MovementAngle()) * 32 / 360), 32)"
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::Speed"
+                      },
+                      "parameters": [
+                        "TrainPart",
+                        "SpeedPathMovement",
+                        ">",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ChangeAnimation"
+                      },
+                      "parameters": [
+                        "TrainPart",
+                        "=",
+                        "mod(round((180 + TrainPart.SpeedPathMovement::MovementAngle()) * 32 / 360), 32)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::Speed"
+                      },
+                      "parameters": [
+                        "TrainPart",
+                        "SpeedPathMovement",
+                        "<",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ChangeAnimation"
+                      },
+                      "parameters": [
+                        "TrainPart",
+                        "=",
+                        "mod(round(TrainPart.SpeedPathMovement::MovementAngle() * 32 / 360), 32)"
+                      ]
+                    }
                   ]
                 }
               ]
             }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
-              },
-              "parameters": [
-                "TrainPart",
-                "SpeedPathMovement",
-                "0",
-                "-25 * sign(Locomotive.SpeedPathMovement::Speed())",
-                ""
-              ]
-            }
-          ]
+          ],
+          "parameters": []
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
-                "value": "KeyPressed"
+                "value": "KeyReleased"
               },
               "parameters": [
                 "",
-                "Right"
+                "Space"
               ]
             }
           ],
           "actions": [
             {
               "type": {
-                "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
-              },
-              "parameters": [
-                "TrainPart",
-                "SpeedPathMovement",
-                "-300",
-                "-100",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "KeyPressed"
+                "value": "Scene"
               },
               "parameters": [
                 "",
-                "Left"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
-              },
-              "parameters": [
-                "TrainPart",
-                "SpeedPathMovement",
-                "300",
-                "100",
+                "\"Train (top-down)\"",
                 ""
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::ForEach",
-          "object": "TrainPart",
-          "conditions": [],
-          "actions": [],
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::Speed"
-                  },
-                  "parameters": [
-                    "TrainPart",
-                    "SpeedPathMovement",
-                    ">",
-                    "0",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ChangeAnimation"
-                  },
-                  "parameters": [
-                    "TrainPart",
-                    "=",
-                    "mod((180 + TrainPart.SpeedPathMovement::MovementAngle()) * 32 / 360, 32)"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::Speed"
-                  },
-                  "parameters": [
-                    "TrainPart",
-                    "SpeedPathMovement",
-                    "<",
-                    "0",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ChangeAnimation"
-                  },
-                  "parameters": [
-                    "TrainPart",
-                    "=",
-                    "mod(TrainPart.SpeedPathMovement::MovementAngle() * 32 / 360, 32)"
-                  ]
-                }
               ]
             }
           ]
@@ -3038,7 +3111,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.9466666687011718,
+        "zoomFactor": 0.9885791828225317,
         "windowMask": false
       },
       "objectsGroups": [],
@@ -3070,6 +3143,21 @@
           "x": 268,
           "y": 561,
           "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Skip",
+          "persistentUuid": "6811400b-fd75-4fe3-8a2c-888361eae44f",
+          "width": 0,
+          "x": 600,
+          "y": 22,
+          "zOrder": 3,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -3198,6 +3286,28 @@
             "g": 226,
             "r": 226
           }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Skip",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Press Space to skip",
+          "font": "",
+          "textAlignment": "",
+          "characterSize": 20,
+          "color": {
+            "b": 226,
+            "g": 226,
+            "r": 226
+          }
         }
       ],
       "events": [
@@ -3228,77 +3338,89 @@
           ],
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Repeat",
-              "repeatExpression": "24",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "RedEnemy1",
-                    "645",
-                    "199",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ChangeScale"
-                  },
-                  "parameters": [
-                    "RedEnemy1",
-                    "=",
-                    "0.25"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                  },
-                  "parameters": [
-                    "RedEnemy1",
-                    "SpeedPathMovement",
-                    "\"Incoming\"",
-                    "1",
-                    "yes",
-                    "300"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
-                  },
-                  "parameters": [
-                    "RedEnemy1",
-                    "SpeedPathMovement",
-                    "=",
-                    "24 * SceneInstancesCount(RedEnemy1)",
-                    ""
-                  ]
-                }
-              ],
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Build the train",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "24",
                   "conditions": [],
                   "actions": [
                     {
                       "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::DrawDebug"
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "RedEnemy1",
+                        "645",
+                        "199",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeScale"
+                      },
+                      "parameters": [
+                        "RedEnemy1",
+                        "=",
+                        "0.25"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPath"
                       },
                       "parameters": [
                         "RedEnemy1",
                         "SpeedPathMovement",
-                        "Trajectory",
+                        "\"Incoming\"",
+                        "1",
+                        "yes",
+                        "300"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
+                      },
+                      "parameters": [
+                        "RedEnemy1",
+                        "SpeedPathMovement",
+                        "=",
+                        "24 * SceneInstancesCount(RedEnemy1)",
                         ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::DrawDebug"
+                          },
+                          "parameters": [
+                            "RedEnemy1",
+                            "SpeedPathMovement",
+                            "Trajectory",
+                            ""
+                          ]
+                        }
                       ]
                     }
                   ]
                 }
-              ]
+              ],
+              "parameters": []
             }
           ]
         },
@@ -3321,40 +3443,95 @@
           ]
         },
         {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "KeyPressed"
-              },
-              "parameters": [
-                "",
-                "Left"
-              ]
-            }
-          ],
-          "actions": [],
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Drive the train",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
-                    "value": "BuiltinCommonInstructions::Not"
+                    "value": "KeyPressed"
                   },
-                  "parameters": [],
-                  "subInstructions": [
+                  "parameters": [
+                    "",
+                    "Right"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
                     {
                       "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::HasReachedOrigin"
+                        "value": "BuiltinCommonInstructions::Not"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::HasReachedOrigin"
+                          },
+                          "parameters": [
+                            "RedEnemy1",
+                            "SpeedPathMovement",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AjoutObjConcern"
+                      },
+                      "parameters": [
+                        "",
+                        "RedEnemy1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
                       },
                       "parameters": [
                         "RedEnemy1",
                         "SpeedPathMovement",
+                        "-800",
+                        "-400",
                         ""
                       ]
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CurvedMovement::SpeedPathMovement::HasReachedOrigin"
+                  },
+                  "parameters": [
+                    "RedEnemy1",
+                    "SpeedPathMovement",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
                 }
               ],
               "actions": [
@@ -3369,98 +3546,99 @@
                 },
                 {
                   "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                    "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
                   },
                   "parameters": [
                     "RedEnemy1",
                     "SpeedPathMovement",
-                    "-800",
-                    "-400",
+                    "=",
+                    "0",
                     ""
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "CurvedMovement::SpeedPathMovement::HasReachedOrigin"
-              },
-              "parameters": [
-                "RedEnemy1",
-                "SpeedPathMovement",
-                ""
-              ]
             },
-            {
-              "type": {
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "AjoutObjConcern"
-              },
-              "parameters": [
-                "",
-                "RedEnemy1"
-              ]
-            },
-            {
-              "type": {
-                "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-              },
-              "parameters": [
-                "RedEnemy1",
-                "SpeedPathMovement",
-                "0",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "KeyPressed"
-              },
-              "parameters": [
-                "",
-                "Right"
-              ]
-            }
-          ],
-          "actions": [],
-          "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
-                    "value": "BuiltinCommonInstructions::Not"
+                    "value": "KeyPressed"
                   },
-                  "parameters": [],
-                  "subInstructions": [
+                  "parameters": [
+                    "",
+                    "Left"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
                     {
                       "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::HasReachedTarget"
+                        "value": "BuiltinCommonInstructions::Not"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::HasReachedTarget"
+                          },
+                          "parameters": [
+                            "RedEnemy1",
+                            "SpeedPathMovement",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AjoutObjConcern"
+                      },
+                      "parameters": [
+                        "",
+                        "RedEnemy1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
                       },
                       "parameters": [
                         "RedEnemy1",
                         "SpeedPathMovement",
+                        "800",
+                        "400",
                         ""
                       ]
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CurvedMovement::SpeedPathMovement::HasReachedTarget"
+                  },
+                  "parameters": [
+                    "RedEnemy1",
+                    "SpeedPathMovement",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
                 }
               ],
               "actions": [
@@ -3475,75 +3653,42 @@
                 },
                 {
                   "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                    "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
                   },
                   "parameters": [
                     "RedEnemy1",
                     "SpeedPathMovement",
-                    "800",
-                    "400",
+                    "=",
+                    "0",
                     ""
                   ]
                 }
               ]
             }
-          ]
+          ],
+          "parameters": []
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
-                "value": "CurvedMovement::SpeedPathMovement::HasReachedTarget"
+                "value": "KeyReleased"
               },
               "parameters": [
-                "RedEnemy1",
-                "SpeedPathMovement",
-                ""
+                "",
+                "Space"
               ]
-            },
-            {
-              "type": {
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": []
             }
           ],
           "actions": [
             {
               "type": {
-                "value": "AjoutObjConcern"
+                "value": "Scene"
               },
               "parameters": [
                 "",
-                "RedEnemy1"
-              ]
-            },
-            {
-              "type": {
-                "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-              },
-              "parameters": [
-                "RedEnemy1",
-                "SpeedPathMovement",
-                "0",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "disabled": true,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "value": "DebuggerTools::ConsoleLog"
-              },
-              "parameters": [
-                "ToString(RedEnemy1.X()) + \" \" + ToString(RedEnemy1.Y())",
-                "",
+                "\"Move to cursor (isometry)\"",
                 ""
               ]
             }
@@ -3652,6 +3797,21 @@
           "x": 381,
           "y": 302,
           "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Skip",
+          "persistentUuid": "6192799f-f895-48c1-992e-de30d4268652",
+          "width": 0,
+          "x": 600,
+          "y": 22,
+          "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -4683,6 +4843,28 @@
             "g": 192,
             "r": 192
           }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Skip",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Press Space to skip",
+          "font": "",
+          "textAlignment": "",
+          "characterSize": 20,
+          "color": {
+            "b": 226,
+            "g": 226,
+            "r": 226
+          }
         }
       ],
       "events": [
@@ -4797,7 +4979,7 @@
               "parameters": [
                 "Locomotive",
                 "=",
-                "mod((Locomotive.TweenPathMovement::MovementAngle()) * 32 / 360, 32)"
+                "mod(round(Locomotive.TweenPathMovement::MovementAngle() * 32 / 360), 32)"
               ]
             }
           ]
@@ -4807,10 +4989,11 @@
           "conditions": [
             {
               "type": {
-                "value": "AnyKeyReleased"
+                "value": "KeyReleased"
               },
               "parameters": [
-                ""
+                "",
+                "Space"
               ]
             }
           ],
@@ -4821,7 +5004,7 @@
               },
               "parameters": [
                 "",
-                "\"Untitled scene\"",
+                "\"Move to cursor (top-down)\"",
                 ""
               ]
             }
@@ -4937,6 +5120,21 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Skip",
+          "persistentUuid": "9d6a82b8-7f8e-4722-befe-de10d4bd8b79",
+          "width": 0,
+          "x": 600,
+          "y": 22,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -5044,6 +5242,28 @@
             "g": 192,
             "r": 192
           }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Skip",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Press Space to skip",
+          "font": "",
+          "textAlignment": "",
+          "characterSize": 20,
+          "color": {
+            "b": 226,
+            "g": 226,
+            "r": 226
+          }
         }
       ],
       "events": [
@@ -5052,10 +5272,23 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "All these events do the same",
+          "name": "Build the path",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "All these events build the same path using a different way.",
+              "comment2": ""
+            },
             {
               "disabled": true,
               "type": "BuiltinCommonInstructions::Standard",
@@ -5467,10 +5700,11 @@
           "conditions": [
             {
               "type": {
-                "value": "AnyKeyReleased"
+                "value": "KeyReleased"
               },
               "parameters": [
-                ""
+                "",
+                "Space"
               ]
             }
           ],
@@ -5481,7 +5715,7 @@
               },
               "parameters": [
                 "",
-                "\"Untitled scene\"",
+                "\"Incoming enemies (tween)\"",
                 ""
               ]
             }
@@ -5556,6 +5790,21 @@
           "x": 561,
           "y": -69,
           "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Skip",
+          "persistentUuid": "35dc44c2-2983-4107-adce-94f49e605544",
+          "width": 0,
+          "x": 600,
+          "y": 22,
+          "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -5661,6 +5910,28 @@
           },
           "absoluteCoordinates": false,
           "clearBetweenFrames": false
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Skip",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Press Space to skip",
+          "font": "",
+          "textAlignment": "",
+          "characterSize": 20,
+          "color": {
+            "b": 226,
+            "g": 226,
+            "r": 226
+          }
         }
       ],
       "events": [
@@ -5772,28 +6043,6 @@
                 "400",
                 ""
               ]
-            },
-            {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "RedEnemy1",
-                "DestinationX",
-                "=",
-                "500 + 35 * mod(SceneInstancesCount(RedEnemy1) - 1, 4)"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "RedEnemy1",
-                "DestinationY",
-                "=",
-                "20 + 35 * ceil((SceneInstancesCount(RedEnemy1)) / 4)"
-              ]
             }
           ],
           "events": [
@@ -5822,6 +6071,47 @@
                     "CurvedMovement",
                     "Trajectory",
                     ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Calculate one position of the square formation that ships take at the end.",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "RedEnemy1",
+                    "DestinationX",
+                    "=",
+                    "500 + 35 * mod(SceneInstancesCount(RedEnemy1) - 1, 4)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "RedEnemy1",
+                    "DestinationY",
+                    "=",
+                    "20 + 35 * ceil((SceneInstancesCount(RedEnemy1)) / 4)"
                   ]
                 }
               ]
@@ -5886,10 +6176,11 @@
           "conditions": [
             {
               "type": {
-                "value": "AnyKeyReleased"
+                "value": "KeyReleased"
               },
               "parameters": [
-                ""
+                "",
+                "Space"
               ]
             }
           ],
@@ -5900,7 +6191,7 @@
               },
               "parameters": [
                 "",
-                "\"IncomingEnemies\"",
+                "\"Incoming enemies (speed)\"",
                 ""
               ]
             }
@@ -5979,6 +6270,21 @@
           "x": 561,
           "y": -69,
           "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Skip",
+          "persistentUuid": "25b3bb67-e4b1-489b-9640-e147bb0574dd",
+          "width": 0,
+          "x": 600,
+          "y": 22,
+          "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -6085,6 +6391,28 @@
           },
           "absoluteCoordinates": false,
           "clearBetweenFrames": false
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Skip",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Press Space to skip",
+          "font": "",
+          "textAlignment": "",
+          "characterSize": 20,
+          "color": {
+            "b": 226,
+            "g": 226,
+            "r": 226
+          }
         }
       ],
       "events": [
@@ -6203,6 +6531,7 @@
               "parameters": [
                 "RedEnemy1",
                 "SpeedPathMovement",
+                "=",
                 "250",
                 ""
               ]
@@ -6320,10 +6649,11 @@
           "conditions": [
             {
               "type": {
-                "value": "AnyKeyReleased"
+                "value": "KeyReleased"
               },
               "parameters": [
-                ""
+                "",
+                "Space"
               ]
             }
           ],
@@ -6334,7 +6664,7 @@
               },
               "parameters": [
                 "",
-                "\"Incoming enemies with speed\"",
+                "\"Train (isometry)\"",
                 ""
               ]
             }
