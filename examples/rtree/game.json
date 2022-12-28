@@ -989,12 +989,19 @@
                 {
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": [
-                    "gdjs.__collisionDetectorExtension = gdjs.__collisionDetectorExtension || {};",
+                    "/**",
+                    " * @param {gdjs.BehaviorRBushAABB} fatAABB",
+                    " * @param {gdjs.AABB} aabb",
+                    " */",
+                    "const includesAABB = function(fatAABB, aabb) {",
+                    "  return fatAABB.minX <= aabb.min[0] && aabb.max[0] <= fatAABB.maxX",
+                    "      && fatAABB.minY <= aabb.min[1] && aabb.max[1] <= fatAABB.maxY;",
+                    "}",
                     "",
                     "/**",
                     " * ",
                     " */",
-                    "gdjs.__collisionDetectorExtension.SolidManager =  /** @class */ (function () {",
+                    "const SolidManager = /** @class */ (function () {",
                     "  /**",
                     "   * Create a manager.",
                     "   */",
@@ -1003,29 +1010,52 @@
                     "  }",
                     "",
                     "  /**",
-                    "   * Add a boid to the R-Tree.",
+                    "   * Add an object to the R-Tree.",
                     "   * @param {gdjs.RuntimeBehavior} behavior",
                     "   */",
                     "  SolidManager.prototype.add = function (behavior) {",
-                    "    if (behavior.currentRBushAABB) {",
-                    "      behavior.currentRBushAABB.updateAABBFromOwner();",
-                    "    }",
-                    "    else {",
+                    "    if (!behavior.currentRBushAABB) {",
                     "      behavior.currentRBushAABB = new gdjs.BehaviorRBushAABB(",
                     "        behavior",
                     "      );",
                     "    }",
+                    "    //behavior.currentRBushAABB.updateAABBFromOwner();",
+                    "    const aabb = behavior.owner.getAABB();",
+                    "    const fatFactor = behavior._getFatFactor();",
+                    "    const marginX = fatFactor * (aabb.min[0] - aabb.max[0]);",
+                    "    const marginY = fatFactor * (aabb.min[1] - aabb.max[1]);",
+                    "    const fatAABB = behavior.currentRBushAABB;",
+                    "    fatAABB.minX = aabb.min[0] - marginX;",
+                    "    fatAABB.minY = aabb.min[1] - marginY;",
+                    "    fatAABB.maxX = aabb.max[0] + marginX;",
+                    "    fatAABB.maxY = aabb.max[1] + marginY;",
+                    "    ",
                     "    const rBush = this.getRBush(behavior.owner.getName());",
-                    "    rBush.insert(behavior.currentRBushAABB);",
+                    "    rBush.insert(fatAABB);",
                     "  }",
                     "",
                     "  /**",
-                    "   * Remove a boid from the R-Tree.",
+                    "   * Remove an object from the R-Tree.",
                     "   * @param {gdjs.RuntimeBehavior} behavior",
                     "   */",
                     "  SolidManager.prototype.remove = function (behavior) {",
                     "    const rBush = this.getRBush(behavior.owner.getName());",
                     "    rBush.remove(behavior.currentRBushAABB);",
+                    "  }",
+                    "  ",
+                    "  /**",
+                    "   * Update an object to the R-Tree.",
+                    "   * @param {gdjs.RuntimeBehavior} behavior",
+                    "   */",
+                    "  SolidManager.prototype.update = function (behavior) {",
+                    "    const fatAABB = behavior.currentRBushAABB;",
+                    "    const aabb = behavior.owner.getAABB();",
+                    "",
+                    "    if (!includesAABB(fatAABB, aabb)) {",
+                    "      const rBush = this.getRBush(behavior.owner.getName());",
+                    "      this.remove(behavior);",
+                    "      this.add(behavior);",
+                    "    }",
                     "  }",
                     "",
                     "  SolidManager.prototype.getRBush = function (objectName) {",
@@ -1049,7 +1079,7 @@
                     "   */",
                     "  SolidManager.prototype.getAllInstancesInRectangle = function (objectName, left, top, right, bottom, results) {",
                     "    const searchArea = gdjs.staticObject(",
-                    "      gdjs.__collisionDetectorExtension.SolidManager.prototype.getAllInstancesInRectangle",
+                    "      SolidManager.prototype.getAllInstancesInRectangle",
                     "    );",
                     "    searchArea.minX = left;",
                     "    searchArea.minY = top;",
@@ -1065,6 +1095,9 @@
                     "",
                     "  return SolidManager;",
                     "}());",
+                    "",
+                    "gdjs.__collisionDetectorExtension = gdjs.__collisionDetectorExtension || {};",
+                    "gdjs.__collisionDetectorExtension.SolidManager = SolidManager;",
                     ""
                   ],
                   "parameterObjects": "",
@@ -1286,6 +1319,35 @@
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionDetector::Solid::PropertySolidType"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Static\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CollisionDetector::Solid::SetPropertyFatFactor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
                     {
@@ -1437,6 +1499,23 @@
               "sentence": "",
               "events": [
                 {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CollisionDetector::Solid::UpdateInTree"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": true,
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
@@ -1596,30 +1675,17 @@
               "sentence": "Update _PARAM0_ in the tree",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "CollisionDetector::Solid::RemoveFromTree"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "CollisionDetector::Solid::AddToTree"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ""
-                      ]
-                    }
-                  ]
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");\r",
+                    "const behavior = object.getBehavior(behaviorName);\r",
+                    "\r",
+                    "runtimeScene.__collisionDetectorExtension.solidManager.update(behavior);"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
                 }
               ],
               "parameters": [
@@ -1762,6 +1828,30 @@
               "extraInformation": [],
               "hidden": true,
               "name": "PreviousAngle"
+            },
+            {
+              "value": "0.5",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "FatFactor"
+            },
+            {
+              "value": "Automatic",
+              "type": "Choice",
+              "label": "Type",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Automatic",
+                "Mobile",
+                "Static"
+              ],
+              "hidden": false,
+              "name": "SolidType"
             }
           ],
           "sharedPropertyDescriptors": []
