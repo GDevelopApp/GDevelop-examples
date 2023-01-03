@@ -261,6 +261,7 @@ const extractExamples = async (
 
         /** @type {{name: string, fullName: string}[]} */
         const usedExtensions = gd.UsedExtensionsFinder.scanProject(project)
+          .getUsedExtensions()
           .toNewVectorString()
           .toJSArray()
           .map(
