@@ -5823,6 +5823,16 @@
                         },
                         {
                           "type": {
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "ShotTrail",
+                            "Shot"
+                          ]
+                        },
+                        {
+                          "type": {
                             "value": "ChangeSprite"
                           },
                           "parameters": [
@@ -6858,6 +6868,19 @@
               "comment2": ""
             },
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 236,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "---Handling Hitlag---\n\nIf your game uses variable times scale you need to make sure that the hitlag resets you scale to a variable instead. Here we always reset the time scale to 1 after the effect wears off.\n\nI prefer a 90% slowdown to total hit stop, but your mileage may vary. Using slowdown has the added benefit that you can use the hitlag system to trigger general slow motion effects too.\n\nReference: SUPER HOT",
+              "comment2": ""
+            },
+            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -6885,87 +6908,29 @@
                       ]
                     }
                   ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CollisionNP"
-                      },
-                      "parameters": [
-                        "Shot",
-                        "Target",
-                        "",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "hitlag_amount",
-                        "=",
-                        "0.03"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "Shot",
-                        "shot_collided",
-                        "=",
-                        "1"
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 236,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "---Handling Hitlag---\n\nIf your game uses variable times scale you need to make sure that the hitlag resets you scale to a variable instead. Here we always reset the time scale to 1 after the effect wears off.\n\nI prefer a 90% slowdown to total hit stop, but your mileage may vary. Using slowdown has the added benefit that you can use the hitlag system to trigger general slow motion effects too.\n\nReference: SUPER HOT",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
+                },
                 {
                   "type": {
-                    "value": "VarScene"
+                    "value": "CollisionNP"
                   },
                   "parameters": [
-                    "hitlag_amount",
-                    ">",
-                    "0"
+                    "Shot",
+                    "Target",
+                    "",
+                    ""
                   ]
                 }
               ],
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "ModVarObjet"
                   },
                   "parameters": [
-                    "hitlag_amount",
-                    "-",
-                    "1*TimeDelta()"
+                    "Shot",
+                    "shot_collided",
+                    "=",
+                    "1"
                   ]
                 },
                 {
@@ -6976,43 +6941,22 @@
                     "",
                     "0.1"
                   ]
-                }
-              ],
-              "events": [
+                },
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "hitlag_amount",
-                        "<=",
-                        "0"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "hitlag_amount",
-                        "=",
-                        "-0.001"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ChangeTimeScale"
-                      },
-                      "parameters": [
-                        "",
-                        "1"
-                      ]
-                    }
+                  "type": {
+                    "value": "Wait"
+                  },
+                  "parameters": [
+                    "0.3 * 0.1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ChangeTimeScale"
+                  },
+                  "parameters": [
+                    "",
+                    "1"
                   ]
                 }
               ]
@@ -8721,14 +8665,49 @@
                     "",
                     "0.9+(Random(2)*0.1)"
                   ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "ShotTrail",
+                        "Shot",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "ShotTrail",
+                        ""
+                      ]
+                    }
+                  ]
                 },
                 {
-                  "type": {
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "Shot",
-                    ""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "Shot",
+                        ""
+                      ]
+                    }
                   ]
                 }
               ]
