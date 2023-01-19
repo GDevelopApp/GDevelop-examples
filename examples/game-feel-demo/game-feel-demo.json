@@ -2828,7 +2828,12 @@
           "updateIfNotVisible": true,
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
           "animations": [
             {
               "name": "",
@@ -4931,6 +4936,22 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ChangeTimeScale"
+                      },
+                      "parameters": [
+                        "",
+                        "0.065"
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -5802,16 +5823,6 @@
                         },
                         {
                           "type": {
-                            "value": "LinkedObjects::LinkObjects"
-                          },
-                          "parameters": [
-                            "",
-                            "ShotTrail",
-                            "Shot"
-                          ]
-                        },
-                        {
-                          "type": {
                             "value": "ChangeSprite"
                           },
                           "parameters": [
@@ -5822,7 +5833,7 @@
                         },
                         {
                           "type": {
-                            "value": "ChangeScaleWidth"
+                            "value": "ChangeWidth"
                           },
                           "parameters": [
                             "ShotTrail",
@@ -5848,6 +5859,55 @@
                             "vfx_general",
                             "=",
                             "Weapon.ZOrder() + 15"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectOpacityTween"
+                          },
+                          "parameters": [
+                            "ShotTrail",
+                            "Tween",
+                            "\"FadeOut\"",
+                            "0",
+                            "\"linear\"",
+                            "1000",
+                            "yes"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 99,
+                            "g": 167,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "---Shot Trail Scaling---\n\nHere we handle our shot trail. Note that the factor we divide the trail by is shorter than the actual sprite. The trail has a lot of glow but the actual trail is only half the total size, thus we multiply by 2. Also look at the vfx_shot_trail animation and note that the origin/center is at the point where the trail physically starts, since that is the position we want it to extend from.\n\nThe ForceLength is a speed in pixels per seconds. Here the animation last 1 second, so it's multiplyed by 1 (the \"2 *\" is explained above).\n\nWith good sprites you can make this quite a nice effect, but there are limits due to the fact that this uses stretching in order to scale the trail.",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Tween::AddObjectWidthTween"
+                              },
+                              "parameters": [
+                                "ShotTrail",
+                                "Tween",
+                                "\"Stretch\"",
+                                "2 * Shot.ForceLength()",
+                                "\"linear\"",
+                                "1000",
+                                "yes"
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -6021,53 +6081,6 @@
                         "0",
                         "0.25",
                         ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "cam_shake_magnitude",
-                        "=",
-                        "10"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "cam_shake_count",
-                        "=",
-                        "8"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "cam_shake_growth",
-                        "=",
-                        "-1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "cam_shake_state",
-                        "=",
-                        "1"
                       ]
                     }
                   ]
@@ -6613,76 +6626,6 @@
                     "0",
                     "=",
                     "Variable(ambience_vol)"
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 99,
-            "g": 167,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "---Shot Trail Scaling---\n\nHere we handle our shot trail. Note that the factor we divide the trail by is shorter than the actual sprite. The trail has a lot of glow but the actual trail is only 96px long. Also look at the vfx_shot_trail animation and note that the origin/center is at the point where the trail physically starts, since that is the position we want it to extend from.\n\nUsing the linked object conditions comes with the advantage that the trail will stop growing as soon as the shot is removed, but you might want to adjust that if you need different behaviors.\n\nWith good sprites you can make this quite a nice effect, but there are limits due to the fact that this uses stretching in order to scale the trail. There might be a better method to do this in future version of GDevelop.",
-          "comment2": ""
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "NbObjet"
-              },
-              "parameters": [
-                "ShotTrail",
-                ">",
-                "0"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "Opacity"
-              },
-              "parameters": [
-                "ShotTrail",
-                "-",
-                "255*TimeDelta()"
-              ]
-            }
-          ],
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "ShotTrail",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "LinkedObjects::PickObjectsLinkedTo"
-                  },
-                  "parameters": [
-                    "",
-                    "Shot",
-                    "ShotTrail"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ChangeScaleWidth"
-                  },
-                  "parameters": [
-                    "ShotTrail",
-                    "=",
-                    "(ShotTrail.Distance(Shot) / 96)"
                   ]
                 }
               ]
@@ -8850,6 +8793,10 @@
         {
           "name": "SmoothCamera",
           "type": "SmoothCamera::SmoothCamera"
+        },
+        {
+          "name": "Tween",
+          "type": "Tween::TweenBehavior"
         }
       ]
     }
