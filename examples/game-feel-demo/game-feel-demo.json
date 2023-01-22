@@ -556,6 +556,17 @@
               "name": "SfxAreaLabel"
             }
           ]
+        },
+        {
+          "name": "FallingItem",
+          "objects": [
+            {
+              "name": "Orb"
+            },
+            {
+              "name": "Casing"
+            }
+          ]
         }
       ],
       "variables": [
@@ -1099,7 +1110,7 @@
               "HasJustFired": false,
               "FiringArc": 45,
               "BulletQuantity": 1,
-              "AngleVariance": 10,
+              "AngleVariance": 0,
               "RotateBullet": true,
               "AmmoQuantity": 0,
               "ShotsPerReload": 0,
@@ -4172,7 +4183,30 @@
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "Orb",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [
+            {
+              "name": "casing_is_falling",
+              "type": "string",
+              "value": "1"
             },
+            {
+              "name": "relative_floor_y",
+              "type": "string",
+              "value": "0"
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
             {
               "name": "",
               "useMultipleDirections": false,
@@ -6860,7 +6894,7 @@
                 "value": "VarObjet"
               },
               "parameters": [
-                "Casing",
+                "FallingItem",
                 "casing_is_falling",
                 "=",
                 "1"
@@ -6870,16 +6904,17 @@
           "actions": [],
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "FallingItem",
               "conditions": [
                 {
                   "type": {
                     "value": "PosY"
                   },
                   "parameters": [
-                    "Casing",
+                    "FallingItem",
                     ">",
-                    "Casing.Variable(relative_floor_y)"
+                    "FallingItem.Variable(relative_floor_y)"
                   ]
                 }
               ],
@@ -6889,7 +6924,7 @@
                     "value": "ModVarObjet"
                   },
                   "parameters": [
-                    "Casing",
+                    "FallingItem",
                     "casing_is_falling",
                     "=",
                     "0"
@@ -6900,7 +6935,7 @@
                     "value": "Arreter"
                   },
                   "parameters": [
-                    "Casing"
+                    "FallingItem"
                   ]
                 },
                 {
@@ -6908,7 +6943,7 @@
                     "value": "SetAngle"
                   },
                   "parameters": [
-                    "Casing",
+                    "FallingItem",
                     "=",
                     "Random(360)"
                   ]
@@ -7820,9 +7855,9 @@
                         "value": "Opacity"
                       },
                       "parameters": [
-                        "Casing",
+                        "Orb",
                         "-",
-                        "20"
+                        "30"
                       ]
                     }
                   ],
@@ -7835,7 +7870,7 @@
                             "value": "Opacity"
                           },
                           "parameters": [
-                            "Casing",
+                            "Orb",
                             "<",
                             "10"
                           ]
@@ -7847,7 +7882,7 @@
                             "value": "Delete"
                           },
                           "parameters": [
-                            "Casing",
+                            "Orb",
                             ""
                           ]
                         }
@@ -7866,7 +7901,7 @@
                       },
                       "parameters": [
                         "",
-                        "Casing",
+                        "Orb",
                         "Shot.X() - 8 + Random(16)",
                         "Shot.PointY(\"Tail\") - 8 + Random(16)",
                         ""
@@ -7874,20 +7909,10 @@
                     },
                     {
                       "type": {
-                        "value": "ChangeAnimation"
-                      },
-                      "parameters": [
-                        "Casing",
-                        "=",
-                        "1"
-                      ]
-                    },
-                    {
-                      "type": {
                         "value": "AddForceAL"
                       },
                       "parameters": [
-                        "Casing",
+                        "Orb",
                         "250+Random(40)",
                         "350+Random(200)",
                         "0.1"
@@ -7898,9 +7923,9 @@
                         "value": "AddForceVersPos"
                       },
                       "parameters": [
-                        "Casing",
+                        "Orb",
                         "Shot.PointX(\"Front\")",
-                        "Shot.PointY(\"Front\")",
+                        "Shot.PointY(\"Front\") - 20",
                         "-100-Random(300)",
                         "0.1"
                       ]
@@ -7910,7 +7935,7 @@
                         "value": "AddForceXY"
                       },
                       "parameters": [
-                        "Casing",
+                        "Orb",
                         "0",
                         "300",
                         "1.1"
@@ -7921,10 +7946,10 @@
                         "value": "ModVarObjet"
                       },
                       "parameters": [
-                        "Casing",
+                        "Orb",
                         "relative_floor_y",
                         "=",
-                        "Casing.Y() + 16 + Random(64)"
+                        "Orb.Y() + 16 + Random(64)"
                       ]
                     },
                     {
@@ -7932,9 +7957,9 @@
                         "value": "ChangePlan"
                       },
                       "parameters": [
-                        "Casing",
+                        "Orb",
                         "=",
-                        "Casing.Variable(relative_floor_y)"
+                        "Orb.Variable(relative_floor_y)"
                       ]
                     }
                   ]
