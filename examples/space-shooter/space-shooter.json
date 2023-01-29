@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.gdevelop.gdblade",
-    "pixelsRounding": false,
+    "pixelsRounding": true,
     "projectUuid": "3079895d-9071-410b-998d-f6390c56a088",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
@@ -1094,7 +1094,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 1.0606,
+        "zoomFactor": 3.5674189520723494,
         "windowMask": false
       },
       "objectsGroups": [
@@ -1978,10 +1978,10 @@
             {
               "name": "StayOnScreen",
               "type": "StayOnScreen::StayOnScreen",
-              "MarginRight": 90,
+              "MarginRight": 70,
               "MarginTop": 0,
               "MarginLeft": 0,
-              "MarginBottom": 20
+              "MarginBottom": 0
             },
             {
               "name": "TopDownMovement",
@@ -7243,35 +7243,92 @@
               "actions": [
                 {
                   "type": {
-                    "value": "CameraX"
+                    "value": "ModVarScene"
                   },
                   "parameters": [
-                    "",
+                    "CameraX",
                     "+",
-                    "20 * TimeDelta()",
-                    "",
-                    ""
+                    "20 * TimeDelta()"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "The camera an the player must be shifted at the same time to avoid flickering.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "CameraX",
+                        ">=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "CameraX",
+                        "-",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "Player",
+                        "+",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterX"
+                      },
+                      "parameters": [
+                        "",
+                        "+",
+                        "1",
+                        "",
+                        ""
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "AddForceXY"
-                  },
-                  "parameters": [
-                    "Player",
-                    "20",
-                    "0",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TiledSpriteObject::XOffset"
-                  },
-                  "parameters": [
-                    "SpaceBackground",
-                    "+",
-                    "10 * TimeDelta()"
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TiledSpriteObject::XOffset"
+                      },
+                      "parameters": [
+                        "SpaceBackground",
+                        "=",
+                        "CameraCenterX() / 2"
+                      ]
+                    }
                   ]
                 }
               ]
