@@ -72,11 +72,16 @@
       "showGDevelopSplash": true,
       "showProgressBar": true
     },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
     "authorIds": [
       "jy7FXnGX0ZZcWfrAI9YuQaeIphi1",
       "9MGDlUQAh8QUilno4JPycekjRCJ3",
       "R0F5QGNCzgOY5w2cxGeKJOq2UaD2"
     ],
+    "authorUsernames": [],
     "categories": [],
     "playableDevices": [],
     "extensionProperties": [],
@@ -3579,6 +3584,38 @@
                       "conditions": [
                         {
                           "type": {
+                            "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TextInput::TextInputObject::SetText"
+                          },
+                          "parameters": [
+                            "PlayerNameInput",
+                            "=",
+                            "PlayerAuthentication::Username()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "TextInput::TextInputObject::SetDisabled"
+                          },
+                          "parameters": [
+                            "PlayerNameInput",
+                            "yes"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
                             "inverted": true,
                             "value": "PlayerAuthentication::IsPlayerAuthenticated"
                           },
@@ -3604,29 +3641,6 @@
                             "PlayerNameInput",
                             "=",
                             "GlobalVariableString(PlayerName)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "PlayerAuthentication::IsPlayerAuthenticated"
-                          },
-                          "parameters": []
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "TextInput::TextInputObject::SetText"
-                          },
-                          "parameters": [
-                            "PlayerNameInput",
-                            "=",
-                            "PlayerAuthentication::Username()"
                           ]
                         }
                       ]
@@ -3672,46 +3686,90 @@
                       ]
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "State",
-                        "=",
-                        "\"Leaderboard\""
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Leaderboards::SaveConnectedPlayerScore"
+                          },
+                          "parameters": [
+                            "",
+                            "\"cb53c2e6-d603-4913-8728-ae0108ba3eee\"",
+                            "Variable(Score)"
+                          ]
+                        }
                       ]
                     },
                     {
-                      "type": {
-                        "value": "Leaderboards::SavePlayerScore"
-                      },
-                      "parameters": [
-                        "",
-                        "\"cb53c2e6-d603-4913-8728-ae0108ba3eee\"",
-                        "Variable(Score)",
-                        "PlayerNameInput.Text()"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Leaderboards::SavePlayerScore"
+                          },
+                          "parameters": [
+                            "",
+                            "\"cb53c2e6-d603-4913-8728-ae0108ba3eee\"",
+                            "Variable(Score)",
+                            "PlayerNameInput.Text()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarGlobalTxt"
+                          },
+                          "parameters": [
+                            "PlayerName",
+                            "=",
+                            "PlayerNameInput.Text()"
+                          ]
+                        }
                       ]
                     },
                     {
-                      "type": {
-                        "value": "Leaderboards::DisplayLeaderboard"
-                      },
-                      "parameters": [
-                        "",
-                        "\"cb53c2e6-d603-4913-8728-ae0108ba3eee\"",
-                        "yes"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarGlobalTxt"
-                      },
-                      "parameters": [
-                        "PlayerName",
-                        "=",
-                        "PlayerNameInput.Text()"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Leaderboards::DisplayLeaderboard"
+                          },
+                          "parameters": [
+                            "",
+                            "\"cb53c2e6-d603-4913-8728-ae0108ba3eee\"",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"Leaderboard\""
+                          ]
+                        }
                       ]
                     }
                   ]
