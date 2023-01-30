@@ -44,9 +44,14 @@
       "showGDevelopSplash": true,
       "showProgressBar": true
     },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
     "authorIds": [
       "R0F5QGNCzgOY5w2cxGeKJOq2UaD2"
     ],
+    "authorUsernames": [],
     "categories": [],
     "playableDevices": [],
     "extensionProperties": [],
@@ -807,6 +812,8 @@
               "MarginRight": 0
             },
             {
+              "name": "TopDownMovement",
+              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
               "acceleration": 6400,
               "allowDiagonals": false,
               "angleOffset": 0,
@@ -816,9 +823,7 @@
               "ignoreDefaultControls": true,
               "maxSpeed": 450,
               "movementAngleOffset": 0,
-              "name": "TopDownMovement",
               "rotateObject": false,
-              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
               "viewpoint": "TopDown"
             }
           ],
@@ -3102,6 +3107,15 @@
                     "=",
                     "PlayerAuthentication::Username()"
                   ]
+                },
+                {
+                  "type": {
+                    "value": "TextInput::TextInputObject::SetDisabled"
+                  },
+                  "parameters": [
+                    "PlayerNameInput",
+                    "yes"
+                  ]
                 }
               ]
             },
@@ -3255,36 +3269,90 @@
                       ]
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "Leaderboards::SavePlayerScore"
-                      },
-                      "parameters": [
-                        "",
-                        "\"2e66ecc2-822b-4860-ae21-80d274657f1d\"",
-                        "GlobalVariable(Score)",
-                        "PlayerNameInput.Text()"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Leaderboards::SaveConnectedPlayerScore"
+                          },
+                          "parameters": [
+                            "",
+                            "\"2e66ecc2-822b-4860-ae21-80d274657f1d\"",
+                            "GlobalVariable(Score)"
+                          ]
+                        }
                       ]
                     },
                     {
-                      "type": {
-                        "value": "Leaderboards::DisplayLeaderboard"
-                      },
-                      "parameters": [
-                        "",
-                        "\"2e66ecc2-822b-4860-ae21-80d274657f1d\"",
-                        "yes"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "PlayerAuthentication::IsPlayerAuthenticated"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Leaderboards::SavePlayerScore"
+                          },
+                          "parameters": [
+                            "",
+                            "\"2e66ecc2-822b-4860-ae21-80d274657f1d\"",
+                            "GlobalVariable(Score)",
+                            "PlayerNameInput.Text()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarGlobalTxt"
+                          },
+                          "parameters": [
+                            "PlayerName",
+                            "=",
+                            "PlayerNameInput.Text()"
+                          ]
+                        }
                       ]
                     },
                     {
-                      "type": {
-                        "value": "ModVarGlobalTxt"
-                      },
-                      "parameters": [
-                        "PlayerName",
-                        "=",
-                        "PlayerNameInput.Text()"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Leaderboards::DisplayLeaderboard"
+                          },
+                          "parameters": [
+                            "",
+                            "\"2e66ecc2-822b-4860-ae21-80d274657f1d\"",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"Leaderboard\""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -3389,7 +3457,21 @@
                     {
                       "type": {
                         "inverted": true,
+                        "value": "Leaderboards::IsLeaderboardViewLoading"
+                      },
+                      "parameters": []
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
                         "value": "Leaderboards::IsLeaderboardViewLoaded"
+                      },
+                      "parameters": []
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Leaderboards::IsLeaderboardViewErrored"
                       },
                       "parameters": []
                     }
