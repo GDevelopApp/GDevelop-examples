@@ -259,6 +259,20 @@ const extractExamples = async (
 
         const project = loadSerializedProject(gd, projectObject);
 
+        /** @type {number} */
+        const instructionsCount =
+          gd.InstructionsCountEvaluator.scanProject(project);
+        /** @type {string} */
+        const codeSizeLevel =
+          instructionsCount < 20
+            ? 'tiny'
+            : instructionsCount < 100
+            ? 'small'
+            : instructionsCount < 200
+            ? 'medium'
+            : instructionsCount < 500
+            ? 'big'
+            : 'huge';
         /** @type {{name: string, fullName: string}[]} */
         const usedExtensions = gd.UsedExtensionsFinder.scanProject(project)
           .getUsedExtensions()
@@ -346,6 +360,7 @@ const extractExamples = async (
           description,
           authorIds,
           tags,
+          codeSizeLevel,
           usedExtensions,
           eventsBasedExtensions,
           previewImageUrls: getPreviewImageUrls(gameFolderPath, allFiles),
@@ -438,6 +453,7 @@ const generateSortedShortHeaders = (allExamples) => {
     authorIds: example.authorIds,
     tags: example.tags,
     gdevelopVersion: example.gdevelopVersion,
+    codeSizeLevel: example.codeSizeLevel,
   }));
 };
 
