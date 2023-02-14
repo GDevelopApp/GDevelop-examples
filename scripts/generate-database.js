@@ -331,7 +331,7 @@ const extractExamples = async (
           ...getStaticTags(slug),
           ...usedExtensions.map(({ fullName }) => fullName),
           ...eventsBasedExtensions.map(({ fullName }) => fullName),
-        ];
+        ].filter((tag) => tag.length > 0);
         tags.forEach((tag) => allExampleTags.add(tag));
         const difficultyLevel = tags.includes('simple')
           ? 'simple'
