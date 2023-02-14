@@ -260,7 +260,8 @@ const extractExamples = async (
         const project = loadSerializedProject(gd, projectObject);
 
         /** @type {number} */
-        const instructionsCount = gd.InstructionsCountEvaluator.scanProject(project);
+        const instructionsCount =
+          gd.InstructionsCountEvaluator.scanProject(project);
         /** @type {string} */
         const codeSizeLevel =
           instructionsCount < 20
