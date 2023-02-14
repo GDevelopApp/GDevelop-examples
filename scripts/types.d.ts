@@ -11,6 +11,7 @@ export interface Example {
   authorIds: string[];
   previewImageUrls: string[];
   gdevelopVersion: string;
+  eventsSizeLevel: string;
 
   description: string;
   projectFileUrl: string;
@@ -33,6 +34,7 @@ export interface ExampleShortHeader {
   authorIds: string[];
   previewImageUrls: string[];
   gdevelopVersion: string;
+  eventsSizeLevel: string;
 }
 
 export type gdProject = any;

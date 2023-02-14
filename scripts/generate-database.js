@@ -259,6 +259,19 @@ const extractExamples = async (
 
         const project = loadSerializedProject(gd, projectObject);
 
+        /** @type {number} */
+        const eventsSize = gd.InstructionsCountEvaluator.scanProject(project);
+        /** @type {string} */
+        const eventsSizeLevel =
+          eventsSize < 20
+            ? 'tiny'
+            : eventsSize < 100
+            ? 'small'
+            : eventsSize < 200
+            ? 'medium'
+            : eventsSize < 500
+            ? 'big'
+            : 'huge';
         /** @type {{name: string, fullName: string}[]} */
         const usedExtensions = gd.UsedExtensionsFinder.scanProject(project)
           .getUsedExtensions()
@@ -346,6 +359,7 @@ const extractExamples = async (
           description,
           authorIds,
           tags,
+          eventsSizeLevel,
           usedExtensions,
           eventsBasedExtensions,
           previewImageUrls: getPreviewImageUrls(gameFolderPath, allFiles),
@@ -438,6 +452,7 @@ const generateSortedShortHeaders = (allExamples) => {
     authorIds: example.authorIds,
     tags: example.tags,
     gdevelopVersion: example.gdevelopVersion,
+    eventsSizeLevel: example.eventsSizeLevel,
   }));
 };
 
