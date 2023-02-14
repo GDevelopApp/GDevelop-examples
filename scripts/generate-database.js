@@ -260,16 +260,16 @@ const extractExamples = async (
         const project = loadSerializedProject(gd, projectObject);
 
         /** @type {number} */
-        const eventsSize = gd.InstructionsCountEvaluator.scanProject(project);
+        const instructionsCount = gd.InstructionsCountEvaluator.scanProject(project);
         /** @type {string} */
-        const eventsSizeLevel =
-          eventsSize < 20
+        const codeSizeLevel =
+          instructionsCount < 20
             ? 'tiny'
-            : eventsSize < 100
+            : instructionsCount < 100
             ? 'small'
-            : eventsSize < 200
+            : instructionsCount < 200
             ? 'medium'
-            : eventsSize < 500
+            : instructionsCount < 500
             ? 'big'
             : 'huge';
         /** @type {{name: string, fullName: string}[]} */
@@ -359,7 +359,7 @@ const extractExamples = async (
           description,
           authorIds,
           tags,
-          eventsSizeLevel,
+          codeSizeLevel,
           usedExtensions,
           eventsBasedExtensions,
           previewImageUrls: getPreviewImageUrls(gameFolderPath, allFiles),
@@ -452,7 +452,7 @@ const generateSortedShortHeaders = (allExamples) => {
     authorIds: example.authorIds,
     tags: example.tags,
     gdevelopVersion: example.gdevelopVersion,
-    eventsSizeLevel: example.eventsSizeLevel,
+    codeSizeLevel: example.codeSizeLevel,
   }));
 };
 
