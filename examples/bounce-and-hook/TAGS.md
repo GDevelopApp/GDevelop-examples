@@ -1,1 +1,1 @@
-game, straightforward
+game, simple

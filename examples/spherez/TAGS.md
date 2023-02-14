@@ -1,1 +1,1 @@
-game, expert
+game, advanced
