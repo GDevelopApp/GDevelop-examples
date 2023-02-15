@@ -12,6 +12,7 @@ export interface Example {
   previewImageUrls: string[];
   gdevelopVersion: string;
   codeSizeLevel: string;
+  difficultyLevel: string | undefined;
 
   description: string;
   projectFileUrl: string;
@@ -35,6 +36,7 @@ export interface ExampleShortHeader {
   previewImageUrls: string[];
   gdevelopVersion: string;
   codeSizeLevel: string;
+  difficultyLevel: string | undefined;
 }
 
 export type gdProject = any;

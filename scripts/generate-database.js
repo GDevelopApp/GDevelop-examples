@@ -331,8 +331,15 @@ const extractExamples = async (
           ...getStaticTags(slug),
           ...usedExtensions.map(({ fullName }) => fullName),
           ...eventsBasedExtensions.map(({ fullName }) => fullName),
-        ];
+        ].filter((tag) => tag.length > 0);
         tags.forEach((tag) => allExampleTags.add(tag));
+        const difficultyLevel = tags.includes('simple')
+          ? 'simple'
+          : tags.includes('advanced')
+          ? 'advanced'
+          : tags.includes('expert')
+          ? 'expert'
+          : undefined;
 
         const authorIds = project.getAuthorIds().toJSArray();
 
@@ -361,6 +368,7 @@ const extractExamples = async (
           authorIds,
           tags,
           codeSizeLevel,
+          difficultyLevel,
           usedExtensions,
           eventsBasedExtensions,
           previewImageUrls: getPreviewImageUrls(gameFolderPath, allFiles),
@@ -452,6 +460,7 @@ const generateSortedShortHeaders = (allExamples) => {
     previewImageUrls: example.previewImageUrls,
     authorIds: example.authorIds,
     tags: example.tags,
+    difficultyLevel: example.difficultyLevel,
     gdevelopVersion: example.gdevelopVersion,
     codeSizeLevel: example.codeSizeLevel,
   }));
