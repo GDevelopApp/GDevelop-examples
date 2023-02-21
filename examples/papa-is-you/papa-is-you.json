@@ -4865,7 +4865,18 @@
               ]
             }
           ],
-          "actions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "GameState",
+                "=",
+                "\"WaitPlayerInput\""
+              ]
+            }
+          ],
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -4891,26 +4902,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Link",
-              "include": {
-                "includeConfig": 0
-              },
-              "target": "FindAndUpdateRulesFromTextBlocks"
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "In games like Baba is You, game rules are not set in stone.\nThe text blocks form sentenses that define the rules.\nA set of boolean variables are used to know what a block can do:\n- Controlled, move with arrows\n- Push, can be pushed by other blocks\n- Stop, can't be moved\n- Win, the game is won when a controlled block reach one of them\n- none of the above, don't do anything, they don't even have collision",
-              "comment2": ""
             }
           ]
         },
@@ -4919,640 +4910,37 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Resetting values and checking win conditions",
+          "name": "Wait for player input",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
+              "conditions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "VarSceneTxt"
                   },
                   "parameters": [
-                    "XMove",
+                    "GameState",
                     "=",
-                    "0"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "YMove",
-                    "=",
-                    "0"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "If the movement tween ended, update the rules and check if the player has won the game.",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "SceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "DidMovementTweenEnd",
-                    "True"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetSceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "DidMovementTweenEnd",
-                    "False"
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "FindAndUpdateRulesFromTextBlocks"
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Check game success",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "The game is won if a \"Controlled\" object is in collision with a \"Win\" object, or if a single object has both of those variables set to true.\nThis is checked by creating a marker object on top of any object that has a true \"Win\" variable, and then checking if that is in collision with an object that has the \"Controlled\" variable set to true.",
-                      "comment2": ""
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "AllObjects",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "AllObjects",
-                            "Win",
-                            "True"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Create"
-                          },
-                          "parameters": [
-                            "",
-                            "Marker",
-                            "AllObjects.X()",
-                            "AllObjects.Y()",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "CollisionNP"
-                          },
-                          "parameters": [
-                            "Marker",
-                            "AllObjects",
-                            "",
-                            "",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "AllObjects",
-                            "Controlled",
-                            "True"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ShowLayer"
-                          },
-                          "parameters": [
-                            "",
-                            "\"WinGame\""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Delete"
-                          },
-                          "parameters": [
-                            "Marker",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "parameters": []
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Player input",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Check in which direction the player intend to move.",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Or"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
-                      },
-                      "parameters": [
-                        "OnScreenButtons",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "AnyKeyPressed"
-                      },
-                      "parameters": [
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Not"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "Tween::IsPlaying"
-                      },
-                      "parameters": [
-                        "AllObjects",
-                        "Tween",
-                        "\"Move\""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetSceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "IsAnyArrowPressed",
-                    "True"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Tween::RemoveTween"
-                  },
-                  "parameters": [
-                    "AllObjects",
-                    "Tween",
-                    "\"Move\""
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
-                          },
-                          "parameters": [
-                            "LeftButton",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "a"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsAnyArrowPressed",
-                        "True"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "XMove",
-                        "=",
-                        "-64"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsAnyArrowPressed",
-                        "False"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
-                          },
-                          "parameters": [
-                            "DownButton",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Down"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "s"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsAnyArrowPressed",
-                        "True"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "YMove",
-                        "=",
-                        "64"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsAnyArrowPressed",
-                        "False"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
-                          },
-                          "parameters": [
-                            "UpButton",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Up"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "w"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsAnyArrowPressed",
-                        "True"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "YMove",
-                        "=",
-                        "-64"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsAnyArrowPressed",
-                        "False"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
-                          },
-                          "parameters": [
-                            "RightButton",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Right"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "d"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsAnyArrowPressed",
-                        "True"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "XMove",
-                        "=",
-                        "64"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsAnyArrowPressed",
-                        "False"
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Push and collision checks",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "When players are trying to move...",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Or"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "XMove",
-                        "!=",
-                        "0"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "YMove",
-                        "!=",
-                        "0"
-                      ]
-                    }
+                    "\"WaitPlayerInput\""
                   ]
                 }
               ],
               "actions": [],
               "events": [
                 {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Look for free cells to go",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Comment",
@@ -5564,55 +4952,24 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "...check if this is really possible.\n\nEvery controlled object checks if they can move in the direction asked by the player.\nA marker is used to check each cell in that direction. It will move from one cell to the next.",
+                      "comment": "In games like Baba is You, game rules are not set in stone.\nThe text blocks form sentenses that define the rules.\nA set of boolean variables are used to know what a block can do:\n- Controlled, move with arrows\n- Push, can be pushed by other blocks\n- Stop, can't be moved\n- Win, the game is won when a controlled block reach one of them\n- none of the above, don't do anything, they don't even have collision",
                       "comment2": ""
                     },
                     {
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "AllObjects",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "AllObjects",
-                            "Controlled",
-                            "True"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Create"
-                          },
-                          "parameters": [
-                            "",
-                            "Marker",
-                            "AllObjects.X() + Variable(XMove)",
-                            "AllObjects.Y() + Variable(YMove)",
-                            "\"\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjetTxt"
-                          },
-                          "parameters": [
-                            "AllObjects",
-                            "Direction",
-                            "=",
-                            "\"Move\""
-                          ]
-                        }
-                      ]
+                      "type": "BuiltinCommonInstructions::Link",
+                      "include": {
+                        "includeConfig": 0
+                      },
+                      "target": "FindAndUpdateRulesFromTextBlocks"
                     },
                     {
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "Marker",
-                      "conditions": [],
-                      "actions": [],
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Check game success",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Comment",
@@ -5624,95 +4981,38 @@
                             "textG": 0,
                             "textR": 0
                           },
-                          "comment": "The marker is on a pushable object.\nThis pushable object could maybe be pushed...",
+                          "comment": "The game is won if a \"Controlled\" object is in collision with a \"Win\" object, or if a single object has both of those variables set to true.\nThis is checked by creating a marker object on top of any object that has a true \"Win\" variable, and then checking if that is in collision with an object that has the \"Controlled\" variable set to true.",
                           "comment2": ""
                         },
                         {
-                          "infiniteLoopWarning": true,
-                          "type": "BuiltinCommonInstructions::While",
-                          "whileConditions": [
-                            {
-                              "type": {
-                                "value": "CollisionNP"
-                              },
-                              "parameters": [
-                                "Marker",
-                                "AllObjects",
-                                "",
-                                "",
-                                ""
-                              ]
-                            },
+                          "type": "BuiltinCommonInstructions::ForEach",
+                          "object": "AllObjects",
+                          "conditions": [
                             {
                               "type": {
                                 "value": "ObjectVariableAsBoolean"
                               },
                               "parameters": [
                                 "AllObjects",
-                                "Push",
+                                "Win",
                                 "True"
                               ]
                             }
                           ],
-                          "conditions": [],
-                          "actions": [],
-                          "events": [
+                          "actions": [
                             {
-                              "type": "BuiltinCommonInstructions::Comment",
-                              "color": {
-                                "b": 109,
-                                "g": 230,
-                                "r": 255,
-                                "textB": 0,
-                                "textG": 0,
-                                "textR": 0
+                              "type": {
+                                "value": "Create"
                               },
-                              "comment": "...move the marker to check the next cell.",
-                              "comment2": ""
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "ModVarObjetTxt"
-                                  },
-                                  "parameters": [
-                                    "AllObjects",
-                                    "Direction",
-                                    "=",
-                                    "\"Move\""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "MettreXY"
-                                  },
-                                  "parameters": [
-                                    "Marker",
-                                    "=",
-                                    "Marker.X() + Variable(XMove)",
-                                    "=",
-                                    "Marker.Y() + Variable(YMove)"
-                                  ]
-                                }
+                              "parameters": [
+                                "",
+                                "Marker",
+                                "AllObjects.X()",
+                                "AllObjects.Y()",
+                                ""
                               ]
                             }
                           ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "When the marker reached a controlled object, we remve the marker because this controlled object already have a marker on the next cell.\nThis other marker will continue to look further there is no need to do it 2 times.",
-                          "comment2": ""
                         },
                         {
                           "type": "BuiltinCommonInstructions::Standard",
@@ -5743,6 +5043,21 @@
                           "actions": [
                             {
                               "type": {
+                                "value": "ShowLayer"
+                              },
+                              "parameters": [
+                                "",
+                                "\"WinGame\""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
                                 "value": "Delete"
                               },
                               "parameters": [
@@ -5752,17 +5067,17 @@
                             }
                           ]
                         }
-                      ]
+                      ],
+                      "parameters": []
                     }
-                  ],
-                  "parameters": []
+                  ]
                 },
                 {
                   "colorB": 228,
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "name": "Reached walls",
+                  "name": "Player input",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
@@ -5776,157 +5091,336 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "When the marker has finished moving and the cell contains a stop object, it means that there is actually no room to move.\nWe have to go back and tell objects they can't move. ReturnMarker is used for this.",
+                      "comment": "Check in which direction the player intend to move.",
                       "comment2": ""
                     },
-                    {
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "Marker",
-                      "conditions": [],
-                      "actions": [],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "CollisionNP"
-                              },
-                              "parameters": [
-                                "Marker",
-                                "AllObjects",
-                                "",
-                                "",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ObjectVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "AllObjects",
-                                "Stop",
-                                "True"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Create"
-                              },
-                              "parameters": [
-                                "",
-                                "ReturnMarker",
-                                "Marker.X() - Variable(XMove)",
-                                "Marker.Y() - Variable(YMove)",
-                                "\"\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Delete"
-                              },
-                              "parameters": [
-                                "Marker",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "ReturnMarker",
-                      "conditions": [],
-                      "actions": [],
-                      "events": [
-                        {
-                          "infiniteLoopWarning": true,
-                          "type": "BuiltinCommonInstructions::While",
-                          "whileConditions": [
-                            {
-                              "type": {
-                                "value": "CollisionNP"
-                              },
-                              "parameters": [
-                                "ReturnMarker",
-                                "AllObjects",
-                                "",
-                                "",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "VarObjetTxt"
-                              },
-                              "parameters": [
-                                "AllObjects",
-                                "Direction",
-                                "=",
-                                "\"Move\""
-                              ]
-                            }
-                          ],
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "ModVarObjetTxt"
-                              },
-                              "parameters": [
-                                "AllObjects",
-                                "Direction",
-                                "=",
-                                "\"None\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "MettreXY"
-                              },
-                              "parameters": [
-                                "ReturnMarker",
-                                "=",
-                                "ReturnMarker.X() - Variable(XMove)",
-                                "=",
-                                "ReturnMarker.Y() - Variable(YMove)"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "parameters": []
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Move objects that can",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
                         {
                           "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "XMove",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "YMove",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
                             "value": "SetSceneVariableAsBoolean"
                           },
                           "parameters": [
-                            "DidMoveHappen",
+                            "IsAnyArrowPressed",
                             "False"
                           ]
                         }
                       ]
                     },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
+                              },
+                              "parameters": [
+                                "LeftButton",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "a"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "IsAnyArrowPressed",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "XMove",
+                            "=",
+                            "-64"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "IsAnyArrowPressed",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
+                              },
+                              "parameters": [
+                                "DownButton",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Down"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "s"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "IsAnyArrowPressed",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "YMove",
+                            "=",
+                            "64"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "IsAnyArrowPressed",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
+                              },
+                              "parameters": [
+                                "UpButton",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Up"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "w"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "IsAnyArrowPressed",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "YMove",
+                            "=",
+                            "-64"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "IsAnyArrowPressed",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "PanelSpriteButton::PanelSpriteButton::IsPressed"
+                              },
+                              "parameters": [
+                                "RightButton",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Right"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "d"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "IsAnyArrowPressed",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "XMove",
+                            "=",
+                            "64"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "IsAnyArrowPressed",
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Push and collision checks",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
                     {
                       "type": "BuiltinCommonInstructions::Comment",
                       "color": {
@@ -5937,7 +5431,7 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "Blue markers that still exist are on free cells. It means that at least one block can move there.",
+                      "comment": "When players are trying to move...",
                       "comment2": ""
                     },
                     {
@@ -5945,41 +5439,619 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "SceneInstancesCount"
+                            "value": "SceneVariableAsBoolean"
                           },
                           "parameters": [
-                            "",
-                            "Marker",
+                            "IsAnyArrowPressed",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Look for free cells to go",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "...check if this is really possible.\n\nEvery controlled object checks if they can move in the direction asked by the player.\nA marker is used to check each cell in that direction. It will move from one cell to the next.",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::ForEach",
+                              "object": "AllObjects",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "ObjectVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "AllObjects",
+                                    "Controlled",
+                                    "True"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Create"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Marker",
+                                    "AllObjects.X() + Variable(XMove)",
+                                    "AllObjects.Y() + Variable(YMove)",
+                                    "\"\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarObjetTxt"
+                                  },
+                                  "parameters": [
+                                    "AllObjects",
+                                    "Direction",
+                                    "=",
+                                    "\"Move\""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::ForEach",
+                              "object": "Marker",
+                              "conditions": [],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "The marker is on a pushable object.\nThis pushable object could maybe be pushed...",
+                                  "comment2": ""
+                                },
+                                {
+                                  "infiniteLoopWarning": true,
+                                  "type": "BuiltinCommonInstructions::While",
+                                  "whileConditions": [
+                                    {
+                                      "type": {
+                                        "value": "CollisionNP"
+                                      },
+                                      "parameters": [
+                                        "Marker",
+                                        "AllObjects",
+                                        "",
+                                        "",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "Push",
+                                        "True"
+                                      ]
+                                    }
+                                  ],
+                                  "conditions": [],
+                                  "actions": [],
+                                  "events": [
+                                    {
+                                      "type": "BuiltinCommonInstructions::Comment",
+                                      "color": {
+                                        "b": 109,
+                                        "g": 230,
+                                        "r": 255,
+                                        "textB": 0,
+                                        "textG": 0,
+                                        "textR": 0
+                                      },
+                                      "comment": "...move the marker to check the next cell.",
+                                      "comment2": ""
+                                    },
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "ModVarObjetTxt"
+                                          },
+                                          "parameters": [
+                                            "AllObjects",
+                                            "Direction",
+                                            "=",
+                                            "\"Move\""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "MettreXY"
+                                          },
+                                          "parameters": [
+                                            "Marker",
+                                            "=",
+                                            "Marker.X() + Variable(XMove)",
+                                            "=",
+                                            "Marker.Y() + Variable(YMove)"
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "When the marker reached a controlled object, we remve the marker because this controlled object already have a marker on the next cell.\nThis other marker will continue to look further there is no need to do it 2 times.",
+                                  "comment2": ""
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "CollisionNP"
+                                      },
+                                      "parameters": [
+                                        "Marker",
+                                        "AllObjects",
+                                        "",
+                                        "",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "Controlled",
+                                        "True"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "Delete"
+                                      },
+                                      "parameters": [
+                                        "Marker",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Reached walls",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "When the marker has finished moving and the cell contains a stop object, it means that there is actually no room to move.\nWe have to go back and tell objects they can't move. ReturnMarker is used for this.",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::ForEach",
+                              "object": "Marker",
+                              "conditions": [],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "CollisionNP"
+                                      },
+                                      "parameters": [
+                                        "Marker",
+                                        "AllObjects",
+                                        "",
+                                        "",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ObjectVariableAsBoolean"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "Stop",
+                                        "True"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "Create"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "ReturnMarker",
+                                        "Marker.X() - Variable(XMove)",
+                                        "Marker.Y() - Variable(YMove)",
+                                        "\"\""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Delete"
+                                      },
+                                      "parameters": [
+                                        "Marker",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::ForEach",
+                              "object": "ReturnMarker",
+                              "conditions": [],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "infiniteLoopWarning": true,
+                                  "type": "BuiltinCommonInstructions::While",
+                                  "whileConditions": [
+                                    {
+                                      "type": {
+                                        "value": "CollisionNP"
+                                      },
+                                      "parameters": [
+                                        "ReturnMarker",
+                                        "AllObjects",
+                                        "",
+                                        "",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "VarObjetTxt"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "Direction",
+                                        "=",
+                                        "\"Move\""
+                                      ]
+                                    }
+                                  ],
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjetTxt"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "Direction",
+                                        "=",
+                                        "\"None\""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "MettreXY"
+                                      },
+                                      "parameters": [
+                                        "ReturnMarker",
+                                        "=",
+                                        "ReturnMarker.X() - Variable(XMove)",
+                                        "=",
+                                        "ReturnMarker.Y() - Variable(YMove)"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Move objects that can",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Blue markers that still exist are on free cells. It means that at least one block can move there.",
+                              "comment2": ""
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "SceneInstancesCount"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Marker",
+                                    ">",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "Save all objects position before moving them.\nThese positions are used to undo moves.",
+                                  "comment2": ""
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::ForEach",
+                                  "object": "AllObjects",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "ObjectVariablePushNumber"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "XPosition",
+                                        "AllObjects.X()"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ObjectVariablePushNumber"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "YPosition",
+                                        "AllObjects.Y()"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "Move any object that was marked to move, and set a wait timer to toggle the DidMovementTweenEnd at the time the movement tween would have ended.",
+                                  "comment2": ""
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "VarObjetTxt"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "Direction",
+                                        "=",
+                                        "\"Move\""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "Tween::AddObjectPositionTween"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "Tween",
+                                        "\"Move\"",
+                                        "AllObjects.X() + Variable(XMove)",
+                                        "AllObjects.Y() + Variable(YMove)",
+                                        "\"easeOutCubic\"",
+                                        "200",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarObjetTxt"
+                                      },
+                                      "parameters": [
+                                        "AllObjects",
+                                        "Direction",
+                                        "=",
+                                        "\"None\""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarSceneTxt"
+                                      },
+                                      "parameters": [
+                                        "GameState",
+                                        "=",
+                                        "\"PlayMovementAnimation\""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Wait"
+                                      },
+                                      "parameters": [
+                                        "0.2"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ModVarSceneTxt"
+                                      },
+                                      "parameters": [
+                                        "GameState",
+                                        "=",
+                                        "\"WaitPlayerInput\""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Delete"
+                                  },
+                                  "parameters": [
+                                    "Marker",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Delete"
+                                  },
+                                  "parameters": [
+                                    "ReturnMarker",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Go back a turn",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Use the previous positions saved for every object to move objects back to their position from the previous turn.\nThese positions are removed from the array, so doing it again will go back one step further.",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
+                          },
+                          "parameters": [
+                            "ReverseTurnButton",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "AllObjects.VariableChildCount(YPosition)",
                             ">",
                             "0"
                           ]
                         }
                       ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetSceneVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "DidMoveHappen",
-                            "True"
-                          ]
-                        }
-                      ],
+                      "actions": [],
                       "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "Save all objects position before moving them.\nThese positions are used to undo moves.",
-                          "comment2": ""
-                        },
                         {
                           "type": "BuiltinCommonInstructions::ForEach",
                           "object": "AllObjects",
@@ -5987,128 +6059,100 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "ObjectVariablePushNumber"
+                                "value": "MettreX"
                               },
                               "parameters": [
                                 "AllObjects",
-                                "XPosition",
-                                "AllObjects.X()"
+                                "=",
+                                "AllObjects.Variable(XPosition[AllObjects.VariableChildCount(XPosition) - 1])"
                               ]
                             },
                             {
                               "type": {
-                                "value": "ObjectVariablePushNumber"
+                                "value": "MettreY"
+                              },
+                              "parameters": [
+                                "AllObjects",
+                                "=",
+                                "AllObjects.Variable(YPosition[AllObjects.VariableChildCount(YPosition) - 1])"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectVariableRemoveAt"
+                              },
+                              "parameters": [
+                                "AllObjects",
+                                "XPosition",
+                                "AllObjects.VariableChildCount(XPosition) - 1"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectVariableRemoveAt"
                               },
                               "parameters": [
                                 "AllObjects",
                                 "YPosition",
-                                "AllObjects.Y()"
+                                "AllObjects.VariableChildCount(YPosition) - 1"
                               ]
                             }
                           ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Delete"
-                          },
-                          "parameters": [
-                            "Marker",
-                            ""
-                          ]
                         },
                         {
-                          "type": {
-                            "value": "Delete"
+                          "type": "BuiltinCommonInstructions::Link",
+                          "include": {
+                            "includeConfig": 0
                           },
-                          "parameters": [
-                            "ReturnMarker",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Move any object that was marked to move, and set a wait timer to toggle the DidMovementTweenEnd at the time the movement tween would have ended.",
-                      "comment2": ""
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarObjetTxt"
-                          },
-                          "parameters": [
-                            "AllObjects",
-                            "Direction",
-                            "=",
-                            "\"Move\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Tween::AddObjectPositionTween"
-                          },
-                          "parameters": [
-                            "AllObjects",
-                            "Tween",
-                            "\"Move\"",
-                            "AllObjects.X() + Variable(XMove)",
-                            "AllObjects.Y() + Variable(YMove)",
-                            "\"easeOutCubic\"",
-                            "200",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjetTxt"
-                          },
-                          "parameters": [
-                            "AllObjects",
-                            "Direction",
-                            "=",
-                            "\"None\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Wait"
-                          },
-                          "parameters": [
-                            "0.2"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetSceneVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "DidMovementTweenEnd",
-                            "True"
-                          ]
+                          "target": "FindAndUpdateRulesFromTextBlocks"
                         }
                       ]
                     }
                   ],
                   "parameters": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "PlayMovementAnimation",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "GameState",
+                    "=",
+                    "\"PlayMovementAnimation\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Nothing is done in this state.\nThe game state is set back to the other state after the wait action above.",
+                  "comment2": ""
                 }
               ]
             }
@@ -6147,112 +6191,6 @@
                     "CurrentSceneName()",
                     ""
                   ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Go back a turn",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Use the previous positions saved for every object to move objects back to their position from the previous turn.\nThese positions are removed from the array, so doing it again will go back one step further.",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "PanelSpriteButton::PanelSpriteButton::IsClicked"
-                  },
-                  "parameters": [
-                    "ReverseTurnButton",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::CompareNumbers"
-                  },
-                  "parameters": [
-                    "AllObjects.VariableChildCount(YPosition)",
-                    ">",
-                    "0"
-                  ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "AllObjects",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "MettreX"
-                      },
-                      "parameters": [
-                        "AllObjects",
-                        "=",
-                        "AllObjects.Variable(XPosition[AllObjects.VariableChildCount(XPosition) - 1])"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "MettreY"
-                      },
-                      "parameters": [
-                        "AllObjects",
-                        "=",
-                        "AllObjects.Variable(YPosition[AllObjects.VariableChildCount(YPosition) - 1])"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ObjectVariableRemoveAt"
-                      },
-                      "parameters": [
-                        "AllObjects",
-                        "XPosition",
-                        "AllObjects.VariableChildCount(XPosition) - 1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ObjectVariableRemoveAt"
-                      },
-                      "parameters": [
-                        "AllObjects",
-                        "YPosition",
-                        "AllObjects.VariableChildCount(YPosition) - 1"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "FindAndUpdateRulesFromTextBlocks"
                 }
               ]
             }
