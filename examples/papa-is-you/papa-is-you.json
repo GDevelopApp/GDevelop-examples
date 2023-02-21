@@ -595,7 +595,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.4038196492803209,
+        "zoomFactor": 0.45986522709186245,
         "windowMask": false
       },
       "objectsGroups": [
@@ -3166,21 +3166,6 @@
           "customSize": false,
           "height": 0,
           "layer": "",
-          "name": "TextMan",
-          "persistentUuid": "da1a942e-d67e-4ef1-a580-8f213b0e8e35",
-          "width": 0,
-          "x": 1056,
-          "y": 416,
-          "zOrder": 27,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
           "name": "TextIs",
           "persistentUuid": "50fa3b59-4417-4a46-84a4-caf241569496",
           "width": 0,
@@ -3217,6 +3202,21 @@
           "x": 800,
           "y": 96,
           "zOrder": 51,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "TextMan",
+          "persistentUuid": "789d9e31-6f85-4bd1-9527-6012623ba147",
+          "width": 0,
+          "x": 1056,
+          "y": 416,
+          "zOrder": 27,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -4919,7 +4919,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Player input",
+          "name": "Resetting values and checking win conditions",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -4959,7 +4959,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "If the movement tween ended, update the rules.",
+              "comment": "If the movement tween ended, update the rules and check if the player has won the game.",
               "comment2": ""
             },
             {
@@ -4993,9 +4993,129 @@
                     "includeConfig": 0
                   },
                   "target": "FindAndUpdateRulesFromTextBlocks"
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Check game success",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "The game is won if a \"Controlled\" object is in collision with a \"Win\" object, or if a single object has both of those variables set to true.\nThis is checked by creating a marker object on top of any object that has a true \"Win\" variable, and then checking if that is in collision with an object that has the \"Controlled\" variable set to true.",
+                      "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "AllObjects",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "AllObjects",
+                            "Win",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Marker",
+                            "AllObjects.X()",
+                            "AllObjects.Y()",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "Marker",
+                            "AllObjects",
+                            "",
+                            "",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "AllObjects",
+                            "Controlled",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ShowLayer"
+                          },
+                          "parameters": [
+                            "",
+                            "\"WinGame\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "Marker",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
                 }
               ]
-            },
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Player input",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
               "type": "BuiltinCommonInstructions::Comment",
               "color": {
@@ -5989,131 +6109,6 @@
                     }
                   ],
                   "parameters": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "DidMoveHappen",
-                        "True"
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "colorB": 228,
-                      "colorG": 176,
-                      "colorR": 74,
-                      "creationTime": 0,
-                      "name": "Check game success",
-                      "source": "",
-                      "type": "BuiltinCommonInstructions::Group",
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "The game is won if a \"Controlled\" object is in collision with a \"Win\" object, or if a single object has both of those variables set to true.\nThis is checked by creating a marker object on top of any object that has a true \"Win\" variable, and then checking if that is in collision with an object that has the \"Controlled\" variable set to true.",
-                          "comment2": ""
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::ForEach",
-                          "object": "AllObjects",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "ObjectVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "AllObjects",
-                                "Win",
-                                "True"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Create"
-                              },
-                              "parameters": [
-                                "",
-                                "Marker",
-                                "AllObjects.X()",
-                                "AllObjects.Y()",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "CollisionNP"
-                              },
-                              "parameters": [
-                                "Marker",
-                                "AllObjects",
-                                "",
-                                "",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ObjectVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "AllObjects",
-                                "Controlled",
-                                "True"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "ShowLayer"
-                              },
-                              "parameters": [
-                                "",
-                                "\"WinGame\""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Delete"
-                              },
-                              "parameters": [
-                                "Marker",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "parameters": []
-                    }
-                  ]
                 }
               ]
             }
