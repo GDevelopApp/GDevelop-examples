@@ -9,3 +9,5 @@ The example features:
 - Simple scoring system
 - Leaderboard
 - Text input object(For leaderboard name)
+
+Check out [the YouTube video](https://www.youtube.com/watch?v=cPwUh1669Gs&list=PL3YlZTdKiS88Of4lET8JuQl3gAqLpOkoF) that explains how to use the physics behavior.
