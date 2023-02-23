@@ -21,6 +21,8 @@ const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
 /** @typedef {import('./types').gdProject} gdProject */
 /** @typedef {import('./types').gdPlatformExtension} gdPlatformExtension */
 /** @typedef {import('./types').Example} Example */
+/** @typedef {import('./types').ExampleUsedExtension} ExampleUsedExtension */
+/** @typedef {import('./types').ExampleEventsBasedExtension} ExampleEventsBasedExtension */
 /** @typedef {import('./types').ExampleShortHeader} ExampleShortHeader */
 
 if (!args['gdevelop-root-path']) {
@@ -273,26 +275,41 @@ const extractExamples = async (
             : instructionsCount < 500
             ? 'big'
             : 'huge';
-        /** @type {{name: string, fullName: string}[]} */
+        /** @type {ExampleUsedExtension[]} */
         const usedExtensions = gd.UsedExtensionsFinder.scanProject(project)
           .getUsedExtensions()
           .toNewVectorString()
           .toJSArray()
           .map(
             /** @param {string} name */
-            (name) => ({
-              name,
-              fullName: platformExtensionsMap[name]
-                ? platformExtensionsMap[name].getFullName()
-                : '',
-            })
+            (name) => {
+              const platformExtension = platformExtensionsMap[name];
+              if (!platformExtension) {
+                return { name, fullName: '', helpPath: '', iconUrl: '' };
+              }
+
+              /** @type {ExampleUsedExtension} */
+              const usedExtension = {
+                name,
+                fullName: platformExtension.getFullName(),
+                helpPath: platformExtension.getHelpPath(),
+                iconUrl: platformExtension.getIconUrl(),
+                category: platformExtension.getCategory(),
+              };
+              return usedExtension;
+            }
           );
-        /** @type {{name: string, fullName: string}[]} */
+        /** @type {ExampleEventsBasedExtension[]} */
         const eventsBasedExtensions = [];
         for (let i = 0; i < project.getEventsFunctionsExtensionsCount(); ++i) {
+          const extension = project.getEventsFunctionsExtensionAt(i);
           eventsBasedExtensions.push({
-            name: project.getEventsFunctionsExtensionAt(i).getName(),
-            fullName: project.getEventsFunctionsExtensionAt(i).getFullName(),
+            name: extension.getName(),
+            fullName: extension.getFullName(),
+            helpPath: extension.getHelpPath(),
+            category: extension.getCategory(),
+            previewIconUrl: extension.getPreviewIconUrl(),
+            authorIds: extension.getAuthorIds().toJSArray(),
           });
         }
 
