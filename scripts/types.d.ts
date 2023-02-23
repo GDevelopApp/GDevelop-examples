@@ -1,3 +1,20 @@
+export interface ExampleUsedExtension {
+  name: string;
+  fullName: string;
+  helpPath: string;
+  iconUrl: string;
+  category: string;
+}
+
+export interface ExampleEventsBasedExtension {
+  name: string;
+  fullName: string;
+  helpPath: string;
+  previewIconUrl: string;
+  authorIds: string[];
+  category: string;
+}
+
 /**
  * Describe an example and all the useful information about it.
  */
@@ -17,8 +34,8 @@ export interface Example {
   description: string;
   projectFileUrl: string;
 
-  usedExtensions: Array<{ name: string; fullName: string }>;
-  eventsBasedExtensions: Array<{ name: string; fullName: string }>;
+  usedExtensions: Array<ExampleUsedExtension>;
+  eventsBasedExtensions: Array<ExampleEventsBasedExtension>;
 }
 
 /**
