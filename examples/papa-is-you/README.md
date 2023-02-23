@@ -1,3 +1,3 @@
 Building upon the sokoban example, it adds mechanics similar to Baba is You, a hit indie puzzle game made by Arvi Teikari in 2019.
 
-In this example you play using typical sokoban controls, but you'll also move text blocks that can turn on and off different logic to solve puzzles in the game. With the eventual goal of each level being to put an object with the "win" logic in collision with an object with the "controlled" logic.
+In this example, you play using typical Sokoban controls, but there is a twist: you'll also push text blocks that change the game rules to solve puzzles.
