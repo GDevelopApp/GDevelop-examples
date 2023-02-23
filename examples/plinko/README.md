@@ -10,4 +10,4 @@ The example features:
 - Leaderboard
 - Text input object(For leaderboard name)
 
-Check out [the YouTube video](https://youtube.com/playlist?list=PL3YlZTdKiS88Of4lET8JuQl3gAqLpOkoF) that explains how to use the physics behavior.
+Check out [the YouTube video](https://www.youtube.com/watch?v=cPwUh1669Gs&list=PL3YlZTdKiS88Of4lET8JuQl3gAqLpOkoF) that explains how to use the physics behavior.
