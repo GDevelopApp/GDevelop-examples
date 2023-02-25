@@ -19,7 +19,7 @@
     "useExternalSourceFiles": false,
     "version": "1.0.0",
     "name": "Fly From Fire!",
-    "description": "Example game that demonstrates the \"Connected Terrain Generator\" extension.",
+    "description": "Example game that demonstrates the \"Generate Connected Terrain\" extension.",
     "author": "GDevelop",
     "windowWidth": 1280,
     "windowHeight": 720,
@@ -73,10 +73,18 @@
       "showGDevelopSplash": true,
       "showProgressBar": true
     },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
     "authorIds": [
       "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
     ],
-    "categories": [],
+    "authorUsernames": [],
+    "categories": [
+      "action",
+      "racing"
+    ],
     "playableDevices": [
       "keyboard"
     ],
@@ -277,7 +285,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.1,
         "snap": true,
-        "zoomFactor": 0.9197304541837493,
+        "zoomFactor": 0.7733980419227857,
         "windowMask": false
       },
       "objectsGroups": [
@@ -969,7 +977,7 @@
         },
         {
           "assetStoreId": "b566c4946296cbfd3dd9fda66484059c0db2f4a54a721be5e315b071b3b1abd1",
-          "name": "Fluff",
+          "name": "FluffBalls",
           "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
@@ -990,7 +998,7 @@
               "shapeOffsetY": 0,
               "polygonOrigin": "Center",
               "vertices": [],
-              "density": 0.1,
+              "density": 0.01,
               "friction": 0,
               "restitution": 0.1,
               "linearDamping": 0.1,
@@ -1077,34 +1085,6 @@
                   ]
                 },
                 {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Noise::Create"
-                      },
-                      "parameters": [
-                        "",
-                        "\"Terrain\"",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Noise::SetFrequency"
-                      },
-                      "parameters": [
-                        "",
-                        "0.04",
-                        "\"Terrain\"",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
@@ -1116,24 +1096,6 @@
                         "",
                         "0.40",
                         "",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Noise::SetOctaves"
-                      },
-                      "parameters": [
-                        "",
-                        "4",
-                        "\"Terrain\"",
                         ""
                       ]
                     }
@@ -1200,6 +1162,16 @@
                       "parameters": [
                         "FireMovementSpeed",
                         "=",
+                        "10"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "TargetAngle",
+                        "=",
                         "0"
                       ]
                     }
@@ -1209,26 +1181,6 @@
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "TargetAngle",
-                        "=",
-                        "10"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "NoiseAngle",
-                        "=",
-                        "Variable(TargetAngle)"
-                      ]
-                    },
                     {
                       "type": {
                         "value": "Noise::SetSeed"
@@ -1250,6 +1202,111 @@
                       ]
                     }
                   ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Generate connected terrain (ON DEMAND)",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "GenerateConnectedTerrain::NextTerrainX()",
+                    "<",
+                    "CameraBorderRight()"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "GenerateConnectedTerrain::GenerateConnectedTerrain"
+                  },
+                  "parameters": [
+                    "",
+                    "TerrainSegment",
+                    "1",
+                    "Variable(TargetAngle)",
+                    "0",
+                    "0",
+                    "Variable(SegmentLength)",
+                    "Variable(SegmentThickness)",
+                    "Variable(MaxDeviation)",
+                    "\"Terrain\"",
+                    "\"\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GenerateConnectedTerrain::DrawTerrainFillArea"
+                  },
+                  "parameters": [
+                    "",
+                    "Ground",
+                    "TerrainSegment",
+                    "\"below\"",
+                    "1000",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "GenerateConnectedTerrain::FillTerrainArea"
+                  },
+                  "parameters": [
+                    "",
+                    "Ground",
+                    "FillTexture",
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Create fluff",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "FluffBalls",
+                            "GenerateConnectedTerrain::NextTerrainX()",
+                            "GenerateConnectedTerrain::NextTerrainY() - 64",
+                            "\"\""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
                 }
               ]
             }
@@ -1284,11 +1341,25 @@
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "name": "Configure random noise for terrain generation",
+                  "name": "Configure random noise for terrain generation (optional)",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "If this is not run manually, it will be run automatically with default values when \"Generate segments of connected terrain\" is run.",
+                      "comment2": ""
+                    },
+                    {
+                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
@@ -1321,6 +1392,7 @@
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
                     {
+                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
@@ -1352,7 +1424,7 @@
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "name": "Draw the fill area",
+                  "name": "Draw the outline of the fill area",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
@@ -1369,7 +1441,7 @@
                             "Ground",
                             "TerrainSegment",
                             "\"below\"",
-                            "20000",
+                            "1000",
                             ""
                           ]
                         }
@@ -1412,7 +1484,6 @@
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "folded": true,
                   "name": "Create player",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
@@ -1472,6 +1543,16 @@
                         },
                         {
                           "type": {
+                            "value": "ChangePlan"
+                          },
+                          "parameters": [
+                            "Trail",
+                            "=",
+                            "Player.ZOrder() - 1"
+                          ]
+                        },
+                        {
+                          "type": {
                             "value": "Sticker::Sticker::Stick"
                           },
                           "parameters": [
@@ -1506,9 +1587,9 @@
                           },
                           "parameters": [
                             "",
-                            "Fluff",
+                            "FluffBalls",
                             "TerrainSegment.CenterX()",
-                            "TerrainSegment.BoundingBoxTop()",
+                            "TerrainSegment.BoundingBoxTop() - 64",
                             "\"\""
                           ]
                         }
@@ -1522,7 +1603,6 @@
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "folded": true,
                   "name": "Create finish line",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
@@ -1569,64 +1649,6 @@
                     }
                   ],
                   "parameters": []
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::CompareNumbers"
-                  },
-                  "parameters": [
-                    "GenerateConnectedTerrain::NextTerrainX()",
-                    "<",
-                    "CameraBorderRight()"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "GenerateConnectedTerrain::AddMoreConnectedTerrain"
-                  },
-                  "parameters": [
-                    "",
-                    "TerrainSegment",
-                    "1",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BoundingBoxLeft"
-                  },
-                  "parameters": [
-                    "TerrainSegment",
-                    "<",
-                    "CameraBorderRight()"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "GenerateConnectedTerrain::AddMoreConnectedTerrain"
-                  },
-                  "parameters": [
-                    "",
-                    "TerrainSegment",
-                    "1",
-                    ""
-                  ]
                 }
               ]
             }
@@ -1682,116 +1704,6 @@
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BoundingBoxLeft"
-                  },
-                  "parameters": [
-                    "TerrainSegment",
-                    "<",
-                    "Player.CenterX()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BoundingBoxRight"
-                  },
-                  "parameters": [
-                    "TerrainSegment",
-                    ">",
-                    "Player.CenterX()"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "FollowObjectsWithCamera::FollowObjectsWithCamera"
-                  },
-                  "parameters": [
-                    "",
-                    "AllObjects",
-                    "Variable(CameraPadding)",
-                    "Variable(CameraPadding)",
-                    "0",
-                    "0.40",
-                    "\"\"",
-                    "",
-                    "0.1",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetCameraCenterX"
-                  },
-                  "parameters": [
-                    "",
-                    "=",
-                    "lerp(CameraCenterX(),Variable(NextPosX),0.05)",
-                    "",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetCameraCenterY"
-                  },
-                  "parameters": [
-                    "",
-                    "=",
-                    "lerp(CameraCenterY(),Variable(NextPosY),0.05)",
-                    "",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ZoomCamera"
-                  },
-                  "parameters": [
-                    "",
-                    "clamp(2000 / Player.Physics2::LinearVelocity(), 0.1, 0.5)",
-                    "\"\"",
-                    "0"
-                  ]
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "TiledSpriteObject::XOffset"
-                  },
-                  "parameters": [
-                    "FillTexture",
-                    "=",
-                    "CameraCenterX()"
-                  ]
-                }
-              ]
-            },
-            {
               "colorB": 228,
               "colorG": 176,
               "colorR": 74,
@@ -1823,15 +1735,6 @@
                         "=",
                         "clamp(Variable(CameraPadding) - 30, 0, 10000)"
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "Montre"
-                      },
-                      "parameters": [
-                        "CameraZoom_Text",
-                        ""
-                      ]
                     }
                   ]
                 },
@@ -1858,64 +1761,6 @@
                         "=",
                         "clamp(Variable(CameraPadding) + 30, 0, 10000)"
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "Montre"
-                      },
-                      "parameters": [
-                        "CameraZoom_Text",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "KeyPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "NumpadSubtract"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "KeyPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "NumpadAdd"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Wait"
-                      },
-                      "parameters": [
-                        "3"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Cache"
-                      },
-                      "parameters": [
-                        "CameraZoom_Text"
-                      ]
                     }
                   ]
                 },
@@ -1937,6 +1782,50 @@
                 }
               ],
               "parameters": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BoundingBoxLeft"
+                  },
+                  "parameters": [
+                    "TerrainSegment",
+                    "<",
+                    "Player.CenterX()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BoundingBoxRight"
+                  },
+                  "parameters": [
+                    "TerrainSegment",
+                    ">",
+                    "Player.CenterX()"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "FollowObjectsWithCamera::FollowObjectsWithCamera"
+                  },
+                  "parameters": [
+                    "",
+                    "TerrainSegment",
+                    "Variable(CameraPadding)",
+                    "Variable(CameraPadding)",
+                    "0",
+                    "0.30",
+                    "\"\"",
+                    "",
+                    "0.1",
+                    ""
+                  ]
+                }
+              ]
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -1966,53 +1855,10 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "folded": true,
           "name": "Player Controls",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Prevent rolling backwards",
-              "comment2": ""
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Physics2::LinearVelocityX"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Physics2",
-                    "<",
-                    "0"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Physics2::LinearVelocityX"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Physics2",
-                    "=",
-                    "1"
-                  ]
-                }
-              ]
-            },
             {
               "type": "BuiltinCommonInstructions::Comment",
               "color": {
@@ -2141,24 +1987,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Physics2::LinearVelocityX"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Physics2",
-                    "<",
-                    "1500"
-                  ]
-                }
-              ],
-              "actions": []
             },
             {
               "type": "BuiltinCommonInstructions::Comment",
@@ -2387,6 +2215,19 @@
               ]
             },
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Move normally when buttons are released or when fliding hits the ground",
+              "comment2": ""
+            },
+            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -2495,6 +2336,48 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Prevent rolling backwards",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Physics2::LinearVelocityX"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Physics2",
+                    "<",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics2::LinearVelocityX"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Physics2",
+                    "=",
+                    "1"
+                  ]
+                }
+              ]
             }
           ],
           "parameters": []
@@ -2508,6 +2391,19 @@
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Create fire particle emitters based on a set speed",
+              "comment2": ""
+            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -2534,6 +2430,106 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "TerrainSegment",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BoundingBoxLeft"
+                      },
+                      "parameters": [
+                        "TerrainSegment",
+                        "<",
+                        "Variable(FireX)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "TerrainSegment",
+                        "IsBurning",
+                        "False"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "TerrainSegment",
+                        "IsBurning",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Flame",
+                        "TerrainSegment.CenterX()",
+                        "TerrainSegment.CenterY()",
+                        "TerrainSegment.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangePlan"
+                      },
+                      "parameters": [
+                        "Flame",
+                        "=",
+                        "Player.ZOrder() - 1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Flame",
+                        "=",
+                        "270"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleSystem::ZoneRadius"
+                      },
+                      "parameters": [
+                        "Flame",
+                        "=",
+                        "Variable(SegmentLength) / 2"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Player dies when the fire reaches the right side of the screen",
+              "comment2": ""
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -2599,107 +2595,17 @@
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "TerrainSegment",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BoundingBoxLeft"
-                      },
-                      "parameters": [
-                        "TerrainSegment",
-                        "<",
-                        "Variable(FireX)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ObjectVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "TerrainSegment",
-                        "IsBurning",
-                        "False"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetObjectVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "TerrainSegment",
-                        "IsBurning",
-                        "True"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Create"
-                      },
-                      "parameters": [
-                        "",
-                        "Flame",
-                        "TerrainSegment.CenterX()",
-                        "TerrainSegment.CenterY()",
-                        "TerrainSegment.Layer()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ChangePlan"
-                      },
-                      "parameters": [
-                        "Flame",
-                        "=",
-                        "TerrainSegment.ZOrder() - 1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetAngle"
-                      },
-                      "parameters": [
-                        "Flame",
-                        "=",
-                        "270"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ParticleSystem::ZoneRadius"
-                      },
-                      "parameters": [
-                        "Flame",
-                        "=",
-                        "Variable(SegmentLength)/2"
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ParticleSystem::SetFlow"
-                  },
-                  "parameters": [
-                    "Flame",
-                    "=",
-                    "75"
-                  ]
-                }
-              ]
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Stop all flame emitters that are outside the screen to the left",
+              "comment2": ""
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -2729,60 +2635,81 @@
               ]
             },
             {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Explode fluff",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
                 {
-                  "type": {
-                    "value": "CenterX"
-                  },
-                  "parameters": [
-                    "Flame",
-                    "<",
-                    "CameraBorderLeft()"
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "FluffBalls",
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Distance"
+                          },
+                          "parameters": [
+                            "Flame",
+                            "FluffBalls",
+                            "64",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::ApplyPolarImpulse"
+                          },
+                          "parameters": [
+                            "FluffBalls",
+                            "Physics2",
+                            "RandomInRange(230,310)",
+                            "0.001",
+                            "FluffBalls.Physics2::MassCenterX()",
+                            "FluffBalls.Physics2::MassCenterY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeColor"
+                          },
+                          "parameters": [
+                            "FluffBalls",
+                            "\"245;166;35\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Wait"
+                          },
+                          "parameters": [
+                            "1"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "FluffBalls",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ParticleSystem::SetFlow"
-                  },
-                  "parameters": [
-                    "Flame",
-                    "=",
-                    "0"
-                  ]
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "CenterX"
-                  },
-                  "parameters": [
-                    "Flame",
-                    ">=",
-                    "CameraBorderLeft()"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ParticleSystem::SetFlow"
-                  },
-                  "parameters": [
-                    "Flame",
-                    "=",
-                    "75"
-                  ]
-                }
-              ]
+              "parameters": []
             }
           ],
           "parameters": []
@@ -22781,24 +22708,22 @@
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoYXJ0LWxpbmUtdmFyaWFudCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0zLjUsMTguNUw5LjUsMTIuNUwxMy41LDE2LjVMMjIsNi45MkwyMC41OSw1LjVMMTMuNSwxMy41TDkuNSw5LjVMMiwxN0wzLjUsMTguNVoiIC8+PC9zdmc+",
       "name": "GenerateConnectedTerrain",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/b582ce7ce3d317321b6ea813c8284f54fc82a482c8550a18caf194fd799bd9b4_chart-line-variant.svg",
-      "shortDescription": "Generate connected terrain in a direction with variation from random noise.",
+      "shortDescription": "Generate connected terrain that heads towards a target angle with random variation.\n",
       "version": "0.0.1",
       "description": [
-        "Steps 1 and 2 are required to create connected terrain.",
-        "Steps 3 and 4 can be used to fill in the area above/below the terrain objects.",
-        "",
-        "Step 1: Configure random noise used to generate terrain",
-        "- Parameters can be left blank to accept defaults or these parameters can be changed to customize how your terrain looks. ",
-        "- Frequency is an important value to experiment with.",
+        "Step 1 (optional): Configure the random noise used to generate terrain",
+        "- Useful for customizing how the terrain looks",
+        "- Frequency is used to zoom in/out",
+        "- Seed can be used to recreate the exact same terrain each time the level is started",
         "",
         "Step 2: Generate connected terrain",
-        "- Creates objects that touch each other on the sides and are rotated to head towards a target angle, with variation based on random noise.",
+        "- Creates objects that touch each other on the sides and generally heads towards a target angle but with random variation based on simplex noise",
         "",
         "Step 3: Draw terrain fill area",
-        "- Use a shape-painter object to draw the shape of the area above or below the terrain.",
+        "- Use a shape-painter object to draw the shape of the area above or below the terrain",
         "",
         "Step 4: Fill terrain area",
-        "- Use a tiled-sprite object to fill the area that was drawn by the shape-painter."
+        "- Use a tiled-sprite object to fill the terrain area that was drawn by the shape-painter"
       ],
       "tags": [
         "procedural",
@@ -23003,6 +22928,21 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetSceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "__GenerateConnectedTerrain.IsNoiseConfigured",
+                    "True"
+                  ]
+                }
+              ]
             }
           ],
           "parameters": [
@@ -23046,98 +22986,151 @@
           "sentence": "Generate _PARAM2_ segments of _PARAM1_ terrain (length: _PARAM6_, thickness: _PARAM7_, layer: _PARAM9_) starting at position _PARAM4_,_PARAM5_, with a target angle of _PARAM3_ degrees (max deviation: _PARAM8_ degrees)",
           "events": [
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Configure noise with default values if it has not be configured before",
+              "comment2": ""
+            },
+            {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "__GenerateConnectedTerrain.IsNoiseConfigured",
+                    "False"
+                  ]
+                }
+              ],
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "GenerateConnectedTerrain::ConfigureTerrainNoise"
                   },
                   "parameters": [
-                    "SegmentThickness",
-                    "=",
-                    "GetArgumentAsNumber(\"SegmentThickness\")"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "SegmentLength",
-                    "=",
-                    "GetArgumentAsNumber(\"SegmentLength\")"
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
                   ]
                 }
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "NoiseAngle",
-                    "=",
-                    "GetArgumentAsNumber(\"TargetAngle\")"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "NextPosY",
-                    "=",
-                    "GetArgumentAsNumber(\"NextPosY\")"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "NextPosX",
-                    "=",
-                    "GetArgumentAsNumber(\"NextPosX\")"
-                  ]
-                }
-              ]
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set starting position (but only if one was provided)",
+              "comment2": ""
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
+              "conditions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "CompareArgumentAsNumber"
                   },
                   "parameters": [
-                    "SegmentsCreated",
-                    "=",
+                    "\"StartPosX\"",
+                    "!=",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CompareArgumentAsNumber"
+                  },
+                  "parameters": [
+                    "\"StartPosY\"",
+                    "!=",
                     "0"
                   ]
                 }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__GenerateConnectedTerrain.NextPosX",
+                    "=",
+                    "GetArgumentAsNumber(\"NextPosX\")"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__GenerateConnectedTerrain.NextPosY",
+                    "=",
+                    "GetArgumentAsNumber(\"NextPosY\")"
+                  ]
+                }
               ]
             },
             {
-              "infiniteLoopWarning": true,
-              "type": "BuiltinCommonInstructions::While",
-              "whileConditions": [
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Set the initial noise angle to the target angle",
+              "comment2": ""
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
                 {
                   "type": {
                     "value": "VarScene"
                   },
                   "parameters": [
-                    "SegmentsCreated",
-                    "<",
-                    "GetArgumentAsNumber(\"SegmentsToCreate\")"
+                    "__GenerateConnectedTerrain.NoiseAngle",
+                    "=",
+                    "0"
                   ]
                 }
               ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__GenerateConnectedTerrain.NoiseAngle",
+                    "=",
+                    "GetArgumentAsNumber(\"TargetAngle\")"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "GetArgumentAsNumber(\"SegmentsToCreate\")",
               "conditions": [],
               "actions": [],
               "events": [
@@ -23161,8 +23154,8 @@
                           "parameters": [
                             "",
                             "TerrainObject",
-                            "Variable(NextPosX)",
-                            "Variable(NextPosY)",
+                            "Variable(__GenerateConnectedTerrain.NextPosX)",
+                            "Variable(__GenerateConnectedTerrain.NextPosY)",
                             "GetArgumentAsString(\"Layer\")"
                           ]
                         }
@@ -23173,7 +23166,7 @@
                           "colorG": 176,
                           "colorR": 74,
                           "creationTime": 0,
-                          "name": "Use correct size",
+                          "name": "Use correct size of terrain",
                           "source": "",
                           "type": "BuiltinCommonInstructions::Group",
                           "events": [
@@ -23188,7 +23181,7 @@
                                   "parameters": [
                                     "TerrainObject",
                                     "=",
-                                    "Variable(SegmentLength)"
+                                    "GetArgumentAsNumber(\"SegmentLength\")"
                                   ]
                                 },
                                 {
@@ -23198,7 +23191,7 @@
                                   "parameters": [
                                     "TerrainObject",
                                     "=",
-                                    "Variable(SegmentThickness)"
+                                    "GetArgumentAsNumber(\"SegmentThickness\")"
                                   ]
                                 }
                               ]
@@ -23211,7 +23204,7 @@
                           "colorG": 176,
                           "colorR": 74,
                           "creationTime": 0,
-                          "name": "Move center to previous center",
+                          "name": "Start with the center of new terrain at the center of previous terrain",
                           "source": "",
                           "type": "BuiltinCommonInstructions::Group",
                           "events": [
@@ -23226,9 +23219,9 @@
                                   "parameters": [
                                     "TerrainObject",
                                     "=",
-                                    "Variable(NextPosX)",
+                                    "Variable(__GenerateConnectedTerrain.NextPosX)",
                                     "=",
-                                    "Variable(NextPosY)"
+                                    "Variable(__GenerateConnectedTerrain.NextPosY)"
                                   ]
                                 }
                               ]
@@ -23241,10 +23234,23 @@
                           "colorG": 176,
                           "colorR": 74,
                           "creationTime": 0,
-                          "name": "Move to the end of the previous object",
+                          "name": "Move new terrain to the end of the previous object",
                           "source": "",
                           "type": "BuiltinCommonInstructions::Group",
                           "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Note: This uses the noise angle from the previously created object (which is why we set the initial noise angle to target angle)",
+                              "comment2": ""
+                            },
                             {
                               "type": "BuiltinCommonInstructions::Standard",
                               "conditions": [],
@@ -23256,9 +23262,9 @@
                                   "parameters": [
                                     "TerrainObject",
                                     "+",
-                                    "XFromAngleAndDistance(Variable(NoiseAngle), Variable(SegmentLength)/2)",
+                                    "XFromAngleAndDistance(Variable(__GenerateConnectedTerrain.NoiseAngle), GetArgumentAsNumber(\"SegmentLength\") / 2)",
                                     "+",
-                                    "YFromAngleAndDistance(Variable(NoiseAngle), Variable(SegmentLength)/2)"
+                                    "YFromAngleAndDistance(Variable(__GenerateConnectedTerrain.NoiseAngle), GetArgumentAsNumber(\"SegmentLength\") / 2)"
                                   ]
                                 }
                               ]
@@ -23271,7 +23277,7 @@
                           "colorG": 176,
                           "colorR": 74,
                           "creationTime": 0,
-                          "name": "Set the angle based on random noise",
+                          "name": "Set the terrain angle based on random noise",
                           "source": "",
                           "type": "BuiltinCommonInstructions::Group",
                           "events": [
@@ -23284,9 +23290,9 @@
                                     "value": "ModVarScene"
                                   },
                                   "parameters": [
-                                    "NoiseValue",
+                                    "__GenerateConnectedTerrain.NoiseValue",
                                     "=",
-                                    "GenerateConnectedTerrain::Noise1d(\"GenerateConnectedTerrain\", Variable(SegmentID))"
+                                    "GenerateConnectedTerrain::Noise1d(\"GenerateConnectedTerrain\", Variable(__GenerateConnectedTerrain.SegmentID))"
                                   ]
                                 },
                                 {
@@ -23294,9 +23300,9 @@
                                     "value": "ModVarScene"
                                   },
                                   "parameters": [
-                                    "NoiseAngle",
+                                    "__GenerateConnectedTerrain.NoiseAngle",
                                     "=",
-                                    "GetArgumentAsNumber(\"TargetAngle\") + GenerateConnectedTerrain::Map(Variable(NoiseValue), -1, 1, -GetArgumentAsNumber(\"MaxAngleDeviation\"), GetArgumentAsNumber(\"MaxAngleDeviation\"))"
+                                    "GetArgumentAsNumber(\"TargetAngle\") + GenerateConnectedTerrain::Map(Variable(__GenerateConnectedTerrain.NoiseValue), -1, 1, -GetArgumentAsNumber(\"MaxAngleDeviation\"), GetArgumentAsNumber(\"MaxAngleDeviation\"))"
                                   ]
                                 },
                                 {
@@ -23306,7 +23312,7 @@
                                   "parameters": [
                                     "TerrainObject",
                                     "=",
-                                    "Variable(NoiseAngle)"
+                                    "Variable(__GenerateConnectedTerrain.NoiseAngle)"
                                   ]
                                 }
                               ]
@@ -23319,7 +23325,7 @@
                           "colorG": 176,
                           "colorR": 74,
                           "creationTime": 0,
-                          "name": "Move in the direction the object is facing",
+                          "name": "Move terrain in the direction the object is facing",
                           "source": "",
                           "type": "BuiltinCommonInstructions::Group",
                           "events": [
@@ -23334,9 +23340,9 @@
                                   "parameters": [
                                     "TerrainObject",
                                     "+",
-                                    "XFromAngleAndDistance(Variable(NoiseAngle), Variable(SegmentLength) / 2)",
+                                    "XFromAngleAndDistance(Variable(__GenerateConnectedTerrain.NoiseAngle), GetArgumentAsNumber(\"SegmentLength\") / 2)",
                                     "+",
-                                    "YFromAngleAndDistance(Variable(NoiseAngle), Variable(SegmentLength) / 2)"
+                                    "YFromAngleAndDistance(Variable(__GenerateConnectedTerrain.NoiseAngle), GetArgumentAsNumber(\"SegmentLength\") / 2)"
                                   ]
                                 }
                               ]
@@ -23363,9 +23369,31 @@
                                   },
                                   "parameters": [
                                     "TerrainObject",
+                                    "NoiseValue",
+                                    "=",
+                                    "Variable(__GenerateConnectedTerrain.NoiseValue)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "TerrainObject",
+                                    "NoiseAngle",
+                                    "=",
+                                    "Variable(__GenerateConnectedTerrain.NoiseAngle)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "TerrainObject",
                                     "SegmentID",
                                     "=",
-                                    "Variable(SegmentID)"
+                                    "Variable(__GenerateConnectedTerrain.SegmentID)"
                                   ]
                                 },
                                 {
@@ -23378,17 +23406,6 @@
                                     "=",
                                     "GetArgumentAsNumber(\"TargetAngle\")"
                                   ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "ModVarObjet"
-                                  },
-                                  "parameters": [
-                                    "TerrainObject",
-                                    "NoiseValue",
-                                    "=",
-                                    "Variable(SegmentID)"
-                                  ]
                                 }
                               ]
                             }
@@ -23400,7 +23417,7 @@
                           "colorG": 176,
                           "colorR": 74,
                           "creationTime": 0,
-                          "name": "Update position for next segment",
+                          "name": "Update variables for next segment",
                           "source": "",
                           "type": "BuiltinCommonInstructions::Group",
                           "events": [
@@ -23413,7 +23430,7 @@
                                     "value": "ModVarScene"
                                   },
                                   "parameters": [
-                                    "NextPosX",
+                                    "__GenerateConnectedTerrain.NextPosX",
                                     "=",
                                     "TerrainObject.CenterX()"
                                   ]
@@ -23423,9 +23440,19 @@
                                     "value": "ModVarScene"
                                   },
                                   "parameters": [
-                                    "NextPosY",
+                                    "__GenerateConnectedTerrain.NextPosY",
                                     "=",
                                     "TerrainObject.CenterY()"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "__GenerateConnectedTerrain.SegmentID",
+                                    "+",
+                                    "1"
                                   ]
                                 }
                               ]
@@ -23437,32 +23464,6 @@
                     }
                   ],
                   "parameters": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "SegmentsCreated",
-                        "+",
-                        "1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "SegmentID",
-                        "+",
-                        "1"
-                      ]
-                    }
-                  ]
                 }
               ]
             }
@@ -23514,53 +23515,6 @@
               "description": "Layer",
               "name": "Layer",
               "type": "layer"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Add additional terrain that is connected to previously created terrain. New terrain will use the same parameters as the initial terrain.",
-          "fullName": "Add more connected terrain",
-          "functionType": "Action",
-          "name": "AddMoreConnectedTerrain",
-          "sentence": "Add _PARAM2_ segments of terrain using _PARAM1_",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "GenerateConnectedTerrain::GenerateConnectedTerrain"
-                  },
-                  "parameters": [
-                    "",
-                    "TerrainObject",
-                    "GetArgumentAsNumber(\"SegmentsToCreate\")",
-                    "Variable(TargetAngle)",
-                    "GenerateConnectedTerrain::NextTerrainX()",
-                    "GenerateConnectedTerrain::NextTerrainY()",
-                    "Variable(SegmentLength)",
-                    "Variable(SegmentThickness)",
-                    "Variable(MaxDeviation)",
-                    "VariableString(NoiseGenerator)",
-                    "VariableString(TerrainLayer)"
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Terrain object",
-              "name": "TerrainObject",
-              "supplementaryInformation": "Sprite",
-              "type": "objectList"
-            },
-            {
-              "description": "Quantity of segments",
-              "name": "SegmentsToCreate",
-              "type": "expression"
             }
           ],
           "objectGroups": []
@@ -23686,6 +23640,19 @@
                   ]
                 },
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Start drawing at the first terrain segment",
+                  "comment2": ""
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
@@ -23707,8 +23674,8 @@
                       },
                       "parameters": [
                         "ShapePainterObject",
-                        "TerrainObject.CenterX()",
-                        "TerrainObject.BoundingBoxCenterY()"
+                        "TerrainObject.X()",
+                        "TerrainObject.Y()"
                       ]
                     }
                   ]
@@ -23730,20 +23697,8 @@
                   ]
                 },
                 {
-                  "infiniteLoopWarning": true,
-                  "type": "BuiltinCommonInstructions::While",
-                  "whileConditions": [
-                    {
-                      "type": {
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "SegmentToDraw",
-                        "<=",
-                        "SceneInstancesCount(TerrainObject)"
-                      ]
-                    }
-                  ],
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "SceneInstancesCount(TerrainObject)",
                   "conditions": [],
                   "actions": [],
                   "events": [
@@ -23769,16 +23724,10 @@
                           },
                           "parameters": [
                             "ShapePainterObject",
-                            "TerrainObject.CenterX()",
-                            "TerrainObject.CenterY()"
+                            "TerrainObject.BoundingBoxCenterX()",
+                            "TerrainObject.BoundingBoxCenterY()"
                           ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
+                        },
                         {
                           "type": {
                             "value": "ModVarScene"
@@ -23804,7 +23753,7 @@
                       "parameters": [
                         "ShapePainterObject",
                         "ValuesOfMultipleObjects::MaxX(TerrainObject)",
-                        "100000"
+                        "ValuesOfMultipleObjects::MaxY(TerrainObject) + GetArgumentAsNumber(\"VerticalPadding\")"
                       ]
                     },
                     {
@@ -23864,7 +23813,7 @@
           "fullName": "Fill terrain area using a tiled sprite",
           "functionType": "Action",
           "name": "FillTerrainArea",
-          "sentence": "Fill the terrain area that was drawn with _PARAM1_ using _PARAM2_ for the texture.",
+          "sentence": "Fill the terrain area that was drawn with _PARAM1_ and use _PARAM2_ for the texture.",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -23948,7 +23897,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(NextPosX)"
+                    "Variable(__GenerateConnectedTerrain.NextPosX)"
                   ]
                 }
               ]
@@ -23976,7 +23925,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(NextPosY)"
+                    "Variable(__GenerateConnectedTerrain.NextPosY)"
                   ]
                 }
               ]
