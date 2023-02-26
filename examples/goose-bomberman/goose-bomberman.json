@@ -450,6 +450,15 @@
         "name": "ExplosionDoigt-Anim4.png",
         "smoothed": true,
         "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "assets/FlammeBonus.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\FlammeBonus.png",
+        "smoothed": true,
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -1912,17 +1921,6 @@
             },
             {
               "name": "Player4"
-            }
-          ]
-        },
-        {
-          "name": "Bonus",
-          "objects": [
-            {
-              "name": "BombBonus"
-            },
-            {
-              "name": "FlameBonus"
             }
           ]
         },
@@ -3830,7 +3828,7 @@
         },
         {
           "assetStoreId": "",
-          "name": "BombBonus",
+          "name": "Bonus",
           "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
@@ -3885,21 +3883,9 @@
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "assetStoreId": "",
-          "name": "FlameBonus",
-          "tags": "",
-          "type": "Sprite",
-          "updateIfNotVisible": false,
-          "variables": [],
-          "effects": [],
-          "behaviors": [],
-          "animations": [
+            },
             {
-              "name": "NewObject",
+              "name": "FlameBonus",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -3907,8 +3893,8 @@
                   "timeBetweenFrames": 0.08,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": true,
-                      "image": "FlammeBonus.png",
+                      "hasCustomCollisionMask": false,
+                      "image": "assets\\FlammeBonus.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -3921,26 +3907,7 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 16,
-                            "y": 16
-                          },
-                          {
-                            "x": 32,
-                            "y": 16
-                          },
-                          {
-                            "x": 32,
-                            "y": 32
-                          },
-                          {
-                            "x": 16,
-                            "y": 32
-                          }
-                        ]
-                      ]
+                      "customCollisionMask": []
                     }
                   ]
                 }
@@ -6391,6 +6358,127 @@
                       },
                       "comment": "Check that no bomb is already on this square.\nThe negation of \"Is there at least one bomb on this square?\" is equivalent to \"Is there no bomb on this square?\".\nThis is not the same as having the negation directly on the condition because it would mean \"Is there a bomb that is not on this square?\".",
                       "comment2": ""
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Not"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "CollisionPoint"
+                              },
+                              "parameters": [
+                                "Bomb",
+                                "round(Player.X() / 48) * 48 + 24",
+                                "round(Player.Y() / 48) * 48 + 24"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Bomb",
+                            "round(Player.X() / 48) * 48",
+                            "round(Player.Y() / 48) * 48",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangePlan"
+                          },
+                          "parameters": [
+                            "Bomb",
+                            "=",
+                            "Bomb.Y() + 10"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResetObjectTimer"
+                          },
+                          "parameters": [
+                            "Bomb",
+                            "\"Detonator\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "BombPut",
+                            "+",
+                            "1"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Bomb",
+                            "Range",
+                            "=",
+                            "Player.Variable(Range)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "BombX",
+                            "=",
+                            "Bomb.X()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "BombY",
+                            "=",
+                            "Bomb.Y()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Bomb",
+                            "PlayerNum",
+                            "=",
+                            "Player.Variable(Number)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Bomb",
+                            "IsNew",
+                            "True"
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
@@ -6887,18 +6975,7 @@
       "events": [
         {
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "VarScene"
-              },
-              "parameters": [
-                "Bonus",
-                "=",
-                "1"
-              ]
-            }
-          ],
+          "conditions": [],
           "actions": [
             {
               "type": {
@@ -6906,7 +6983,7 @@
               },
               "parameters": [
                 "",
-                "BombBonus",
+                "Bonus",
                 "Variable(BonusX)",
                 "Variable(BonusY)",
                 ""
@@ -6917,77 +6994,18 @@
                 "value": "ChangePlan"
               },
               "parameters": [
-                "BombBonus",
+                "Bonus",
                 "=",
-                "BombBonus.Y() + 10"
+                "Bonus.Y() + 10"
               ]
             },
             {
               "type": {
                 "value": "ChangeHeight"
-              },
-              "parameters": [
-                "BombBonus",
-                "=",
-                "48"
-              ]
-            },
-            {
-              "type": {
-                "value": "ChangeWidth"
-              },
-              "parameters": [
-                "BombBonus",
-                "=",
-                "48"
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "VarScene"
               },
               "parameters": [
                 "Bonus",
                 "=",
-                "2"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
-                "FlameBonus",
-                "Variable(BonusX)",
-                "Variable(BonusY)",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "ChangePlan"
-              },
-              "parameters": [
-                "FlameBonus",
-                "=",
-                "FlameBonus.Y() + 10"
-              ]
-            },
-            {
-              "type": {
-                "value": "ChangeHeight"
-              },
-              "parameters": [
-                "FlameBonus",
-                "=",
                 "48"
               ]
             },
@@ -6996,9 +7014,19 @@
                 "value": "ChangeWidth"
               },
               "parameters": [
-                "FlameBonus",
+                "Bonus",
                 "=",
                 "48"
+              ]
+            },
+            {
+              "type": {
+                "value": "ChangeAnimation"
+              },
+              "parameters": [
+                "Bonus",
+                "=",
+                "Variable(Bonus)"
               ]
             }
           ]
@@ -7493,157 +7521,125 @@
               },
               "parameters": [
                 "Player",
-                "BombBonus",
+                "Bonus",
                 "",
                 "",
                 ""
               ]
             }
           ],
-          "actions": [
+          "actions": [],
+          "events": [
             {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Player",
-                "BombCapacity",
-                "+",
-                "1"
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "AnimationName"
+                  },
+                  "parameters": [
+                    "Bonus",
+                    "\"BombBonus\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Player",
+                    "BombCapacity",
+                    "+",
+                    "1"
+                  ]
+                }
               ]
             },
             {
-              "type": {
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "newIndex",
-                "=",
-                "Player.VariableChildCount(Bonus) + 1"
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "AnimationName"
+                  },
+                  "parameters": [
+                    "Bonus",
+                    "\"FlameBonus\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Range",
+                    "+",
+                    "1"
+                  ]
+                }
               ]
             },
             {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Player",
-                "Bonus[VariableString(newIndex)][\"Number\"]",
-                "=",
-                "1"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Player",
-                "Bonus[VariableString(newIndex)][\"X\"]",
-                "=",
-                "BombBonus.X()"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Player",
-                "Bonus[VariableString(newIndex)][\"Y\"]",
-                "=",
-                "BombBonus.Y()"
-              ]
-            },
-            {
-              "type": {
-                "value": "Delete"
-              },
-              "parameters": [
-                "BombBonus",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "CollisionNP"
-              },
-              "parameters": [
-                "Player",
-                "FlameBonus",
-                "",
-                "",
-                ""
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Player",
-                "Range",
-                "+",
-                "1"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "newIndex",
-                "=",
-                "Player.VariableChildCount(Bonus) + 1"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Player",
-                "Bonus[VariableString(newIndex)][\"Number\"]",
-                "=",
-                "2"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Player",
-                "Bonus[VariableString(newIndex)][\"X\"]",
-                "=",
-                "FlameBonus.X()"
-              ]
-            },
-            {
-              "type": {
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "Player",
-                "Bonus[VariableString(newIndex)][\"Y\"]",
-                "=",
-                "FlameBonus.Y()"
-              ]
-            },
-            {
-              "type": {
-                "value": "Delete"
-              },
-              "parameters": [
-                "FlameBonus",
-                ""
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "newIndex",
+                    "=",
+                    "Player.VariableChildCount(Bonus) + 1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Bonus[VariableString(newIndex)][\"Number\"]",
+                    "=",
+                    "Bonus.Animation()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Bonus[VariableString(newIndex)][\"X\"]",
+                    "=",
+                    "Bonus.X()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Bonus[VariableString(newIndex)][\"Y\"]",
+                    "=",
+                    "Bonus.Y()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Bonus",
+                    ""
+                  ]
+                }
               ]
             }
           ]
