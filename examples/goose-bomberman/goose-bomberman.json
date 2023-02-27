@@ -4189,7 +4189,7 @@
                   "timeBetweenFrames": 0.08,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "assets\\FlammeBonus.png",
                       "points": [],
                       "originPoint": {
@@ -4203,7 +4203,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 16,
+                            "y": 16
+                          },
+                          {
+                            "x": 32,
+                            "y": 16
+                          },
+                          {
+                            "x": 32,
+                            "y": 32
+                          },
+                          {
+                            "x": 16,
+                            "y": 32
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -5039,34 +5058,6 @@
                   "parameters": [
                     "Score",
                     ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ModVarObjet"
-                  },
-                  "parameters": [
-                    "Player",
-                    "BombCapacity",
-                    "=",
-                    "GlobalVariable(Bomb)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarObjet"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Range",
-                    "=",
-                    "GlobalVariable(Flame)"
                   ]
                 }
               ]
@@ -6588,33 +6579,12 @@
                         },
                         {
                           "type": {
-                            "value": "VarObjet"
-                          },
-                          "parameters": [
-                            "Player",
-                            "BombPut",
-                            "<",
-                            "Player.Variable(BombCapacity)"
-                          ]
-                        },
-                        {
-                          "type": {
                             "value": "BuiltinCommonInstructions::Once"
                           },
                           "parameters": []
                         }
                       ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetSceneVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "bombAlreadyExist",
-                            "="
-                          ]
-                        }
-                      ],
+                      "actions": [],
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Comment",
@@ -6632,6 +6602,17 @@
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
+                            {
+                              "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "Player",
+                                "BombPut",
+                                "<",
+                                "Player.Variable(BombCapacity)"
+                              ]
+                            },
                             {
                               "type": {
                                 "value": "BuiltinCommonInstructions::Not"
@@ -7104,12 +7085,11 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetSceneVariableAsBoolean"
                   },
                   "parameters": [
                     "scoreHasChanged",
-                    "=",
-                    "0"
+                    "False"
                   ]
                 }
               ]
@@ -7162,23 +7142,21 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarScene"
+                        "value": "SetSceneVariableAsBoolean"
                       },
                       "parameters": [
                         "scoreHasChanged",
-                        "=",
-                        "1"
+                        "True"
                       ]
                     },
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "SetObjectVariableAsBoolean"
                       },
                       "parameters": [
                         "Player",
                         "Death",
-                        "=",
-                        "1"
+                        "True"
                       ]
                     }
                   ],
@@ -7267,26 +7245,24 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "VarObjet"
+                        "value": "ObjectVariableAsBoolean"
                       },
                       "parameters": [
                         "Player",
                         "Death",
-                        "=",
-                        "1"
+                        "True"
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "SetObjectVariableAsBoolean"
                       },
                       "parameters": [
                         "Player",
                         "Death",
-                        "=",
-                        "0"
+                        "False"
                       ]
                     },
                     {
@@ -7340,12 +7316,11 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "VarScene"
+                    "value": "SceneVariableAsBoolean"
                   },
                   "parameters": [
                     "scoreHasChanged",
-                    "=",
-                    "1"
+                    "True"
                   ]
                 }
               ],
@@ -11432,10 +11407,11 @@
       "dependencies": [],
       "eventsFunctions": [
         {
-          "fullName": "Explose a bombe",
+          "description": "Explode a bombe into 4 lines of Explosion objects.",
+          "fullName": "Explode a bombe",
           "functionType": "Action",
           "name": "Explode",
-          "sentence": "_PARAM1_ explose in _PARAM2_ and is stoped by _PARAM3_",
+          "sentence": "_PARAM1_ explose into _PARAM2_ and is stoped by _PARAM3_",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Comment",
@@ -11605,6 +11581,7 @@
           "objectGroups": []
         },
         {
+          "description": "Create one line of Explosion object in a given direction.",
           "fullName": "Create an explosion arm",
           "functionType": "Action",
           "name": "CreateExplosionArm",
@@ -12112,6 +12089,7 @@
       "dependencies": [],
       "eventsFunctions": [
         {
+          "description": "Create a bonus at specified position.",
           "fullName": "Create bonus",
           "functionType": "Action",
           "name": "CreateBonus",
@@ -12205,12 +12183,51 @@
       ],
       "eventsBasedBehaviors": [
         {
-          "description": "",
-          "fullName": "",
+          "description": "A player that picks up bonuses to become more powerful.",
+          "fullName": "Player",
           "name": "Player",
           "objectType": "",
           "eventsFunctions": [
             {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Player::Player::ResetPowers"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::Player",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Pick up a bonus and gain powers.",
               "fullName": "Pick up bonus",
               "functionType": "Action",
               "name": "PickUpBonus",
@@ -12294,7 +12311,7 @@
                       "parameters": [
                         "newIndex",
                         "=",
-                        "Object.VariableChildCount(Bonus) + 1"
+                        "Object.VariableChildCount(Bonus)"
                       ]
                     },
                     {
@@ -12365,7 +12382,7 @@
             },
             {
               "description": "The bonus accumulated by the dead player come back to their initial locations.",
-              "fullName": "",
+              "fullName": "Give back all bonuses",
               "functionType": "Action",
               "name": "GiveBackBonuses",
               "sentence": "_PARAM0_ give back all _PARAM2_",
@@ -12376,24 +12393,12 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "Player::Player::ResetPowers"
                       },
                       "parameters": [
                         "Object",
-                        "Range",
-                        "=",
-                        "GlobalVariable(Flame)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "Object",
-                        "BombCapacity",
-                        "=",
-                        "GlobalVariable(Bomb)"
+                        "Behavior",
+                        ""
                       ]
                     }
                   ]
@@ -12409,14 +12414,14 @@
                       "parameters": [
                         "iteration",
                         "=",
-                        "1"
+                        "0"
                       ]
                     }
                   ]
                 },
                 {
                   "type": "BuiltinCommonInstructions::Repeat",
-                  "repeatExpression": "Player.VariableChildCount(Bonus)",
+                  "repeatExpression": "Object.VariableChildCount(Bonus)",
                   "conditions": [],
                   "actions": [
                     {
@@ -12477,6 +12482,57 @@
                   "name": "Bonus",
                   "supplementaryInformation": "Sprite",
                   "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Reset powers",
+              "functionType": "Action",
+              "name": "ResetPowers",
+              "private": true,
+              "sentence": "Reset powers of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Range",
+                        "=",
+                        "GlobalVariable(Flame)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "BombCapacity",
+                        "=",
+                        "GlobalVariable(Bomb)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::Player",
+                  "type": "behavior"
                 }
               ],
               "objectGroups": []
