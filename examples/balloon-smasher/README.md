@@ -1,0 +1,1 @@
+Show how to smash balloons with touch or cursor.
