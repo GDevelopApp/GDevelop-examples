@@ -8381,7 +8381,7 @@
           ],
           "animations": [
             {
-              "name": "idle",
+              "name": "Idle",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -27798,6 +27798,7 @@
                         "NavMeshPathfindingBehavior",
                         "TopDownMovement",
                         "TopDownMovementAnimator",
+                        "NavMeshPathfindingAnimator",
                         ""
                       ]
                     }
@@ -28471,9 +28472,9 @@
                         "value": "BuiltinCommonInstructions::CompareNumbers"
                       },
                       "parameters": [
-                        "abs(mod(Object.Behavior::SharedPropertyNewAnimationDirection() - Object.Behavior::PropertyAnimationDirection(), Object.Behavior::PropertyDirectionCount()))",
+                        "abs(Object.Behavior:: DirectionDifference(Object.Behavior::SharedPropertyNewAnimationDirection(), Object.Behavior::PropertyAnimationDirection()))",
                         ">",
-                        "0.5 + 0.0625"
+                        "0.5 + 0.03125"
                       ]
                     }
                   ],
@@ -28819,7 +28820,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "mod((Object.TopDownMovement::Angle() + Object.Behavior::PropertyAngleOffset()) * Object.Behavior::PropertyDirectionCount() / 360, Object.Behavior::PropertyDirectionCount())"
+                        "(Object.TopDownMovement::Angle() + Object.Behavior::PropertyAngleOffset()) * Object.Behavior::PropertyDirectionCount() / 360"
                       ]
                     }
                   ]
@@ -28840,6 +28841,58 @@
                   "name": "Behavior",
                   "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
                   "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the difference between 2 directions.",
+              "fullName": "Direction dirrerence",
+              "functionType": "Expression",
+              "name": "DirectionDifference",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "mod(mod(GetArgumentAsNumber(\"Direction\") - GetArgumentAsNumber(\"OtherDirection\"), Object.Behavior::PropertyDirectionCount()) + Object.Behavior::PropertyDirectionCount() / 2, Object.Behavior::PropertyDirectionCount()) - Object.Behavior::PropertyDirectionCount() / 2"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Direction",
+                  "name": "Direction",
+                  "type": "expression"
+                },
+                {
+                  "description": "Other direction",
+                  "name": "OtherDirection",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -28877,7 +28930,7 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "round(GetArgumentAsNumber(\"Value\"))"
+                        "mod(mod(round(GetArgumentAsNumber(\"Value\")), Object.Behavior::PropertyDirectionCount()) + Object.Behavior::PropertyDirectionCount(), Object.Behavior::PropertyDirectionCount())"
                       ]
                     },
                     {
@@ -29051,19 +29104,6 @@
           "sentence": "Choose the animation of _PARAM1_ according to the movement",
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "When moving, set the animation according to the direction of the movement (we can automatically compute it. For example, if the angle is 180 degrees (i.e: left), the direction will be 1 + 180/45  = 5). This allow us to make only one action, rather than adding conditions for every direction.\nThis supposes that animation #0 is the Idle animation, and the others animation are in the right order (animation #1 is the right, and then ordered in a clock wise manner).",
-              "comment2": ""
-            },
-            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -29216,12 +29256,11 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ChangeAnimation"
+                    "value": "SetAnimationName"
                   },
                   "parameters": [
                     "Mindy",
-                    "=",
-                    "0"
+                    "\"Idle\""
                   ]
                 }
               ]
@@ -41899,9 +41938,9 @@
                         "value": "BuiltinCommonInstructions::CompareNumbers"
                       },
                       "parameters": [
-                        "abs(mod(Object.Behavior::SharedPropertyNewAnimationDirection() - Object.Behavior::PropertyAnimationDirection(), Object.Behavior::PropertyDirectionCount()))",
+                        "abs(Object.Behavior:: DirectionDifference(Object.Behavior::SharedPropertyNewAnimationDirection(), Object.Behavior::PropertyAnimationDirection()))",
                         ">",
-                        "0.5 + 0.0625"
+                        "0.5 + 0.03125"
                       ]
                     }
                   ],
@@ -42247,7 +42286,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "mod((Object.NavMeshPathfinding::MovementAngle() + Object.Behavior::PropertyAngleOffset()) * Object.Behavior::PropertyDirectionCount() / 360, Object.Behavior::PropertyDirectionCount())"
+                        "(Object.NavMeshPathfinding::MovementAngle() + Object.Behavior::PropertyAngleOffset()) * Object.Behavior::PropertyDirectionCount() / 360"
                       ]
                     }
                   ]
@@ -42268,6 +42307,58 @@
                   "name": "Behavior",
                   "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
                   "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the difference between 2 directions.",
+              "fullName": "Direction dirrerence",
+              "functionType": "Expression",
+              "name": "DirectionDifference",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "mod(mod(GetArgumentAsNumber(\"Direction\") - GetArgumentAsNumber(\"OtherDirection\"), Object.Behavior::PropertyDirectionCount()) + Object.Behavior::PropertyDirectionCount() / 2, Object.Behavior::PropertyDirectionCount()) - Object.Behavior::PropertyDirectionCount() / 2"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Direction",
+                  "name": "Direction",
+                  "type": "expression"
+                },
+                {
+                  "description": "Other direction",
+                  "name": "OtherDirection",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -42305,7 +42396,7 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "round(GetArgumentAsNumber(\"Value\"))"
+                        "mod(mod(round(GetArgumentAsNumber(\"Value\")), Object.Behavior::PropertyDirectionCount()) + Object.Behavior::PropertyDirectionCount(), Object.Behavior::PropertyDirectionCount())"
                       ]
                     },
                     {
