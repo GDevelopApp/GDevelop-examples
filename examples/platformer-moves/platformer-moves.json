@@ -44,12 +44,17 @@
       "showGDevelopSplash": true,
       "showProgressBar": true
     },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
     "authorIds": [
       "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
       "JD2xwvKWgodlqsGiL1GCH3tDEwq1",
       "q8ubdigLvIRXLxsJDDTaokO41mc2",
       "UMcf9dzu8pVV84ZSLaGAtUB8PyF2"
     ],
+    "authorUsernames": [],
     "categories": [],
     "playableDevices": [
       "keyboard",
@@ -4923,7 +4928,7 @@
     },
     {
       "author": "",
-      "category": "",
+      "category": "Camera",
       "extensionNamespace": "",
       "fullName": "Smooth Camera",
       "helpPath": "",
@@ -4931,11 +4936,11 @@
       "name": "SmoothCamera",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_camcoder_gopro_go_pro_camera.svg",
       "shortDescription": "Smoothly scroll to follow an object.",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "description": [
         "The camera follows an object according to:",
         "- a frame rate independent catch-up speed to make the scrolling from smooth to strong",
-        "- a maximum speed to do linear following or slow down the camera when teleporting the object",
+        "- a maximum speed to do linear following ([open the project online](https://editor.gdevelop.io/?project=example://platformer-with-tilemap)) or slow down the camera when teleporting the object",
         "- a follow-free zone to avoid scrolling on small movements",
         "- an offset to see further in one direction",
         "- an extra delay and catch-up speed to give an impression of speed (useful for dash)",
@@ -5996,7 +6001,7 @@
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "name": "Linear regression vector used by the forcasting.",
+                  "name": "Linear regression vector used by the forecasting.",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
@@ -6845,12 +6850,52 @@
               "objectGroups": []
             },
             {
-              "description": "Change the camera offset on X axis of an object.",
-              "fullName": "Camera Offset X",
-              "functionType": "Action",
+              "description": "the camera offset on X axis of the object. This is not the current difference between the object and the camera position.",
+              "fullName": "Camera offset X",
+              "functionType": "ExpressionAndCondition",
               "group": "Camera configuration",
-              "name": "SetOffsetX",
-              "sentence": "Change the camera offset on X axis of _PARAM0_: _PARAM2_",
+              "name": "OffsetX",
+              "sentence": "the camera offset on X axis",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyCameraOffsetX()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "OffsetX",
+              "name": "SetOffsetXOp",
+              "sentence": "",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -6864,7 +6909,63 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "GetArgumentAsNumber(\"CameraOffsetX\")"
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the camera offset on X axis of an object.",
+              "fullName": "Camera Offset X",
+              "functionType": "Action",
+              "group": "Camera configuration",
+              "name": "SetOffsetX",
+              "private": true,
+              "sentence": "Change the camera offset on X axis of _PARAM0_: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Deprecated use SetOffsetXOp instead.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::SetOffsetXOp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"CameraOffsetX\")",
+                        ""
                       ]
                     }
                   ]
@@ -6891,13 +6992,66 @@
               "objectGroups": []
             },
             {
-              "description": "Change the camera offset on Y axis of an object.",
-              "fullName": "Camera Offset Y",
-              "functionType": "Action",
+              "description": "the camera offset on Y axis of the object. This is not the current difference between the object and the camera position.",
+              "fullName": "Camera offset Y",
+              "functionType": "ExpressionAndCondition",
               "group": "Camera configuration",
-              "name": "SetOffsetY",
-              "sentence": "Change the camera offset on Y axis of _PARAM0_: _PARAM2_",
+              "name": "OffsetY",
+              "sentence": "the camera offset on Y axis",
               "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyCameraOffsetY()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "OffsetY",
+              "name": "SetOffsetYOp",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Deprecated use SetOffsetYOp instead.",
+                  "comment2": ""
+                },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
@@ -6910,7 +7064,50 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "GetArgumentAsNumber(\"CameraOffsetY\")"
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the camera offset on Y axis of an object.",
+              "fullName": "Camera Offset Y",
+              "functionType": "Action",
+              "group": "Camera configuration",
+              "name": "SetOffsetY",
+              "private": true,
+              "sentence": "Change the camera offset on Y axis of _PARAM0_: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::SetOffsetYOp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"CameraOffsetY\")",
+                        ""
                       ]
                     }
                   ]
@@ -6929,8 +7126,8 @@
                   "type": "behavior"
                 },
                 {
-                  "description": "Camera offset X",
-                  "name": "CameraOffsetX",
+                  "description": "Camera offset Y",
+                  "name": "CameraOffsetY",
                   "type": "expression"
                 }
               ],
@@ -9031,7 +9228,7 @@
                                   "colorG": 176,
                                   "colorR": 74,
                                   "creationTime": 0,
-                                  "name": "Forcasted position",
+                                  "name": "Forecasted position",
                                   "source": "",
                                   "type": "BuiltinCommonInstructions::Group",
                                   "events": [
@@ -9330,6 +9527,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area left border",
               "description": "",
               "group": "Position",
@@ -9340,6 +9538,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area right border",
               "description": "",
               "group": "Position",
@@ -9350,6 +9549,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area top border",
               "description": "",
               "group": "Position",
@@ -9360,6 +9560,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area bottom border",
               "description": "",
               "group": "Position",
@@ -9370,6 +9571,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Camera offset X",
               "description": "",
               "group": "Position",
@@ -9380,6 +9582,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Camera offset Y",
               "description": "",
               "group": "Position",
@@ -9390,7 +9593,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Camera delay (in seconds)",
+              "unit": "Second",
+              "label": "Camera delay",
               "description": "",
               "group": "Timing",
               "extraInformation": [],
@@ -9400,7 +9604,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Forcast time (in seconds)",
+              "unit": "Second",
+              "label": "Forecast time",
               "description": "",
               "group": "Timing",
               "extraInformation": [],
@@ -9410,7 +9615,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Forecast history duration (in second)",
+              "unit": "Second",
+              "label": "Forecast history duration",
               "description": "",
               "group": "Timing",
               "extraInformation": [],
@@ -9680,7 +9886,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Leftward maximum speed (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Leftward maximum speed",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -9690,7 +9897,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Rightward maximum speed (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Rightward maximum speed",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -9700,7 +9908,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Upward maximum speed (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Upward maximum speed",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -9710,7 +9919,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Downward maximum speed (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Downward maximum speed",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -10009,6 +10219,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area top in the air",
               "description": "",
               "group": "Position",
@@ -10019,6 +10230,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area bottom in the air",
               "description": "",
               "group": "Position",
@@ -10029,6 +10241,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area top on the floor",
               "description": "",
               "group": "Position",
@@ -10039,6 +10252,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area bottom on the floor",
               "description": "",
               "group": "Position",
@@ -10049,7 +10263,7 @@
             {
               "value": "0.95",
               "type": "Number",
-              "label": "Upward speed in the air (in ratio persecond)",
+              "label": "Upward speed in the air (in ratio per second)",
               "description": "",
               "group": "Catch-up speed",
               "extraInformation": [],
@@ -10059,7 +10273,7 @@
             {
               "value": "0.95",
               "type": "Number",
-              "label": "Downward speed in the air (in ratio persecond)",
+              "label": "Downward speed in the air (in ratio per second)",
               "description": "",
               "group": "Catch-up speed",
               "extraInformation": [],
@@ -10069,7 +10283,7 @@
             {
               "value": "0.9",
               "type": "Number",
-              "label": "Upward speed on the floor (in ratio persecond)",
+              "label": "Upward speed on the floor (in ratio per second)",
               "description": "",
               "group": "Catch-up speed",
               "extraInformation": [],
@@ -10079,7 +10293,7 @@
             {
               "value": "0.9",
               "type": "Number",
-              "label": "Downward speed on the floor (in ratio persecond)",
+              "label": "Downward speed on the floor (in ratio per second)",
               "description": "",
               "group": "Catch-up speed",
               "extraInformation": [],
@@ -10089,7 +10303,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Upward maximum speed in the air (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Upward maximum speed in the air",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -10099,7 +10314,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Downward maximum speed in the air (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Downward maximum speed in the air",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -10109,7 +10325,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Upward maximum speed on the floor (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Upward maximum speed on the floor",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -10119,7 +10336,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Downward maximum speed on the floor (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Downward maximum speed on the floor",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -10134,7 +10352,7 @@
     },
     {
       "author": "Entropy",
-      "category": "",
+      "category": "Movement",
       "extensionNamespace": "",
       "fullName": "Advanced platformer movements",
       "helpPath": "",
@@ -10142,15 +10360,21 @@
       "name": "AdvancedJump",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_training_running_run.svg",
       "shortDescription": "Enhancements for the platformer character: air jump, wall jump wall sliding, coyote time and dashing.",
-      "version": "0.1.0",
+      "version": "0.1.2",
       "description": [
         "This provides behaviors that provide jump enhancements for the platformer character:",
         "* The air jump behavior lets platformer characters jump in mid-air.",
         "* The wall jump behavior lets platformer characters jump and slide against walls.",
         "* The coyote time behavior, also known as \"ledge tolerance\", lets players to jump even after their character is no longer touching the ground for a given amount of time. It aims to give players a feeling of control and reduce frustration.",
         "* The horizontal dash behavior makes platformer characters dash horizontally.",
-        "* The dive dash behavior makes platformer characters dash toward the floor."
+        "* The dive dash behavior makes platformer characters dash toward the floor.",
+        "",
+        "An example allows to check it out ([open the project online](https://editor.gdevelop.io/?project=example://platformer-moves))."
       ],
+      "origin": {
+        "identifier": "AdvancedJump",
+        "name": "gdevelop-extension-store"
+      },
       "tags": [
         "platform",
         "ledge tolerance",
@@ -11732,7 +11956,8 @@
             {
               "value": "0.25",
               "type": "Number",
-              "label": "Coyote time duration in seconds",
+              "unit": "Second",
+              "label": "Coyote time duration",
               "description": "",
               "group": "Coyote time",
               "extraInformation": [],
@@ -14412,7 +14637,8 @@
             {
               "value": "0.125",
               "type": "Number",
-              "label": "Jump detection time frame (in seconds)",
+              "unit": "Second",
+              "label": "Jump detection time frame",
               "description": "",
               "group": "Wall jump",
               "extraInformation": [],
@@ -14422,6 +14648,7 @@
             {
               "value": "250",
               "type": "Number",
+              "unit": "PixelSpeed",
               "label": "Side speed",
               "description": "",
               "group": "Wall jump",
@@ -14432,6 +14659,7 @@
             {
               "value": "1500",
               "type": "Number",
+              "unit": "PixelAcceleration",
               "label": "Side acceleration",
               "description": "",
               "group": "Wall jump",
@@ -14442,6 +14670,7 @@
             {
               "value": "0.2",
               "type": "Number",
+              "unit": "Second",
               "label": "Side speed sustain time",
               "description": "",
               "group": "Wall jump",
@@ -14452,6 +14681,7 @@
             {
               "value": "500",
               "type": "Number",
+              "unit": "PixelAcceleration",
               "label": "Gravity",
               "description": "",
               "group": "Wall sliding",
@@ -14462,6 +14692,7 @@
             {
               "value": "350",
               "type": "Number",
+              "unit": "PixelSpeed",
               "label": "Maximum falling speed",
               "description": "",
               "group": "Wall sliding",
@@ -14472,6 +14703,7 @@
             {
               "value": "350",
               "type": "Number",
+              "unit": "PixelSpeed",
               "label": "Impact speed absorption",
               "description": "",
               "group": "Wall sliding",
@@ -14482,6 +14714,7 @@
             {
               "value": "50",
               "type": "Number",
+              "unit": "PixelSpeed",
               "label": "Minimal falling speed",
               "description": "",
               "group": "Wall sliding",
@@ -14926,6 +15159,7 @@
             {
               "value": "3000",
               "type": "Number",
+              "unit": "PixelSpeed",
               "label": "Maximum falling speed",
               "description": "",
               "group": "",
@@ -14936,6 +15170,7 @@
             {
               "value": "1000",
               "type": "Number",
+              "unit": "PixelSpeed",
               "label": "Initial falling speed",
               "description": "",
               "group": "",
@@ -14946,6 +15181,7 @@
             {
               "value": "8000",
               "type": "Number",
+              "unit": "PixelAcceleration",
               "label": "Gravity",
               "description": "",
               "group": "",
