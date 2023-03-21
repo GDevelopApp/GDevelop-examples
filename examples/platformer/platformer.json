@@ -11099,7 +11099,7 @@
       "name": "RectangleMovement",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/shape-rectangle-plus.svg",
       "shortDescription": "Move objects in a rectangular pattern.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "description": [
         "Move objects in a rectangular pattern with easing functions from the Tween extension.",
         "",
@@ -13816,6 +13816,7 @@
             {
               "value": "100",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Width",
               "description": "",
               "group": "Dimension",
@@ -13826,6 +13827,7 @@
             {
               "value": "100",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Height",
               "description": "",
               "group": "Dimension",
@@ -13846,7 +13848,8 @@
             {
               "value": "4",
               "type": "Number",
-              "label": "Horizontal edge duration (in seconds)",
+              "unit": "Second",
+              "label": "Horizontal edge duration",
               "description": "",
               "group": "Speed",
               "extraInformation": [],
@@ -13856,7 +13859,8 @@
             {
               "value": "1",
               "type": "Number",
-              "label": "Vertical edge duration (in seconds)",
+              "unit": "Second",
+              "label": "Vertical edge duration",
               "description": "",
               "group": "Speed",
               "extraInformation": [],
@@ -13990,7 +13994,7 @@
     },
     {
       "author": "",
-      "category": "",
+      "category": "Camera",
       "extensionNamespace": "",
       "fullName": "Smooth Camera",
       "helpPath": "",
@@ -13998,11 +14002,11 @@
       "name": "SmoothCamera",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_camcoder_gopro_go_pro_camera.svg",
       "shortDescription": "Smoothly scroll to follow an object.",
-      "version": "0.1.1",
+      "version": "0.3.0",
       "description": [
         "The camera follows an object according to:",
         "- a frame rate independent catch-up speed to make the scrolling from smooth to strong",
-        "- a maximum speed to do linear following or slow down the camera when teleporting the object",
+        "- a maximum speed to do linear following ([open the project online](https://editor.gdevelop.io/?project=example://platformer-with-tilemap)) or slow down the camera when teleporting the object",
         "- a follow-free zone to avoid scrolling on small movements",
         "- an offset to see further in one direction",
         "- an extra delay and catch-up speed to give an impression of speed (useful for dash)",
@@ -14221,6 +14225,119 @@
               "functionType": "Action",
               "name": "doStepPreEvents",
               "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SmoothCamera::SmoothCamera::PropertyIsCalledManually"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::DoMoveCameraCloser"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Move the camera closer to the object. This action must be called after the object has moved for the frame.",
+              "fullName": "Move the camera closer",
+              "functionType": "Action",
+              "name": "MoveCameraCloser",
+              "sentence": "Move the camera closer to _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "The camera following is called with an action, the call from doStepPreEvents must be disabled to avoid to do it twice.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::SetPropertyIsCalledManually"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::DoMoveCameraCloser"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Move the camera closer to the object.",
+              "fullName": "Do move the camera closer",
+              "functionType": "Action",
+              "name": "DoMoveCameraCloser",
+              "private": true,
+              "sentence": "Do move the camera closer _PARAM0_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Comment",
@@ -14767,7 +14884,7 @@
                             "value": "Egal"
                           },
                           "parameters": [
-                            "Object.VariableChildCount(__SmoothCamera_ForecastHistoryTime)",
+                            "Object.VariableChildCount(__SmoothCamera.ForecastHistoryTime)",
                             ">",
                             "0"
                           ]
@@ -14800,15 +14917,15 @@
                           },
                           "parameters": [
                             "ShapePainter",
-                            "Object.Variable(__SmoothCamera_ForecastHistoryX[0])",
-                            "Object.Variable(__SmoothCamera_ForecastHistoryY[0])"
+                            "Object.Variable(__SmoothCamera.ForecastHistoryX[0])",
+                            "Object.Variable(__SmoothCamera.ForecastHistoryY[0])"
                           ]
                         }
                       ],
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "Object.VariableChildCount(__SmoothCamera_ForecastHistoryX)",
+                          "repeatExpression": "Object.VariableChildCount(__SmoothCamera.ForecastHistoryX)",
                           "conditions": [],
                           "actions": [
                             {
@@ -14817,8 +14934,8 @@
                               },
                               "parameters": [
                                 "ShapePainter",
-                                "Object.Variable(__SmoothCamera_ForecastHistoryX[Object.Behavior::PropertyIndex()])",
-                                "Object.Variable(__SmoothCamera_ForecastHistoryY[Object.Behavior::PropertyIndex()])"
+                                "Object.Variable(__SmoothCamera.ForecastHistoryX[Object.Behavior::PropertyIndex()])",
+                                "Object.Variable(__SmoothCamera.ForecastHistoryY[Object.Behavior::PropertyIndex()])"
                               ]
                             },
                             {
@@ -14950,7 +15067,7 @@
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "name": "Linear regression vector used by the forcasting.",
+                  "name": "Linear regression vector used by the forecasting.",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
@@ -15799,12 +15916,52 @@
               "objectGroups": []
             },
             {
-              "description": "Change the camera offset on X axis of an object.",
-              "fullName": "Camera Offset X",
-              "functionType": "Action",
+              "description": "the camera offset on X axis of the object. This is not the current difference between the object and the camera position.",
+              "fullName": "Camera offset X",
+              "functionType": "ExpressionAndCondition",
               "group": "Camera configuration",
-              "name": "SetOffsetX",
-              "sentence": "Change the camera offset on X axis of _PARAM0_: _PARAM2_",
+              "name": "OffsetX",
+              "sentence": "the camera offset on X axis",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyCameraOffsetX()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "OffsetX",
+              "name": "SetOffsetXOp",
+              "sentence": "",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -15818,7 +15975,63 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "GetArgumentAsNumber(\"CameraOffsetX\")"
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the camera offset on X axis of an object.",
+              "fullName": "Camera Offset X",
+              "functionType": "Action",
+              "group": "Camera configuration",
+              "name": "SetOffsetX",
+              "private": true,
+              "sentence": "Change the camera offset on X axis of _PARAM0_: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Deprecated use SetOffsetXOp instead.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::SetOffsetXOp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"CameraOffsetX\")",
+                        ""
                       ]
                     }
                   ]
@@ -15845,13 +16058,66 @@
               "objectGroups": []
             },
             {
-              "description": "Change the camera offset on Y axis of an object.",
-              "fullName": "Camera Offset Y",
-              "functionType": "Action",
+              "description": "the camera offset on Y axis of the object. This is not the current difference between the object and the camera position.",
+              "fullName": "Camera offset Y",
+              "functionType": "ExpressionAndCondition",
               "group": "Camera configuration",
-              "name": "SetOffsetY",
-              "sentence": "Change the camera offset on Y axis of _PARAM0_: _PARAM2_",
+              "name": "OffsetY",
+              "sentence": "the camera offset on Y axis",
               "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyCameraOffsetY()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "OffsetY",
+              "name": "SetOffsetYOp",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Deprecated use SetOffsetYOp instead.",
+                  "comment2": ""
+                },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
@@ -15864,7 +16130,50 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "GetArgumentAsNumber(\"CameraOffsetY\")"
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera::SmoothCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the camera offset on Y axis of an object.",
+              "fullName": "Camera Offset Y",
+              "functionType": "Action",
+              "group": "Camera configuration",
+              "name": "SetOffsetY",
+              "private": true,
+              "sentence": "Change the camera offset on Y axis of _PARAM0_: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera::SmoothCamera::SetOffsetYOp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"CameraOffsetY\")",
+                        ""
                       ]
                     }
                   ]
@@ -15883,8 +16192,8 @@
                   "type": "behavior"
                 },
                 {
-                  "description": "Camera offset X",
-                  "name": "CameraOffsetX",
+                  "description": "Camera offset Y",
+                  "name": "CameraOffsetY",
                   "type": "expression"
                 }
               ],
@@ -16190,7 +16499,7 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "Object.VariableChildCount(__SmoothCamera_ObjectTime)",
+                        "Object.VariableChildCount(__SmoothCamera.ObjectTime)",
                         "=",
                         "0"
                       ]
@@ -16203,7 +16512,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectTime",
+                        "__SmoothCamera.ObjectTime",
                         "TimeFromStart()"
                       ]
                     },
@@ -16213,7 +16522,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectX",
+                        "__SmoothCamera.ObjectX",
                         "Object.Behavior::PropertyDelayedCenterX()"
                       ]
                     },
@@ -16223,7 +16532,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectY",
+                        "__SmoothCamera.ObjectY",
                         "Object.Behavior::PropertyDelayedCenterY()"
                       ]
                     }
@@ -16340,7 +16649,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectTime",
+                        "__SmoothCamera.ObjectTime",
                         "TimeFromStart()"
                       ]
                     },
@@ -16350,7 +16659,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectX",
+                        "__SmoothCamera.ObjectX",
                         "Object.CenterX()"
                       ]
                     },
@@ -16360,7 +16669,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectY",
+                        "__SmoothCamera.ObjectY",
                         "Object.CenterY()"
                       ]
                     }
@@ -16388,7 +16697,7 @@
                             "value": "Egal"
                           },
                           "parameters": [
-                            "Object.VariableChildCount(__SmoothCamera_ObjectTime)",
+                            "Object.VariableChildCount(__SmoothCamera.ObjectTime)",
                             ">=",
                             "2"
                           ]
@@ -16399,7 +16708,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ObjectTime[1]",
+                            "__SmoothCamera.ObjectTime[1]",
                             "<",
                             "TimeFromStart() - Object.Behavior::CurrentDelay()"
                           ]
@@ -16414,9 +16723,9 @@
                           "parameters": [
                             "Object",
                             "Behavior",
-                            "Object.Variable(__SmoothCamera_ObjectTime[0])",
-                            "Object.Variable(__SmoothCamera_ObjectX[0])",
-                            "Object.Variable(__SmoothCamera_ObjectY[0])",
+                            "Object.Variable(__SmoothCamera.ObjectTime[0])",
+                            "Object.Variable(__SmoothCamera.ObjectX[0])",
+                            "Object.Variable(__SmoothCamera.ObjectY[0])",
                             ""
                           ]
                         },
@@ -16426,7 +16735,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ObjectTime",
+                            "__SmoothCamera.ObjectTime",
                             "0"
                           ]
                         },
@@ -16436,7 +16745,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ObjectX",
+                            "__SmoothCamera.ObjectX",
                             "0"
                           ]
                         },
@@ -16446,7 +16755,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ObjectY",
+                            "__SmoothCamera.ObjectY",
                             "0"
                           ]
                         }
@@ -16477,7 +16786,7 @@
                             "Object",
                             "Behavior",
                             "=",
-                            "Object.Variable(__SmoothCamera_ObjectX[0])"
+                            "Object.Variable(__SmoothCamera.ObjectX[0])"
                           ]
                         },
                         {
@@ -16488,7 +16797,7 @@
                             "Object",
                             "Behavior",
                             "=",
-                            "Object.Variable(__SmoothCamera_ObjectY[0])"
+                            "Object.Variable(__SmoothCamera.ObjectY[0])"
                           ]
                         }
                       ]
@@ -16501,7 +16810,7 @@
                             "value": "Egal"
                           },
                           "parameters": [
-                            "Object.VariableChildCount(__SmoothCamera_ObjectTime)",
+                            "Object.VariableChildCount(__SmoothCamera.ObjectTime)",
                             ">=",
                             "2"
                           ]
@@ -16512,7 +16821,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ObjectTime[0]",
+                            "__SmoothCamera.ObjectTime[0]",
                             "<",
                             "TimeFromStart() - Object.Behavior::CurrentDelay()"
                           ]
@@ -16556,7 +16865,7 @@
                                 "Object",
                                 "Behavior",
                                 "+",
-                                "max(0, TimeDelta() * (1 - min(Object.Behavior::PropertyWaitingSpeedXMax() * abs(Object.Variable(__SmoothCamera_ObjectX[1]) - Object.Variable(__SmoothCamera_ObjectX[0])), Object.Behavior::PropertyWaitingSpeedYMax() * abs(Object.Variable(__SmoothCamera_ObjectY[1]) - Object.Variable(__SmoothCamera_ObjectY[0]))) / (Object.Variable(__SmoothCamera_ObjectTime[1]) - Object.Variable(__SmoothCamera_ObjectTime[0]))))"
+                                "max(0, TimeDelta() * (1 - min(Object.Behavior::PropertyWaitingSpeedXMax() * abs(Object.Variable(__SmoothCamera.ObjectX[1]) - Object.Variable(__SmoothCamera.ObjectX[0])), Object.Behavior::PropertyWaitingSpeedYMax() * abs(Object.Variable(__SmoothCamera.ObjectY[1]) - Object.Variable(__SmoothCamera.ObjectY[0]))) / (Object.Variable(__SmoothCamera.ObjectTime[1]) - Object.Variable(__SmoothCamera.ObjectTime[0]))))"
                               ]
                             }
                           ],
@@ -16605,7 +16914,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "lerp(Object.Variable(__SmoothCamera_ObjectX[1]), Object.Variable(__SmoothCamera_ObjectX[0]), ((TimeFromStart() - Object.Behavior::CurrentDelay()) - Object.Variable(__SmoothCamera_ObjectTime[1])) / (Object.Variable(__SmoothCamera_ObjectTime[0]) - Object.Variable(__SmoothCamera_ObjectTime[1])))"
+                                "lerp(Object.Variable(__SmoothCamera.ObjectX[1]), Object.Variable(__SmoothCamera.ObjectX[0]), ((TimeFromStart() - Object.Behavior::CurrentDelay()) - Object.Variable(__SmoothCamera.ObjectTime[1])) / (Object.Variable(__SmoothCamera.ObjectTime[0]) - Object.Variable(__SmoothCamera.ObjectTime[1])))"
                               ]
                             },
                             {
@@ -16616,7 +16925,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "lerp(Object.Variable(__SmoothCamera_ObjectY[1]), Object.Variable(__SmoothCamera_ObjectY[0]), ((TimeFromStart() - Object.Behavior::CurrentDelay()) - Object.Variable(__SmoothCamera_ObjectTime[1])) / (Object.Variable(__SmoothCamera_ObjectTime[0]) - Object.Variable(__SmoothCamera_ObjectTime[1])))"
+                                "lerp(Object.Variable(__SmoothCamera.ObjectY[1]), Object.Variable(__SmoothCamera.ObjectY[0]), ((TimeFromStart() - Object.Behavior::CurrentDelay()) - Object.Variable(__SmoothCamera.ObjectTime[1])) / (Object.Variable(__SmoothCamera.ObjectTime[0]) - Object.Variable(__SmoothCamera.ObjectTime[1])))"
                               ]
                             }
                           ]
@@ -16658,7 +16967,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectTime"
+                        "__SmoothCamera.ObjectTime"
                       ]
                     },
                     {
@@ -16667,7 +16976,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectX"
+                        "__SmoothCamera.ObjectX"
                       ]
                     },
                     {
@@ -16676,7 +16985,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ObjectY"
+                        "__SmoothCamera.ObjectY"
                       ]
                     }
                   ]
@@ -17000,7 +17309,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ForecastHistoryTime",
+                        "__SmoothCamera.ForecastHistoryTime",
                         "GetArgumentAsNumber(\"Time\")"
                       ]
                     },
@@ -17010,7 +17319,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ForecastHistoryX",
+                        "__SmoothCamera.ForecastHistoryX",
                         "GetArgumentAsNumber(\"ObjectX\")"
                       ]
                     },
@@ -17020,7 +17329,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "__SmoothCamera_ForecastHistoryY",
+                        "__SmoothCamera.ForecastHistoryY",
                         "GetArgumentAsNumber(\"ObjectY\")"
                       ]
                     }
@@ -17048,7 +17357,7 @@
                             "value": "Egal"
                           },
                           "parameters": [
-                            "Object.VariableChildCount(__SmoothCamera_ForecastHistoryTime)",
+                            "Object.VariableChildCount(__SmoothCamera.ForecastHistoryTime)",
                             ">=",
                             "3"
                           ]
@@ -17059,7 +17368,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ForecastHistoryTime[0]",
+                            "__SmoothCamera.ForecastHistoryTime[0]",
                             "<",
                             "TimeFromStart() - Object.Behavior::PropertyCameraDelay() - Object.Behavior::PropertyCameraExtraDelay() - Object.Behavior::PropertyForecastHistoryDuration()"
                           ]
@@ -17073,7 +17382,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ForecastHistoryTime",
+                            "__SmoothCamera.ForecastHistoryTime",
                             "0"
                           ]
                         },
@@ -17083,7 +17392,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ForecastHistoryX",
+                            "__SmoothCamera.ForecastHistoryX",
                             "0"
                           ]
                         },
@@ -17093,7 +17402,7 @@
                           },
                           "parameters": [
                             "Object",
-                            "__SmoothCamera_ForecastHistoryY",
+                            "__SmoothCamera.ForecastHistoryY",
                             "0"
                           ]
                         }
@@ -17190,7 +17499,7 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "Object.VariableChildCount(__SmoothCamera_ForecastHistoryTime)",
+                        "Object.VariableChildCount(__SmoothCamera.ForecastHistoryTime)",
                         ">=",
                         "2"
                       ]
@@ -17267,7 +17576,7 @@
                         },
                         {
                           "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "Object.VariableChildCount(__SmoothCamera_ForecastHistoryX)",
+                          "repeatExpression": "Object.VariableChildCount(__SmoothCamera.ForecastHistoryX)",
                           "conditions": [],
                           "actions": [
                             {
@@ -17278,7 +17587,7 @@
                                 "Object",
                                 "Behavior",
                                 "+",
-                                "Object.Variable(__SmoothCamera_ForecastHistoryX[Object.Behavior::PropertyIndex()])"
+                                "Object.Variable(__SmoothCamera.ForecastHistoryX[Object.Behavior::PropertyIndex()])"
                               ]
                             },
                             {
@@ -17306,7 +17615,7 @@
                                 "Object",
                                 "Behavior",
                                 "/",
-                                "Object.VariableChildCount(__SmoothCamera_ForecastHistoryX)"
+                                "Object.VariableChildCount(__SmoothCamera.ForecastHistoryX)"
                               ]
                             }
                           ]
@@ -17353,7 +17662,7 @@
                         },
                         {
                           "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "Object.VariableChildCount(__SmoothCamera_ForecastHistoryY)",
+                          "repeatExpression": "Object.VariableChildCount(__SmoothCamera.ForecastHistoryY)",
                           "conditions": [],
                           "actions": [
                             {
@@ -17364,7 +17673,7 @@
                                 "Object",
                                 "Behavior",
                                 "+",
-                                "Object.Variable(__SmoothCamera_ForecastHistoryY[Object.Behavior::PropertyIndex()])"
+                                "Object.Variable(__SmoothCamera.ForecastHistoryY[Object.Behavior::PropertyIndex()])"
                               ]
                             },
                             {
@@ -17392,7 +17701,7 @@
                                 "Object",
                                 "Behavior",
                                 "/",
-                                "Object.VariableChildCount(__SmoothCamera_ForecastHistoryY)"
+                                "Object.VariableChildCount(__SmoothCamera.ForecastHistoryY)"
                               ]
                             }
                           ]
@@ -17491,7 +17800,7 @@
                         },
                         {
                           "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "Object.VariableChildCount(__SmoothCamera_ForecastHistoryX)",
+                          "repeatExpression": "Object.VariableChildCount(__SmoothCamera.ForecastHistoryX)",
                           "conditions": [],
                           "actions": [
                             {
@@ -17502,7 +17811,7 @@
                                 "Object",
                                 "Behavior",
                                 "+",
-                                "pow(Object.Variable(__SmoothCamera_ForecastHistoryX[Object.Behavior::PropertyIndex()]) - Object.Behavior::PropertyForecastHistoryMeanX(), 2)"
+                                "pow(Object.Variable(__SmoothCamera.ForecastHistoryX[Object.Behavior::PropertyIndex()]) - Object.Behavior::PropertyForecastHistoryMeanX(), 2)"
                               ]
                             },
                             {
@@ -17513,7 +17822,7 @@
                                 "Object",
                                 "Behavior",
                                 "+",
-                                "pow(Object.Variable(__SmoothCamera_ForecastHistoryY[Object.Behavior::PropertyIndex()]) - Object.Behavior::PropertyForecastHistoryMeanY(), 2)"
+                                "pow(Object.Variable(__SmoothCamera.ForecastHistoryY[Object.Behavior::PropertyIndex()]) - Object.Behavior::PropertyForecastHistoryMeanY(), 2)"
                               ]
                             },
                             {
@@ -17524,7 +17833,7 @@
                                 "Object",
                                 "Behavior",
                                 "+",
-                                "(Object.Variable(__SmoothCamera_ForecastHistoryX[Object.Behavior::PropertyIndex()]) - Object.Behavior::PropertyForecastHistoryMeanX())\n*\n(Object.Variable(__SmoothCamera_ForecastHistoryY[Object.Behavior::PropertyIndex()]) - Object.Behavior::PropertyForecastHistoryMeanY())"
+                                "(Object.Variable(__SmoothCamera.ForecastHistoryX[Object.Behavior::PropertyIndex()]) - Object.Behavior::PropertyForecastHistoryMeanX())\n*\n(Object.Variable(__SmoothCamera.ForecastHistoryY[Object.Behavior::PropertyIndex()]) - Object.Behavior::PropertyForecastHistoryMeanY())"
                               ]
                             },
                             {
@@ -17738,10 +18047,10 @@
                                               "parameters": [
                                                 "Object",
                                                 "Behavior",
-                                                "Object.Variable(__SmoothCamera_ForecastHistoryX[0])",
-                                                "Object.Variable(__SmoothCamera_ForecastHistoryY[0])",
-                                                "Object.Variable(__SmoothCamera_ForecastHistoryX[Object.VariableChildCount(__SmoothCamera_ForecastHistoryX) - 1])",
-                                                "Object.Variable(__SmoothCamera_ForecastHistoryY[Object.VariableChildCount(__SmoothCamera_ForecastHistoryY) - 1])",
+                                                "Object.Variable(__SmoothCamera.ForecastHistoryX[0])",
+                                                "Object.Variable(__SmoothCamera.ForecastHistoryY[0])",
+                                                "Object.Variable(__SmoothCamera.ForecastHistoryX[Object.VariableChildCount(__SmoothCamera.ForecastHistoryX) - 1])",
+                                                "Object.Variable(__SmoothCamera.ForecastHistoryY[Object.VariableChildCount(__SmoothCamera.ForecastHistoryY) - 1])",
                                                 ""
                                               ]
                                             }
@@ -17841,10 +18150,10 @@
                                               "parameters": [
                                                 "Object",
                                                 "Behavior",
-                                                "Object.Variable(__SmoothCamera_ForecastHistoryY[0])",
-                                                "Object.Variable(__SmoothCamera_ForecastHistoryX[0])",
-                                                "Object.Variable(__SmoothCamera_ForecastHistoryY[Object.VariableChildCount(__SmoothCamera_ForecastHistoryY) - 1])",
-                                                "Object.Variable(__SmoothCamera_ForecastHistoryX[Object.VariableChildCount(__SmoothCamera_ForecastHistoryX) - 1])",
+                                                "Object.Variable(__SmoothCamera.ForecastHistoryY[0])",
+                                                "Object.Variable(__SmoothCamera.ForecastHistoryX[0])",
+                                                "Object.Variable(__SmoothCamera.ForecastHistoryY[Object.VariableChildCount(__SmoothCamera.ForecastHistoryY) - 1])",
+                                                "Object.Variable(__SmoothCamera.ForecastHistoryX[Object.VariableChildCount(__SmoothCamera.ForecastHistoryX) - 1])",
                                                 ""
                                               ]
                                             }
@@ -17985,7 +18294,7 @@
                                   "colorG": 176,
                                   "colorR": 74,
                                   "creationTime": 0,
-                                  "name": "Forcasted position",
+                                  "name": "Forecasted position",
                                   "source": "",
                                   "type": "BuiltinCommonInstructions::Group",
                                   "events": [
@@ -18195,7 +18504,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "- Object.Behavior::PropertyForecastTime() / (Object.Variable(__SmoothCamera_ForecastHistoryTime[0]) - Object.Variable(__SmoothCamera_ForecastHistoryTime[Object.VariableChildCount(__SmoothCamera_ForecastHistoryTime) - 1]))"
+                        "- Object.Behavior::PropertyForecastTime() / (Object.Variable(__SmoothCamera.ForecastHistoryTime[0]) - Object.Variable(__SmoothCamera.ForecastHistoryTime[Object.VariableChildCount(__SmoothCamera.ForecastHistoryTime) - 1]))"
                       ]
                     }
                   ]
@@ -18284,6 +18593,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area left border",
               "description": "",
               "group": "Position",
@@ -18294,6 +18604,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area right border",
               "description": "",
               "group": "Position",
@@ -18304,6 +18615,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area top border",
               "description": "",
               "group": "Position",
@@ -18314,6 +18626,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area bottom border",
               "description": "",
               "group": "Position",
@@ -18324,6 +18637,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Camera offset X",
               "description": "",
               "group": "Position",
@@ -18334,6 +18648,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Camera offset Y",
               "description": "",
               "group": "Position",
@@ -18344,7 +18659,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Camera delay (in seconds)",
+              "unit": "Second",
+              "label": "Camera delay",
               "description": "",
               "group": "Timing",
               "extraInformation": [],
@@ -18354,7 +18670,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Forcast time (in seconds)",
+              "unit": "Second",
+              "label": "Forecast time",
               "description": "",
               "group": "Timing",
               "extraInformation": [],
@@ -18364,7 +18681,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Forecast history duration (in second)",
+              "unit": "Second",
+              "label": "Forecast history duration",
               "description": "",
               "group": "Timing",
               "extraInformation": [],
@@ -18634,7 +18952,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Leftward maximum speed (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Leftward maximum speed",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -18644,7 +18963,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Rightward maximum speed (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Rightward maximum speed",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -18654,7 +18974,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Upward maximum speed (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Upward maximum speed",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -18664,7 +18985,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Downward maximum speed (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Downward maximum speed",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -18690,6 +19012,16 @@
               "extraInformation": [],
               "hidden": true,
               "name": "OldY"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "IsCalledManually"
             }
           ],
           "sharedPropertyDescriptors": []
@@ -18953,6 +19285,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area top in the air",
               "description": "",
               "group": "Position",
@@ -18963,6 +19296,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area bottom in the air",
               "description": "",
               "group": "Position",
@@ -18973,6 +19307,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area top on the floor",
               "description": "",
               "group": "Position",
@@ -18983,6 +19318,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Follow free area bottom on the floor",
               "description": "",
               "group": "Position",
@@ -18993,7 +19329,7 @@
             {
               "value": "0.95",
               "type": "Number",
-              "label": "Upward speed in the air (in ratio persecond)",
+              "label": "Upward speed in the air (in ratio per second)",
               "description": "",
               "group": "Catch-up speed",
               "extraInformation": [],
@@ -19003,7 +19339,7 @@
             {
               "value": "0.95",
               "type": "Number",
-              "label": "Downward speed in the air (in ratio persecond)",
+              "label": "Downward speed in the air (in ratio per second)",
               "description": "",
               "group": "Catch-up speed",
               "extraInformation": [],
@@ -19013,7 +19349,7 @@
             {
               "value": "0.9",
               "type": "Number",
-              "label": "Upward speed on the floor (in ratio persecond)",
+              "label": "Upward speed on the floor (in ratio per second)",
               "description": "",
               "group": "Catch-up speed",
               "extraInformation": [],
@@ -19023,7 +19359,7 @@
             {
               "value": "0.9",
               "type": "Number",
-              "label": "Downward speed on the floor (in ratio persecond)",
+              "label": "Downward speed on the floor (in ratio per second)",
               "description": "",
               "group": "Catch-up speed",
               "extraInformation": [],
@@ -19033,7 +19369,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Upward maximum speed in the air (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Upward maximum speed in the air",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -19043,7 +19380,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Downward maximum speed in the air (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Downward maximum speed in the air",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -19053,7 +19391,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Upward maximum speed on the floor (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Upward maximum speed on the floor",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
@@ -19063,7 +19402,8 @@
             {
               "value": "9000",
               "type": "Number",
-              "label": "Downward maximum speed on the floor (in pixels per second)",
+              "unit": "PixelSpeed",
+              "label": "Downward maximum speed on the floor",
               "description": "",
               "group": "Maximum speed",
               "extraInformation": [],
