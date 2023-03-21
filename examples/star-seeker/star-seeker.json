@@ -44,9 +44,14 @@
       "showGDevelopSplash": true,
       "showProgressBar": true
     },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
     "authorIds": [
       "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
     ],
+    "authorUsernames": [],
     "categories": [],
     "playableDevices": [],
     "extensionProperties": [],
@@ -317,6 +322,7 @@
           "behaviors": [],
           "string": "0",
           "font": "",
+          "textAlignment": "",
           "characterSize": 20,
           "color": {
             "b": 170,
@@ -466,16 +472,22 @@
   "eventsFunctionsExtensions": [
     {
       "author": "Tristan Rhodes (tristan@victrisgames.com), Entropy",
-      "category": "",
-      "description": "By default, the borders of the wrapping area match the screen size, but they can be changed.\n\nThe teleport happens when the center of the object crosses a border. In the behavior properties, you can modify (increase or decrease) the margin used to trigger this teleport.",
+      "category": "Movement",
       "extensionNamespace": "",
       "fullName": "Screen Wrap",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW1vbml0b3Itc2NyZWVuc2hvdCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik05LDZINVYxMEg3VjhIOU0xOSwxMEgxN1YxMkgxNVYxNEgxOU0yMSwxNkgzVjRIMjFNMjEsMkgzQzEuODksMiAxLDIuODkgMSw0VjE2QTIsMiAwIDAsMCAzLDE4SDEwVjIwSDhWMjJIMTZWMjBIMTRWMThIMjFBMiwyIDAgMCwwIDIzLDE2VjRDMjMsMi44OSAyMi4xLDIgMjEsMiIgLz48L3N2Zz4=",
       "name": "ScreenWrap",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/monitor-screenshot.svg",
-      "shortDescription": "Teleport objects leaving one side of the screen so that they immediately reappear on the opposite side, maintaining speed and trajectory.",
-      "version": "0.1.6",
+      "shortDescription": "Teleport object when it moves off the screen and immediately appear on the opposite side while maintaining speed and trajectory.",
+      "version": "0.2.3",
+      "description": [
+        "The teleport happens when the center point of the object crosses a border. ",
+        "Change behavior properties to increase or decrease the margin used to trigger this teleport.",
+        "By default, the borders of the wrapping area match the screen size, but they can alo be changed.",
+        "",
+        "This behavior can be used to recreate the movement of the classic game \"Asteroids\"."
+      ],
       "origin": {
         "identifier": "ScreenWrap",
         "name": "gdevelop-extension-store"
@@ -483,7 +495,8 @@
       "tags": [
         "screen",
         "wrap",
-        "teleport"
+        "teleport",
+        "asteroids"
       ],
       "authorIds": [
         "q8ubdigLvIRXLxsJDDTaokO41mc2",
@@ -499,13 +512,9 @@
           "objectType": "",
           "eventsFunctions": [
             {
-              "description": "",
               "fullName": "",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "onCreated",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -581,18 +590,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -601,13 +604,9 @@
               "objectGroups": []
             },
             {
-              "description": "",
               "fullName": "",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "doStepPostEvents",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -778,18 +777,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -801,10 +794,7 @@
               "description": "Check if the object is wrapping on the left and right borders.",
               "fullName": "Is horizontal wrapping",
               "functionType": "Condition",
-              "getterName": "",
-              "group": "",
               "name": "IsHorizontalWrapping",
-              "private": false,
               "sentence": "_PARAM0_ is horizontal wrapping",
               "events": [
                 {
@@ -812,11 +802,34 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::PropertyHorizontalWrapping"
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "\"Horizontal\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Horizontal\""
                       ]
                     }
                   ],
@@ -834,18 +847,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -857,10 +864,7 @@
               "description": "Check if the object is wrapping on the top and bottom borders.",
               "fullName": "Is vertical wrapping",
               "functionType": "Condition",
-              "getterName": "",
-              "group": "",
               "name": "IsVerticalWrapping",
-              "private": false,
               "sentence": "_PARAM0_ is vertical wrapping",
               "events": [
                 {
@@ -868,11 +872,34 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::PropertyVerticalWrapping"
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "\"Vertical\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Vertical\""
                       ]
                     }
                   ],
@@ -890,18 +917,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -913,10 +934,7 @@
               "description": "Enable wrapping on the left and right borders.",
               "fullName": "Enable horizontal wrapping",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "EnableHorizontalWrapping",
-              "private": false,
               "sentence": "Enable _PARAM0_ horizontal wrapping: _PARAM2_",
               "events": [
                 {
@@ -973,27 +991,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Value",
-                  "longDescription": "",
                   "name": "EnableHorizontalWrapping",
                   "type": "yesorno"
                 }
@@ -1004,10 +1013,7 @@
               "description": "Enable wrapping on the top and bottom borders.",
               "fullName": "Enable vertical wrapping",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "EnableVerticalWrapping",
-              "private": false,
               "sentence": "Enable _PARAM0_ vertical wrapping: _PARAM2_",
               "events": [
                 {
@@ -1064,27 +1070,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Value",
-                  "longDescription": "",
                   "name": "EnableVerticalWrapping",
                   "type": "yesorno"
                 }
@@ -1095,10 +1092,7 @@
               "description": "Top border (Y position).",
               "fullName": "Top border",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "BorderTop",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -1121,18 +1115,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -1144,10 +1132,7 @@
               "description": "Left border (X position).",
               "fullName": "Left border",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "BorderLeft",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -1170,18 +1155,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -1193,10 +1172,7 @@
               "description": "Right border (X position).",
               "fullName": "Right border",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "BorderRight",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -1219,18 +1195,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -1242,10 +1212,7 @@
               "description": "Bottom border (Y position).",
               "fullName": "Bottom border",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "BorderBottom",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -1268,18 +1235,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -1291,10 +1252,7 @@
               "description": "Number of pixels past the center where the object teleports and appears.",
               "fullName": "Trigger offset",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "TriggerOffset",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -1317,18 +1275,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
@@ -1340,10 +1292,7 @@
               "description": "Set top border (Y position).",
               "fullName": "Set top border",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "SetTopBorder",
-              "private": false,
               "sentence": "Set _PARAM0_ top border to _PARAM2_",
               "events": [
                 {
@@ -1366,27 +1315,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Top border value",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -1397,10 +1337,7 @@
               "description": "Set left border (X position).",
               "fullName": "Set left border",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "SetLeftBorder",
-              "private": false,
               "sentence": "Set _PARAM0_ left border to _PARAM2_",
               "events": [
                 {
@@ -1423,27 +1360,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Left border value",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -1454,10 +1382,7 @@
               "description": "Set bottom border (Y position).",
               "fullName": "Set bottom border",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "SetBottomBorder",
-              "private": false,
               "sentence": "Set _PARAM0_ bottom border to _PARAM2_",
               "events": [
                 {
@@ -1480,27 +1405,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Bottom border value",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -1511,10 +1427,7 @@
               "description": "Set right border (X position).",
               "fullName": "Set right border",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "SetRightBorder",
-              "private": false,
               "sentence": "Set _PARAM0_ right border to _PARAM2_",
               "events": [
                 {
@@ -1537,27 +1450,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Right border value",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -1568,10 +1472,7 @@
               "description": "Set trigger offset (pixels).",
               "fullName": "Set trigger offset",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "SetTriggerOffset",
-              "private": false,
               "sentence": "Set _PARAM0_ trigger offset to _PARAM2_ pixels",
               "events": [
                 {
@@ -1594,27 +1495,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "ScreenWrap::ScreenWrap",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "SetScreen Offset Leaving Value",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -1646,7 +1538,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Top border of wrapped area (Y).  If blank, the value will be 0.",
+              "unit": "Pixel",
+              "label": "Top border of wrapped area (Y)",
               "description": "",
               "group": "",
               "extraInformation": [],
@@ -1656,7 +1549,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Left border of wrapped area (X).  If blank, the value will be 0.",
+              "unit": "Pixel",
+              "label": "Left border of wrapped area (X)",
               "description": "",
               "group": "",
               "extraInformation": [],
@@ -1666,8 +1560,9 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Right border of wrapped area (X).  If blank, the value will be the scene width.",
-              "description": "",
+              "unit": "Pixel",
+              "label": "Right border of wrapped area (X)",
+              "description": "If blank, the value will be the scene width.",
               "group": "",
               "extraInformation": [],
               "hidden": false,
@@ -1676,8 +1571,9 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Bottom border of wrapped area (Y).  If blank, the value will be scene height.",
-              "description": "",
+              "unit": "Pixel",
+              "label": "Bottom border of wrapped area (Y)",
+              "description": "If blank, the value will be scene height.",
               "group": "",
               "extraInformation": [],
               "hidden": false,
@@ -1686,6 +1582,7 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Pixel",
               "label": "Number of pixels past the center where the object teleports and appears",
               "description": "",
               "group": "",
@@ -1693,7 +1590,1355 @@
               "hidden": false,
               "name": "TriggerOffset"
             }
-          ]
+          ],
+          "sharedPropertyDescriptors": []
+        },
+        {
+          "description": "Teleport the object when leaving one side of the screen so that it immediately reappears on the opposite side, maintaining speed and trajectory.",
+          "fullName": "Screen Wrap (physics objects)",
+          "name": "ScreenWrapPhysics",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Initialize variables (if needed)",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ScreenWrap::ScreenWrap::PropertyBorderBottom"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ScreenWrap::ScreenWrap::SetBottomBorder"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "SceneWindowHeight()",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ScreenWrap::ScreenWrap::PropertyBorderRight"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ScreenWrap::ScreenWrap::SetRightBorder"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "SceneWindowWidth()",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "colorB": 5,
+                  "colorG": 117,
+                  "colorR": 65,
+                  "creationTime": 0,
+                  "name": "ScreenWrap",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Move object to opposite side (if needed)",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [],
+                      "parameters": []
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ScreenWrap::ScreenWrap::PropertyHorizontalWrapping"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Velocity is saved because Physics2 resets objects velocities when they are moved from the outside of the extension.",
+                          "comment2": ""
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "PosX"
+                              },
+                              "parameters": [
+                                "Object",
+                                "<",
+                                "Object.Behavior::PropertyBorderLeft() - (Object.Width()/2) - Object.Behavior::PropertyTriggerOffset()"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ScreenWrap::ScreenWrapPhysics::SaveCurrentVelocities"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "MettreX"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "Object.Behavior::PropertyBorderRight() - (Object.Width()/2) +  Object.Behavior::PropertyTriggerOffset()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ScreenWrap::ScreenWrapPhysics::ApplySavedVelocities"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "PosX"
+                              },
+                              "parameters": [
+                                "Object",
+                                ">",
+                                "Object.Behavior::PropertyBorderRight() - (Object.Width()/2) + Object.Behavior::PropertyTriggerOffset()"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ScreenWrap::ScreenWrapPhysics::SaveCurrentVelocities"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "MettreX"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "Object.Behavior::PropertyBorderLeft() - (Object.Width()/2) -  Object.Behavior::PropertyTriggerOffset()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ScreenWrap::ScreenWrapPhysics::ApplySavedVelocities"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ScreenWrap::ScreenWrap::PropertyVerticalWrapping"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "PosY"
+                              },
+                              "parameters": [
+                                "Object",
+                                "<",
+                                "Object.Behavior::PropertyBorderTop() - (Object.Height()/2) - Object.Behavior::PropertyTriggerOffset()"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ScreenWrap::ScreenWrapPhysics::SaveCurrentVelocities"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "MettreY"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "Object.Behavior::PropertyBorderBottom() - (Object.Height()/2) + Object.Behavior::PropertyTriggerOffset()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ScreenWrap::ScreenWrapPhysics::ApplySavedVelocities"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "PosY"
+                              },
+                              "parameters": [
+                                "Object",
+                                ">",
+                                "Object.Behavior::PropertyBorderBottom() - (Object.Height()/2) + Object.Behavior::PropertyTriggerOffset()"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ScreenWrap::ScreenWrapPhysics::SaveCurrentVelocities"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "MettreY"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "Object.Behavior::PropertyBorderTop() - (Object.Height()/2) -  Object.Behavior::PropertyTriggerOffset()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ScreenWrap::ScreenWrapPhysics::ApplySavedVelocities"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object is wrapping on the left and right borders.",
+              "fullName": "Is horizontal wrapping",
+              "functionType": "Condition",
+              "name": "IsHorizontalWrapping",
+              "sentence": "_PARAM0_ is horizontal wrapping",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Horizontal\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Horizontal\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object is wrapping on the top and bottom borders.",
+              "fullName": "Is vertical wrapping",
+              "functionType": "Condition",
+              "name": "IsVerticalWrapping",
+              "sentence": "_PARAM0_ is vertical wrapping",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Vertical\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Vertical\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Enable wrapping on the left and right borders.",
+              "fullName": "Enable horizontal wrapping",
+              "functionType": "Action",
+              "name": "EnableHorizontalWrapping",
+              "sentence": "Enable _PARAM0_ horizontal wrapping: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"EnableHorizontalWrapping\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyHorizontalWrapping"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "no"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"EnableHorizontalWrapping\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyHorizontalWrapping"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Value",
+                  "name": "EnableHorizontalWrapping",
+                  "type": "yesorno"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Enable wrapping on the top and bottom borders.",
+              "fullName": "Enable vertical wrapping",
+              "functionType": "Action",
+              "name": "EnableVerticalWrapping",
+              "sentence": "Enable _PARAM0_ vertical wrapping: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"EnableVerticalWrapping\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyVerticalWrapping"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "no"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"EnableVerticalWrapping\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyVerticalWrapping"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Value",
+                  "name": "EnableVerticalWrapping",
+                  "type": "yesorno"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Top border (Y position).",
+              "fullName": "Top border",
+              "functionType": "Expression",
+              "name": "BorderTop",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyBorderTop()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Left border (X position).",
+              "fullName": "Left border",
+              "functionType": "Expression",
+              "name": "BorderLeft",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyBorderLeft()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Right border (X position).",
+              "fullName": "Right border",
+              "functionType": "Expression",
+              "name": "BorderRight",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyBorderRight()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Bottom border (Y position).",
+              "fullName": "Bottom border",
+              "functionType": "Expression",
+              "name": "BorderBottom",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyBorderBottom()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Number of pixels past the center where the object teleports and appears.",
+              "fullName": "Trigger offset",
+              "functionType": "Expression",
+              "name": "TriggerOffset",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyTriggerOffset()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set top border (Y position).",
+              "fullName": "Set top border",
+              "functionType": "Action",
+              "name": "SetTopBorder",
+              "sentence": "Set _PARAM0_ top border to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyBorderTop"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Top border value",
+                  "name": "Value",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set left border (X position).",
+              "fullName": "Set left border",
+              "functionType": "Action",
+              "name": "SetLeftBorder",
+              "sentence": "Set _PARAM0_ left border to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyBorderLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Left border value",
+                  "name": "Value",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set bottom border (Y position).",
+              "fullName": "Set bottom border",
+              "functionType": "Action",
+              "name": "SetBottomBorder",
+              "sentence": "Set _PARAM0_ bottom border to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyBorderBottom"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bottom border value",
+                  "name": "Value",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set right border (X position).",
+              "fullName": "Set right border",
+              "functionType": "Action",
+              "name": "SetRightBorder",
+              "sentence": "Set _PARAM0_ right border to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyBorderRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Right border value",
+                  "name": "Value",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set trigger offset (pixels).",
+              "fullName": "Set trigger offset",
+              "functionType": "Action",
+              "name": "SetTriggerOffset",
+              "sentence": "Set _PARAM0_ trigger offset to _PARAM2_ pixels",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrap::SetPropertyTriggerOffset"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                },
+                {
+                  "description": "SetScreen Offset Leaving Value",
+                  "name": "Value",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Save current velocity values.",
+              "fullName": "Save current velocity values",
+              "functionType": "Action",
+              "name": "SaveCurrentVelocities",
+              "sentence": "Save current velocity values of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyAngularVelocity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.RequiredPhysicsBehavior::AngularVelocity()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyLinearVelocityX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.RequiredPhysicsBehavior::LinearVelocityX()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyLinearVelocityY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.RequiredPhysicsBehavior::LinearVelocityY()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Apply saved velocity values.",
+              "fullName": "Apply saved velocity values",
+              "functionType": "Action",
+              "name": "ApplySavedVelocities",
+              "sentence": "Apply saved velocity values of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::AngularVelocity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "RequiredPhysicsBehavior",
+                        "=",
+                        "Object.Behavior::PropertyAngularVelocity()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics2::LinearVelocityX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "RequiredPhysicsBehavior",
+                        "=",
+                        "Object.Behavior::PropertyLinearVelocityX()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics2::LinearVelocityY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "RequiredPhysicsBehavior",
+                        "=",
+                        "Object.Behavior::PropertyLinearVelocityY()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScreenWrap::ScreenWrapPhysics",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "Physics Behavior",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Physics2::Physics2Behavior"
+              ],
+              "hidden": false,
+              "name": "RequiredPhysicsBehavior"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Horizontal wrapping",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "HorizontalWrapping"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Vertical wrapping",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "VerticalWrapping"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Top border of wrapped area (Y)",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "BorderTop"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Left border of wrapped area (X)",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "BorderLeft"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Right border of wrapped area (X).",
+              "description": "If blank, the value will be the scene width.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "BorderRight"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Bottom border of wrapped area (Y)",
+              "description": "If blank, the value will be scene height.",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "BorderBottom"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Number of pixels past the center where the object teleports and appears",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "TriggerOffset"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "Angular Velocity",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "AngularVelocity"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "Linear Velocity X",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "LinearVelocityX"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "Linear Velocity Y",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "LinearVelocityY"
+            }
+          ],
+          "sharedPropertyDescriptors": []
         }
       ],
       "eventsBasedObjects": []
@@ -1701,7 +2946,6 @@
     {
       "author": "@4ian, Tristan Rhodes (https://victrisgames.itch.io/)",
       "category": "Movement",
-      "description": "It allows objects to move:\n- on an ellipsis or arcs\n- smoothly vertically or horizontally (by setting one radius to 0)\n- on a sine wave (by adding a force)\n\nIt can be used for:\n- Making objects float, such as powerups or coins\n- Moving platforms\n- Enemy movement patterns\n- Making a player constantly turn right or left",
       "extensionNamespace": "",
       "fullName": "Ellipse movement",
       "helpPath": "",
@@ -1709,7 +2953,19 @@
       "name": "EllipseMovement",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sine-wave.svg",
       "shortDescription": "Move objects on ellipses or smoothly back and forth in one direction.",
-      "version": "1.0.0",
+      "version": "1.0.2",
+      "description": [
+        "It allows objects to move:",
+        "- on an ellipsis or arcs",
+        "- smoothly vertically or horizontally (by setting one radius to 0)",
+        "- on a sine wave (by adding a force)",
+        "",
+        "It can be used for:",
+        "- Making objects float, such as powerups or coins",
+        "- Moving platforms",
+        "- Enemy movement patterns",
+        "- Making a player constantly turn right or left ([open the project online](https://editor.gdevelop.io/?project=example://star-seeker))"
+      ],
       "origin": {
         "identifier": "EllipseMovement",
         "name": "gdevelop-extension-store"
@@ -1739,13 +2995,9 @@
           "objectType": "",
           "eventsFunctions": [
             {
-              "description": "",
               "fullName": "",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "onCreated",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -1905,18 +3157,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -1925,13 +3171,9 @@
               "objectGroups": []
             },
             {
-              "description": "",
               "fullName": "",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "doStepPreEvents",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -2114,18 +3356,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2134,13 +3370,9 @@
               "objectGroups": []
             },
             {
-              "description": "",
               "fullName": "",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "doStepPostEvents",
-              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -2176,18 +3408,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2199,10 +3425,7 @@
               "description": "Change the turning direction (left or right).",
               "fullName": "Turn the other way",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "ToggleTurningLeft",
-              "private": false,
               "sentence": "_PARAM0_ turn the other way",
               "events": [
                 {
@@ -2258,18 +3481,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2281,10 +3498,7 @@
               "description": "Change the in which side the object is turning (left or right).",
               "fullName": "Turn left or right",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "SetTurningLeft",
-              "private": false,
               "sentence": "_PARAM0_ turn left: _PARAM2_",
               "events": [
                 {
@@ -2370,27 +3584,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Turn left",
-                  "longDescription": "",
                   "name": "TurnLeft",
                   "type": "yesorno"
                 }
@@ -2401,10 +3606,7 @@
               "description": "Check if the object is turning left.",
               "fullName": "Is turning left",
               "functionType": "Condition",
-              "getterName": "",
-              "group": "",
               "name": "IsTurningLeft",
-              "private": false,
               "sentence": "_PARAM0_ is turning left",
               "events": [
                 {
@@ -2436,18 +3638,12 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2459,10 +3655,7 @@
               "description": "Return the movement angle of the object.",
               "fullName": "Movement angle",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "MovementAngle",
-              "private": false,
               "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2485,18 +3678,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2508,10 +3695,8 @@
               "description": "Return the loop duration (in seconds).",
               "fullName": "Loop duration",
               "functionType": "Expression",
-              "getterName": "",
               "group": "Configuration",
               "name": "LoopDuration",
-              "private": false,
               "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2534,18 +3719,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2557,10 +3736,8 @@
               "description": "Return the ellipse radius on X axis.",
               "fullName": "Radius X",
               "functionType": "Expression",
-              "getterName": "",
               "group": "Configuration",
               "name": "RadiusX",
-              "private": false,
               "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2583,18 +3760,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2606,10 +3777,8 @@
               "description": "Return the ellipse radius on X axis.",
               "fullName": "Radius Y",
               "functionType": "Expression",
-              "getterName": "",
               "group": "Configuration",
               "name": "RadiusY",
-              "private": false,
               "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2632,18 +3801,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2655,10 +3818,8 @@
               "description": "Return the movement center position on X axis.",
               "fullName": "Movement center X",
               "functionType": "Expression",
-              "getterName": "",
               "group": "Configuration",
               "name": "CenterX",
-              "private": false,
               "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2681,18 +3842,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2704,10 +3859,8 @@
               "description": "Return the movement center position on Y axis.",
               "fullName": "Movement center Y",
               "functionType": "Expression",
-              "getterName": "",
               "group": "Configuration",
               "name": "CenterY",
-              "private": false,
               "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2730,18 +3883,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -2753,10 +3900,8 @@
               "description": "Change the radius on X axis of the movement.",
               "fullName": "Radius X",
               "functionType": "Action",
-              "getterName": "",
               "group": "Elliptical movement configuration",
               "name": "SetRadiusX",
-              "private": false,
               "sentence": "Change the radius on X axis of the movement of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2779,27 +3924,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Radius X",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -2810,10 +3946,8 @@
               "description": "Change the radius on Y axis of the movement.",
               "fullName": "Radius Y",
               "functionType": "Action",
-              "getterName": "",
               "group": "Elliptical movement configuration",
               "name": "SetRadiusY",
-              "private": false,
               "sentence": "Change the radius on Y axis of the movement of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2836,27 +3970,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Radius Y",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -2867,10 +3992,8 @@
               "description": "Change the loop duration.",
               "fullName": "Loop duration",
               "functionType": "Action",
-              "getterName": "",
               "group": "Elliptical movement configuration",
               "name": "SetLoopDuration",
-              "private": false,
               "sentence": "Change the loop duration of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -2933,27 +4056,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Speed (in degrees per second)",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -2964,10 +4078,7 @@
               "description": "Change the movement angle. The object is teleported according to the angle.",
               "fullName": "Teleport at an angle",
               "functionType": "Action",
-              "getterName": "",
-              "group": "",
               "name": "SetMovementAngle",
-              "private": false,
               "sentence": "Teleport _PARAM0_ on the ellipse at _PARAM2_°",
               "events": [
                 {
@@ -2990,27 +4101,18 @@
               ],
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Movement angle",
-                  "longDescription": "",
                   "name": "Value",
                   "type": "expression"
                 }
@@ -3018,11 +4120,8 @@
               "objectGroups": []
             },
             {
-              "description": "",
               "fullName": "Delta X",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "DeltaX",
               "private": true,
               "sentence": "",
@@ -3047,18 +4146,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -3067,11 +4160,8 @@
               "objectGroups": []
             },
             {
-              "description": "",
               "fullName": "Delta Y",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "DeltaY",
               "private": true,
               "sentence": "",
@@ -3096,18 +4186,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -3116,11 +4200,8 @@
               "objectGroups": []
             },
             {
-              "description": "",
               "fullName": "Direction angle",
               "functionType": "Expression",
-              "getterName": "",
-              "group": "",
               "name": "DirectionAngle",
               "private": true,
               "sentence": "",
@@ -3183,18 +4264,12 @@
               },
               "parameters": [
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Object",
-                  "longDescription": "",
                   "name": "Object",
                   "type": "object"
                 },
                 {
-                  "codeOnly": false,
-                  "defaultValue": "",
                   "description": "Behavior",
-                  "longDescription": "",
                   "name": "Behavior",
                   "supplementaryInformation": "EllipseMovement::EllipseMovement",
                   "type": "behavior"
@@ -3207,7 +4282,8 @@
             {
               "value": "100",
               "type": "Number",
-              "label": "Radius of the movement on X axis (0 to deactivate)",
+              "unit": "Pixel",
+              "label": "Radius of the movement on X axis",
               "description": "",
               "group": "Ellipse",
               "extraInformation": [],
@@ -3217,7 +4293,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Radius of the movement on Y axis (0 to deactivate)",
+              "unit": "Pixel",
+              "label": "Radius of the movement on Y axis",
               "description": "",
               "group": "Ellipse",
               "extraInformation": [],
@@ -3227,7 +4304,8 @@
             {
               "value": "6",
               "type": "Number",
-              "label": "Loop duration (in seconds)",
+              "unit": "Second",
+              "label": "Loop duration",
               "description": "",
               "group": "Speed",
               "extraInformation": [],
@@ -3245,9 +4323,10 @@
               "name": "InitialTurningLeft"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
-              "label": "Initial direction (in degree)",
+              "unit": "DegreeAngle",
+              "label": "Initial direction",
               "description": "",
               "group": "Speed",
               "extraInformation": [],
@@ -3267,7 +4346,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Rotation offset (in degree)",
+              "unit": "DegreeAngle",
+              "label": "Rotation offset",
               "description": "",
               "group": "Rotation",
               "extraInformation": [],
@@ -3324,7 +4404,8 @@
               "hidden": true,
               "name": "OldY"
             }
-          ]
+          ],
+          "sharedPropertyDescriptors": []
         }
       ],
       "eventsBasedObjects": []
