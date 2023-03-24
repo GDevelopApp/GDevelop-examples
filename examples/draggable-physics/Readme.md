@@ -1,1 +1,1 @@
-Test the Draggable (Physics) extension.
+Simple example game to demonstrate the Draggable (Physics) extension.
