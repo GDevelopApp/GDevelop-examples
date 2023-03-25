@@ -1,0 +1,1 @@
+Show how to fire bullets with different patterns.
