@@ -3263,6 +3263,30 @@
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "RectangleMovement::LinkNearestObjects"
+                  },
+                  "parameters": [
+                    "",
+                    "Saw",
+                    "SummerTileWater",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
                 {
@@ -7361,51 +7385,71 @@
           "sentence": "Move _PARAM1_ along the rectangular border of _PARAM3_",
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "CenterObject",
               "conditions": [],
-              "actions": [
+              "actions": [],
+              "events": [
                 {
-                  "type": {
-                    "value": "RectangleMovement::RectangleMovement::SetTop"
-                  },
-                  "parameters": [
-                    "MovingObject",
-                    "RectangleMovement",
-                    "CenterObject.BoundingBoxTop()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "RectangleMovement::RectangleMovement::SetBottom"
-                  },
-                  "parameters": [
-                    "MovingObject",
-                    "RectangleMovement",
-                    "CenterObject.BoundingBoxBottom()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "RectangleMovement::RectangleMovement::SetLeft"
-                  },
-                  "parameters": [
-                    "MovingObject",
-                    "RectangleMovement_Behavior",
-                    "CenterObject.BoundingBoxLeft()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "RectangleMovement::RectangleMovement::SetRight"
-                  },
-                  "parameters": [
-                    "MovingObject",
-                    "RectangleMovement_Behavior",
-                    "CenterObject.BoundingBoxRight()",
-                    ""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "MovingObject",
+                        "CenterObject",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "RectangleMovement::RectangleMovement::SetTop"
+                      },
+                      "parameters": [
+                        "MovingObject",
+                        "RectangleMovement",
+                        "CenterObject.BoundingBoxTop()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "RectangleMovement::RectangleMovement::SetBottom"
+                      },
+                      "parameters": [
+                        "MovingObject",
+                        "RectangleMovement",
+                        "CenterObject.BoundingBoxBottom()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "RectangleMovement::RectangleMovement::SetLeft"
+                      },
+                      "parameters": [
+                        "MovingObject",
+                        "RectangleMovement_Behavior",
+                        "CenterObject.BoundingBoxLeft()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "RectangleMovement::RectangleMovement::SetRight"
+                      },
+                      "parameters": [
+                        "MovingObject",
+                        "RectangleMovement_Behavior",
+                        "CenterObject.BoundingBoxRight()",
+                        ""
+                      ]
+                    }
                   ]
                 }
               ]
@@ -7426,6 +7470,104 @@
             {
               "description": "Center object",
               "name": "CenterObject",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Create an object link between two objects that are nearest to each other.",
+          "fullName": "Create object links between nearest objects",
+          "functionType": "Action",
+          "name": "LinkNearestObjects",
+          "sentence": "Create an object link between _PARAM1_ and the _PARAM2_ that is closest to it",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "FirstObject",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "FirstObject",
+                        "__RectangleMovement.Linked",
+                        "False"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "SecondObject",
+                        "__RectangleMovement.Linked",
+                        "False"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PickNearest"
+                      },
+                      "parameters": [
+                        "SecondObject",
+                        "FirstObject.BoundingBoxCenterX()",
+                        "FirstObject.BoundingBoxCenterY()",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "FirstObject",
+                        "SecondObject"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "SecondObject",
+                        "__RectangleMovement.Linked",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "FirstObject",
+                        "__RectangleMovement.Linked",
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "First object",
+              "name": "FirstObject",
+              "type": "objectList"
+            },
+            {
+              "description": "Second object",
+              "name": "SecondObject",
               "type": "objectList"
             }
           ],
