@@ -8268,6 +8268,16 @@
           "effects": [],
           "behaviors": [
             {
+              "name": "NavMeshPathfindingAnimator",
+              "type": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+              "NavMeshPathfinding": "NavMeshPathfindingBehavior",
+              "IsScalingAnimation": true,
+              "AnimationName": "Walk",
+              "DirectionCount": 8,
+              "AngleOffset": 0,
+              "AnimationDirection": 0
+            },
+            {
               "name": "NavMeshPathfindingBehavior",
               "type": "NavMeshPathfinding::NavMeshPathfindingBehavior",
               "Acceleration": 400,
@@ -8355,13 +8365,23 @@
               "ignoreDefaultControls": false
             },
             {
+              "name": "TopDownMovementAnimator",
+              "type": "TopDownMovementAnimator::TopDownMovementAnimator",
+              "TopDownMovement": "TopDownMovement",
+              "IsScalingAnimation": true,
+              "AnimationName": "Walk",
+              "DirectionCount": 8,
+              "AngleOffset": 45,
+              "AnimationDirection": 0
+            },
+            {
               "name": "YSort",
               "type": "YSort::YSort"
             }
           ],
           "animations": [
             {
-              "name": "idle",
+              "name": "Idle",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -11193,7 +11213,7 @@
               ]
             },
             {
-              "name": "Right",
+              "name": "Walk0",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -12239,7 +12259,7 @@
               ]
             },
             {
-              "name": "Right_Down",
+              "name": "Walk1",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -13285,7 +13305,7 @@
               ]
             },
             {
-              "name": "Down",
+              "name": "Walk2",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -14331,7 +14351,7 @@
               ]
             },
             {
-              "name": "Left_Down",
+              "name": "Walk3",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -15377,7 +15397,7 @@
               ]
             },
             {
-              "name": "Left",
+              "name": "Walk4",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -16423,7 +16443,7 @@
               ]
             },
             {
-              "name": "Left_Up",
+              "name": "Walk5",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -17469,7 +17489,7 @@
               ]
             },
             {
-              "name": "Up",
+              "name": "Walk6",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -18515,7 +18535,7 @@
               ]
             },
             {
-              "name": "Right_Up",
+              "name": "Walk7",
               "useMultipleDirections": false,
               "directions": [
                 {
@@ -27777,6 +27797,8 @@
                         "Mindy",
                         "NavMeshPathfindingBehavior",
                         "TopDownMovement",
+                        "TopDownMovementAnimator",
+                        "NavMeshPathfindingAnimator",
                         ""
                       ]
                     }
@@ -28108,6 +28130,12 @@
       ],
       "behaviorsSharedData": [
         {
+          "name": "NavMeshPathfindingAnimator",
+          "type": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+          "NewAnimationDirection": 0,
+          "AnimationFrame": 0
+        },
+        {
           "name": "NavMeshPathfindingBehavior",
           "type": "NavMeshPathfinding::NavMeshPathfindingBehavior"
         },
@@ -28140,6 +28168,12 @@
           "type": "TopDownMovementBehavior::TopDownMovementBehavior"
         },
         {
+          "name": "TopDownMovementAnimator",
+          "type": "TopDownMovementAnimator::TopDownMovementAnimator",
+          "NewAnimationDirection": 0,
+          "AnimationFrame": 0
+        },
+        {
           "name": "YSort",
           "type": "YSort::YSort"
         }
@@ -28148,6 +28182,904 @@
   ],
   "externalEvents": [],
   "eventsFunctionsExtensions": [
+    {
+      "author": "",
+      "category": "Movement",
+      "extensionNamespace": "",
+      "fullName": "Top-down movement animator",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNNiwyMS4xYy0wLjMsMC0wLjUtMC4xLTAuNy0wLjNsLTQtNC4xYy0wLjQtMC40LTAuNC0xLDAtMS40bDQtNC4xYzAuNC0wLjQsMS0wLjQsMS40LDBzMC40LDEsMCwxLjRMMy40LDE2bDMuMywzLjMNCgkJYzAuNCwwLjQsMC40LDEsMCwxLjRDNi42LDIxLDYuMywyMS4xLDYsMjEuMXoiLz4NCjwvZz4NCjxnPg0KCTxwYXRoIGQ9Ik0yNiwyMS4xYy0wLjMsMC0wLjUtMC4xLTAuNy0wLjNjLTAuNC0wLjQtMC40LTEsMC0xLjRsMy4zLTMuM2wtMy4zLTMuM2MtMC40LTAuNC0wLjQtMSwwLTEuNHMxLTAuNCwxLjQsMGw0LjEsNC4xDQoJCWMwLjIsMC4yLDAuMywwLjQsMC4zLDAuN3MtMC4xLDAuNS0wLjMsMC43bC00LjEsNC4xQzI2LjYsMjEsMjYuMywyMS4xLDI2LDIxLjF6Ii8+DQo8L2c+DQo8Zz4NCgk8cGF0aCBkPSJNMTYsMzEuMUwxNiwzMS4xYy0wLjMsMC0wLjUtMC4xLTAuNy0wLjNsLTQtNC4xYy0wLjQtMC40LTAuNC0xLDAtMS40czEtMC40LDEuNCwwbDMuMywzLjNsMy4zLTMuM2MwLjQtMC40LDEtMC40LDEuNCwwDQoJCXMwLjQsMSwwLDEuNGwtNC4xLDQuMUMxNi42LDMwLjksMTYuMywzMS4xLDE2LDMxLjF6Ii8+DQo8L2c+DQo8Zz4NCgk8cGF0aCBkPSJNMjAuMSw3Yy0wLjMsMC0wLjUtMC4xLTAuNy0wLjNMMTYsMy40bC0zLjMsMy4zYy0wLjQsMC40LTEsMC40LTEuNCwwcy0wLjQtMSwwLTEuNGw0LTQuMWMwLjQtMC40LDEtMC40LDEuNCwwbDQuMSw0LjENCgkJYzAuNCwwLjQsMC40LDEsMCwxLjRDMjAuNiw2LjksMjAuNCw3LDIwLjEsN3oiLz4NCjwvZz4NCjxnPg0KCTxwYXRoIGQ9Ik0xNiwzMGMtMC42LDAtMS0wLjQtMS0xVjNjMC0wLjYsMC40LTEsMS0xczEsMC40LDEsMXYyNkMxNywyOS42LDE2LjYsMzAsMTYsMzB6Ii8+DQo8L2c+DQo8Zz4NCgk8cGF0aCBkPSJNMjksMTdIMmMtMC42LDAtMS0wLjQtMS0xczAuNC0xLDEtMWgyN2MwLjYsMCwxLDAuNCwxLDFTMjkuNiwxNywyOSwxN3oiLz4NCjwvZz4NCjwvc3ZnPg0K",
+      "name": "TopDownMovementAnimator",
+      "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Glyphster Pack/Master/SVG/Arrows/a6026156355ae5f03613b03971e4ddb50d0c95b8901e7a21edc57f33f0032e42_Arrows_thin_arrows_all_directions_cross.svg",
+      "shortDescription": "Change the animation according to the movement direction.",
+      "version": "0.1.0",
+      "description": "Change the animation according to the movement direction.",
+      "tags": [
+        "animation",
+        "direction"
+      ],
+      "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Change the animation according to the movement direction.",
+          "fullName": "Top-down movement animator",
+          "name": "TopDownMovementAnimator",
+          "objectType": "Sprite",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::PropertyDirectionCount"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::DiagonalsAllowed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetPropertyDirectionCount"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "8"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "TopDownMovementBehavior::DiagonalsAllowed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetPropertyDirectionCount"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "4"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onActivate",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetAnimationDirection"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Object.Behavior::Direction()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementBehavior::Speed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "TopDownMovement",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PauseAnimation"
+                      },
+                      "parameters": [
+                        "Object"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementBehavior::Speed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "TopDownMovement",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlayAnimation"
+                      },
+                      "parameters": [
+                        "Object"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementAnimator::TopDownMovementAnimator::PropertyIsScalingAnimation"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetAnimationSpeedScale"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetSharedPropertyNewAnimationDirection"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Behavior::Direction()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Use a small margin is used to avoid to flicker between 2 directions.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                      },
+                      "parameters": [
+                        "abs(Object.Behavior:: DirectionDifference(Object.Behavior::SharedPropertyNewAnimationDirection(), Object.Behavior::PropertyAnimationDirection()))",
+                        ">",
+                        "0.5 + 0.03125"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetAnimationDirection"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Object.Behavior::SharedPropertyNewAnimationDirection()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the animation name of the object.",
+              "fullName": "Animation name",
+              "functionType": "ExpressionAndCondition",
+              "name": "AnimationName",
+              "sentence": "the animation name",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyAnimationName()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "string"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "AnimationName",
+              "name": "SetAnimationName",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::PropertyAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "!=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetPropertyAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object. Behavior::PropertyAnimationName() + ToString(Object.Behavior::PropertyAnimationDirection())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the animation is scaled according to speed.",
+              "fullName": "Scale animation according to speed",
+              "functionType": "Condition",
+              "name": "IsScalingAnimation",
+              "sentence": "_PARAM0_ animation is scaled according to speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::PropertyIsScalingAnimation"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change whether the animation is scaled according to speed or not.",
+              "fullName": "Scale animation according to speed",
+              "functionType": "Action",
+              "name": "SetIsScalingAnimation",
+              "sentence": "Scale the animation of _PARAM0_ according to speed: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Value\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetPropertyIsScalingAnimation"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "no"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeAnimationSpeedScale"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Value\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetPropertyIsScalingAnimation"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetAnimationSpeedScale"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                },
+                {
+                  "defaultValue": "yes",
+                  "description": "IsScalingAnimation",
+                  "name": "Value",
+                  "optional": true,
+                  "type": "yesorno"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the animation speed scale according to the object speed.",
+              "fullName": "Animation speed scale",
+              "functionType": "Action",
+              "name": "SetAnimationSpeedScale",
+              "private": true,
+              "sentence": "Change the animation speed scale according to _PARAM0_ speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ChangeAnimationSpeedScale"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.TopDownMovement::Speed() / Object.TopDownMovement::MaxSpeed()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the object movement direction.",
+              "fullName": "Direction",
+              "functionType": "Expression",
+              "name": "Direction",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "(Object.TopDownMovement::Angle() + Object.Behavior::PropertyAngleOffset()) * Object.Behavior::PropertyDirectionCount() / 360"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the difference between 2 directions.",
+              "fullName": "Direction dirrerence",
+              "functionType": "Expression",
+              "name": "DirectionDifference",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "mod(mod(GetArgumentAsNumber(\"Direction\") - GetArgumentAsNumber(\"OtherDirection\"), Object.Behavior::PropertyDirectionCount()) + Object.Behavior::PropertyDirectionCount() / 2, Object.Behavior::PropertyDirectionCount()) - Object.Behavior::PropertyDirectionCount() / 2"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Direction",
+                  "name": "Direction",
+                  "type": "expression"
+                },
+                {
+                  "description": "Other direction",
+                  "name": "OtherDirection",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the animation direction of the object.",
+              "fullName": "Animation direction",
+              "functionType": "Action",
+              "name": "SetAnimationDirection",
+              "private": true,
+              "sentence": "Change the animation direction of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Change the animation but keep the current frame number.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetPropertyAnimationDirection"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "mod(mod(round(GetArgumentAsNumber(\"Value\")), Object.Behavior::PropertyDirectionCount()) + Object.Behavior::PropertyDirectionCount(), Object.Behavior::PropertyDirectionCount())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TopDownMovementAnimator::TopDownMovementAnimator::SetSharedPropertyAnimationFrame"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Sprite()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object. Behavior::PropertyAnimationName() + ToString(Object.Behavior::PropertyAnimationDirection())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeSprite"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.Behavior::SharedPropertyAnimationFrame()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Value",
+                  "name": "Value",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "Top-down movement",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "TopDownMovementBehavior::TopDownMovementBehavior"
+              ],
+              "hidden": false,
+              "name": "TopDownMovement"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Scale animation according to speed",
+              "description": "",
+              "group": "Animation",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "IsScalingAnimation"
+            },
+            {
+              "value": "Walk",
+              "type": "String",
+              "label": "Animation name",
+              "description": "Animations must be called \"Walk0\", \"Walk1\"... for left, down...",
+              "group": "Animation",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AnimationName"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Number of directions",
+              "description": "Leave to 0 to automatically use 8 when diagonals are allowed and 4 otherwise.",
+              "group": "Direction",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "DirectionCount"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Angle offset",
+              "description": "Setted to 90°, \"Walk0\" becomes the animation for down.",
+              "group": "Direction",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AngleOffset"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "AnimationDirection"
+            }
+          ],
+          "sharedPropertyDescriptors": [
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "NewAnimationDirection"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "AnimationFrame"
+            }
+          ]
+        }
+      ],
+      "eventsBasedObjects": []
+    },
     {
       "author": "",
       "category": "",
@@ -28172,17 +29104,31 @@
           "sentence": "Choose the animation of _PARAM1_ according to the movement",
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "When moving, set the animation according to the direction of the movement (we can automatically compute it. For example, if the angle is 180 degrees (i.e: left), the direction will be 1 + 180/45  = 5). This allow us to make only one action, rather than adding conditions for every direction.\nThis supposes that animation #0 is the Idle animation, and the others animation are in the right order (animation #1 is the right, and then ordered in a clock wise manner).",
-              "comment2": ""
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "TopDownMovementBehavior::IsMoving"
+                  },
+                  "parameters": [
+                    "Mindy",
+                    "TopDownMovement"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Mindy",
+                    "TopDownAnimator",
+                    "no"
+                  ]
+                }
+              ]
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -28200,12 +29146,57 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ChangeAnimation"
+                    "value": "ActivateBehavior"
                   },
                   "parameters": [
                     "Mindy",
-                    "=",
-                    "1 + mod(round((Mindy.TopDownMovement::Angle())/45+1), 8)"
+                    "TopDownAnimator",
+                    "yes"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BehaviorActivated"
+                      },
+                      "parameters": [
+                        "Mindy",
+                        "NavMeshPathfindingBehavior"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "NavMeshPathfinding::NavMeshPathfindingBehavior::IsMoving"
+                      },
+                      "parameters": [
+                        "Mindy",
+                        "NavMeshPathfindingBehavior"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Mindy",
+                    "PathfindingAnimator",
+                    "no"
                   ]
                 }
               ]
@@ -28235,12 +29226,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ChangeAnimation"
+                    "value": "ActivateBehavior"
                   },
                   "parameters": [
                     "Mindy",
-                    "=",
-                    "1 + mod(round((Mindy.NavMeshPathfindingBehavior::MovementAngle())/45), 8)"
+                    "PathfindingAnimator",
+                    "yes"
                   ]
                 }
               ]
@@ -28265,12 +29256,11 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ChangeAnimation"
+                    "value": "SetAnimationName"
                   },
                   "parameters": [
                     "Mindy",
-                    "=",
-                    "0"
+                    "\"Idle\""
                   ]
                 }
               ]
@@ -28293,6 +29283,18 @@
               "description": "Top-down movement",
               "name": "TopDownMovement",
               "supplementaryInformation": "TopDownMovementBehavior::TopDownMovementBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Top-down movement animator",
+              "name": "TopDownAnimator",
+              "supplementaryInformation": "TopDownMovementAnimator::TopDownMovementAnimator",
+              "type": "behavior"
+            },
+            {
+              "description": "Navigation mesh pathfinding animator",
+              "name": "PathfindingAnimator",
+              "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
               "type": "behavior"
             }
           ],
@@ -33821,16 +34823,26 @@
       "name": "NavMeshPathfinding",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Maps and Navigation/Maps and Navigation_map_find_search.svg",
       "shortDescription": "Pathfinding allows to compute an efficient path for objects, avoiding obstacles on the way.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": [
         "In comparison to the built-in pathfinding behavior, this one aims to:",
         "- better respect obstacle shapes",
-        "- find pathes faster if obstacles don't move",
-        ""
+        "- find paths faster if obstacles don't move",
+        "",
+        "The isometric example shows how to use this extension to move a character to a destination ([open the project online](https://editor.gdevelop.io/?project=example://isometric-game))."
       ],
+      "origin": {
+        "identifier": "NavMeshPathfinding",
+        "name": "gdevelop-extension-store"
+      },
       "tags": [
         "navmesh",
-        "pathfinding"
+        "pathfinding",
+        "obstacle",
+        "solid",
+        "path",
+        "detour",
+        "recast"
       ],
       "authorIds": [
         "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
@@ -39985,6 +40997,111 @@
               "objectGroups": []
             },
             {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onDeActivate",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");\r",
+                    "const behavior = object.getBehavior(behaviorName);\r",
+                    "\r",
+                    "behavior.__NavMeshPathfinding.obstacle.onDeActivate();"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingObstacleBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onActivate",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");\r",
+                    "const behavior = object.getBehavior(behaviorName);\r",
+                    "\r",
+                    "behavior.__NavMeshPathfinding.obstacle.onActivate();"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingObstacleBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onDestroy",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");\r",
+                    "const behavior = object.getBehavior(behaviorName);\r",
+                    "\r",
+                    "behavior.__NavMeshPathfinding.obstacle.onDestroy();"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingObstacleBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "the cell size for obstacle collision mask rasterization. While an object is needed, this will apply to all objects using the behavior.",
               "fullName": "Cell size",
               "functionType": "ExpressionAndCondition",
@@ -40553,6 +41670,881 @@
               "extraInformation": [],
               "hidden": true,
               "name": "IsometricRatio"
+            }
+          ]
+        },
+        {
+          "description": "Change the animation according to the movement direction.",
+          "fullName": "Navigation mesh pathfinding animator",
+          "name": "NavMeshPathfindingAnimator",
+          "objectType": "Sprite",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::PropertyDirectionCount"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::DiagonalsAllowed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "NavMeshPathfinding"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetPropertyDirectionCount"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "8"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "TopDownMovementBehavior::DiagonalsAllowed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "NavMeshPathfinding"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetPropertyDirectionCount"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "4"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onActivate",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetAnimationDirection"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Object.Behavior::Direction()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingBehavior::Speed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "NavMeshPathfinding",
+                        "=",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PauseAnimation"
+                      },
+                      "parameters": [
+                        "Object"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingBehavior::Speed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "NavMeshPathfinding",
+                        ">",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlayAnimation"
+                      },
+                      "parameters": [
+                        "Object"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::PropertyIsScalingAnimation"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetAnimationSpeedScale"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetSharedPropertyNewAnimationDirection"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Behavior::Direction()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Use a small margin is used to avoid to flicker between 2 directions.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                      },
+                      "parameters": [
+                        "abs(Object.Behavior:: DirectionDifference(Object.Behavior::SharedPropertyNewAnimationDirection(), Object.Behavior::PropertyAnimationDirection()))",
+                        ">",
+                        "0.5 + 0.03125"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetAnimationDirection"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Object.Behavior::SharedPropertyNewAnimationDirection()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the animation name of the object.",
+              "fullName": "Animation name",
+              "functionType": "ExpressionAndCondition",
+              "name": "AnimationName",
+              "sentence": "the animation name",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyAnimationName()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "string"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "AnimationName",
+              "name": "SetAnimationName",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::PropertyAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "!=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetPropertyAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object. Behavior::PropertyAnimationName() + ToString(Object.Behavior::PropertyAnimationDirection())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the animation is scaled according to speed.",
+              "fullName": "Scale animation according to speed",
+              "functionType": "Condition",
+              "name": "IsScalingAnimation",
+              "sentence": "_PARAM0_ animation is scaled according to speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::PropertyIsScalingAnimation"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change whether the animation is scaled according to speed or not.",
+              "fullName": "Scale animation according to speed",
+              "functionType": "Action",
+              "name": "SetIsScalingAnimation",
+              "sentence": "Scale the animation of _PARAM0_ according to speed: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Value\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetPropertyIsScalingAnimation"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "no"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeAnimationSpeedScale"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"Value\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetPropertyIsScalingAnimation"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetAnimationSpeedScale"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                },
+                {
+                  "defaultValue": "yes",
+                  "description": "IsScalingAnimation",
+                  "name": "Value",
+                  "optional": true,
+                  "type": "yesorno"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the animation speed scale according to the object speed.",
+              "fullName": "Animation speed scale",
+              "functionType": "Action",
+              "name": "SetAnimationSpeedScale",
+              "private": true,
+              "sentence": "Change the animation speed scale according to _PARAM0_ speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ChangeAnimationSpeedScale"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.NavMeshPathfinding::Speed() / Object.NavMeshPathfinding::MaxSpeed()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the object movement direction.",
+              "fullName": "Direction",
+              "functionType": "Expression",
+              "name": "Direction",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "(Object.NavMeshPathfinding::MovementAngle() + Object.Behavior::PropertyAngleOffset()) * Object.Behavior::PropertyDirectionCount() / 360"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the difference between 2 directions.",
+              "fullName": "Direction dirrerence",
+              "functionType": "Expression",
+              "name": "DirectionDifference",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "mod(mod(GetArgumentAsNumber(\"Direction\") - GetArgumentAsNumber(\"OtherDirection\"), Object.Behavior::PropertyDirectionCount()) + Object.Behavior::PropertyDirectionCount() / 2, Object.Behavior::PropertyDirectionCount()) - Object.Behavior::PropertyDirectionCount() / 2"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Direction",
+                  "name": "Direction",
+                  "type": "expression"
+                },
+                {
+                  "description": "Other direction",
+                  "name": "OtherDirection",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the animation direction of the object.",
+              "fullName": "Animation direction",
+              "functionType": "Action",
+              "name": "SetAnimationDirection",
+              "private": true,
+              "sentence": "Change the animation direction of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Change the animation but keep the current frame number.",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetPropertyAnimationDirection"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "mod(mod(round(GetArgumentAsNumber(\"Value\")), Object.Behavior::PropertyDirectionCount()) + Object.Behavior::PropertyDirectionCount(), Object.Behavior::PropertyDirectionCount())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::NavMeshPathfindingAnimator::SetSharedPropertyAnimationFrame"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Sprite()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object. Behavior::PropertyAnimationName() + ToString(Object.Behavior::PropertyAnimationDirection())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeSprite"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.Behavior::SharedPropertyAnimationFrame()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "NavMeshPathfinding::NavMeshPathfindingAnimator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Value",
+                  "name": "Value",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "Navigation mesh pathfinding",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "NavMeshPathfinding::NavMeshPathfindingBehavior"
+              ],
+              "hidden": false,
+              "name": "NavMeshPathfinding"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Scale animation according to speed",
+              "description": "",
+              "group": "Animation",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "IsScalingAnimation"
+            },
+            {
+              "value": "Walk",
+              "type": "String",
+              "label": "Animation name",
+              "description": "Animations must be called \"Walk0\", \"Walk1\"... for left, down...",
+              "group": "Animation",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AnimationName"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Number of directions",
+              "description": "Leave to 0 to automatically use 8 when diagonals are allowed and 4 otherwise.",
+              "group": "Direction",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "DirectionCount"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Angle offset",
+              "description": "Setted to 90°, \"Walk0\" becomes the animation for down.",
+              "group": "Direction",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AngleOffset"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "AnimationDirection"
+            }
+          ],
+          "sharedPropertyDescriptors": [
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "NewAnimationDirection"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "AnimationFrame"
             }
           ]
         }
