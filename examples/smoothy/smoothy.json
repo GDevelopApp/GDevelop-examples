@@ -2127,6 +2127,81 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "5",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "BoardBubble",
+                        "StartLocation.X()",
+                        "StartLocation.Y()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "BoardBubble",
+                        "StartLocation.X()",
+                        "StartLocation.Y()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "\"Gutter\"",
+                        "1",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeAnimation"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "=",
+                        "Variable(index)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::ObjectStack::AddOnTop"
+                      },
+                      "parameters": [
+                        "StartLocation",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "index",
+                        "-",
+                        "1"
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -3813,23 +3888,6 @@
                                   ]
                                 }
                               ]
-                            },
-                            {
-                              "colorB": 228,
-                              "colorG": 176,
-                              "colorR": 74,
-                              "creationTime": 0,
-                              "name": "Combo",
-                              "source": "",
-                              "type": "BuiltinCommonInstructions::Group",
-                              "events": [
-                                {
-                                  "type": "BuiltinCommonInstructions::Standard",
-                                  "conditions": [],
-                                  "actions": []
-                                }
-                              ],
-                              "parameters": []
                             }
                           ]
                         }
@@ -4228,6 +4286,231 @@
                         "1"
                       ]
                     }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Combo",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "queueIndex",
+                    "=",
+                    "Gutter.ObjectStack::Height() - 2"
+                  ]
+                }
+              ]
+            },
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "queueIndex",
+                    ">=",
+                    "0"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsAt"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        "Variable(queueIndex) + 1",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsAt"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarSceneTxt"
+                      },
+                      "parameters": [
+                        "firstBubbleColor",
+                        "=",
+                        "BoardBubble.AnimationName()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsAt"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        "Variable(queueIndex)",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::HasOnTop"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "AnimationName"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "VariableString(firstBubbleColor)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "BubbleQueue",
+                            "IsRewinding",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"Rewind\"",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "queueIndex",
+                        "-",
+                        "1"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "BubbleQueue",
+                    "IsRewinding",
+                    "True"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ObjectStack::Contains"
+                  },
+                  "parameters": [
+                    "",
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "BoardBubble",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                  },
+                  "parameters": [
+                    "BoardBubble",
+                    "SpeedPathMovement",
+                    "-200",
+                    "800",
+                    ""
                   ]
                 }
               ]
