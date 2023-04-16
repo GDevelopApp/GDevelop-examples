@@ -1013,7 +1013,7 @@
             {
               "name": "FireBullet",
               "type": "FireBullet::FireBullet",
-              "FireCooldown": 0.1,
+              "FireCooldown": 0.35,
               "HasJustFired": false
             }
           ],
@@ -2663,6 +2663,16 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "type": {
+                            "value": "FireBullet::FireBullet::IsReadyToShoot"
+                          },
+                          "parameters": [
+                            "AimingBubble",
+                            "FireBullet",
+                            ""
+                          ]
                         }
                       ],
                       "actions": [
@@ -2680,23 +2690,52 @@
                             "300",
                             ""
                           ]
-                        },
+                        }
+                      ],
+                      "events": [
                         {
-                          "type": {
-                            "value": "SetAnimationName"
-                          },
-                          "parameters": [
-                            "MovingBubble",
-                            "AimingBubble.AnimationName()"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetAnimationName"
-                          },
-                          "parameters": [
-                            "AimingBubble",
-                            "VariableString(remainingColors[RandomInRange(0, VariableChildCount(remainingColors) - 1)])"
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "PosX"
+                              },
+                              "parameters": [
+                                "MovingBubble",
+                                "=",
+                                "AimingBubble.X()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PosY"
+                              },
+                              "parameters": [
+                                "MovingBubble",
+                                "=",
+                                "AimingBubble.Y()"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetAnimationName"
+                              },
+                              "parameters": [
+                                "MovingBubble",
+                                "AimingBubble.AnimationName()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetAnimationName"
+                              },
+                              "parameters": [
+                                "AimingBubble",
+                                "VariableString(remainingColors[RandomInRange(0, VariableChildCount(remainingColors) - 1)])"
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -2925,7 +2964,7 @@
                             "InsertedBubble",
                             "FreedDistance",
                             "=",
-                            "min(InsertedBubble.Variable(FreedDistance) + 32 * TimeDelta() * 2, 32)"
+                            "min(InsertedBubble.Variable(FreedDistance) + 32 * TimeDelta() * 3, 32)"
                           ]
                         }
                       ],
@@ -3738,15 +3777,23 @@
                                 "ObjectStack",
                                 ""
                               ]
-                            },
+                            }
+                          ],
+                          "events": [
                             {
-                              "type": {
-                                "value": "DebuggerTools::ConsoleLog"
-                              },
-                              "parameters": [
-                                "\"Insert in Gutter\"",
-                                "",
-                                ""
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "DebuggerTools::ConsoleLog"
+                                  },
+                                  "parameters": [
+                                    "\"Insert in Gutter\"",
+                                    "",
+                                    ""
+                                  ]
+                                }
                               ]
                             }
                           ]
@@ -3922,19 +3969,25 @@
                   ]
                 }
               ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "DebuggerTools::ConsoleLog"
-                  },
-                  "parameters": [
-                    "\"delta: \" + ToString(Variable(firstBubblePathPosition) + 32 - BoardBubble.SpeedPathMovement::PositionOnPath())",
-                    "",
-                    ""
-                  ]
-                }
-              ],
+              "actions": [],
               "events": [
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"delta: \" + ToString(Variable(firstBubblePathPosition) + 32 - BoardBubble.SpeedPathMovement::PositionOnPath())",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
