@@ -1,0 +1,1 @@
+Show how to use the "Ellipse movement" extension to move a player in a snake-like game.
