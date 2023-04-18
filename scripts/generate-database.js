@@ -21,6 +21,8 @@ const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
 /** @typedef {import('./types').gdProject} gdProject */
 /** @typedef {import('./types').gdPlatformExtension} gdPlatformExtension */
 /** @typedef {import('./types').Example} Example */
+/** @typedef {import('./types').ExampleUsedExtension} ExampleUsedExtension */
+/** @typedef {import('./types').ExampleEventsBasedExtension} ExampleEventsBasedExtension */
 /** @typedef {import('./types').ExampleShortHeader} ExampleShortHeader */
 
 if (!args['gdevelop-root-path']) {
@@ -170,23 +172,26 @@ const checkProjectResourceFiles = async (project, projectFolderPath) => {
 
 const sortedStarterSlugs = new Set([
   'platformer',
-  'ball-cup-boom',
-  'spherez',
-  'absorbus',
-  'tappy-plane',
+  'plinko',
   'parking-jam',
+  'top-down-rpg',
+  'spherez',
+  'tappy-plane',
+  'game-feel-demo',
+  'tile-based-city-builder',
   'conviction-of-gun-dude-desktop',
+  'ball-cup-boom',
+  'particle-effects-demo',
   'space-shooter',
   'run-dino-run',
   'bounce-and-hook',
+  'absorbus',
   'duck-game',
   'downhill-bike-physics-demo',
   'space-asteroids',
   'geometry-monster',
   'pairs',
   'isometric-game',
-  'particle-effects-demo',
-  'game-feel-demo',
 ]);
 
 /**
@@ -256,25 +261,55 @@ const extractExamples = async (
 
         const project = loadSerializedProject(gd, projectObject);
 
-        /** @type {{name: string, fullName: string}[]} */
+        /** @type {number} */
+        const instructionsCount =
+          gd.InstructionsCountEvaluator.scanProject(project);
+        /** @type {string} */
+        const codeSizeLevel =
+          instructionsCount < 20
+            ? 'tiny'
+            : instructionsCount < 100
+            ? 'small'
+            : instructionsCount < 200
+            ? 'medium'
+            : instructionsCount < 500
+            ? 'big'
+            : 'huge';
+        /** @type {ExampleUsedExtension[]} */
         const usedExtensions = gd.UsedExtensionsFinder.scanProject(project)
+          .getUsedExtensions()
           .toNewVectorString()
           .toJSArray()
           .map(
             /** @param {string} name */
-            (name) => ({
-              name,
-              fullName: platformExtensionsMap[name]
-                ? platformExtensionsMap[name].getFullName()
-                : '',
-            })
+            (name) => {
+              const platformExtension = platformExtensionsMap[name];
+              if (!platformExtension) {
+                return { name, fullName: '', helpPath: '', iconUrl: '' };
+              }
+
+              /** @type {ExampleUsedExtension} */
+              const usedExtension = {
+                name,
+                fullName: platformExtension.getFullName(),
+                helpPath: platformExtension.getHelpPath(),
+                iconUrl: platformExtension.getIconUrl(),
+                category: platformExtension.getCategory(),
+              };
+              return usedExtension;
+            }
           );
-        /** @type {{name: string, fullName: string}[]} */
+        /** @type {ExampleEventsBasedExtension[]} */
         const eventsBasedExtensions = [];
         for (let i = 0; i < project.getEventsFunctionsExtensionsCount(); ++i) {
+          const extension = project.getEventsFunctionsExtensionAt(i);
           eventsBasedExtensions.push({
-            name: project.getEventsFunctionsExtensionAt(i).getName(),
-            fullName: project.getEventsFunctionsExtensionAt(i).getFullName(),
+            name: extension.getName(),
+            fullName: extension.getFullName(),
+            helpPath: extension.getHelpPath(),
+            category: extension.getCategory(),
+            previewIconUrl: extension.getPreviewIconUrl(),
+            authorIds: extension.getAuthorIds().toJSArray(),
           });
         }
 
@@ -313,8 +348,15 @@ const extractExamples = async (
           ...getStaticTags(slug),
           ...usedExtensions.map(({ fullName }) => fullName),
           ...eventsBasedExtensions.map(({ fullName }) => fullName),
-        ];
+        ].filter((tag) => tag.length > 0);
         tags.forEach((tag) => allExampleTags.add(tag));
+        const difficultyLevel = tags.includes('simple')
+          ? 'simple'
+          : tags.includes('advanced')
+          ? 'advanced'
+          : tags.includes('expert')
+          ? 'expert'
+          : undefined;
 
         const authorIds = project.getAuthorIds().toJSArray();
 
@@ -342,6 +384,8 @@ const extractExamples = async (
           description,
           authorIds,
           tags,
+          codeSizeLevel,
+          difficultyLevel,
           usedExtensions,
           eventsBasedExtensions,
           previewImageUrls: getPreviewImageUrls(gameFolderPath, allFiles),
@@ -433,7 +477,9 @@ const generateSortedShortHeaders = (allExamples) => {
     previewImageUrls: example.previewImageUrls,
     authorIds: example.authorIds,
     tags: example.tags,
+    difficultyLevel: example.difficultyLevel,
     gdevelopVersion: example.gdevelopVersion,
+    codeSizeLevel: example.codeSizeLevel,
   }));
 };
 

@@ -1,0 +1,1 @@
+Demonstrates how to use the "Room based camera movement" extension for a top down action adventure/action RPG style camera.

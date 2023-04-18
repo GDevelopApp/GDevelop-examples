@@ -1,3 +1,20 @@
+export interface ExampleUsedExtension {
+  name: string;
+  fullName: string;
+  helpPath: string;
+  iconUrl: string;
+  category: string;
+}
+
+export interface ExampleEventsBasedExtension {
+  name: string;
+  fullName: string;
+  helpPath: string;
+  previewIconUrl: string;
+  authorIds: string[];
+  category: string;
+}
+
 /**
  * Describe an example and all the useful information about it.
  */
@@ -11,12 +28,14 @@ export interface Example {
   authorIds: string[];
   previewImageUrls: string[];
   gdevelopVersion: string;
+  codeSizeLevel: string;
+  difficultyLevel: string | undefined;
 
   description: string;
   projectFileUrl: string;
 
-  usedExtensions: Array<{ name: string; fullName: string }>;
-  eventsBasedExtensions: Array<{ name: string; fullName: string }>;
+  usedExtensions: Array<ExampleUsedExtension>;
+  eventsBasedExtensions: Array<ExampleEventsBasedExtension>;
 }
 
 /**
@@ -33,6 +52,8 @@ export interface ExampleShortHeader {
   authorIds: string[];
   previewImageUrls: string[];
   gdevelopVersion: string;
+  codeSizeLevel: string;
+  difficultyLevel: string | undefined;
 }
 
 export type gdProject = any;

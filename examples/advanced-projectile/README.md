@@ -1,0 +1,1 @@
+Control how a projectile object moves including speed, acceleration, distance, and lifetime.
