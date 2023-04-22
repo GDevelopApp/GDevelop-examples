@@ -3752,31 +3752,100 @@
                   ]
                 }
               ],
-              "actions": [
+              "actions": [],
+              "events": [
                 {
-                  "type": {
-                    "value": "JointConnector::CreateRevoluteJoints"
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
                   },
-                  "parameters": [
-                    "",
-                    "BodyParts",
-                    "Physics2",
-                    "JointConnector",
-                    "EnforceAngles_Checkbox.Checkbox::CheckedValue()",
-                    "MinAngle_Slider.DraggableSliderControl::Value()",
-                    "MaxAngle_Slider.DraggableSliderControl::Value()",
-                    "EnableMotor_Checkbox.Checkbox::CheckedValue()",
-                    "MotorSpeed_Slider.DraggableSliderControl::Value()",
-                    "MotorTorque_Slider.DraggableSliderControl::Value()",
-                    "MotorTorque_Slider.DraggableSliderControl::Value()"
+                  "comment": "Add a rope joint between both ends of the chain to prevent chain from being pulled apart",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Chain",
+                        "Ground",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::AddRopeJoint"
+                      },
+                      "parameters": [
+                        "RightBoot",
+                        "Physics2",
+                        "RightBoot.CenterX()",
+                        "RightBoot.CenterY()",
+                        "Chain",
+                        "Chain.CenterX()",
+                        "Chain.CenterY()",
+                        "-1",
+                        "",
+                        ""
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "Cache"
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
                   },
-                  "parameters": [
-                    "JointConnector"
+                  "comment": "Connect ragdoll and chain using revolute joint connectors",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "JointConnector::CreateRevoluteJoints"
+                      },
+                      "parameters": [
+                        "",
+                        "BodyParts",
+                        "Physics2",
+                        "JointConnector",
+                        "EnforceAngles_Checkbox.Checkbox::CheckedValue()",
+                        "MinAngle_Slider.DraggableSliderControl::Value()",
+                        "MaxAngle_Slider.DraggableSliderControl::Value()",
+                        "EnableMotor_Checkbox.Checkbox::CheckedValue()",
+                        "MotorSpeed_Slider.DraggableSliderControl::Value()",
+                        "MotorTorque_Slider.DraggableSliderControl::Value()",
+                        "MotorTorque_Slider.DraggableSliderControl::Value()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "JointConnector"
+                      ]
+                    }
                   ]
                 }
               ]
@@ -3789,33 +3858,10 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Controls and Camera",
+          "name": "Create objects with right-click",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "FollowObjectsWithCamera::FollowObjectsWithCamera"
-                  },
-                  "parameters": [
-                    "",
-                    "Ground",
-                    "0",
-                    "0",
-                    "",
-                    "",
-                    "\"\"",
-                    "",
-                    "1",
-                    ""
-                  ]
-                }
-              ]
-            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -3885,6 +3931,84 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
+          "name": "Allow joints to be broken",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "JointConnector::WeldJoint::SetBreakingForce"
+                  },
+                  "parameters": [
+                    "WeldJointConnector",
+                    "WeldJoint",
+                    "15000",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "JointConnector::WeldJoint::BreakJointIfNeeded"
+                  },
+                  "parameters": [
+                    "WeldJointConnector",
+                    "WeldJoint",
+                    "BlueBackground",
+                    "Physics2",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "folded": true,
+          "name": "Camera",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "FollowObjectsWithCamera::FollowObjectsWithCamera"
+                  },
+                  "parameters": [
+                    "",
+                    "Ground",
+                    "0",
+                    "0",
+                    "",
+                    "",
+                    "\"\"",
+                    "",
+                    "1",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "folded": true,
           "name": "UI",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -6892,31 +7016,100 @@
                   ]
                 }
               ],
-              "actions": [
+              "actions": [],
+              "events": [
                 {
-                  "type": {
-                    "value": "JointConnector::CreateRevoluteJoints"
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
                   },
-                  "parameters": [
-                    "",
-                    "BodyParts",
-                    "Physics2",
-                    "JointConnector",
-                    "EnforceAngles_Checkbox.Checkbox::CheckedValue()",
-                    "MinAngle_Slider.DraggableSliderControl::Value()",
-                    "MaxAngle_Slider.DraggableSliderControl::Value()",
-                    "EnableMotor_Checkbox.Checkbox::CheckedValue()",
-                    "MotorSpeed_Slider.DraggableSliderControl::Value()",
-                    "MotorTorque_Slider.DraggableSliderControl::Value()",
-                    "MotorTorque_Slider.DraggableSliderControl::Value()"
+                  "comment": "Add a rope joint between both ends of the chain to prevent chain from being pulled apart",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Chain",
+                        "Ground",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::AddRopeJoint"
+                      },
+                      "parameters": [
+                        "RightBoot",
+                        "Physics2",
+                        "RightBoot.CenterX()",
+                        "RightBoot.CenterY()",
+                        "Chain",
+                        "Chain.CenterX()",
+                        "Chain.CenterY()",
+                        "-1",
+                        "",
+                        ""
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "Cache"
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
                   },
-                  "parameters": [
-                    "JointConnector"
+                  "comment": "Connect ragdoll and chain using revolute joint connectors",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "JointConnector::CreateRevoluteJoints"
+                      },
+                      "parameters": [
+                        "",
+                        "BodyParts",
+                        "Physics2",
+                        "JointConnector",
+                        "EnforceAngles_Checkbox.Checkbox::CheckedValue()",
+                        "MinAngle_Slider.DraggableSliderControl::Value()",
+                        "MaxAngle_Slider.DraggableSliderControl::Value()",
+                        "EnableMotor_Checkbox.Checkbox::CheckedValue()",
+                        "MotorSpeed_Slider.DraggableSliderControl::Value()",
+                        "MotorTorque_Slider.DraggableSliderControl::Value()",
+                        "MotorTorque_Slider.DraggableSliderControl::Value()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "JointConnector"
+                      ]
+                    }
                   ]
                 }
               ]
@@ -6929,33 +7122,10 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Controls and Camera",
+          "name": "Create objects with right-click",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "FollowObjectsWithCamera::FollowObjectsWithCamera"
-                  },
-                  "parameters": [
-                    "",
-                    "Ground",
-                    "0",
-                    "0",
-                    "",
-                    "",
-                    "\"\"",
-                    "",
-                    "1",
-                    ""
-                  ]
-                }
-              ]
-            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -7025,6 +7195,43 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
+          "folded": true,
+          "name": "Camera",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "FollowObjectsWithCamera::FollowObjectsWithCamera"
+                  },
+                  "parameters": [
+                    "",
+                    "Ground",
+                    "0",
+                    "0",
+                    "",
+                    "",
+                    "\"\"",
+                    "",
+                    "1",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "folded": true,
           "name": "UI",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -10028,31 +10235,100 @@
                   ]
                 }
               ],
-              "actions": [
+              "actions": [],
+              "events": [
                 {
-                  "type": {
-                    "value": "JointConnector::CreateRevoluteJoints"
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
                   },
-                  "parameters": [
-                    "",
-                    "BodyParts",
-                    "Physics2",
-                    "JointConnector",
-                    "EnforceAngles_Checkbox.Checkbox::CheckedValue()",
-                    "MinAngle_Slider.DraggableSliderControl::Value()",
-                    "MaxAngle_Slider.DraggableSliderControl::Value()",
-                    "EnableMotor_Checkbox.Checkbox::CheckedValue()",
-                    "MotorSpeed_Slider.DraggableSliderControl::Value()",
-                    "MotorTorque_Slider.DraggableSliderControl::Value()",
-                    "MotorTorque_Slider.DraggableSliderControl::Value()"
+                  "comment": "Add a rope joint between both ends of the chain to prevent chain from being pulled apart",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Chain",
+                        "Ground",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Physics2::AddRopeJoint"
+                      },
+                      "parameters": [
+                        "RightBoot",
+                        "Physics2",
+                        "RightBoot.CenterX()",
+                        "RightBoot.CenterY()",
+                        "Chain",
+                        "Chain.CenterX()",
+                        "Chain.CenterY()",
+                        "-1",
+                        "",
+                        ""
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "Cache"
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
                   },
-                  "parameters": [
-                    "JointConnector"
+                  "comment": "Connect ragdoll and chain using revolute joint connectors",
+                  "comment2": ""
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "JointConnector::CreateRevoluteJoints"
+                      },
+                      "parameters": [
+                        "",
+                        "BodyParts",
+                        "Physics2",
+                        "JointConnector",
+                        "EnforceAngles_Checkbox.Checkbox::CheckedValue()",
+                        "MinAngle_Slider.DraggableSliderControl::Value()",
+                        "MaxAngle_Slider.DraggableSliderControl::Value()",
+                        "EnableMotor_Checkbox.Checkbox::CheckedValue()",
+                        "MotorSpeed_Slider.DraggableSliderControl::Value()",
+                        "MotorTorque_Slider.DraggableSliderControl::Value()",
+                        "MotorTorque_Slider.DraggableSliderControl::Value()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "JointConnector"
+                      ]
+                    }
                   ]
                 }
               ]
@@ -10065,33 +10341,10 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Controls and Camera",
+          "name": "Create objects with right-click",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "FollowObjectsWithCamera::FollowObjectsWithCamera"
-                  },
-                  "parameters": [
-                    "",
-                    "Ground",
-                    "0",
-                    "0",
-                    "",
-                    "",
-                    "\"\"",
-                    "",
-                    "1",
-                    ""
-                  ]
-                }
-              ]
-            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -10161,6 +10414,43 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
+          "folded": true,
+          "name": "Camera",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "FollowObjectsWithCamera::FollowObjectsWithCamera"
+                  },
+                  "parameters": [
+                    "",
+                    "Ground",
+                    "0",
+                    "0",
+                    "",
+                    "",
+                    "\"\"",
+                    "",
+                    "1",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "folded": true,
           "name": "UI",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -12692,7 +12982,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Controls",
+          "name": "Create objects with right-click",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -12937,6 +13227,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
+          "folded": true,
           "name": "Camera",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -12972,6 +13263,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
+          "folded": true,
           "name": "UI",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -24885,7 +25177,7 @@
           "angle": 39.805572509765625,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "50a2e027-18f7-4825-ac35-d4b36db7b03d",
           "width": 0,
@@ -24990,7 +25282,7 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "51ffca79-2e09-4730-aaa1-bb35a7095553",
           "width": 0,
@@ -25020,7 +25312,7 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "45f5f549-0ab8-424e-b47d-76c921efa8af",
           "width": 0,
@@ -25035,7 +25327,7 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "0b990d4f-ec8b-4c5f-993e-afab9d3c751d",
           "width": 0,
@@ -25050,7 +25342,7 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "03d5bb6c-645e-4def-805f-257d545fc901",
           "width": 0,
@@ -25080,7 +25372,7 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "60fc7164-b56f-443d-8086-3cc9c2be7afa",
           "width": 0,
@@ -25125,7 +25417,7 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "4f08ecec-25a2-4cb5-b217-e4da30a75cca",
           "width": 0,
@@ -25140,7 +25432,7 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "43e52995-b34b-43e1-9cc2-7e01c7b6655e",
           "width": 0,
@@ -25155,7 +25447,7 @@
           "angle": 0,
           "customSize": false,
           "height": 0,
-          "layer": "Joints",
+          "layer": "",
           "name": "JointConnector",
           "persistentUuid": "b9b3a0b2-c1b4-43c3-8f13-3ef6c316ed3a",
           "width": 0,
@@ -25222,7 +25514,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.45999999999999974,
+        "zoomFactor": 0.4449946340557062,
         "windowMask": false
       }
     },
