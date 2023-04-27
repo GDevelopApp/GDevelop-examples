@@ -1909,13 +1909,13 @@
               "Height": 100,
               "Clockwise": true,
               "HorizontalEdgeDuration": 2,
-              "VerticalEdgeDuration": 1,
+              "VerticalEdgeDuration": 2,
               "Left": 1,
               "Top": 1,
               "Progress": 1,
               "OldX": 1,
               "OldY": 1,
-              "Easing": "bounce",
+              "Easing": "easeInOutQuad",
               "InitialPosition": "Top-left corner",
               "ToogleClockwise": false
             }
@@ -2116,13 +2116,13 @@
               "Height": 100,
               "Clockwise": true,
               "HorizontalEdgeDuration": 2,
-              "VerticalEdgeDuration": 1,
+              "VerticalEdgeDuration": 2,
               "Left": 1,
               "Top": 1,
               "Progress": 1,
               "OldX": 1,
               "OldY": 1,
-              "Easing": "bounce",
+              "Easing": "easeInOutQuad",
               "InitialPosition": "Bottom-left corner",
               "ToogleClockwise": false
             }
@@ -2329,7 +2329,7 @@
               "Progress": 1,
               "OldX": 1,
               "OldY": 1,
-              "Easing": "bounce",
+              "Easing": "easeInOutQuad",
               "InitialPosition": "Bottom-right corner",
               "ToogleClockwise": false
             }
@@ -2530,13 +2530,13 @@
               "Height": 100,
               "Clockwise": true,
               "HorizontalEdgeDuration": 2,
-              "VerticalEdgeDuration": 1,
+              "VerticalEdgeDuration": 2,
               "Left": 1,
               "Top": 1,
               "Progress": 1,
               "OldX": 1,
               "OldY": 1,
-              "Easing": "bounce",
+              "Easing": "easeInOutQuad",
               "InitialPosition": "Top-right corner",
               "ToogleClockwise": false
             }
@@ -3656,10 +3656,33 @@
           "colorR": 74,
           "creationTime": 0,
           "folded": true,
-          "name": "Draw",
+          "name": "Draw border",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TiledSpriteObject::SetOpacity"
+                  },
+                  "parameters": [
+                    "SummerTileWater",
+                    "=",
+                    "210"
+                  ]
+                }
+              ]
+            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
@@ -3975,7 +3998,7 @@
               "actions": [
                 {
                   "type": {
-                    "value": "RectangleMovement::MoveAlongObjectLinked"
+                    "value": "RectangleMovement::MoveAlongBorderOfObject"
                   },
                   "parameters": [
                     "",
@@ -3983,29 +4006,6 @@
                     "RectangleMovement",
                     "SummerTileWater",
                     ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "TiledSpriteObject::SetOpacity"
-                  },
-                  "parameters": [
-                    "SummerTileWater",
-                    "=",
-                    "210"
                   ]
                 }
               ]
@@ -8089,126 +8089,11 @@
       "dependencies": [],
       "eventsFunctions": [
         {
-          "description": "Move along the rectangular border of an object. Run once, or every time the center object moves.",
-          "fullName": "Move along the rectangular border of an object",
+          "description": "Update rectangular movement to follow the border of an object. Run once, or every time the center object moves.",
+          "fullName": "Update rectangular movement to follow the border of an object",
           "functionType": "Action",
-          "name": "MoveAlongObject",
-          "private": true,
-          "sentence": "Move _PARAM1_ along the rectangular border of _PARAM3_",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "CenterObject",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "RectangleMovement::LinkObjectsPointInside"
-                      },
-                      "parameters": [
-                        "",
-                        "MovingObject",
-                        "CenterObject",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CollisionPoint"
-                      },
-                      "parameters": [
-                        "CenterObject",
-                        "MovingObject.BoundingBoxCenterX()",
-                        "MovingObject.BoundingBoxCenterY()"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "RectangleMovement::RectangleMovement::SetTop"
-                      },
-                      "parameters": [
-                        "MovingObject",
-                        "RectangleMovement",
-                        "CenterObject.BoundingBoxTop()",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "RectangleMovement::RectangleMovement::SetBottom"
-                      },
-                      "parameters": [
-                        "MovingObject",
-                        "RectangleMovement",
-                        "CenterObject.BoundingBoxBottom()",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "RectangleMovement::RectangleMovement::SetLeft"
-                      },
-                      "parameters": [
-                        "MovingObject",
-                        "RectangleMovement",
-                        "CenterObject.BoundingBoxLeft()",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "RectangleMovement::RectangleMovement::SetRight"
-                      },
-                      "parameters": [
-                        "MovingObject",
-                        "RectangleMovement",
-                        "CenterObject.BoundingBoxRight()",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Moving object",
-              "name": "MovingObject",
-              "type": "objectList"
-            },
-            {
-              "description": "Rectangle Movement (required)",
-              "name": "RectangleMovement",
-              "supplementaryInformation": "RectangleMovement::RectangleMovement",
-              "type": "behavior"
-            },
-            {
-              "description": "Center object",
-              "name": "CenterObject",
-              "type": "objectList"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Set rectangular movement to follow the border of an object. Run once, or every time the center object moves. Objects will be linked to each other.",
-          "fullName": "Set rectangular movement to follow the border of an object",
-          "functionType": "Action",
-          "name": "MoveAlongObjectLinked",
-          "sentence": "Move _PARAM1_ along the rectangular border of _PARAM3_",
+          "name": "MoveAlongBorderOfObject",
+          "sentence": "Update rectangular movement  of _PARAM1_ to follow the border of _PARAM3_",
           "events": [
             {
               "type": "BuiltinCommonInstructions::ForEach",
@@ -8373,219 +8258,6 @@
               "name": "RectangleMovement",
               "supplementaryInformation": "RectangleMovement::RectangleMovement",
               "type": "behavior"
-            },
-            {
-              "description": "Center object",
-              "name": "CenterObject",
-              "type": "objectList"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Create an object link between two objects that are colliding with each other.",
-          "fullName": "Create object link between colliding objects",
-          "functionType": "Action",
-          "name": "LinkCollidingObjects",
-          "private": true,
-          "sentence": "Create an object link between _PARAM1_ and the _PARAM2_ that are colliding with each other",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "FirstObject",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "SecondObject",
-                  "conditions": [],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "FirstObject",
-                            "__RectangleMovement.Linked",
-                            "False"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "SecondObject",
-                            "__RectangleMovement.Linked",
-                            "False"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "CollisionNP"
-                          },
-                          "parameters": [
-                            "FirstObject",
-                            "SecondObject",
-                            "",
-                            "",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "LinkedObjects::LinkObjects"
-                          },
-                          "parameters": [
-                            "",
-                            "FirstObject",
-                            "SecondObject"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "SecondObject",
-                            "__RectangleMovement.Linked",
-                            "True"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "FirstObject",
-                            "__RectangleMovement.Linked",
-                            "True"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "First object",
-              "name": "FirstObject",
-              "type": "objectList"
-            },
-            {
-              "description": "Second object",
-              "name": "SecondObject",
-              "type": "objectList"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Create an object link between moving objects that have a center point inside the center object.",
-          "fullName": "Create object link (if needed) between moving object and center object",
-          "functionType": "Action",
-          "name": "LinkObjectsPointInside",
-          "sentence": "Create an object link between _PARAM1_ that has a center point inside _PARAM2_",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "MovingObject",
-              "conditions": [],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "CenterObject",
-                  "conditions": [],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "MovingObject",
-                            "__RectangleMovement.Linked",
-                            "False"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "CenterObject",
-                            "__RectangleMovement.Linked",
-                            "False"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "CollisionPoint"
-                          },
-                          "parameters": [
-                            "CenterObject",
-                            "MovingObject.BoundingBoxCenterX()",
-                            "MovingObject.BoundingBoxCenterY()"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "LinkedObjects::LinkObjects"
-                          },
-                          "parameters": [
-                            "",
-                            "MovingObject",
-                            "CenterObject"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "MovingObject",
-                            "__RectangleMovement.Linked",
-                            "True"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "CenterObject",
-                            "__RectangleMovement.Linked",
-                            "True"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Moving object",
-              "name": "MovingObject",
-              "type": "objectList"
             },
             {
               "description": "Center object",
