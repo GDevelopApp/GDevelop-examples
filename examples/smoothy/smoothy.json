@@ -4865,6 +4865,34 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DebuggerTools::ConsoleLog"
+                  },
+                  "parameters": [
+                    "\"Merge\"",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Get information about"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
@@ -4931,18 +4959,6 @@
                     "GetArgumentAsNumber(\"TaillingQueueIndex\") - 1",
                     ""
                   ]
-                },
-                {
-                  "type": {
-                    "value": "ObjectStack::HasOnTop"
-                  },
-                  "parameters": [
-                    "",
-                    "BubbleQueue",
-                    "ObjectStack",
-                    "BoardBubble",
-                    ""
-                  ]
                 }
               ],
               "actions": [
@@ -4980,6 +4996,77 @@
                 }
               ],
               "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::HasOnTop"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "lastBubblePathPosition",
+                        "=",
+                        "BoardBubble.SpeedPathMovement::PositionOnPath()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Fix the gap between the 2 bubble queues."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "+",
+                        "Variable(firstBubblePathPosition) + 32 - Variable(lastBubblePathPosition)",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "=",
+                        "Variable(firstBubbleSpeed)",
+                        ""
+                      ]
+                    }
+                  ]
+                },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
@@ -5020,157 +5107,109 @@
                       ]
                     }
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Merge the queue"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "\"Merge\"",
-                        "",
-                        ""
-                      ]
-                    }
+                  "type": {
+                    "value": "ObjectStack::ContainsAt"
+                  },
+                  "parameters": [
+                    "",
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "GetArgumentAsNumber(\"TaillingQueueIndex\")",
+                    ""
                   ]
                 },
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "AjoutObjConcern"
-                      },
-                      "parameters": [
-                        "",
-                        "BubbleQueue"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ObjectStack::HasOnTop"
-                      },
-                      "parameters": [
-                        "",
-                        "Gutter",
-                        "ObjectStack",
-                        "BubbleQueue",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ObjectStack::ObjectStack::MoveAllInto"
-                      },
-                      "parameters": [
-                        "BubbleQueue",
-                        "ObjectStack",
-                        "0",
-                        "BubbleClipboard",
-                        "ObjectStack",
-                        ""
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "AjoutObjConcern"
-                          },
-                          "parameters": [
-                            "",
-                            "BoardBubble"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectStack::Contains"
-                          },
-                          "parameters": [
-                            "",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                          },
-                          "parameters": [
-                            "BoardBubble",
-                            "SpeedPathMovement",
-                            "=",
-                            "Variable(firstBubbleSpeed)",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
+                  "type": {
+                    "value": "ObjectStack::Contains"
+                  },
+                  "parameters": [
+                    "",
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "BoardBubble",
+                    ""
                   ]
-                },
+                }
+              ],
+              "actions": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "IsRewinding",
-                        "True"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "AjoutObjConcern"
-                      },
-                      "parameters": [
-                        "",
-                        "BubbleQueue"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "AjoutObjConcern"
-                      },
-                      "parameters": [
-                        "",
-                        "BoardBubble"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Smoothy::MatchBubbles"
-                      },
-                      "parameters": [
-                        "",
-                        "Gutter",
-                        "ObjectStack",
-                        "BubbleQueue",
-                        "ObjectStack",
-                        "BoardBubble",
-                        "SpeedPathMovement",
-                        "GetArgumentAsNumber(\"TaillingQueueIndex\")",
-                        "Variable(insertedBubbleIndex)",
-                        "BubbleClipboard",
-                        "ObjectStack",
-                        ""
-                      ]
-                    }
+                  "type": {
+                    "value": "ObjectStack::ObjectStack::MoveAllInto"
+                  },
+                  "parameters": [
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "0",
+                    "BubbleClipboard",
+                    "ObjectStack",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Queck for a match at the junction."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "IsRewinding",
+                    "True"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Smoothy::MatchBubbles"
+                  },
+                  "parameters": [
+                    "",
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "BoardBubble",
+                    "SpeedPathMovement",
+                    "GetArgumentAsNumber(\"TaillingQueueIndex\")",
+                    "Variable(insertedBubbleIndex)",
+                    "BubbleClipboard",
+                    "ObjectStack",
+                    ""
                   ]
                 }
               ]
