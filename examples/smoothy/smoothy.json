@@ -2410,25 +2410,17 @@
                         "Variable(lastBubblePathPosition) - 32",
                         ""
                       ]
-                    }
-                  ],
-                  "events": [
+                    },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                          },
-                          "parameters": [
-                            "BoardBubble",
-                            "SpeedPathMovement",
-                            "=",
-                            "Variable(lastBubbleSpeed)",
-                            ""
-                          ]
-                        }
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "=",
+                        "Variable(lastBubbleSpeed)",
+                        ""
                       ]
                     }
                   ]
@@ -3695,6 +3687,18 @@
                       ]
                     },
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "2 bubble queues are colliding."
+                    },
+                    {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
@@ -4445,6 +4449,18 @@
                   ]
                 },
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Scan bubbles of the same color toward tail."
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
@@ -4558,6 +4574,18 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Scan bubbles of the same color toward head."
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -4692,6 +4720,18 @@
                   ]
                 },
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Move the leading bubbles in a new BubbleQueue.\n\nA new BubbleQueue can't be modified directly because another BubbleQueue is already picked.\nInstead, the leading bubbles are moved into a temporary queue BubbleClipboard."
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
@@ -4780,6 +4820,18 @@
               ]
             },
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Now that no BubbleQueue is picked, a new one can be created."
+            },
+            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -4815,7 +4867,7 @@
                     "Gutter",
                     "ObjectStack",
                     "BubbleQueue",
-                    "0",
+                    "GetArgumentAsNumber(\"InsertedBubbleQueueIndex\")",
                     ""
                   ]
                 },
@@ -4851,6 +4903,18 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "When the bubbles are matched at the tail of the queue, the original queue is left empty an must be deleted."
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -4937,6 +5001,234 @@
               "name": "ObjectStack",
               "supplementaryInformation": "ObjectStack::ObjectStack",
               "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Queue collision",
+          "functionType": "Action",
+          "name": "IsQueueColliding",
+          "sentence": "_PARAM5_ from _PARAM1_ at _PARAM3_ number _PARAM7_ is in collision with the bubble queue ahaed",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectStack::ContainsAt"
+                  },
+                  "parameters": [
+                    "",
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "Variable(queueIndex)",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ObjectStack::ContainsAt"
+                  },
+                  "parameters": [
+                    "",
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "BoardBubble",
+                    "0",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "firstBubblePathPosition",
+                    "=",
+                    "BoardBubble.SpeedPathMovement::PositionOnPath()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "firstBubbleSpeed",
+                    "=",
+                    "BoardBubble.SpeedPathMovement::Speed()"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"firstBubblePathPosition: \" + VariableString(firstBubblePathPosition)",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"firstBubblePathColor: \" + BoardBubble.AnimationName()",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "disabled": true,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DebuggerTools::ConsoleLog"
+                  },
+                  "parameters": [
+                    "\"Gutter: \" + ToString(Gutter.ObjectStack::Height())",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectStack::ContainsAt"
+                  },
+                  "parameters": [
+                    "",
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "Variable(queueIndex) - 1",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ObjectStack::HasOnTop"
+                  },
+                  "parameters": [
+                    "",
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "BoardBubble",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"delta: \" + ToString(Variable(firstBubblePathPosition) + 32 - BoardBubble.SpeedPathMovement::PositionOnPath())",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::PositionOnPath"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "<=",
+                        "Variable(firstBubblePathPosition) + 32",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Gutter",
+              "name": "Gutter",
+              "type": "objectList"
+            },
+            {
+              "description": "Object stack behavior",
+              "name": "ObjectStack",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Bubble queue",
+              "name": "BubbleQueue",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "Object stack behavior",
+              "name": "ObjectStack",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Board bubble",
+              "name": "BoardBubble",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "SpeedPathMovement",
+              "name": "SpeedPathMovement",
+              "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Tailling bubble queue index",
+              "name": "TaillingQueueIndex",
+              "supplementaryInformation": "Sprite",
+              "type": "expression"
             }
           ],
           "objectGroups": []
