@@ -2809,52 +2809,23 @@
                             "300",
                             ""
                           ]
-                        }
-                      ],
-                      "events": [
+                        },
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "PosX"
-                              },
-                              "parameters": [
-                                "MovingBubble",
-                                "=",
-                                "AimingBubble.X()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "PosY"
-                              },
-                              "parameters": [
-                                "MovingBubble",
-                                "=",
-                                "AimingBubble.Y()"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetAnimationName"
-                              },
-                              "parameters": [
-                                "MovingBubble",
-                                "AimingBubble.AnimationName()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetAnimationName"
-                              },
-                              "parameters": [
-                                "AimingBubble",
-                                "VariableString(remainingColors[RandomInRange(0, VariableChildCount(remainingColors) - 1)])"
-                              ]
-                            }
+                          "type": {
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "MovingBubble",
+                            "AimingBubble.AnimationName()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "AimingBubble",
+                            "VariableString(remainingColors[RandomInRange(0, VariableChildCount(remainingColors) - 1)])"
                           ]
                         }
                       ]
@@ -13917,7 +13888,7 @@
       "name": "FireBullet",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/bullet.svg",
       "shortDescription": "Fire bullets, manage ammo, reloading and overheating.",
-      "version": "0.6.1",
+      "version": "0.6.3",
       "description": [
         "This extension allows objects to fire bullets.",
         "",
@@ -14658,11 +14629,11 @@
               "objectGroups": []
             },
             {
-              "description": "Fire bullets toward a position.",
-              "fullName": "Fire bullets toward a position",
+              "description": "Fire bullets toward an object.",
+              "fullName": "Fire bullets toward an object",
               "functionType": "Action",
-              "name": "FireTowardPosition",
-              "sentence": "Fire _PARAM4_ from _PARAM0_, at position _PARAM2_; _PARAM3_, toward position _PARAM5_;_PARAM6_ with speed _PARAM7_ px/s",
+              "name": "FireTowardObject",
+              "sentence": "Fire _PARAM4_ from _PARAM0_, at position _PARAM2_; _PARAM3_, toward _PARAM5_ with speed _PARAM6_ px/s",
               "events": [
                 {
                   "colorB": 228,
@@ -14687,7 +14658,7 @@
                             "GetArgumentAsNumber(\"XPosition\")",
                             "GetArgumentAsNumber(\"YPosition\")",
                             "Bullet",
-                            "Object.AngleToPosition(GetArgumentAsNumber(\"TargetXPosition\"),GetArgumentAsNumber(\"TargetYPosition\"))",
+                            "Object.AngleToObject(TargetObject)",
                             "GetArgumentAsNumber(\"Speed\")",
                             ""
                           ]
@@ -14723,7 +14694,88 @@
                 {
                   "description": "The bullet object",
                   "name": "Bullet",
+                  "type": "objectListOrEmptyIfJustDeclared"
+                },
+                {
+                  "description": "Target object",
+                  "name": "TargetObject",
                   "type": "objectList"
+                },
+                {
+                  "description": "Speed of the bullet, in pixels per second",
+                  "name": "Speed",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Fire bullets toward a position.",
+              "fullName": "Fire bullets toward a position",
+              "functionType": "Action",
+              "name": "FireTowardPosition",
+              "sentence": "Fire _PARAM4_ from _PARAM0_, at position _PARAM2_; _PARAM3_, toward position _PARAM5_;_PARAM6_ with speed _PARAM7_ px/s",
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Calculate the trajectory angle and use the \"Fire bullets\" action",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "FireBullet::FireBullet::Fire"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "GetArgumentAsNumber(\"XPosition\")",
+                            "GetArgumentAsNumber(\"YPosition\")",
+                            "Bullet",
+                            "Object.AngleToPosition(GetArgumentAsNumber(\"TargetXPosition\"), GetArgumentAsNumber(\"TargetYPosition\"))",
+                            "GetArgumentAsNumber(\"Speed\")",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet",
+                  "type": "behavior"
+                },
+                {
+                  "description": "X position, where to create the bullet",
+                  "name": "XPosition",
+                  "type": "expression"
+                },
+                {
+                  "description": "Y position, where to create the bullet",
+                  "name": "YPosition",
+                  "type": "expression"
+                },
+                {
+                  "description": "The bullet object",
+                  "name": "Bullet",
+                  "type": "objectListOrEmptyIfJustDeclared"
                 },
                 {
                   "description": "Target X position",
@@ -14978,7 +15030,7 @@
                 {
                   "description": "The bullet object",
                   "name": "Bullet",
-                  "type": "objectList"
+                  "type": "objectListOrEmptyIfJustDeclared"
                 },
                 {
                   "description": "Angle of the bullet, in degrees",
@@ -15230,7 +15282,7 @@
                 {
                   "description": "The bullet object",
                   "name": "Bullet",
-                  "type": "objectList"
+                  "type": "objectListOrEmptyIfJustDeclared"
                 },
                 {
                   "description": "Angle of the bullet, in degrees",
