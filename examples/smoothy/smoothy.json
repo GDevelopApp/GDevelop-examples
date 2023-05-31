@@ -1513,6 +1513,11 @@
           "effects": [],
           "behaviors": [
             {
+              "name": "InsertedBubble",
+              "type": "Smoothy::InsertedBubble",
+              "SpeedPathMovement": "SpeedPathMovement"
+            },
+            {
               "name": "SpeedPathMovement",
               "type": "CurvedMovement::SpeedPathMovement",
               "Rotation": true,
@@ -2866,25 +2871,6 @@
               "actions": [
                 {
                   "type": {
-                    "value": "SeparateFromObjects"
-                  },
-                  "parameters": [
-                    "MovingBubble",
-                    "BoardBubble",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "MovingBubble",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
                     "value": "Create"
                   },
                   "parameters": [
@@ -2897,608 +2883,109 @@
                 },
                 {
                   "type": {
-                    "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                    "value": "Smoothy::InsertedBubble::Initialize"
                   },
                   "parameters": [
                     "InsertedBubble",
-                    "SpeedPathMovement",
-                    "\"Gutter\"",
-                    "1",
-                    "",
+                    "InsertedBubble",
+                    "BoardBubble",
+                    "MovingBubble",
                     ""
                   ]
                 },
                 {
                   "type": {
-                    "value": "LinkedObjects::LinkObjects"
+                    "value": "Delete"
                   },
                   "parameters": [
-                    "",
-                    "InsertedBubble",
-                    "BoardBubble"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetAnimationName"
-                  },
-                  "parameters": [
-                    "InsertedBubble",
-                    "MovingBubble.AnimationName()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarObjet"
-                  },
-                  "parameters": [
-                    "InsertedBubble",
-                    "FreedDistance",
-                    "=",
-                    "0"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarObjet"
-                  },
-                  "parameters": [
-                    "InsertedBubble",
-                    "InitialDeltaX",
-                    "=",
-                    "MovingBubble.X() - BoardBubble.X()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarObjet"
-                  },
-                  "parameters": [
-                    "InsertedBubble",
-                    "InitialDeltaY",
-                    "=",
-                    "MovingBubble.Y() - BoardBubble.Y()"
+                    "MovingBubble",
+                    ""
                   ]
                 }
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "InsertedBubble",
-              "conditions": [],
-              "actions": [],
-              "events": [
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
                 {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "\"FreedDistance: \" + InsertedBubble.VariableString(FreedDistance)",
-                        "",
-                        ""
-                      ]
-                    }
+                  "type": {
+                    "inverted": true,
+                    "value": "Smoothy::InsertedBubble::IsAnimationFinished"
+                  },
+                  "parameters": [
+                    "InsertedBubble",
+                    "InsertedBubble",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Smoothy::InsertedBubble::PlayInsertion"
+                  },
+                  "parameters": [
+                    "InsertedBubble",
+                    "InsertedBubble",
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "BoardBubble",
+                    "SpeedPathMovement",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Smoothy::InsertedBubble::IsAnimationFinished"
+                  },
+                  "parameters": [
+                    "InsertedBubble",
+                    "InsertedBubble",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Smoothy::InsertedBubble::CreateBubble"
+                  },
+                  "parameters": [
+                    "InsertedBubble",
+                    "InsertedBubble",
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "BoardBubble",
+                    "SpeedPathMovement",
+                    ""
                   ]
                 },
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "VarObjet"
-                      },
-                      "parameters": [
-                        "InsertedBubble",
-                        "FreedDistance",
-                        "<",
-                        "32"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "InsertedBubble",
-                        "PreviousFreedDistance",
-                        "=",
-                        "InsertedBubble.Variable(FreedDistance)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "InsertedBubble",
-                        "FreedDistance",
-                        "=",
-                        "min(InsertedBubble.Variable(FreedDistance) + 32 * TimeDelta() * 3, 32)"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Move the inserted bubble ahead of the bubble it collides."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "LinkedObjects::PickObjectsLinkedTo"
-                          },
-                          "parameters": [
-                            "",
-                            "BoardBubble",
-                            "InsertedBubble",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectStack::Contains"
-                          },
-                          "parameters": [
-                            "",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
-                          },
-                          "parameters": [
-                            "InsertedBubble",
-                            "SpeedPathMovement",
-                            "=",
-                            "BoardBubble.SpeedPathMovement::PositionOnPath() + InsertedBubble.Variable(FreedDistance)",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "MettreXY"
-                          },
-                          "parameters": [
-                            "InsertedBubble",
-                            "=",
-                            "lerp(BoardBubble.X() + InsertedBubble.Variable(InitialDeltaX), InsertedBubble.X(), InsertedBubble.Variable(FreedDistance) / 32)",
-                            "=",
-                            "lerp(BoardBubble.Y() + InsertedBubble.Variable(InitialDeltaY), InsertedBubble.Y(), InsertedBubble.Variable(FreedDistance) / 32)"
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "disabled": true,
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "DebuggerTools::ConsoleLog"
-                              },
-                              "parameters": [
-                                "ToString(InsertedBubble.X()) + \" \" + ToString(InsertedBubble.Y())",
-                                "",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "InsertedBubble",
-                                "BubbleIndex",
-                                "=",
-                                "BubbleQueue.ObjectStack::HeightOf(BoardBubble)"
-                              ]
-                            }
-                          ],
-                          "events": [
-                            {
-                              "disabled": true,
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "DebuggerTools::ConsoleLog"
-                                  },
-                                  "parameters": [
-                                    "\"BubbleIndex: \" + InsertedBubble.VariableString(BubbleIndex)",
-                                    "",
-                                    ""
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "Push all the bubbles of the queue head."
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "AjoutObjConcern"
-                              },
-                              "parameters": [
-                                "",
-                                "BoardBubble"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ObjectStack::ContainsBetween"
-                              },
-                              "parameters": [
-                                "",
-                                "BubbleQueue",
-                                "ObjectStack",
-                                "BoardBubble",
-                                "0",
-                                "InsertedBubble.Variable(BubbleIndex) - 1",
-                                ""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "+",
-                                "InsertedBubble.Variable(FreedDistance) - InsertedBubble.Variable(PreviousFreedDistance)",
-                                ""
-                              ]
-                            }
-                          ],
-                          "events": [
-                            {
-                              "disabled": true,
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "DebuggerTools::ConsoleLog"
-                                  },
-                                  "parameters": [
-                                    "\"Push: \" + ToString(PickedInstancesCount(BoardBubble))",
-                                    "",
-                                    ""
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "VarObjet"
-                      },
-                      "parameters": [
-                        "InsertedBubble",
-                        "FreedDistance",
-                        "=",
-                        "32"
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Get the information on the inserted bubble because a BoardBubble can only be initialized when no other BoardBubble is picked."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "LinkedObjects::PickObjectsLinkedTo"
-                          },
-                          "parameters": [
-                            "",
-                            "BoardBubble",
-                            "InsertedBubble",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectStack::Contains"
-                          },
-                          "parameters": [
-                            "",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectStack::Contains"
-                          },
-                          "parameters": [
-                            "",
-                            "Gutter",
-                            "ObjectStack",
-                            "BubbleQueue",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "InsertedBubble",
-                            "PositionOnPath",
-                            "=",
-                            "BoardBubble.SpeedPathMovement::PositionOnPath() + 32"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "InsertedBubble",
-                            "Speed",
-                            "=",
-                            "BoardBubble.SpeedPathMovement::Speed()"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "InsertedBubble",
-                            "BubbleIndex",
-                            "=",
-                            "BubbleQueue.ObjectStack::HeightOf(BoardBubble)"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "InsertedBubble",
-                            "QueueIndex",
-                            "=",
-                            "Gutter.ObjectStack::HeightOf(BubbleQueue)"
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "disabled": true,
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "DebuggerTools::ConsoleLog"
-                              },
-                              "parameters": [
-                                "\"BubbleIndex: \" + InsertedBubble.VariableString(BubbleIndex)",
-                                "",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Actually insert the bubble in the queue."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectStack::ContainsBetween"
-                          },
-                          "parameters": [
-                            "",
-                            "Gutter",
-                            "ObjectStack",
-                            "BubbleQueue",
-                            "InsertedBubble.Variable(QueueIndex)",
-                            "InsertedBubble.Variable(QueueIndex)",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Create"
-                              },
-                              "parameters": [
-                                "",
-                                "BoardBubble",
-                                "StartLocation.X()",
-                                "StartLocation.Y()",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "\"Gutter\"",
-                                "1",
-                                "",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetAnimationName"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "InsertedBubble.AnimationName()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "=",
-                                "InsertedBubble.Variable(PositionOnPath)",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "=",
-                                "InsertedBubble.Variable(Speed)",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ObjectStack::ObjectStack::Insert"
-                              },
-                              "parameters": [
-                                "BubbleQueue",
-                                "ObjectStack",
-                                "BoardBubble",
-                                "InsertedBubble.Variable(BubbleIndex)",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Delete"
-                              },
-                              "parameters": [
-                                "InsertedBubble",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Smoothy::MatchBubbles"
-                          },
-                          "parameters": [
-                            "",
-                            "Gutter",
-                            "ObjectStack",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            "SpeedPathMovement",
-                            "InsertedBubble.Variable(QueueIndex)",
-                            "InsertedBubble.Variable(BubbleIndex)",
-                            "BubbleClipboard",
-                            "ObjectStack",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
+                  "type": {
+                    "value": "Smoothy::MatchBubbles"
+                  },
+                  "parameters": [
+                    "",
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "BoardBubble",
+                    "SpeedPathMovement",
+                    "InsertedBubble.InsertedBubble::QueueIndex()",
+                    "InsertedBubble.InsertedBubble::BubbleIndex()",
+                    "BubbleClipboard",
+                    "ObjectStack",
+                    ""
                   ]
                 }
               ]
@@ -3682,48 +3169,40 @@
                         "Variable(queueIndex)",
                         ""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsAt"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        "Variable(queueIndex)",
+                        ""
+                      ]
                     }
                   ],
-                  "actions": [],
-                  "events": [
+                  "actions": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectStack::ContainsAt"
-                          },
-                          "parameters": [
-                            "",
-                            "Gutter",
-                            "ObjectStack",
-                            "BubbleQueue",
-                            "Variable(queueIndex)",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "BubbleQueue",
-                            "IsRewinding",
-                            "True"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "DebuggerTools::ConsoleLog"
-                          },
-                          "parameters": [
-                            "\"Rewind\"",
-                            "",
-                            ""
-                          ]
-                        }
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "BubbleQueue",
+                        "IsRewinding",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"Rewind\"",
+                        "",
+                        ""
                       ]
                     }
                   ]
@@ -3840,6 +3319,10 @@
         {
           "name": "FireBullet",
           "type": "FireBullet::FireBullet"
+        },
+        {
+          "name": "InsertedBubble",
+          "type": "Smoothy::InsertedBubble"
         },
         {
           "name": "ObjectStack",
@@ -4562,7 +4045,7 @@
               "type": "objectList"
             },
             {
-              "description": "SpeedPathMovement",
+              "description": "Speed path movement",
               "name": "SpeedPathMovement",
               "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
               "type": "behavior"
@@ -4797,7 +4280,7 @@
               "type": "objectList"
             },
             {
-              "description": "SpeedPathMovement",
+              "description": "Speed path movement",
               "name": "SpeedPathMovement",
               "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
               "type": "behavior"
@@ -5202,7 +4685,7 @@
               "type": "objectList"
             },
             {
-              "description": "SpeedPathMovement",
+              "description": "Speed path movement",
               "name": "SpeedPathMovement",
               "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
               "type": "behavior"
@@ -5357,7 +4840,7 @@
               "type": "objectList"
             },
             {
-              "description": "SpeedPathMovement",
+              "description": "Speed path movement",
               "name": "SpeedPathMovement",
               "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
               "type": "behavior"
@@ -5372,7 +4855,1189 @@
           "objectGroups": []
         }
       ],
-      "eventsBasedBehaviors": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "",
+          "fullName": "",
+          "name": "InsertedBubble",
+          "objectType": "Sprite",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": []
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Initialize",
+              "functionType": "Action",
+              "name": "Initialize",
+              "sentence": "Initialize the animation of _PARAM0_ for the insertion of _PARAM3_ next to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                      },
+                      "parameters": [
+                        "Object",
+                        "SpeedPathMovement",
+                        "\"Gutter\"",
+                        "1",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SeparateFromObjects"
+                      },
+                      "parameters": [
+                        "MovingBubble",
+                        "BoardBubble",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "BoardBubble"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetAnimationName"
+                      },
+                      "parameters": [
+                        "Object",
+                        "MovingBubble.AnimationName()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FreedDistance",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "InitialDeltaX",
+                        "=",
+                        "MovingBubble.X() - BoardBubble.X()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "InitialDeltaY",
+                        "=",
+                        "MovingBubble.Y() - BoardBubble.Y()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Board bubble",
+                  "name": "BoardBubble",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Moving bubble",
+                  "name": "MovingBubble",
+                  "supplementaryInformation": "Sprite",
+                  "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Play insertion animation",
+              "functionType": "Action",
+              "name": "PlayInsertion",
+              "sentence": "Play the insertion animation of _PARAM0_ in _PARAM6_ from _PARAM4_ of _PARAM2_",
+              "events": [
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"FreedDistance: \" + Object.VariableString(FreedDistance)",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FreedDistance",
+                        "<",
+                        "32"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PreviousFreedDistance",
+                        "=",
+                        "Object.Variable(FreedDistance)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FreedDistance",
+                        "=",
+                        "min(Object.Variable(FreedDistance) + 32 * TimeDelta() * 3, 32)"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Move the inserted bubble ahead of the bubble it collides."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "BoardBubble",
+                            "Object",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectStack::Contains"
+                          },
+                          "parameters": [
+                            "",
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
+                          },
+                          "parameters": [
+                            "Object",
+                            "SpeedPathMovement",
+                            "=",
+                            "BoardBubble.SpeedPathMovement::PositionOnPath() + Object.Variable(FreedDistance)",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "MettreXY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "lerp(BoardBubble.X() + Object.Variable(InitialDeltaX), Object.X(), Object.Variable(FreedDistance) / 32)",
+                            "=",
+                            "lerp(BoardBubble.Y() + Object.Variable(InitialDeltaY), Object.Y(), Object.Variable(FreedDistance) / 32)"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "disabled": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "ToString(Object.X()) + \" \" + ToString(Object.Y())",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Object",
+                                "BubbleIndex",
+                                "=",
+                                "BubbleQueue.ObjectStack::HeightOf(BoardBubble)"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "disabled": true,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "DebuggerTools::ConsoleLog"
+                                  },
+                                  "parameters": [
+                                    "\"BubbleIndex: \" + Object.VariableString(BubbleIndex)",
+                                    "",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Push all the bubbles of the queue head."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "AjoutObjConcern"
+                              },
+                              "parameters": [
+                                "",
+                                "BoardBubble"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectStack::ContainsBetween"
+                              },
+                              "parameters": [
+                                "",
+                                "BubbleQueue",
+                                "ObjectStack",
+                                "BoardBubble",
+                                "0",
+                                "Object.Variable(BubbleIndex) - 1",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "+",
+                                "Object.Variable(FreedDistance) - Object.Variable(PreviousFreedDistance)",
+                                ""
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "disabled": true,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "DebuggerTools::ConsoleLog"
+                                  },
+                                  "parameters": [
+                                    "\"Push: \" + ToString(PickedInstancesCount(BoardBubble))",
+                                    "",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FreedDistance",
+                        "=",
+                        "32"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Get the information on the inserted bubble because a BoardBubble can only be initialized when no other BoardBubble is picked."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "BoardBubble",
+                            "Object",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectStack::Contains"
+                          },
+                          "parameters": [
+                            "",
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectStack::Contains"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PositionOnPath",
+                            "=",
+                            "BoardBubble.SpeedPathMovement::PositionOnPath() + 32"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Speed",
+                            "=",
+                            "BoardBubble.SpeedPathMovement::Speed()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "BubbleIndex",
+                            "=",
+                            "BubbleQueue.ObjectStack::HeightOf(BoardBubble)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "QueueIndex",
+                            "=",
+                            "Gutter.ObjectStack::HeightOf(BubbleQueue)"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "disabled": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"BubbleIndex: \" + Object.VariableString(BubbleIndex)",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Actually insert the bubble in the queue."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectStack::ContainsBetween"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            "Object.Variable(QueueIndex)",
+                            "Object.Variable(QueueIndex)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "BoardBubble",
+                                "StartLocation.X()",
+                                "StartLocation.Y()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "\"Gutter\"",
+                                "1",
+                                "",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetAnimationName"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "Object.AnimationName()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "=",
+                                "Object.Variable(PositionOnPath)",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "=",
+                                "Object.Variable(Speed)",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectStack::ObjectStack::Insert"
+                              },
+                              "parameters": [
+                                "BubbleQueue",
+                                "ObjectStack",
+                                "BoardBubble",
+                                "Object.Variable(BubbleIndex)",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Delete"
+                              },
+                              "parameters": [
+                                "Object",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::MatchBubbles"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "Object.Variable(QueueIndex)",
+                            "Object.Variable(BubbleIndex)",
+                            "BubbleClipboard",
+                            "ObjectStack",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Gutter",
+                  "name": "Gutter",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bubble queue",
+                  "name": "BubbleQueue",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Board bubble",
+                  "name": "BoardBubble",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Speed path movement",
+                  "name": "SpeedPathMovement",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Animation finished",
+              "functionType": "Condition",
+              "name": "IsAnimationFinished",
+              "sentence": "The insertion animation of _PARAM0_ is finished",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FreedDistance",
+                        "=",
+                        "32"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Create bubble",
+              "functionType": "Action",
+              "name": "CreateBubble",
+              "sentence": "Replace _PARAM0_ by a new _PARAM6_ into _PARAM4_ from _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Get the information on the inserted bubble because a BoardBubble can only be initialized when no other BoardBubble is picked."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "BoardBubble",
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::Contains"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::Contains"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PositionOnPath",
+                        "=",
+                        "BoardBubble.SpeedPathMovement::PositionOnPath() + 32"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Speed",
+                        "=",
+                        "BoardBubble.SpeedPathMovement::Speed()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "BubbleIndex",
+                        "=",
+                        "BubbleQueue.ObjectStack::HeightOf(BoardBubble)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "QueueIndex",
+                        "=",
+                        "Gutter.ObjectStack::HeightOf(BubbleQueue)"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "disabled": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "DebuggerTools::ConsoleLog"
+                          },
+                          "parameters": [
+                            "\"BubbleIndex: \" + Object.VariableString(BubbleIndex)",
+                            "",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Actually insert the bubble in the queue."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsBetween"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        "Object.Variable(QueueIndex)",
+                        "Object.Variable(QueueIndex)",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "BoardBubble",
+                            "Object.SpeedPathMovement::PathOriginX()",
+                            "Object.SpeedPathMovement::PathOriginY()",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "\"Gutter\"",
+                            "1",
+                            "",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "Object.AnimationName()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::SetPositionOnPath"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "=",
+                            "Object.Variable(PositionOnPath)",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "=",
+                            "Object.Variable(Speed)",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ObjectStack::ObjectStack::Insert"
+                          },
+                          "parameters": [
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            "Object.Variable(BubbleIndex)",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "Object",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Gutter",
+                  "name": "Gutter",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bubble queue",
+                  "name": "BubbleQueue",
+                  "supplementaryInformation": "Sprite",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Board bubble",
+                  "name": "BoardBubble",
+                  "supplementaryInformation": "Sprite",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Speed path movement",
+                  "name": "SpeedPathMovement",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the index of the queue where the bubble was inserted.",
+              "fullName": "Queue index",
+              "functionType": "Expression",
+              "name": "QueueIndex",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(QueueIndex)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the index of the inserted bubble in the queue.",
+              "fullName": "Bubble index",
+              "functionType": "Expression",
+              "name": "BubbleIndex",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(BubbleIndex)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "Speed path movement",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "CurvedMovement::SpeedPathMovement"
+              ],
+              "hidden": false,
+              "name": "SpeedPathMovement"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        }
+      ],
       "eventsBasedObjects": []
     },
     {
@@ -13895,6 +14560,88 @@
                       },
                       "parameters": [
                         "180"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the path origin on X axis of the object.",
+              "fullName": "Path origin X",
+              "functionType": "Expression",
+              "group": "Movement on a curve (speed-based) configuration",
+              "name": "PathOriginX",
+              "sentence": "the path origin on X axis",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyPathOriginX()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the path origin on Y axis of the object.",
+              "fullName": "Path origin Y",
+              "functionType": "Expression",
+              "group": "Movement on a curve (speed-based) configuration",
+              "name": "PathOriginY",
+              "sentence": "the path origin on Y axis",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyPathOriginY()"
                       ]
                     }
                   ]
