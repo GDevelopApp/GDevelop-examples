@@ -224,39 +224,7 @@
         "zoomFactor": 0.6627256836254674,
         "windowMask": false
       },
-      "objectsGroups": [
-        {
-          "name": "LevelBubble",
-          "objects": [
-            {
-              "name": "BlueBubble"
-            },
-            {
-              "name": "YellowBubble"
-            },
-            {
-              "name": "GreenBubble"
-            },
-            {
-              "name": "PurpuleBubble"
-            },
-            {
-              "name": "RedBubble"
-            }
-          ]
-        },
-        {
-          "name": "LinkedBubble",
-          "objects": [
-            {
-              "name": "BoardBubble"
-            },
-            {
-              "name": "StartLocation"
-            }
-          ]
-        }
-      ],
+      "objectsGroups": [],
       "variables": [
         {
           "name": "neighbors",
@@ -1841,6 +1809,12 @@
           "effects": [],
           "behaviors": [
             {
+              "name": "BubbleQueue",
+              "type": "Smoothy::BubbleQueue",
+              "State": "Idle",
+              "ComboLevel": 0
+            },
+            {
               "name": "ObjectStack",
               "type": "ObjectStack::ObjectStack"
             }
@@ -3096,6 +3070,18 @@
               ]
             },
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "TODO Make \"match\" a condition that picks the bubbles."
+            },
+            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -3146,6 +3132,23 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "TODO Check for rewind here?\n- between the split queues\n- or a new leading or tailing inserted bubble\n\nWhat if one of the queue became empty?"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": []
             }
           ],
           "parameters": []
@@ -3213,33 +3216,137 @@
                       ]
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "Smoothy::MergeQueue"
-                      },
-                      "parameters": [
-                        "",
-                        "Gutter",
-                        "ObjectStack",
-                        "BubbleQueue",
-                        "ObjectStack",
-                        "BoardBubble",
-                        "SpeedPathMovement",
-                        "Variable(queueIndex)",
-                        "BubbleClipboard",
-                        "ObjectStack",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "queueIndex",
-                        "-",
-                        "1"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectStack::ContainsAt"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            "Variable(queueIndex)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "TODO No need to match?\n\nKeep the state of the tailling queue."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "ObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "BubbleQueue",
+                                "IsRewinding",
+                                "True"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::MergeQueue"
+                              },
+                              "parameters": [
+                                "",
+                                "Gutter",
+                                "ObjectStack",
+                                "BubbleQueue",
+                                "ObjectStack",
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "Variable(queueIndex)",
+                                "BubbleClipboard",
+                                "ObjectStack",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "queueIndex",
+                                "-",
+                                "1"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "ObjectVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "BubbleQueue",
+                                "IsRewinding",
+                                "True"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "TODO Match tailling bubbles and leading bubbles as a condition.\n\nQueue won't be merged so states are preserved.\nIncrease the combo level of the leading queue."
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": []
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "TODO Check for rewind here?"
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": []
+                            }
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -3274,6 +3381,18 @@
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "TODO It won't be necessary to check for rewind every frame?\n\nOr we keep this and reset the combo level when no rewind happend."
+            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
@@ -3589,6 +3708,10 @@
         }
       ],
       "behaviorsSharedData": [
+        {
+          "name": "BubbleQueue",
+          "type": "Smoothy::BubbleQueue"
+        },
         {
           "name": "FireBullet",
           "type": "FireBullet::FireBullet"
@@ -6306,6 +6429,364 @@
               ],
               "hidden": false,
               "name": "SpeedPathMovement"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        },
+        {
+          "description": "",
+          "fullName": "",
+          "name": "BubbleQueue",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "Update bubble speed",
+              "functionType": "Action",
+              "name": "SetBubblesSpeed",
+              "sentence": "Update  speed of _PARAM2_ from _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueue::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueue::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"JustSplit\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueue::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"HitStop\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueue::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Rewind\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Board bubble",
+                  "name": "BoardBubble",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Speed path movement",
+                  "name": "SpeedPathMovement",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"Split\"",
+                        ">=",
+                        "0.3"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueue::PropertyComboLevel"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueue::SetPropertyState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Idle\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueue::PropertyComboLevel"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "1"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueue::SetPropertyState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Rewind\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueue::PropertyComboLevel"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            ">",
+                            "1"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueue::SetPropertyState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"HitStop\""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueue::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"HitStop\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CompareObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"Split\"",
+                        ">=",
+                        "0.3 + 0.1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueue::SetPropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Rewind\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "Idle",
+              "type": "Choice",
+              "label": "State",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Idle",
+                "JustSplit",
+                "HitStop",
+                "Rewind"
+              ],
+              "hidden": true,
+              "name": "State"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Combo level",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "ComboLevel"
             }
           ],
           "sharedPropertyDescriptors": []
