@@ -1482,7 +1482,7 @@
           "behaviors": [
             {
               "name": "InsertedBubble",
-              "type": "Smoothy::InsertedBubble",
+              "type": "Smoothy::InsertedBubbleBehavior",
               "SpeedPathMovement": "SpeedPathMovement"
             },
             {
@@ -1809,10 +1809,12 @@
           "effects": [],
           "behaviors": [
             {
-              "name": "BubbleQueue",
-              "type": "Smoothy::BubbleQueue",
-              "State": "Idle",
-              "ComboLevel": 0
+              "name": "BubbleQueueBehavior",
+              "type": "Smoothy::BubbleQueueBehavior",
+              "TailState": "Idle",
+              "HeadState": "Idle",
+              "TailComboLevel": 0,
+              "HeadComboLevel": 0
             },
             {
               "name": "ObjectStack",
@@ -2875,7 +2877,7 @@
                 },
                 {
                   "type": {
-                    "value": "Smoothy::InsertedBubble::Initialize"
+                    "value": "Smoothy::InsertedBubbleBehavior::Initialize"
                   },
                   "parameters": [
                     "InsertedBubble",
@@ -2902,7 +2904,7 @@
                 {
                   "type": {
                     "inverted": true,
-                    "value": "Smoothy::InsertedBubble::IsAnimationFinished"
+                    "value": "Smoothy::InsertedBubbleBehavior::IsAnimationFinished"
                   },
                   "parameters": [
                     "InsertedBubble",
@@ -2914,7 +2916,7 @@
               "actions": [
                 {
                   "type": {
-                    "value": "Smoothy::InsertedBubble::PlayInsertion"
+                    "value": "Smoothy::InsertedBubbleBehavior::PlayInsertion"
                   },
                   "parameters": [
                     "InsertedBubble",
@@ -2935,7 +2937,7 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "Smoothy::InsertedBubble::IsAnimationFinished"
+                    "value": "Smoothy::InsertedBubbleBehavior::IsAnimationFinished"
                   },
                   "parameters": [
                     "InsertedBubble",
@@ -2947,7 +2949,7 @@
               "actions": [
                 {
                   "type": {
-                    "value": "Smoothy::InsertedBubble::CreateBubble"
+                    "value": "Smoothy::InsertedBubbleBehavior::CreateBubble"
                   },
                   "parameters": [
                     "InsertedBubble",
@@ -3152,13 +3154,14 @@
                             "Gutter",
                             "ObjectStack",
                             "BubbleQueue",
-                            "",
+                            "BubbleQueueBehavior",
                             "ObjectStack",
                             "BoardBubble",
                             "SpeedPathMovement",
                             "Variable(queueIndex)",
                             "BubbleClipboard",
-                            "ObjectStack"
+                            "ObjectStack",
+                            ""
                           ]
                         },
                         {
@@ -3292,11 +3295,11 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::SetShouldRewind"
+                            "value": "Smoothy::BubbleQueueBehavior::SetShouldRewind"
                           },
                           "parameters": [
                             "BubbleQueue",
-                            "BubbleQueue",
+                            "BubbleQueueBehavior",
                             "yes",
                             ""
                           ]
@@ -3323,11 +3326,11 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::SetLeadingQueueShouldRewind"
+                            "value": "Smoothy::BubbleQueueBehavior::SetLeadingQueueShouldRewind"
                           },
                           "parameters": [
                             "BubbleQueue",
-                            "BubbleQueue",
+                            "BubbleQueueBehavior",
                             "yes",
                             ""
                           ]
@@ -3390,11 +3393,11 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::SetShouldRewind"
+                            "value": "Smoothy::BubbleQueueBehavior::SetShouldRewind"
                           },
                           "parameters": [
                             "BubbleQueue",
-                            "BubbleQueue",
+                            "BubbleQueueBehavior",
                             "no",
                             ""
                           ]
@@ -3421,11 +3424,11 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::SetLeadingQueueShouldRewind"
+                            "value": "Smoothy::BubbleQueueBehavior::SetLeadingQueueShouldRewind"
                           },
                           "parameters": [
                             "BubbleQueue",
-                            "BubbleQueue",
+                            "BubbleQueueBehavior",
                             "no",
                             ""
                           ]
@@ -3475,21 +3478,21 @@
                   "subInstructions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::ShouldRewind"
+                        "value": "Smoothy::BubbleQueueBehavior::ShouldRewind"
                       },
                       "parameters": [
                         "BubbleQueue",
-                        "BubbleQueue",
+                        "BubbleQueueBehavior",
                         ""
                       ]
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::LeadingQueueShouldRewind"
+                        "value": "Smoothy::BubbleQueueBehavior::LeadingQueueShouldRewind"
                       },
                       "parameters": [
                         "BubbleQueue",
-                        "BubbleQueue",
+                        "BubbleQueueBehavior",
                         ""
                       ]
                     }
@@ -3499,7 +3502,7 @@
               "actions": [
                 {
                   "type": {
-                    "value": "Smoothy::BubbleQueue::SetBubblesSpeed"
+                    "value": "Smoothy::BubbleQueueBehavior::SetBubblesSpeed"
                   },
                   "parameters": [
                     "BubbleQueue",
@@ -3528,6 +3531,17 @@
                 },
                 {
                   "type": {
+                    "inverted": true,
+                    "value": "Smoothy::BubbleQueueBehavior::LeadingQueueShouldRewind"
+                  },
+                  "parameters": [
+                    "BubbleQueue",
+                    "BubbleQueueBehavior",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
                     "value": "ObjectStack::Contains"
                   },
                   "parameters": [
@@ -3535,17 +3549,6 @@
                     "BubbleQueue",
                     "ObjectStack",
                     "BoardBubble",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "Smoothy::BubbleQueue::LeadingQueueShouldRewind"
-                  },
-                  "parameters": [
-                    "BubbleQueue",
-                    "BubbleQueue",
                     ""
                   ]
                 }
@@ -3780,8 +3783,8 @@
       ],
       "behaviorsSharedData": [
         {
-          "name": "BubbleQueue",
-          "type": "Smoothy::BubbleQueue"
+          "name": "BubbleQueueBehavior",
+          "type": "Smoothy::BubbleQueueBehavior"
         },
         {
           "name": "FireBullet",
@@ -3789,7 +3792,7 @@
         },
         {
           "name": "InsertedBubble",
-          "type": "Smoothy::InsertedBubble"
+          "type": "Smoothy::InsertedBubbleBehavior"
         },
         {
           "name": "ObjectStack",
@@ -3912,637 +3915,6 @@
       "authorIds": [],
       "dependencies": [],
       "eventsFunctions": [
-        {
-          "fullName": "Match bubbles",
-          "functionType": "Action",
-          "name": "MatchBubblesOld",
-          "sentence": "Match bubbles from _PARAM1_ at _PARAM3_ number _PARAM7_ and _PARAM5_ number _PARAM8_",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "ObjectStack::ContainsAt"
-                  },
-                  "parameters": [
-                    "",
-                    "Gutter",
-                    "ObjectStack",
-                    "BubbleQueue",
-                    "GetArgumentAsNumber(\"InsertedBubbleQueueIndex\")",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "ObjectStack::ContainsAt"
-                      },
-                      "parameters": [
-                        "",
-                        "BubbleQueue",
-                        "ObjectStack",
-                        "BoardBubble",
-                        "GetArgumentAsNumber(\"InsertedBubbleIndex\")",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "_SmoothyExtension.BubbleColor",
-                        "=",
-                        "BoardBubble.AnimationName()"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "disabled": true,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "DebuggerTools::ConsoleLog"
-                          },
-                          "parameters": [
-                            "\"Color: \" + VariableString(_SmoothyExtension.BubbleColor)",
-                            "",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Scan bubbles of the same color toward the head."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "lowerIndex",
-                        "=",
-                        "GetArgumentAsNumber(\"InsertedBubbleIndex\")"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "foundOtherColor",
-                        "False"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "infiniteLoopWarning": true,
-                  "type": "BuiltinCommonInstructions::While",
-                  "whileConditions": [
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "foundOtherColor",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "lowerIndex",
-                        ">",
-                        "0"
-                      ]
-                    }
-                  ],
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "lowerIndex",
-                        "-",
-                        "1"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectStack::ContainsBetween"
-                          },
-                          "parameters": [
-                            "",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            "Variable(lowerIndex)",
-                            "Variable(lowerIndex)",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "AnimationName"
-                          },
-                          "parameters": [
-                            "BoardBubble",
-                            "VariableString(_SmoothyExtension.BubbleColor)"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetSceneVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "foundOtherColor",
-                            "True"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "lowerIndex",
-                            "+",
-                            "1"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Scan bubbles of the same color toward the tail."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "upperIndex",
-                        "=",
-                        "GetArgumentAsNumber(\"InsertedBubbleIndex\")"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "foundOtherColor",
-                        "False"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "infiniteLoopWarning": true,
-                  "type": "BuiltinCommonInstructions::While",
-                  "whileConditions": [
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "foundOtherColor",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "upperIndex",
-                        "<",
-                        "BubbleQueue.ObjectStack::Height() - 1"
-                      ]
-                    }
-                  ],
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "upperIndex",
-                        "+",
-                        "1"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectStack::ContainsBetween"
-                          },
-                          "parameters": [
-                            "",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            "Variable(upperIndex)",
-                            "Variable(upperIndex)",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "AnimationName"
-                          },
-                          "parameters": [
-                            "BoardBubble",
-                            "VariableString(_SmoothyExtension.BubbleColor)"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetSceneVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "foundOtherColor",
-                            "True"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "upperIndex",
-                            "-",
-                            "1"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "VariableString(lowerIndex) + \" --> \" + VariableString(upperIndex)",
-                        "",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Move the leading bubbles in a new BubbleQueue.\n\nA new BubbleQueue can't be modified directly because another BubbleQueue is already picked.\nInstead, the leading bubbles are moved into a temporary queue BubbleClipboard."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "ObjectStack::ContainsBetween"
-                      },
-                      "parameters": [
-                        "",
-                        "BubbleQueue",
-                        "ObjectStack",
-                        "BoardBubble",
-                        "Variable(lowerIndex)",
-                        "Variable(upperIndex)",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "PickedInstancesCount"
-                      },
-                      "parameters": [
-                        "BoardBubble",
-                        ">=",
-                        "3"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Delete"
-                      },
-                      "parameters": [
-                        "BoardBubble",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ObjectStack::ObjectStack::MoveInto"
-                      },
-                      "parameters": [
-                        "BubbleClipboard",
-                        "ObjectStack",
-                        "0",
-                        "BubbleQueue",
-                        "ObjectStack",
-                        "0",
-                        "Variable(lowerIndex) -1",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "ObjectStack::Contains"
-                      },
-                      "parameters": [
-                        "",
-                        "BubbleClipboard",
-                        "ObjectStack",
-                        "BoardBubble",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                      },
-                      "parameters": [
-                        "BoardBubble",
-                        "SpeedPathMovement",
-                        "=",
-                        "0",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Now that no BubbleQueue is picked, a new one can be created."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "ObjectStack::ObjectStack::IsEmpty"
-                  },
-                  "parameters": [
-                    "BubbleClipboard",
-                    "ObjectStack",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "BubbleQueue",
-                    "-64",
-                    "-64",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ObjectStack::ObjectStack::Insert"
-                  },
-                  "parameters": [
-                    "Gutter",
-                    "ObjectStack",
-                    "BubbleQueue",
-                    "GetArgumentAsNumber(\"InsertedBubbleQueueIndex\")",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ObjectStack::ObjectStack::MoveAllInto"
-                  },
-                  "parameters": [
-                    "BubbleQueue",
-                    "ObjectStack",
-                    "0",
-                    "BubbleClipboard",
-                    "ObjectStack",
-                    ""
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "\"Insert in Gutter\"",
-                        "",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "When the bubbles are matched at the tail of the queue, the original queue is left empty an must be deleted."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "ObjectStack::ObjectStack::IsEmpty"
-                  },
-                  "parameters": [
-                    "BubbleQueue",
-                    "ObjectStack",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "BubbleQueue",
-                    ""
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Gutter",
-              "name": "Gutter",
-              "type": "objectList"
-            },
-            {
-              "description": "Object stack behavior",
-              "name": "ObjectStack",
-              "supplementaryInformation": "ObjectStack::ObjectStack",
-              "type": "behavior"
-            },
-            {
-              "description": "Bubble queue",
-              "name": "BubbleQueue",
-              "supplementaryInformation": "Sprite",
-              "type": "objectList"
-            },
-            {
-              "description": "Object stack behavior",
-              "name": "ObjectStack",
-              "supplementaryInformation": "ObjectStack::ObjectStack",
-              "type": "behavior"
-            },
-            {
-              "description": "Board bubble",
-              "name": "BoardBubble",
-              "supplementaryInformation": "Sprite",
-              "type": "objectList"
-            },
-            {
-              "description": "Speed path movement",
-              "name": "SpeedPathMovement",
-              "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
-              "type": "behavior"
-            },
-            {
-              "description": "Inserted bubble queue index",
-              "name": "InsertedBubbleQueueIndex",
-              "type": "expression"
-            },
-            {
-              "description": "Inserted bubble index",
-              "name": "InsertedBubbleIndex",
-              "supplementaryInformation": "Sprite",
-              "type": "expression"
-            },
-            {
-              "description": "Bubble clipboard",
-              "name": "BubbleClipboard",
-              "supplementaryInformation": "Sprite",
-              "type": "objectList"
-            },
-            {
-              "description": "Object stack behavior",
-              "name": "ObjectStack",
-              "supplementaryInformation": "ObjectStack::ObjectStack",
-              "type": "behavior"
-            }
-          ],
-          "objectGroups": []
-        },
         {
           "fullName": "Match bubbles",
           "functionType": "Condition",
@@ -6359,7 +5731,7 @@
                       "parameters": [
                         "tailState",
                         "=",
-                        "BubbleQueue.BubbleQueue::TailState()"
+                        "BubbleQueue.BubbleQueueBehavior::TailState()"
                       ]
                     },
                     {
@@ -6369,7 +5741,7 @@
                       "parameters": [
                         "tailComboLevel",
                         "=",
-                        "BubbleQueue.BubbleQueue::TailComboLevel()"
+                        "BubbleQueue.BubbleQueueBehavior::TailComboLevel()"
                       ]
                     },
                     {
@@ -6437,11 +5809,11 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetTailState"
+                        "value": "Smoothy::BubbleQueueBehavior::SetTailState"
                       },
                       "parameters": [
                         "BubbleQueue",
-                        "BubbleQueue",
+                        "BubbleQueueBehavior",
                         "=",
                         "VariableString(tailState)",
                         ""
@@ -6449,74 +5821,14 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetTailComboLevel"
+                        "value": "Smoothy::BubbleQueueBehavior::SetTailComboLevel"
                       },
                       "parameters": [
                         "BubbleQueue",
-                        "BubbleQueue",
+                        "BubbleQueueBehavior",
                         "=",
                         "Variable(tailComboLevel)",
                         ""
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Check for a match at the junction."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "BubbleQueue",
-                            "IsRewinding",
-                            "True"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "BubbleQueue",
-                            "IsRewinding",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Smoothy::MatchBubblesOld"
-                          },
-                          "parameters": [
-                            "",
-                            "Gutter",
-                            "ObjectStack",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            "SpeedPathMovement",
-                            "GetArgumentAsNumber(\"TaillingQueueIndex\") - 1",
-                            "Variable(insertedBubbleIndex)",
-                            "BubbleClipboard",
-                            "ObjectStack",
-                            ""
-                          ]
-                        }
                       ]
                     }
                   ]
@@ -6545,8 +5857,8 @@
             },
             {
               "description": "Bubble queue behavior",
-              "name": "BubbleQueue",
-              "supplementaryInformation": "Smoothy::BubbleQueue",
+              "name": "BubbleQueueBehavior",
+              "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
               "type": "behavior"
             },
             {
@@ -6736,7 +6048,7 @@
         {
           "description": "",
           "fullName": "",
-          "name": "InsertedBubble",
+          "name": "InsertedBubbleBehavior",
           "objectType": "Sprite",
           "eventsFunctions": [
             {
@@ -6761,7 +6073,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "supplementaryInformation": "Smoothy::InsertedBubbleBehavior",
                   "type": "behavior"
                 }
               ],
@@ -6865,7 +6177,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "supplementaryInformation": "Smoothy::InsertedBubbleBehavior",
                   "type": "behavior"
                 },
                 {
@@ -7433,7 +6745,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "supplementaryInformation": "Smoothy::InsertedBubbleBehavior",
                   "type": "behavior"
                 },
                 {
@@ -7515,7 +6827,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "supplementaryInformation": "Smoothy::InsertedBubbleBehavior",
                   "type": "behavior"
                 }
               ],
@@ -7774,7 +7086,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "supplementaryInformation": "Smoothy::InsertedBubbleBehavior",
                   "type": "behavior"
                 },
                 {
@@ -7850,7 +7162,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "supplementaryInformation": "Smoothy::InsertedBubbleBehavior",
                   "type": "behavior"
                 }
               ],
@@ -7891,7 +7203,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::InsertedBubble",
+                  "supplementaryInformation": "Smoothy::InsertedBubbleBehavior",
                   "type": "behavior"
                 }
               ],
@@ -7917,7 +7229,7 @@
         {
           "description": "",
           "fullName": "",
-          "name": "BubbleQueue",
+          "name": "BubbleQueueBehavior",
           "objectType": "",
           "eventsFunctions": [
             {
@@ -7961,7 +7273,7 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::PropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -7978,7 +7290,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyHeadState"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
                               },
                               "parameters": [
                                 "Object",
@@ -8021,7 +7333,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyHeadState"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
                               },
                               "parameters": [
                                 "Object",
@@ -8038,7 +7350,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyHeadState"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
                               },
                               "parameters": [
                                 "Object",
@@ -8083,7 +7395,7 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::PropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -8100,7 +7412,7 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::PropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -8130,7 +7442,7 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::PropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -8160,7 +7472,7 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::PropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -8197,7 +7509,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 },
                 {
@@ -8251,7 +7563,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyTailComboLevel"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailComboLevel"
                               },
                               "parameters": [
                                 "Object",
@@ -8264,7 +7576,7 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::SetPropertyTailState"
+                                "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
                               },
                               "parameters": [
                                 "Object",
@@ -8289,7 +7601,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyTailComboLevel"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailComboLevel"
                               },
                               "parameters": [
                                 "Object",
@@ -8302,7 +7614,7 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::SetPropertyTailState"
+                                "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
                               },
                               "parameters": [
                                 "Object",
@@ -8318,7 +7630,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyTailComboLevel"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailComboLevel"
                               },
                               "parameters": [
                                 "Object",
@@ -8331,7 +7643,7 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::SetPropertyTailState"
+                                "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
                               },
                               "parameters": [
                                 "Object",
@@ -8349,7 +7661,7 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::PropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -8373,7 +7685,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::SetPropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -8398,7 +7710,7 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::PropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -8411,7 +7723,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::SetPropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
                           },
                           "parameters": [
                             "Object",
@@ -8465,7 +7777,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyHeadComboLevel"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadComboLevel"
                               },
                               "parameters": [
                                 "Object",
@@ -8478,7 +7790,7 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::SetPropertyHeadState"
+                                "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
                               },
                               "parameters": [
                                 "Object",
@@ -8503,7 +7815,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyHeadComboLevel"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadComboLevel"
                               },
                               "parameters": [
                                 "Object",
@@ -8516,7 +7828,7 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::SetPropertyHeadState"
+                                "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
                               },
                               "parameters": [
                                 "Object",
@@ -8541,7 +7853,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::PropertyHeadComboLevel"
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadComboLevel"
                               },
                               "parameters": [
                                 "Object",
@@ -8554,7 +7866,7 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueue::SetPropertyHeadState"
+                                "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
                               },
                               "parameters": [
                                 "Object",
@@ -8572,7 +7884,7 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::PropertyHeadState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
                           },
                           "parameters": [
                             "Object",
@@ -8596,7 +7908,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueue::SetPropertyHeadState"
+                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
                           },
                           "parameters": [
                             "Object",
@@ -8629,7 +7941,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -8669,7 +7981,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -8694,7 +8006,7 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::PropertyTailState"
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                       },
                       "parameters": [
                         "Object",
@@ -8707,7 +8019,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyTailState"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
                       },
                       "parameters": [
                         "Object",
@@ -8718,7 +8030,7 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyTailComboLevel"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailComboLevel"
                       },
                       "parameters": [
                         "Object",
@@ -8744,7 +8056,7 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "Smoothy::BubbleQueue::PropertyTailState"
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                       },
                       "parameters": [
                         "Object",
@@ -8757,7 +8069,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyTailState"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
                       },
                       "parameters": [
                         "Object",
@@ -8768,7 +8080,7 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyTailComboLevel"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailComboLevel"
                       },
                       "parameters": [
                         "Object",
@@ -8789,7 +8101,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 },
                 {
@@ -8819,7 +8131,7 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::PropertyHeadState"
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
                       },
                       "parameters": [
                         "Object",
@@ -8832,7 +8144,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyHeadState"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
                       },
                       "parameters": [
                         "Object",
@@ -8843,7 +8155,7 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyHeadComboLevel"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadComboLevel"
                       },
                       "parameters": [
                         "Object",
@@ -8869,7 +8181,7 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "Smoothy::BubbleQueue::PropertyHeadState"
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
                       },
                       "parameters": [
                         "Object",
@@ -8882,7 +8194,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyHeadState"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
                       },
                       "parameters": [
                         "Object",
@@ -8893,7 +8205,7 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyHeadComboLevel"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadComboLevel"
                       },
                       "parameters": [
                         "Object",
@@ -8914,7 +8226,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 },
                 {
@@ -8936,7 +8248,7 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::PropertyTailState"
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
                       },
                       "parameters": [
                         "Object",
@@ -8967,7 +8279,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -8984,7 +8296,7 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::PropertyHeadState"
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
                       },
                       "parameters": [
                         "Object",
@@ -9015,7 +8327,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -9057,7 +8369,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -9076,7 +8388,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyTailState"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
                       },
                       "parameters": [
                         "Object",
@@ -9097,7 +8409,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -9139,7 +8451,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -9158,7 +8470,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyHeadState"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
                       },
                       "parameters": [
                         "Object",
@@ -9179,7 +8491,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -9220,7 +8532,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -9239,7 +8551,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyTailComboLevel"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailComboLevel"
                       },
                       "parameters": [
                         "Object",
@@ -9260,7 +8572,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -9301,7 +8613,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
@@ -9320,7 +8632,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueue::SetPropertyHeadComboLevel"
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadComboLevel"
                       },
                       "parameters": [
                         "Object",
@@ -9341,7 +8653,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueue",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
                   "type": "behavior"
                 }
               ],
