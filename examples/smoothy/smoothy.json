@@ -2931,18 +2931,6 @@
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "TODO Make \"match\" a condition that picks the bubbles."
-            },
-            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -2972,25 +2960,45 @@
                     "SpeedPathMovement",
                     ""
                   ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "TODO Pick the matched bubbles instead of removing them to add an explosion effect."
                 },
                 {
-                  "type": {
-                    "value": "Smoothy::MatchBubbles"
-                  },
-                  "parameters": [
-                    "",
-                    "Gutter",
-                    "ObjectStack",
-                    "BubbleQueue",
-                    "ObjectStack",
-                    "BoardBubble",
-                    "SpeedPathMovement",
-                    "InsertedBubble.InsertedBubble::QueueIndex()",
-                    "InsertedBubble.InsertedBubble::BubbleIndex()",
-                    "BubbleClipboard",
-                    "ObjectStack",
-                    ""
-                  ]
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::MatchBubbles"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "InsertedBubble.InsertedBubble::QueueIndex()",
+                        "InsertedBubble.InsertedBubble::BubbleIndex()",
+                        "BubbleClipboard",
+                        "ObjectStack",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": []
                 }
               ]
             }
@@ -3002,7 +3010,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Merge queues",
+          "name": "Queues collision",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -3063,143 +3071,104 @@
                   "actions": [],
                   "events": [
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "TODO Pick the matched bubbles instead of removing them to add an explosion effect.\n\nIncrease the combo level of the leading queue."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "areBubblesMatched",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "value": "ObjectStack::ContainsAt"
+                            "value": "Smoothy::MatchBubblesBetween"
                           },
                           "parameters": [
                             "",
                             "Gutter",
                             "ObjectStack",
                             "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            "SpeedPathMovement",
                             "Variable(queueIndex)",
                             ""
                           ]
                         }
                       ],
-                      "actions": [],
-                      "events": [
+                      "actions": [
                         {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
                           },
-                          "comment": "TODO Match tailling bubbles and leading bubbles as a condition.\n\nQueue won't be merged so states are preserved.\nIncrease the combo level of the leading queue."
-                        },
+                          "parameters": [
+                            "areBubblesMatched",
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueue::ShouldRewind"
-                              },
-                              "parameters": [
-                                "BubbleQueue",
-                                "BubbleQueue",
-                                "True"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "AjoutObjConcern"
-                              },
-                              "parameters": [
-                                "",
-                                "BubbleQueue"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Smoothy::MatchBubblesBetween"
-                              },
-                              "parameters": [
-                                "",
-                                "Gutter",
-                                "ObjectStack",
-                                "BubbleQueue",
-                                "ObjectStack",
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "Variable(queueIndex)",
-                                ""
-                              ]
-                            }
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "areBubblesMatched",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::MergeQueue"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            "",
+                            "ObjectStack",
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "Variable(queueIndex)",
+                            "BubbleClipboard",
+                            "ObjectStack"
                           ]
                         },
                         {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
+                          "type": {
+                            "value": "ModVarScene"
                           },
-                          "comment": "TODO Use \"match\" as a condition and merge if no match."
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "Smoothy::BubbleQueue::ShouldRewind"
-                              },
-                              "parameters": [
-                                "BubbleQueue",
-                                "BubbleQueue",
-                                "True"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "AjoutObjConcern"
-                              },
-                              "parameters": [
-                                "",
-                                "BubbleQueue"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Smoothy::MergeQueue"
-                              },
-                              "parameters": [
-                                "",
-                                "Gutter",
-                                "ObjectStack",
-                                "BubbleQueue",
-                                "",
-                                "ObjectStack",
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "Variable(queueIndex)",
-                                "BubbleClipboard",
-                                "ObjectStack"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarScene"
-                              },
-                              "parameters": [
-                                "queueIndex",
-                                "-",
-                                "1"
-                              ]
-                            }
+                          "parameters": [
+                            "queueIndex",
+                            "-",
+                            "1"
                           ]
                         }
                       ]
@@ -3946,7 +3915,7 @@
         {
           "fullName": "Match bubbles",
           "functionType": "Action",
-          "name": "MatchBubbles",
+          "name": "MatchBubblesOld",
           "sentence": "Match bubbles from _PARAM1_ at _PARAM3_ number _PARAM7_ and _PARAM5_ number _PARAM8_",
           "events": [
             {
@@ -4575,8 +4544,647 @@
           "objectGroups": []
         },
         {
+          "fullName": "Match bubbles",
+          "functionType": "Condition",
+          "name": "MatchBubbles",
+          "sentence": "Match bubbles from _PARAM1_ at _PARAM3_ number _PARAM7_ and _PARAM5_ number _PARAM8_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectStack::ContainsAt"
+                  },
+                  "parameters": [
+                    "",
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "GetArgumentAsNumber(\"InsertedBubbleQueueIndex\")",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsAt"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        "GetArgumentAsNumber(\"InsertedBubbleIndex\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarSceneTxt"
+                      },
+                      "parameters": [
+                        "_SmoothyExtension.BubbleColor",
+                        "=",
+                        "BoardBubble.AnimationName()"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "disabled": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "DebuggerTools::ConsoleLog"
+                          },
+                          "parameters": [
+                            "\"Color: \" + VariableString(_SmoothyExtension.BubbleColor)",
+                            "",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Scan bubbles of the same color toward the head."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "lowerIndex",
+                        "=",
+                        "GetArgumentAsNumber(\"InsertedBubbleIndex\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "foundOtherColor",
+                        "False"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "infiniteLoopWarning": true,
+                  "type": "BuiltinCommonInstructions::While",
+                  "whileConditions": [
+                    {
+                      "type": {
+                        "value": "SceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "foundOtherColor",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "lowerIndex",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "lowerIndex",
+                        "-",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectStack::ContainsBetween"
+                          },
+                          "parameters": [
+                            "",
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            "Variable(lowerIndex)",
+                            "Variable(lowerIndex)",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "AnimationName"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "VariableString(_SmoothyExtension.BubbleColor)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "foundOtherColor",
+                            "True"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "lowerIndex",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Scan bubbles of the same color toward the tail."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "upperIndex",
+                        "=",
+                        "GetArgumentAsNumber(\"InsertedBubbleIndex\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "foundOtherColor",
+                        "False"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "infiniteLoopWarning": true,
+                  "type": "BuiltinCommonInstructions::While",
+                  "whileConditions": [
+                    {
+                      "type": {
+                        "value": "SceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "foundOtherColor",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "upperIndex",
+                        "<",
+                        "BubbleQueue.ObjectStack::Height() - 1"
+                      ]
+                    }
+                  ],
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "upperIndex",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectStack::ContainsBetween"
+                          },
+                          "parameters": [
+                            "",
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            "Variable(upperIndex)",
+                            "Variable(upperIndex)",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "AnimationName"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "VariableString(_SmoothyExtension.BubbleColor)"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "foundOtherColor",
+                            "True"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "upperIndex",
+                            "-",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "VariableString(lowerIndex) + \" --> \" + VariableString(upperIndex)",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Move the leading bubbles in a new BubbleQueue.\n\nA new BubbleQueue can't be modified directly because another BubbleQueue is already picked.\nInstead, the leading bubbles are moved into a temporary queue BubbleClipboard."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsBetween"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        "Variable(lowerIndex)",
+                        "Variable(upperIndex)",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PickedInstancesCount"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        ">=",
+                        "3"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::ObjectStack::MoveInto"
+                      },
+                      "parameters": [
+                        "BubbleClipboard",
+                        "ObjectStack",
+                        "0",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "0",
+                        "Variable(lowerIndex) -1",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::Contains"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleClipboard",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "=",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Now that no BubbleQueue is picked, a new one can be created."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "ObjectStack::ObjectStack::IsEmpty"
+                  },
+                  "parameters": [
+                    "BubbleClipboard",
+                    "ObjectStack",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "BubbleQueue",
+                    "-64",
+                    "-64",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ObjectStack::ObjectStack::Insert"
+                  },
+                  "parameters": [
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "GetArgumentAsNumber(\"InsertedBubbleQueueIndex\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ObjectStack::ObjectStack::MoveAllInto"
+                  },
+                  "parameters": [
+                    "BubbleQueue",
+                    "ObjectStack",
+                    "0",
+                    "BubbleClipboard",
+                    "ObjectStack",
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"Insert in Gutter\"",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "When the bubbles are matched at the tail of the queue, the original queue is left empty an must be deleted."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ObjectStack::ObjectStack::IsEmpty"
+                  },
+                  "parameters": [
+                    "BubbleQueue",
+                    "ObjectStack",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "BubbleQueue",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Gutter",
+              "name": "Gutter",
+              "type": "objectList"
+            },
+            {
+              "description": "Object stack behavior",
+              "name": "ObjectStack",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Bubble queue",
+              "name": "BubbleQueue",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "Object stack behavior",
+              "name": "ObjectStack",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Board bubble",
+              "name": "BoardBubble",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "Speed path movement",
+              "name": "SpeedPathMovement",
+              "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+              "type": "behavior"
+            },
+            {
+              "description": "Inserted bubble queue index",
+              "name": "InsertedBubbleQueueIndex",
+              "type": "expression"
+            },
+            {
+              "description": "Inserted bubble index",
+              "name": "InsertedBubbleIndex",
+              "supplementaryInformation": "Sprite",
+              "type": "expression"
+            },
+            {
+              "description": "Bubble clipboard",
+              "name": "BubbleClipboard",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "Object stack behavior",
+              "name": "ObjectStack",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
           "fullName": "Match bubbles bewteen 2 queues",
-          "functionType": "Action",
+          "functionType": "Condition",
           "name": "MatchBubblesBetween",
           "sentence": "Match _PARAM5_ from _PARAM1_ at _PARAM3_ number _PARAM7_ and the bubble queue ahead",
           "events": [
@@ -5032,7 +5640,16 @@
                       ]
                     }
                   ],
-                  "actions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
@@ -5883,7 +6500,7 @@
                         },
                         {
                           "type": {
-                            "value": "Smoothy::MatchBubbles"
+                            "value": "Smoothy::MatchBubblesOld"
                           },
                           "parameters": [
                             "",
@@ -6784,7 +7401,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::MatchBubbles"
+                            "value": "Smoothy::MatchBubblesOld"
                           },
                           "parameters": [
                             "",
