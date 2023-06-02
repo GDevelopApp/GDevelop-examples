@@ -3073,6 +3073,66 @@
                   "actions": [],
                   "events": [
                     {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectStack::ContainsAt"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            "Variable(queueIndex)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetHeadJustHit"
+                          },
+                          "parameters": [
+                            "BubbleQueue",
+                            "BubbleQueueBehavior",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectStack::ContainsAt"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            "Variable(queueIndex) - 1",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetTailJustHit"
+                          },
+                          "parameters": [
+                            "BubbleQueue",
+                            "BubbleQueueBehavior",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
                       "type": "BuiltinCommonInstructions::Comment",
                       "color": {
                         "b": 109,
@@ -3295,7 +3355,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetShouldRewind"
+                            "value": "Smoothy::BubbleQueueBehavior::SetTailMatching"
                           },
                           "parameters": [
                             "BubbleQueue",
@@ -3326,7 +3386,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetLeadingQueueShouldRewind"
+                            "value": "Smoothy::BubbleQueueBehavior::SetHeadMatching"
                           },
                           "parameters": [
                             "BubbleQueue",
@@ -3393,7 +3453,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetShouldRewind"
+                            "value": "Smoothy::BubbleQueueBehavior::SetTailMatching"
                           },
                           "parameters": [
                             "BubbleQueue",
@@ -3424,7 +3484,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetLeadingQueueShouldRewind"
+                            "value": "Smoothy::BubbleQueueBehavior::SetHeadMatching"
                           },
                           "parameters": [
                             "BubbleQueue",
@@ -5285,47 +5345,7 @@
                   ]
                 }
               ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "firstBubblePathPosition",
-                    "=",
-                    "BoardBubble.SpeedPathMovement::PositionOnPath()"
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "\"firstBubblePathPosition: \" + VariableString(firstBubblePathPosition)",
-                        "",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "\"firstBubblePathColor: \" + BoardBubble.AnimationName()",
-                        "",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
+              "actions": []
             },
             {
               "disabled": true,
@@ -5559,6 +5579,35 @@
                         "firstBubbleSpeed",
                         "=",
                         "BoardBubble.SpeedPathMovement::Speed()"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "disabled": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "DebuggerTools::ConsoleLog"
+                          },
+                          "parameters": [
+                            "\"firstBubblePathPosition: \" + VariableString(firstBubblePathPosition)",
+                            "",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "DebuggerTools::ConsoleLog"
+                          },
+                          "parameters": [
+                            "\"firstBubblePathColor: \" + BoardBubble.AnimationName()",
+                            "",
+                            ""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -7276,6 +7325,18 @@
                       "actions": [],
                       "events": [
                         {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Idle state speed is decided in the scene events."
+                        },
+                        {
                           "disabled": true,
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
@@ -7311,13 +7372,32 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                                "value": "BuiltinCommonInstructions::Or"
                               },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"JustSplit\""
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "\"JustSplit\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "\"WillMagnet\""
+                                  ]
+                                }
                               ]
                             }
                           ],
@@ -7392,6 +7472,36 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"RewindImpact\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "=",
+                                "Object.Behavior::ImpactSpeed()",
+                                ""
+                              ]
+                            }
+                          ]
                         }
                       ]
                     },
@@ -7413,13 +7523,32 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                            "value": "BuiltinCommonInstructions::Or"
                           },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "\"JustSplit\""
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"JustSplit\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"WillMagnet\""
+                              ]
+                            }
                           ]
                         }
                       ],
@@ -7550,6 +7679,36 @@
                             "SpeedPathMovement",
                             "-444",
                             "-1333",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"RewindImpact\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "=",
+                            "Object.Behavior::ImpactSpeed()",
                             ""
                           ]
                         }
@@ -7881,6 +8040,44 @@
                           ]
                         }
                       ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"RewindImpact\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"JustSplit\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResetObjectTimer"
+                          },
+                          "parameters": [
+                            "Object",
+                            "\"TailSplit\""
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "parameters": []
@@ -8114,6 +8311,44 @@
                           ]
                         }
                       ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"RewindImpact\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"JustSplit\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResetObjectTimer"
+                          },
+                          "parameters": [
+                            "Object",
+                            "\"HeadSplit\""
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "parameters": []
@@ -8175,10 +8410,10 @@
               "objectGroups": []
             },
             {
-              "fullName": "Should rewind",
+              "fullName": "Tail is matching",
               "functionType": "Action",
-              "name": "SetShouldRewind",
-              "sentence": "_PARAM0_ should rewind: _PARAM2_",
+              "name": "SetTailMatching",
+              "sentence": "_PARAM0_ tail is matching: _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -8365,10 +8600,10 @@
               "objectGroups": []
             },
             {
-              "fullName": "Leading queue should rewind",
+              "fullName": "Head is matching",
               "functionType": "Action",
-              "name": "SetLeadingQueueShouldRewind",
-              "sentence": "The leading queue of _PARAM0_ should rewind: _PARAM2_",
+              "name": "SetHeadMatching",
+              "sentence": "_PARAM0_ head is matching: _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -8544,10 +8779,10 @@
               "objectGroups": []
             },
             {
-              "fullName": "Should rewind",
+              "fullName": "Tail is matching",
               "functionType": "Condition",
-              "name": "ShouldRewind",
-              "sentence": "_PARAM0_ should rewind",
+              "name": "IsTailMatching",
+              "sentence": "_PARAM0_ tail is matching",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -8592,10 +8827,10 @@
               "objectGroups": []
             },
             {
-              "fullName": "Leading queue should rewind",
+              "fullName": "Head is matching",
               "functionType": "Condition",
-              "name": "LeadingQueueShouldRewind",
-              "sentence": "The leading queue of _PARAM0_ should rewind",
+              "name": "IsHeadMatching",
+              "sentence": "_PARAM0_ head is matching",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -8672,7 +8907,6 @@
                   ],
                   "events": [
                     {
-                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
@@ -8740,7 +8974,6 @@
                   ],
                   "events": [
                     {
-                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
@@ -8755,6 +8988,108 @@
                             "0"
                           ]
                         }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Tail just hit",
+              "functionType": "Action",
+              "name": "SetTailJustHit",
+              "sentence": "Change tail state of _PARAM0_ to just hit",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Rewinding\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"RewindImpact\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Head just hit",
+              "functionType": "Action",
+              "name": "SetHeadJustHit",
+              "sentence": "Change head state of _PARAM0_ to just hit",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Rewinding\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"RewindImpact\""
                       ]
                     }
                   ]
@@ -9249,9 +9584,11 @@
                 "Idle",
                 "JustSplit",
                 "StopOrTaillingPush",
+                "WillMagnet",
                 "HitStop",
                 "HitStopEnd",
-                "Rewinding"
+                "Rewinding",
+                "RewindImpact"
               ],
               "hidden": true,
               "name": "TailState"
@@ -9266,7 +9603,9 @@
                 "Idle",
                 "JustSplit",
                 "StopOrTaillingPush",
-                "HitStop"
+                "WillMagnet",
+                "HitStop",
+                "RewindImpact"
               ],
               "hidden": true,
               "name": "HeadState"
