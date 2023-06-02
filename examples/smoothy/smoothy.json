@@ -2989,9 +2989,9 @@
                         "Gutter",
                         "ObjectStack",
                         "BubbleQueue",
+                        "BubbleQueueBehavior",
                         "ObjectStack",
                         "BoardBubble",
-                        "SpeedPathMovement",
                         "InsertedBubble.InsertedBubble::QueueIndex()",
                         "InsertedBubble.InsertedBubble::BubbleIndex()",
                         "BubbleClipboard",
@@ -3472,53 +3472,6 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "BuiltinCommonInstructions::Or"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::ShouldRewind"
-                      },
-                      "parameters": [
-                        "BubbleQueue",
-                        "BubbleQueueBehavior",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::LeadingQueueShouldRewind"
-                      },
-                      "parameters": [
-                        "BubbleQueue",
-                        "BubbleQueueBehavior",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Smoothy::BubbleQueueBehavior::SetBubblesSpeed"
-                  },
-                  "parameters": [
-                    "BubbleQueue",
-                    "BubbleQueue",
-                    "BoardBubble",
-                    "SpeedPathMovement",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
                     "value": "ObjectStack::HasOnTop"
                   },
                   "parameters": [
@@ -3526,17 +3479,6 @@
                     "Gutter",
                     "ObjectStack",
                     "BubbleQueue",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "Smoothy::BubbleQueueBehavior::LeadingQueueShouldRewind"
-                  },
-                  "parameters": [
-                    "BubbleQueue",
-                    "BubbleQueueBehavior",
                     ""
                   ]
                 },
@@ -3610,6 +3552,91 @@
                         "88.9",
                         "88.9",
                         ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "queueIndex",
+                    "=",
+                    "Gutter.ObjectStack::Height() - 1"
+                  ]
+                }
+              ]
+            },
+            {
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "queueIndex",
+                    ">=",
+                    "0"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsAt"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        "Variable(queueIndex)",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetBubblesSpeed"
+                      },
+                      "parameters": [
+                        "BubbleQueue",
+                        "BubbleQueueBehavior",
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "Gutter.ObjectStack::Height() - 1 - Variable(queueIndex)",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "queueIndex",
+                        "-",
+                        "1"
                       ]
                     }
                   ]
@@ -4332,35 +4359,14 @@
                         "Variable(lowerIndex) -1",
                         ""
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                    },
                     {
                       "type": {
-                        "value": "ObjectStack::Contains"
+                        "value": "Smoothy::BubbleQueueBehavior::SetHeadJustSplit"
                       },
                       "parameters": [
-                        "",
-                        "BubbleClipboard",
-                        "ObjectStack",
-                        "BoardBubble",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                      },
-                      "parameters": [
-                        "BoardBubble",
-                        "SpeedPathMovement",
-                        "=",
-                        "0",
+                        "BubbleQueue",
+                        "BubbleQueueBehavior",
                         ""
                       ]
                     }
@@ -4430,6 +4436,16 @@
                     "0",
                     "BubbleClipboard",
                     "ObjectStack",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Smoothy::BubbleQueueBehavior::SetTailJustSplit"
+                  },
+                  "parameters": [
+                    "BubbleQueue",
+                    "BubbleQueueBehavior",
                     ""
                   ]
                 }
@@ -4511,6 +4527,12 @@
               "type": "objectList"
             },
             {
+              "description": "Bubble queue behavior",
+              "name": "BubbleQueueBehavior",
+              "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+              "type": "behavior"
+            },
+            {
               "description": "Object stack behavior",
               "name": "ObjectStack",
               "supplementaryInformation": "ObjectStack::ObjectStack",
@@ -4521,12 +4543,6 @@
               "name": "BoardBubble",
               "supplementaryInformation": "Sprite",
               "type": "objectList"
-            },
-            {
-              "description": "Speed path movement",
-              "name": "SpeedPathMovement",
-              "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
-              "type": "behavior"
             },
             {
               "description": "Inserted bubble queue index",
@@ -6047,7 +6063,7 @@
       "eventsBasedBehaviors": [
         {
           "description": "",
-          "fullName": "",
+          "fullName": "Inserted bubble",
           "name": "InsertedBubbleBehavior",
           "objectType": "Sprite",
           "eventsFunctions": [
@@ -7228,7 +7244,7 @@
         },
         {
           "description": "",
-          "fullName": "",
+          "fullName": "Bubble queue",
           "name": "BubbleQueueBehavior",
           "objectType": "",
           "eventsFunctions": [
@@ -7236,7 +7252,7 @@
               "fullName": "Update bubble speed",
               "functionType": "Action",
               "name": "SetBubblesSpeed",
-              "sentence": "Update  speed of _PARAM2_ from _PARAM0_ for the rewind animation",
+              "sentence": "Update  speed of _PARAM2_ from _PARAM0_ for the rewind animation (queue index from tail: _PARAM4_)",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -7256,6 +7272,22 @@
                   ],
                   "actions": [],
                   "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "DebuggerTools::ConsoleLog"
+                          },
+                          "parameters": [
+                            "GetArgumentAsString(\"QueueIndex\") + \": \" + Object.Behavior::PropertyTailState() + \" - \" + Object.Behavior::PropertyHeadState()",
+                            "",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
                     {
                       "type": "BuiltinCommonInstructions::Comment",
                       "color": {
@@ -7286,6 +7318,7 @@
                       "actions": [],
                       "events": [
                         {
+                          "disabled": true,
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
                             {
@@ -7300,20 +7333,7 @@
                               ]
                             }
                           ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "88.9",
-                                "88.9",
-                                ""
-                              ]
-                            }
-                          ]
+                          "actions": []
                         },
                         {
                           "type": "BuiltinCommonInstructions::Comment",
@@ -7344,6 +7364,46 @@
                             }
                           ],
                           "actions": []
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"StopOrTaillingPush\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CompareArgumentAsNumber"
+                              },
+                              "parameters": [
+                                "\"QueueIndexFromTail\"",
+                                ">",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "=",
+                                "0",
+                                ""
+                              ]
+                            }
+                          ]
                         },
                         {
                           "type": "BuiltinCommonInstructions::Standard",
@@ -7406,6 +7466,46 @@
                         }
                       ],
                       "actions": []
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"StopOrTaillingPush\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CompareArgumentAsNumber"
+                          },
+                          "parameters": [
+                            "\"QueueIndexFromTail\"",
+                            ">",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "=",
+                            "0",
+                            ""
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
@@ -7522,6 +7622,11 @@
                   "name": "SpeedPathMovement",
                   "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
                   "type": "behavior"
+                },
+                {
+                  "description": "Queue index from tail",
+                  "name": "QueueIndexFromTail",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -7544,6 +7649,65 @@
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"StopOrTaillingPush\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Idle\""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "disabled": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"StopOrTaillingPush --> Idle\"",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"JustSplit\""
+                          ]
+                        },
                         {
                           "type": {
                             "value": "CompareObjectTimer"
@@ -7582,7 +7746,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "\"Idle\""
+                                "\"StopOrTaillingPush\""
                               ]
                             },
                             {
@@ -7667,7 +7831,36 @@
                             "Object",
                             "Behavior",
                             "=",
-                            "\"TailStop\""
+                            "\"HitStopEnd\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Rewind\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"HitStop\""
                           ]
                         },
                         {
@@ -7704,44 +7897,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "\"HitStopEnd\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "\"Rewind\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "RemoveObjectTimer"
-                          },
-                          "parameters": [
-                            "Object",
-                            "\"TailSplit\""
-                          ]
-                        }
-                      ]
                     }
                   ],
                   "parameters": []
@@ -7758,6 +7913,46 @@
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"StopOrTaillingPush\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Idle\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"JustSplit\""
+                          ]
+                        },
                         {
                           "type": {
                             "value": "CompareObjectTimer"
@@ -7796,7 +7991,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "\"Idle\""
+                                "\"StopOrTaillingPush\""
                               ]
                             },
                             {
@@ -8006,13 +8201,32 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                        "value": "BuiltinCommonInstructions::Or"
                       },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "\"Idle\""
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Idle\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"JustSplit\""
+                          ]
+                        }
                       ]
                     }
                   ],
@@ -8037,6 +8251,15 @@
                         "Behavior",
                         "+",
                         "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"TailSplit\""
                       ]
                     }
                   ]
@@ -8064,29 +8287,41 @@
                         "=",
                         "\"Idle\""
                       ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"JustSplit\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"StopOrTaillingPush\""
+                      ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
+                        "value": "Smoothy::BubbleQueueBehavior::SetTailIdle"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "=",
-                        "\"Idle\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailComboLevel"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "0"
+                        ""
                       ]
                     }
                   ]
@@ -8131,13 +8366,32 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                        "value": "BuiltinCommonInstructions::Or"
                       },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "\"Idle\""
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Idle\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"JustSplit\""
+                          ]
+                        }
                       ]
                     }
                   ],
@@ -8188,6 +8442,30 @@
                         "Behavior",
                         "=",
                         "\"Idle\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"JustSplit\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"StopOrTaillingPush\""
                       ]
                     }
                   ],
@@ -8334,10 +8612,266 @@
               "objectGroups": []
             },
             {
+              "fullName": "Tail just split",
+              "functionType": "Action",
+              "name": "SetTailJustSplit",
+              "sentence": "Change tail state of _PARAM0_ to just split",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"JustSplit\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailComboLevel"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"TailSplit\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Head just split",
+              "functionType": "Action",
+              "name": "SetHeadJustSplit",
+              "sentence": "Change head state of _PARAM0_ to just split",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"JustSplit\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadComboLevel"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"HeadSplit\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Tail idle",
+              "functionType": "Action",
+              "name": "SetTailIdle",
+              "private": true,
+              "sentence": "Change tail state of _PARAM0_ to idle",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailComboLevel"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "RemoveObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"TailSplit\""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "DebuggerTools::ConsoleLog"
+                          },
+                          "parameters": [
+                            "\" --> Idle\"",
+                            "",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Head idle",
+              "functionType": "Action",
+              "name": "SetHeadIdle",
+              "private": true,
+              "sentence": "Change head state of _PARAM0_ to idle",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadComboLevel"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "RemoveObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"HeadSplit\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "the tail state of the object. It should only be used by this extension.",
               "fullName": "Tail state",
               "functionType": "ExpressionAndCondition",
-              "group": "BubbleQueue configuration",
+              "group": "Bubble queue (private)",
               "name": "TailState",
               "sentence": "the tail state",
               "events": [
@@ -8419,7 +8953,7 @@
               "description": "the head state of the object. It should only be used by this extension.",
               "fullName": "Head state",
               "functionType": "ExpressionAndCondition",
-              "group": "BubbleQueue configuration",
+              "group": "Bubble queue (private)",
               "name": "HeadState",
               "sentence": "the head state",
               "events": [
@@ -8501,7 +9035,6 @@
               "description": "the tail combo level of the object.",
               "fullName": "Tail combo level",
               "functionType": "ExpressionAndCondition",
-              "group": "BubbleQueue configuration",
               "name": "TailComboLevel",
               "sentence": "the tail combo level",
               "events": [
@@ -8582,7 +9115,6 @@
               "description": "the head combo level of the object.",
               "fullName": "Head combo level",
               "functionType": "ExpressionAndCondition",
-              "group": "BubbleQueue configuration",
               "name": "HeadComboLevel",
               "sentence": "the head combo level",
               "events": [
@@ -8670,6 +9202,7 @@
               "extraInformation": [
                 "Idle",
                 "JustSplit",
+                "StopOrTaillingPush",
                 "HitStop",
                 "HitStopEnd",
                 "Rewinding"
@@ -8686,6 +9219,7 @@
               "extraInformation": [
                 "Idle",
                 "JustSplit",
+                "StopOrTaillingPush",
                 "HitStop"
               ],
               "hidden": true,
