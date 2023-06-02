@@ -3075,6 +3075,16 @@
                         "BoardBubble",
                         ""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"Inserted bubble is matching\"",
+                        "",
+                        ""
+                      ]
                     }
                   ],
                   "events": [
@@ -4563,7 +4573,6 @@
                     {
                       "type": "BuiltinCommonInstructions::JsCode",
                       "inlineCode": [
-                        "",
                         "// Pick the the matched BoardBubble to handle them in the event sheet. ",
                         "for (const object of objects) {",
                         "    object.pick = true;",
@@ -4899,7 +4908,7 @@
                           "parameters": [
                             "lowerIndex",
                             "=",
-                            "BubbleQueue.ObjectStack::Height()"
+                            "BubbleQueue.ObjectStack::Height() - 1"
                           ]
                         },
                         {
@@ -4938,18 +4947,7 @@
                         }
                       ],
                       "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "lowerIndex",
-                            "-",
-                            "1"
-                          ]
-                        }
-                      ],
+                      "actions": [],
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Standard",
@@ -5000,6 +4998,22 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "lowerIndex",
+                                "-",
+                                "1"
+                              ]
+                            }
+                          ]
                         }
                       ]
                     },
@@ -5012,7 +5026,7 @@
                             "value": "ModVarScene"
                           },
                           "parameters": [
-                            "matchingBubbleCount",
+                            "headMatchingBubbleCount",
                             "=",
                             "BubbleQueue.ObjectStack::Height() - Variable(lowerIndex)"
                           ]
@@ -5075,7 +5089,7 @@
                           "parameters": [
                             "upperIndex",
                             "=",
-                            "GetArgumentAsNumber(\"InsertedBubbleIndex\")"
+                            "0"
                           ]
                         },
                         {
@@ -5114,18 +5128,7 @@
                         }
                       ],
                       "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "upperIndex",
-                            "+",
-                            "1"
-                          ]
-                        }
-                      ],
+                      "actions": [],
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Standard",
@@ -5176,6 +5179,22 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "upperIndex",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
                         }
                       ]
                     },
@@ -5188,9 +5207,9 @@
                             "value": "ModVarScene"
                           },
                           "parameters": [
-                            "matchingBubbleCount",
-                            "+",
-                            "Variable(upperIndex) + 1"
+                            "tailMatchingBubbleCount",
+                            "=",
+                            "Variable(upperIndex)"
                           ]
                         }
                       ]
@@ -5204,7 +5223,7 @@
                             "value": "DebuggerTools::ConsoleLog"
                           },
                           "parameters": [
-                            "\"matchingBubbleCount: \" + VariableString(matchingBubbleCount)",
+                            "\"matchingBubbleCount: \" + VariableString(headMatchingBubbleCount) + \" + \" + VariableString(tailMatchingBubbleCount)",
                             "",
                             ""
                           ]
@@ -5233,7 +5252,27 @@
                         "value": "VarScene"
                       },
                       "parameters": [
-                        "matchingBubbleCount",
+                        "headMatchingBubbleCount",
+                        ">",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "tailMatchingBubbleCount",
+                        ">",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                      },
+                      "parameters": [
+                        "Variable(headMatchingBubbleCount) + Variable(tailMatchingBubbleCount)",
                         ">=",
                         "3"
                       ]
