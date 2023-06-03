@@ -2523,7 +2523,7 @@
                                     "BoardBubble",
                                     "SpeedPathMovement",
                                     "=",
-                                    "64 + Smoothy::SpeedToReach(1/2 * CurvedMovement::PathLength(\"Gutter\"), 889)",
+                                    "Smoothy::SpeedToReach(1/2 * CurvedMovement::PathLength(\"Gutter\"), 889, 64)",
                                     ""
                                   ]
                                 }
@@ -3952,21 +3952,70 @@
                                   ]
                                 }
                               ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
-                                  },
-                                  "parameters": [
-                                    "BoardBubble",
-                                    "SpeedPathMovement",
-                                    "64",
-                                    "64",
-                                    ""
-                                  ]
-                                }
-                              ],
+                              "actions": [],
                               "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "CurvedMovement::SpeedPathMovement::Speed"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "SpeedPathMovement",
+                                        "<=",
+                                        "64",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "SpeedPathMovement",
+                                        "64",
+                                        "64",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "CurvedMovement::SpeedPathMovement::Speed"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "SpeedPathMovement",
+                                        ">",
+                                        "64",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "SpeedPathMovement",
+                                        "64",
+                                        "-64",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                },
                                 {
                                   "disabled": true,
                                   "type": "BuiltinCommonInstructions::Standard",
@@ -4000,20 +4049,7 @@
                                   ]
                                 }
                               ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
-                                  },
-                                  "parameters": [
-                                    "BoardBubble",
-                                    "SpeedPathMovement",
-                                    "20",
-                                    "20",
-                                    ""
-                                  ]
-                                }
-                              ],
+                              "actions": [],
                               "events": [
                                 {
                                   "disabled": true,
@@ -4027,6 +4063,68 @@
                                       "parameters": [
                                         "\"Slow speed\"",
                                         "",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "CurvedMovement::SpeedPathMovement::Speed"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "SpeedPathMovement",
+                                        "<=",
+                                        "17.8",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "SpeedPathMovement",
+                                        "17.8",
+                                        "17.8",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "CurvedMovement::SpeedPathMovement::Speed"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "SpeedPathMovement",
+                                        ">",
+                                        "17.8",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "SpeedPathMovement",
+                                        "17.8",
+                                        "-17.8",
                                         ""
                                       ]
                                     }
@@ -4445,7 +4543,18 @@
                       ]
                     }
                   ],
-                  "actions": []
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarGlobal"
+                      },
+                      "parameters": [
+                        "Score",
+                        "=",
+                        "Variable(Score)"
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -6886,7 +6995,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "sqrt(2 * GetArgumentAsNumber(\"Distance\") * GetArgumentAsNumber(\"Deceleration\"))"
+                    "sqrt(2 * GetArgumentAsNumber(\"Distance\") * GetArgumentAsNumber(\"Deceleration\") + GetArgumentAsNumber(\"FinalSpeed\") * GetArgumentAsNumber(\"FinalSpeed\"))"
                   ]
                 }
               ]
@@ -6911,7 +7020,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "-sqrt(-2 * GetArgumentAsNumber(\"Distance\") * GetArgumentAsNumber(\"Deceleration\"))"
+                    "-sqrt(-2 * GetArgumentAsNumber(\"Distance\") * GetArgumentAsNumber(\"Deceleration\") + GetArgumentAsNumber(\"FinalSpeed\") * GetArgumentAsNumber(\"FinalSpeed\"))"
                   ]
                 }
               ]
@@ -6922,13 +7031,18 @@
           },
           "parameters": [
             {
-              "description": "Distance",
+              "description": "Final distance",
               "name": "Distance",
               "type": "expression"
             },
             {
               "description": "Deceleration",
               "name": "Deceleration",
+              "type": "expression"
+            },
+            {
+              "description": "Final speed",
+              "name": "FinalSpeed",
               "type": "expression"
             }
           ],
