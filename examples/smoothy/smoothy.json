@@ -3764,6 +3764,7 @@
                   ]
                 },
                 {
+                  "disabled": true,
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
@@ -3853,6 +3854,7 @@
                       ],
                       "events": [
                         {
+                          "disabled": true,
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
                           "actions": [
@@ -3900,6 +3902,7 @@
                       ],
                       "events": [
                         {
+                          "disabled": true,
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
                           "actions": [
@@ -6223,6 +6226,16 @@
                         "Variable(tailComboLevel)",
                         ""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetHeadJustMerged"
+                      },
+                      "parameters": [
+                        "BubbleQueue",
+                        "BubbleQueueBehavior",
+                        "="
+                      ]
                     }
                   ]
                 }
@@ -7725,6 +7738,7 @@
                   "actions": [],
                   "events": [
                     {
+                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
@@ -7987,7 +8001,7 @@
                                     "value": "DebuggerTools::ConsoleLog"
                                   },
                                   "parameters": [
-                                    "\"Set speed for the head imact: \" + ToString(Object.Behavior::ImpactSpeed(Object.Behavior::PropertyTailComboLevel()))",
+                                    "\"Combo level for the head imact: \" + ToString(Object.Behavior::PropertyHeadComboLevel())",
                                     "",
                                     ""
                                   ]
@@ -8208,6 +8222,7 @@
                       ],
                       "events": [
                         {
+                          "disabled": true,
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
                           "actions": [
@@ -8226,6 +8241,7 @@
                       ]
                     },
                     {
+                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
@@ -8255,6 +8271,7 @@
                       ]
                     },
                     {
+                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
@@ -8490,7 +8507,7 @@
                                         "value": "DebuggerTools::ConsoleLog"
                                       },
                                       "parameters": [
-                                        "\"WillMagnet --> Rewind\"",
+                                        "\"WillMagnet --> Rewinding\"",
                                         "",
                                         ""
                                       ]
@@ -8715,6 +8732,24 @@
                             "\"Idle\""
                           ]
                         }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"StopOrTaillingPush --> Idle\"",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
                       ]
                     },
                     {
@@ -8749,25 +8784,109 @@
                               ]
                             }
                           ],
-                          "actions": [
+                          "actions": [],
+                          "events": [
                             {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"StopOrTaillingPush\""
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "Smoothy::BubbleQueueBehavior::PropertyHeadComboLevel"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "1"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "\"StopOrTaillingPush\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "RemoveObjectTimer"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "\"HeadSplit\""
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "DebuggerTools::ConsoleLog"
+                                      },
+                                      "parameters": [
+                                        "\"JustSplit --> StopOrTaillingPush\"",
+                                        "",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
                               ]
                             },
                             {
-                              "type": {
-                                "value": "RemoveObjectTimer"
-                              },
-                              "parameters": [
-                                "Object",
-                                "\"HeadSplit\""
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "Smoothy::BubbleQueueBehavior::PropertyHeadComboLevel"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    ">",
+                                    "1"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "\"HitStop\""
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "DebuggerTools::ConsoleLog"
+                                      },
+                                      "parameters": [
+                                        "\"JustSplit --> HitStop\"",
+                                        "",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
                               ]
                             }
                           ]
@@ -8825,6 +8944,24 @@
                                     "\"HeadSplit\""
                                   ]
                                 }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "DebuggerTools::ConsoleLog"
+                                      },
+                                      "parameters": [
+                                        "\"WillMagnet --> Rewinding\"",
+                                        "",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
                               ]
                             },
                             {
@@ -8852,6 +8989,24 @@
                                     "Behavior",
                                     "=",
                                     "\"HitStop\""
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "DebuggerTools::ConsoleLog"
+                                      },
+                                      "parameters": [
+                                        "\"WillMagnet --> HitStop\"",
+                                        "",
+                                        ""
+                                      ]
+                                    }
                                   ]
                                 }
                               ]
@@ -8907,6 +9062,24 @@
                             "\"HeadSplit\""
                           ]
                         }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"HitStop --> Rewinding\"",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
                       ]
                     },
                     {
@@ -8943,6 +9116,24 @@
                           "parameters": [
                             "Object",
                             "\"HeadSplit\""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"RewindImpact --> JustSplit\"",
+                                "",
+                                ""
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -9122,6 +9313,25 @@
                       "parameters": [
                         "\"ShouldRewind\""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Rewinding\""
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "actions": [
@@ -9135,62 +9345,30 @@
                         "=",
                         "0"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetTailIdle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
                     }
                   ],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Or"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"HitStop\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"HitStopEnd\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"Rewinding\""
-                              ]
-                            }
-                          ]
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetTailIdle"
+                            "value": "DebuggerTools::ConsoleLog"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "\"Reset tail combo level\"",
+                            "",
                             ""
                           ]
                         }
@@ -9330,6 +9508,25 @@
                       "parameters": [
                         "\"ShouldRewind\""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Rewinding\""
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "actions": [
@@ -9343,51 +9540,30 @@
                         "=",
                         "0"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetHeadIdle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
                     }
                   ],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Or"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"WillMagnet\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"HitStop\""
-                              ]
-                            }
-                          ]
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetHeadIdle"
+                            "value": "DebuggerTools::ConsoleLog"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "\"Reset head combo level\"",
+                            "",
                             ""
                           ]
                         }
@@ -9760,6 +9936,76 @@
                           },
                           "parameters": [
                             "\"Head just hit\"",
+                            "",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Head just merged",
+              "functionType": "Action",
+              "name": "SetHeadJustMerged",
+              "sentence": "Change head state of _PARAM0_ to just merged",
+              "events": [
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Rewinding\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"RewindImpact\""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "DebuggerTools::ConsoleLog"
+                          },
+                          "parameters": [
+                            "\"Head just merged\"",
                             "",
                             ""
                           ]
