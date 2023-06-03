@@ -415,6 +415,36 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Score",
+          "persistentUuid": "676db6fe-999e-454a-a69c-e1f290b05ee0",
+          "width": 0,
+          "x": 24,
+          "y": 16,
+          "zOrder": 97,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Countdown",
+          "persistentUuid": "60b40b4e-219c-41e6-9cd8-85997e02916d",
+          "width": 0,
+          "x": 784,
+          "y": 16,
+          "zOrder": 98,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -1929,9 +1959,9 @@
           "emitterAngleB": 360,
           "emitterForceMax": 200,
           "emitterForceMin": 50,
-          "flow": 640,
+          "flow": 1280,
           "jumpForwardInTimeOnCreation": 0,
-          "maxParticleNb": 32,
+          "maxParticleNb": 64,
           "name": "BubbleExplosion",
           "particleAlpha1": 204,
           "particleAlpha2": 0,
@@ -1959,13 +1989,57 @@
           "rendererParam2": 1,
           "rendererType": "Point",
           "tags": "",
-          "tank": 32,
+          "tank": 64,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",
           "zoneRadius": 8,
           "variables": [],
           "effects": [],
           "behaviors": []
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Score",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "0000",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Countdown",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "3:00",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
         }
       ],
       "events": [
@@ -2075,6 +2149,16 @@
                   "parameters": [
                     "BeginningBoostIsActive",
                     "True"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "Countdown",
+                    "=",
+                    "3 * 60"
                   ]
                 }
               ],
@@ -3092,12 +3176,12 @@
                             },
                             {
                               "type": {
-                                "value": "DebuggerTools::ConsoleLog"
+                                "value": "ModVarScene"
                               },
                               "parameters": [
-                                "\"Inserted bubble is matching\"",
-                                "",
-                                ""
+                                "Score",
+                                "+",
+                                "10 * PickedInstancesCount(BoardBubble)"
                               ]
                             }
                           ],
@@ -3285,6 +3369,26 @@
                                   "parameters": [
                                     "BoardBubble",
                                     ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "Score",
+                                    "+",
+                                    "10 * PickedInstancesCount(BoardBubble)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "Score",
+                                    "+",
+                                    "100 * BubbleQueue.BubbleQueueBehavior::HeadComboLevel()"
                                   ]
                                 }
                               ],
@@ -4136,6 +4240,75 @@
                     "=",
                     "0",
                     ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "Score",
+                    "=",
+                    "VariableString(Score)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "Countdown",
+                    "-",
+                    "TimeDelta()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "Countdown",
+                    "=",
+                    "ToString(floor(Variable(Countdown) / 60)) + \":\" + ToString(floor(mod(Variable(Countdown), 60)))"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "Countdown",
+                    "<",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "GameState",
+                    "=",
+                    "\"GameOver\""
                   ]
                 }
               ]
