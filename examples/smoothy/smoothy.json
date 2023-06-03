@@ -3477,12 +3477,34 @@
                         },
                         {
                           "type": {
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "InsertedBubble",
+                            "BoardBubble"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "AjoutObjConcern"
+                          },
+                          "parameters": [
+                            "",
+                            "BoardBubble"
+                          ]
+                        },
+                        {
+                          "type": {
                             "value": "Smoothy::InsertedBubbleBehavior::Initialize"
                           },
                           "parameters": [
                             "InsertedBubble",
                             "InsertedBubble",
+                            "BubbleQueue",
+                            "ObjectStack",
                             "BoardBubble",
+                            "SpeedPathMovement",
                             "MovingBubble",
                             ""
                           ]
@@ -4909,6 +4931,14 @@
                     "2000",
                     ""
                   ]
+                },
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "InsertedBubble"
+                  ]
                 }
               ],
               "events": [
@@ -4959,6 +4989,23 @@
                         "Score",
                         "=",
                         "Variable(Score)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "AjoutObjConcern"
+                      },
+                      "parameters": [
+                        "",
+                        "BoardBubble"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "BoardBubble"
                       ]
                     }
                   ]
@@ -7495,11 +7542,182 @@
               "fullName": "Initialize",
               "functionType": "Action",
               "name": "Initialize",
-              "sentence": "Initialize the animation of _PARAM0_ for the insertion of _PARAM3_ next to _PARAM2_",
+              "sentence": "Initialize the animation of _PARAM0_ for the insertion of _PARAM4_ next to _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "BoardBubble",
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::Contains"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "abs(AngleDifference(AngleBetweenPositions(BoardBubble.X(), BoardBubble.Y(), MovingBubble.X(), MovingBubble.Y()), BoardBubble.SpeedPathMovement::MovementAngle()))",
+                            "<",
+                            "90"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Insert before the hit bubble instead of after."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "BubbleIndex",
+                                "=",
+                                "BubbleQueue.ObjectStack::HeightOf(BoardBubble) + 1"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "TODO Handle insersion at the tail."
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "VarScene"
+                                  },
+                                  "parameters": [
+                                    "BubbleIndex",
+                                    "<",
+                                    "BubbleQueue.ObjectStack::HeightOf(BoardBubble)"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "LinkedObjects::RemoveLinkBetween"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Object",
+                                    "BoardBubble"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "AjoutObjConcern"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "BoardBubble"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "ObjectStack::ContainsAt"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "BubbleQueue",
+                                        "ObjectStack",
+                                        "BoardBubble",
+                                        "Variable(BubbleIndex)",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "LinkedObjects::LinkObjects"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "Object",
+                                        "BoardBubble"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "BoardBubble",
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
@@ -7522,16 +7740,6 @@
                         "MovingBubble",
                         "BoardBubble",
                         ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "LinkedObjects::LinkObjects"
-                      },
-                      "parameters": [
-                        "",
-                        "Object",
-                        "BoardBubble"
                       ]
                     },
                     {
@@ -7593,9 +7801,26 @@
                   "type": "behavior"
                 },
                 {
+                  "description": "Bubble queue",
+                  "name": "BubbleQueue",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
                   "description": "Board bubble",
                   "name": "BoardBubble",
                   "type": "objectList"
+                },
+                {
+                  "description": "Speed path movement",
+                  "name": "SpeedPathMovement",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
                 },
                 {
                   "description": "Moving bubble",
