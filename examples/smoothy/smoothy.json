@@ -2406,7 +2406,7 @@
                             "BoardBubble",
                             "SpeedPathMovement",
                             "=",
-                            "1067",
+                            "64 + Smoothy::SpeedToReach(1/2 * CurvedMovement::PathLength(\"Gutter\"), 889)",
                             ""
                           ]
                         }
@@ -2436,7 +2436,7 @@
                             "BoardBubble",
                             "SpeedPathMovement",
                             "=",
-                            "88.9",
+                            "64",
                             ""
                           ]
                         }
@@ -3726,9 +3726,82 @@
                       "parameters": [
                         "BoardBubble",
                         "SpeedPathMovement",
-                        "89.9",
+                        "64",
                         "-889",
                         ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectStack::ContainsAt"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "headPosition",
+                        "=",
+                        "BoardBubble.SpeedPathMovement::PositionOnPath()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"Head position: \" + VariableString(headPosition)",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "headPosition",
+                        ">=",
+                        "1/2 * CurvedMovement::PathLength(\"Gutter\")"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarSceneTxt"
+                      },
+                      "parameters": [
+                        "TaillingQueueState",
+                        "=",
+                        "\"NormalPush\""
                       ]
                     }
                   ]
@@ -3748,17 +3821,100 @@
                       ]
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
-                      },
-                      "parameters": [
-                        "BoardBubble",
-                        "SpeedPathMovement",
-                        "88.9",
-                        "88.9",
-                        ""
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "headPosition",
+                            "<",
+                            "7/8 * CurvedMovement::PathLength(\"Gutter\")"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "64",
+                            "64",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"Normal speed\"",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "headPosition",
+                            ">=",
+                            "7/8 * CurvedMovement::PathLength(\"Gutter\")"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            "20",
+                            "20",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"Slow speed\"",
+                                "",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -6279,6 +6435,81 @@
             }
           ],
           "objectGroups": []
+        },
+        {
+          "description": "Return the speed necessary to cover a distance according to the deceleration.",
+          "fullName": "Speed to reach",
+          "functionType": "Expression",
+          "name": "SpeedToReach",
+          "sentence": "Braking distance from an initial speed: _PARAM2_ and a deceleration: _PARAM3_ is less than _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "GetArgumentAsNumber(\"Distance\")",
+                    ">=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "sqrt(2 * GetArgumentAsNumber(\"Distance\") * GetArgumentAsNumber(\"Deceleration\"))"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "GetArgumentAsNumber(\"Distance\")",
+                    "<",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "-sqrt(-2 * GetArgumentAsNumber(\"Distance\") * GetArgumentAsNumber(\"Deceleration\"))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Distance",
+              "name": "Distance",
+              "type": "expression"
+            },
+            {
+              "description": "Deceleration",
+              "name": "Deceleration",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
         }
       ],
       "eventsBasedBehaviors": [
@@ -7710,8 +7941,8 @@
                               "parameters": [
                                 "BoardBubble",
                                 "SpeedPathMovement",
-                                "89.9",
-                                "88.9",
+                                "64",
+                                "64",
                                 ""
                               ]
                             }
