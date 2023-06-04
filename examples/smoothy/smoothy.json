@@ -341,38 +341,7 @@
       "objectsGroups": [],
       "variables": [
         {
-          "name": "remainingColors",
-          "type": "array",
-          "children": [
-            {
-              "type": "string",
-              "value": "Yellow"
-            },
-            {
-              "type": "string",
-              "value": "Green"
-            },
-            {
-              "type": "string",
-              "value": "Blue"
-            },
-            {
-              "type": "string",
-              "value": "Purple"
-            },
-            {
-              "type": "string",
-              "value": "Red"
-            },
-            {
-              "folded": true,
-              "type": "string",
-              "value": "Grey"
-            }
-          ]
-        },
-        {
-          "name": "colors",
+          "name": "ColorNames",
           "type": "array",
           "children": [
             {
@@ -2532,26 +2501,6 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ChangeAnimation"
-                  },
-                  "parameters": [
-                    "AimingBubble",
-                    "=",
-                    "4 + 0 * RandomInRange(0,5)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ChangeAnimation"
-                  },
-                  "parameters": [
-                    "PreviewBubble",
-                    "=",
-                    "4 + 0 * RandomInRange(0,5)"
-                  ]
-                },
-                {
-                  "type": {
                     "value": "CurvedMovement::CreatePathFromSvg"
                   },
                   "parameters": [
@@ -2647,6 +2596,24 @@
                 },
                 {
                   "type": {
+                    "value": "SetAnimationName"
+                  },
+                  "parameters": [
+                    "PreviewBubble",
+                    "VariableString(ColorNames[RandomInRange(0, Spawner.SpwanerBehavior::ColorCount() - 1)])"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetAnimationName"
+                  },
+                  "parameters": [
+                    "AimingBubble",
+                    "VariableString(ColorNames[RandomInRange(0, Spawner.SpwanerBehavior::ColorCount() - 1)])"
+                  ]
+                },
+                {
+                  "type": {
                     "value": "MettreAutour"
                   },
                   "parameters": [
@@ -2737,6 +2704,23 @@
                             "0.9",
                             "",
                             ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "disabled": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ChangeAnimation"
+                          },
+                          "parameters": [
+                            "AimingBubble",
+                            "=",
+                            "4"
                           ]
                         }
                       ]
@@ -3601,7 +3585,7 @@
                               },
                               "parameters": [
                                 "PreviewBubble",
-                                "VariableString(remainingColors[RandomInRange(0, VariableChildCount(remainingColors) - 1)])"
+                                "VariableString(ColorNames[RandomInRange(0, Spawner.SpwanerBehavior::ColorCount() - 1)])"
                               ]
                             }
                           ]
@@ -17417,6 +17401,87 @@
                   "description": "Speed path movement",
                   "name": "SpeedPathMovement",
                   "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the color count of the object.",
+              "fullName": "Color count",
+              "functionType": "ExpressionAndCondition",
+              "group": "SpwanerBehavior configuration",
+              "name": "ColorCount",
+              "sentence": "the color count",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyColorCount()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::SpwanerBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "ColorCount",
+              "name": "SetColorCount",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::SpwanerBehavior::SetPropertyColorCount"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::SpwanerBehavior",
                   "type": "behavior"
                 }
               ],
