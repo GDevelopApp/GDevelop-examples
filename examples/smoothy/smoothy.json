@@ -11271,6 +11271,92 @@
                         "textG": 0,
                         "textR": 0
                       },
+                      "comment": "Save the head state."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "headState",
+                            "=",
+                            "BubbleQueue.BubbleQueueBehavior::HeadState()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "headComboLevel",
+                            "=",
+                            "BubbleQueue.BubbleQueueBehavior::HeadComboLevel()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "headSplitTimerExists",
+                            "False"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CompareObjectTimer"
+                              },
+                              "parameters": [
+                                "BubbleQueue",
+                                "\"HeadSplit\"",
+                                ">=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "headSplitTimerExists",
+                                "True"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "headSplitTimerValue",
+                                "=",
+                                "BubbleQueue.ObjectTimerElapsedTime(\"HeadSplit\")"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
                       "comment": "When the bubbles are matched at the tail of the queue, the original queue is left empty an must be deleted."
                     },
                     {
@@ -11410,6 +11496,79 @@
                 }
               ],
               "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Set back the head state."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetHeadState"
+                      },
+                      "parameters": [
+                        "BubbleQueue",
+                        "BubbleQueueBehavior",
+                        "=",
+                        "VariableString(headState)",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetHeadComboLevel"
+                      },
+                      "parameters": [
+                        "BubbleQueue",
+                        "BubbleQueueBehavior",
+                        "=",
+                        "Variable(headComboLevel)",
+                        ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "headSplitTimerExists",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "AdvancedTimer::SetObjectTimerElapsedTime"
+                          },
+                          "parameters": [
+                            "",
+                            "=",
+                            "Variable(headSplitTimerValue)",
+                            "BubbleQueue",
+                            "\"HeadSplit\"",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
                 {
                   "disabled": true,
                   "type": "BuiltinCommonInstructions::Standard",
@@ -12701,26 +12860,6 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarSceneTxt"
-                      },
-                      "parameters": [
-                        "tailState",
-                        "=",
-                        "BubbleQueue.BubbleQueueBehavior::TailState()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "tailComboLevel",
-                        "=",
-                        "BubbleQueue.BubbleQueueBehavior::TailComboLevel()"
-                      ]
-                    },
-                    {
-                      "type": {
                         "value": "ObjectStack::ObjectStack::MoveAllOnTop"
                       },
                       "parameters": [
@@ -12749,6 +12888,94 @@
                       "parameters": [
                         "BubbleQueue",
                         ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Save the tail state."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "tailState",
+                            "=",
+                            "BubbleQueue.BubbleQueueBehavior::TailState()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "tailComboLevel",
+                            "=",
+                            "BubbleQueue.BubbleQueueBehavior::TailComboLevel()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetSceneVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "tailSplitTimerExists",
+                            "="
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CompareObjectTimer"
+                              },
+                              "parameters": [
+                                "BubbleQueue",
+                                "\"TailSplit\"",
+                                ">=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "tailSplitTimerExists",
+                                "True"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "tailSplitTimerValue",
+                                "=",
+                                "BubbleQueue.ObjectTimerElapsedTime(\"TailSplit\")"
+                              ]
+                            }
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -12795,36 +13022,87 @@
                     },
                     {
                       "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::SetTailState"
-                      },
-                      "parameters": [
-                        "BubbleQueue",
-                        "BubbleQueueBehavior",
-                        "=",
-                        "VariableString(tailState)",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::SetTailComboLevel"
-                      },
-                      "parameters": [
-                        "BubbleQueue",
-                        "BubbleQueueBehavior",
-                        "=",
-                        "Variable(tailComboLevel)",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
                         "value": "Smoothy::BubbleQueueBehavior::SetHeadJustMerged"
                       },
                       "parameters": [
                         "BubbleQueue",
                         "BubbleQueueBehavior",
                         "="
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Set back the tail state."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetTailState"
+                          },
+                          "parameters": [
+                            "BubbleQueue",
+                            "BubbleQueueBehavior",
+                            "=",
+                            "VariableString(tailState)",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetTailComboLevel"
+                          },
+                          "parameters": [
+                            "BubbleQueue",
+                            "BubbleQueueBehavior",
+                            "=",
+                            "Variable(tailComboLevel)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "tailSplitTimerExists",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "AdvancedTimer::SetObjectTimerElapsedTime"
+                              },
+                              "parameters": [
+                                "",
+                                "=",
+                                "Variable(tailSplitTimerValue)",
+                                "BubbleQueue",
+                                "\"TailSplit\"",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -31421,1399 +31699,107 @@
       "eventsBasedObjects": []
     },
     {
-      "author": "D8H",
-      "category": "Movement",
+      "author": "",
+      "category": "",
       "extensionNamespace": "",
-      "fullName": "Turret movement",
+      "fullName": "",
       "helpPath": "",
-      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI4LDMxSDR2LTJjMC0xLjEsMC45LTIsMi0yaDIwYzEuMSwwLDIsMC45LDIsMlYzMXoiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik02LDI3YzAtNS41LDQuNS0xMCwxMC0xMHMxMCw0LjUsMTAsMTAiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNCwxN1YzYzAtMS4xLDAuOS0yLDItMmgwYzEuMSwwLDIsMC45LDIsMnYxNCIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjE0IiB5MT0iMTQiIHgyPSIxOCIgeTI9IjE0Ii8+DQo8L3N2Zz4NCg==",
-      "name": "Turret",
-      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Cleaning/Cleaning_cleaning_clean_plunger.svg",
-      "shortDescription": "A turret movement with customizable speed, acceleration and stop angles.",
-      "version": "1.1.0",
-      "description": [
-        "With this behavior, you can make an object rotate like a turret toward a position.",
-        "It may be used with the **Bullet** extension to fire objects."
-      ],
-      "origin": {
-        "identifier": "Turret",
-        "name": "gdevelop-extension-store"
-      },
-      "tags": [
-        "turret",
-        "movement",
-        "rotation",
-        "rotate",
-        "pivot",
-        "axis",
-        "aim",
-        "shoot",
-        "bullet",
-        "tank",
-        "tower"
-      ],
-      "authorIds": [
-        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
-      ],
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXRpbWVyLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsMjBBNyw3IDAgMCwxIDUsMTNBNyw3IDAgMCwxIDEyLDZBNyw3IDAgMCwxIDE5LDEzQTcsNyAwIDAsMSAxMiwyME0xOS4wMyw3LjM5TDIwLjQ1LDUuOTdDMjAsNS40NiAxOS41NSw1IDE5LjA0LDQuNTZMMTcuNjIsNkMxNi4wNyw0Ljc0IDE0LjEyLDQgMTIsNEE5LDkgMCAwLDAgMywxM0E5LDkgMCAwLDAgMTIsMjJDMTcsMjIgMjEsMTcuOTcgMjEsMTNDMjEsMTAuODggMjAuMjYsOC45MyAxOS4wMyw3LjM5TTExLDE0SDEzVjhIMTFNMTUsMUg5VjNIMTVWMVoiIC8+PC9zdmc+",
+      "name": "AdvancedTimer",
+      "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/632ad4b4fbdffa09f26d1e73058989bd488b2441c4e85b125c6db16c39c1a1c3_timer-outline.svg",
+      "shortDescription": "",
+      "version": "",
+      "description": "",
+      "tags": [],
+      "authorIds": [],
       "dependencies": [],
-      "eventsFunctions": [],
-      "eventsBasedBehaviors": [
+      "eventsFunctions": [
         {
-          "description": "A turret movement with customizable speed, acceleration and stop angles.",
-          "fullName": "Turret movement",
-          "name": "Turret",
-          "objectType": "",
-          "eventsFunctions": [
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "ObjectTimerElapsedTime",
+          "name": "SetObjectTimerElapsedTime",
+          "sentence": "",
+          "events": [
             {
-              "fullName": "",
-              "functionType": "Action",
-              "name": "doStepPostEvents",
-              "sentence": "",
-              "events": [
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Deceleration",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Or"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::And"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "value": "Turret::Turret::PropertyMustMoveClockwise"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Turret::Turret::PropertyMustMoveCounterClockwise"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::And"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "inverted": true,
-                                    "value": "Turret::Turret::PropertyMustMoveClockwise"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "inverted": true,
-                                    "value": "Turret::Turret::PropertyMustMoveCounterClockwise"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior"
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "actions": [],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::PropertySpeed"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                ">",
-                                "0"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::SetPropertySpeed"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "-",
-                                "Object.Behavior::PropertyDeceleration() * TimeDelta()"
-                              ]
-                            }
-                          ],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Turret::Turret::PropertySpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "<",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "Turret::Turret::SetPropertySpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "0"
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::PropertySpeed"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "<",
-                                "0"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::SetPropertySpeed"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "+",
-                                "Object.Behavior::PropertyDeceleration() * TimeDelta()"
-                              ]
-                            }
-                          ],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Turret::Turret::PropertySpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    ">",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "Turret::Turret::SetPropertySpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "0"
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "parameters": []
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Acceleration",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::PropertyMustMoveClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "Turret::Turret::PropertyMustMoveCounterClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetPropertySpeed"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "+",
-                            "Object.Behavior::PropertyAcceleration() * TimeDelta()"
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::PropertySpeed"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                ">",
-                                "Object.Behavior::PropertySpeedMax()"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::SetPropertySpeed"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "Object.Behavior::PropertySpeedMax()"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::PropertyMustMoveCounterClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "Turret::Turret::PropertyMustMoveClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetPropertySpeed"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "-",
-                            "Object.Behavior::PropertyAcceleration() * TimeDelta()"
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::PropertySpeed"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "<",
-                                "- Object.Behavior::PropertySpeedMax()"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::SetPropertySpeed"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "- Object.Behavior::PropertySpeedMax()"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "parameters": []
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Angle",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetAimingAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "Object.Behavior::PropertyAimingAngle() + Object.Behavior::PropertySpeed() * TimeDelta()",
-                            "Object.Variable(turret_Speed) * TimeDelta()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetPropertyHasMoved"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "False"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::PropertySpeed"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetPropertyHasMoved"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "yes"
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "parameters": []
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Controls Reset",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetPropertyMustMoveClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "False"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetPropertyMustMoveCounterClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "False"
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "parameters": []
-                }
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const timerName = eventsFunctionContext.getArgument(\"Timer\");",
+                "const timerValue = eventsFunctionContext.getArgument(\"Value\");",
+                "",
+                "for (const object of objects) {",
+                "    object.unpauseTimer(timerName);",
+                "    object._timers.get(timerName).setTime(timerValue * 1000);",
+                "}",
+                ""
               ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Check if the turret is moving.",
-              "fullName": "Is moving",
-              "functionType": "Condition",
-              "name": "IsMoving",
-              "sentence": "_PARAM0_ is moving",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::PropertyHasMoved"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnBoolean"
-                      },
-                      "parameters": [
-                        "True"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Move clockwise.",
-              "fullName": "Move clockwise",
-              "functionType": "Action",
-              "name": "MoveClockwise",
-              "sentence": "Move _PARAM0_ clockwise",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::SetPropertyMustMoveClockwise"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Move counter-clockwise.",
-              "fullName": "Move counter-clockwise",
-              "functionType": "Action",
-              "name": "MoveCounterClockwise",
-              "sentence": "Move _PARAM0_ counter-clockwise",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::SetPropertyMustMoveCounterClockwise"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "",
-              "functionType": "Action",
-              "name": "onCreated",
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::SetAimingAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "(Object.Behavior::PropertyAngleMin() + Object.Behavior::PropertyAngleMax()) / 2",
-                        "(mod(Object.Behavior::PropertyAngleMin(), 360) + mod(Object.Behavior::PropertyAngleMax(), 360)) / 2"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Origin angle is the farest angle from AngleMin and AngleMax, it's used by MoveToward"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::SetPropertyOriginAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "(Object.Behavior::PropertyAngleMin() + Object.Behavior::PropertyAngleMax()) / 2 - 180"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Set angle toward a position.",
-              "fullName": "Set aiming angle toward a position",
-              "functionType": "Action",
-              "name": "SetAimingAngleToward",
-              "sentence": "Set the aiming angle of _PARAM0_ toward _PARAM2_;_PARAM3_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Use OriginAngle to obtain an angle that is the nearest from AngleMin and AngleMax"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::SetAimingAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "mod(ToDeg(atan2(GetArgumentAsNumber(\"TargetY\") - Object.Y(), GetArgumentAsNumber(\"TargetX\") - Object.X())) - Object.Behavior::PropertyOriginAngle(), 360) + Object.Behavior::PropertyOriginAngle()",
-                        "mod(ToDeg(atan2(GetArgumentAsNumber(\"TargetY\") - Object.Y(), GetArgumentAsNumber(\"TargetX\") - Object.X())) - Object.Behavior::PropertyOriginAngle(), 360) + Object.Behavior::PropertyOriginAngle()"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                },
-                {
-                  "description": "X position",
-                  "name": "TargetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Y position",
-                  "name": "TargetY",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Move toward a position.",
-              "fullName": "Move toward a position",
-              "functionType": "Action",
-              "name": "MoveToward",
-              "sentence": "Move _PARAM0_ toward _PARAM2_; _PARAM3_ within a _PARAM4_° margin",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Use OriginAngle to obtain an angle that is the nearest from AngleMin and AngleMax"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::SetPropertyTargetAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "mod(ToDeg(atan2(GetArgumentAsNumber(\"TargetY\") - Object.Y(), GetArgumentAsNumber(\"TargetX\") - Object.X())) - Object.Behavior::PropertyOriginAngle(), 360) + Object.Behavior::PropertyOriginAngle()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "There is stop angles"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Egal"
-                      },
-                      "parameters": [
-                        "Object.Behavior::PropertyAngleMin()",
-                        "<",
-                        "Object.Behavior::PropertyAngleMax()"
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::PropertyAimingAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            ">",
-                            "Object.Behavior::PropertyTargetAngle() + GetArgumentAsNumber(\"AngleMargin\")"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::MoveCounterClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "True"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::PropertyAimingAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "<",
-                            "Object.Behavior::PropertyTargetAngle() - GetArgumentAsNumber(\"AngleMargin\")"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::MoveClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "yes"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "No stop angle, the direction is chosen according to the shortest path (never more that 180°)"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Egal"
-                      },
-                      "parameters": [
-                        "Object.Behavior::PropertyAngleMin()",
-                        "=",
-                        "Object.Behavior::PropertyAngleMax()"
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Egal"
-                          },
-                          "parameters": [
-                            "mod(180 + Object.Behavior::PropertyTargetAngle() - Object.Behavior::PropertyAimingAngle(), 360)",
-                            "<",
-                            "180 - GetArgumentAsNumber(\"AngleMargin\")"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::MoveCounterClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "True"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Egal"
-                          },
-                          "parameters": [
-                            "mod(180 + Object.Behavior::PropertyAimingAngle() - Object.Behavior::PropertyTargetAngle(), 360)",
-                            "<",
-                            "180 - GetArgumentAsNumber(\"AngleMargin\")"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::MoveClockwise"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "yes"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                },
-                {
-                  "description": "X position",
-                  "name": "TargetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Y position",
-                  "name": "TargetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Angle margin",
-                  "name": "AngleMargin",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Change the aiming angle.",
-              "fullName": "Aiming angle",
-              "functionType": "Action",
-              "name": "SetAimingAngle",
-              "sentence": "Change the aiming angle of _PARAM0_ to _PARAM2_°",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::SetPropertyAimingAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "GetArgumentAsNumber(\"AimingAngle\")"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Use mod to avoid the angle value to be too large."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Egal"
-                      },
-                      "parameters": [
-                        "Object.Behavior::PropertyAngleMin()",
-                        "=",
-                        "Object.Behavior::PropertyAngleMax()"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::SetPropertyAimingAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "mod(Object.Behavior::PropertyAimingAngle(), 360)"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "There are stop angles, the angle is bounded by these."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Egal"
-                      },
-                      "parameters": [
-                        "Object.Behavior::PropertyAngleMin()",
-                        "<",
-                        "Object.Behavior::PropertyAngleMax()"
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::PropertyAimingAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            ">",
-                            "Object.Behavior::PropertyAngleMax()"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetPropertyAimingAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "Object.Behavior::PropertyAngleMax()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::PropertyAimingAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "<",
-                            "Object.Behavior::PropertyAngleMin()"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::SetPropertyAimingAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "Object.Behavior::PropertyAngleMin()"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Turret::Turret::PropertyRotate"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.Behavior::PropertyAimingAngle()"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Aiming angle",
-                  "name": "AimingAngle",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Aiming angle (between 0° and 360° if no stop angle are set).",
-              "fullName": "Aiming angle",
-              "functionType": "Expression",
-              "name": "AimingAngle",
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "Object.Behavior::PropertyAimingAngle()"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Turret::Turret",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
-          "propertyDescriptors": [
+          "parameters": [
             {
-              "value": "360",
-              "type": "Number",
-              "label": "Maximum rotation speed (in degrees per second)",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "SpeedMax"
+              "description": "Object",
+              "name": "Object",
+              "type": "objectList"
             },
             {
-              "value": "1440",
-              "type": "Number",
-              "label": "Acceleration",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "Acceleration"
+              "description": "Timer's name",
+              "name": "Timer",
+              "supplementaryInformation": "objectobjectTimer",
+              "type": "identifier"
             },
             {
-              "value": "36000",
-              "type": "Number",
-              "label": "Deceleration",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "Deceleration"
-            },
-            {
-              "value": "true",
-              "type": "Boolean",
-              "label": "Rotate the object",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "Rotate"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "label": "Maximum angle (use the same value for min and max to set no constraint)",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "AngleMax"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "label": "Minimum angle (use the same value for min and max to set no constraint)",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": false,
-              "name": "AngleMin"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "label": "Aiming angle property",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "AimingAngle"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "Speed",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "Speed"
-            },
-            {
-              "value": "",
-              "type": "Boolean",
-              "label": "Must move clockwise",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "MustMoveClockwise"
-            },
-            {
-              "value": "",
-              "type": "Boolean",
-              "label": "Must move counter-clockwise",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "MustMoveCounterClockwise"
-            },
-            {
-              "value": "",
-              "type": "Boolean",
-              "label": "Has moved",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "HasMoved"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "Target angle (MoveToward)",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "TargetAngle"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "Origin angle: the farest angle from AngleMin and AngleMax",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "OriginAngle"
+              "description": "Time in seconds",
+              "name": "Value",
+              "type": "expression"
             }
           ],
-          "sharedPropertyDescriptors": []
+          "objectGroups": []
+        },
+        {
+          "description": "the elapsed time of an object timer.",
+          "fullName": "Object timer value",
+          "functionType": "ExpressionAndCondition",
+          "name": "ObjectTimerElapsedTime",
+          "sentence": "the timer _PARAM1_ of _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.ObjectTimerElapsedTime(GetArgumentAsString(\"Timer\"))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "objectList"
+            },
+            {
+              "description": "Timer's name",
+              "name": "Timer",
+              "supplementaryInformation": "objectobjectTimer",
+              "type": "identifier"
+            }
+          ],
+          "objectGroups": []
         }
       ],
+      "eventsBasedBehaviors": [],
       "eventsBasedObjects": []
     }
   ],
