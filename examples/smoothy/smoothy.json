@@ -3348,133 +3348,7 @@
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::MoveCounterClockwise"
-                          },
-                          "parameters": [
-                            "Launcher",
-                            "Turret",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Right"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::MoveClockwise"
-                          },
-                          "parameters": [
-                            "Launcher",
-                            "Turret",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Let time for the launcher to point toward the mouse.\nThe 3° margin is because the mouse is followed by simulating key press.\nSo, it won't stop right toward the mouse beause of inertia."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "CursorMovement::CursorStayStill"
-                          },
-                          "parameters": [
-                            "",
-                            "1",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Right"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::MoveToward"
-                          },
-                          "parameters": [
-                            "Launcher",
-                            "Turret",
-                            "MouseX(\"\", 0)",
-                            "MouseY(\"\", 0)",
-                            "3",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Turret::Turret::IsMoving"
-                          },
-                          "parameters": [
-                            "Launcher",
-                            "Turret",
-                            ""
-                          ]
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
@@ -3484,31 +3358,29 @@
                             "AimingBubble",
                             "Launcher",
                             "48",
-                            "Launcher.Turret::AimingAngle()"
+                            "AngleBetweenPositions(Launcher.X(), Launcher.Y(), CursorX(), CursorY())"
                           ]
                         }
                       ]
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [],
-                      "events": [
+                      "conditions": [
                         {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
                           },
-                          "comment": "Aim exactly at the mouse.\nIt also allows to aim without hovering, on a touch device for instance."
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "KeyReleased"
+                              },
+                              "parameters": [
+                                "",
+                                "Space"
+                              ]
+                            },
                             {
                               "type": {
                                 "value": "MouseButtonReleased"
@@ -3518,36 +3390,73 @@
                                 "Left"
                               ]
                             }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Turret::Turret::SetAimingAngleToward"
-                              },
-                              "parameters": [
-                                "Launcher",
-                                "Turret",
-                                "MouseX(\"\", 0)",
-                                "MouseY(\"\", 0)",
-                                "3"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "MettreAutour"
-                              },
-                              "parameters": [
-                                "AimingBubble",
-                                "Launcher",
-                                "48",
-                                "Launcher.Turret::AimingAngle()"
-                              ]
-                            }
                           ]
                         },
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
+                          "type": {
+                            "value": "FireBullet::FireBullet::IsReadyToShoot"
+                          },
+                          "parameters": [
+                            "AimingBubble",
+                            "FireBullet",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "FireBullet::FireBullet::Fire"
+                          },
+                          "parameters": [
+                            "AimingBubble",
+                            "FireBullet",
+                            "AimingBubble.X()",
+                            "AimingBubble.Y()",
+                            "MovingBubble",
+                            "AngleBetweenPositions(Launcher.X(), Launcher.Y(), CursorX(), CursorY())",
+                            "690",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "MovingBubble",
+                            "AimingBubble.AnimationName()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "AimingBubble",
+                            "PreviewBubble.AnimationName()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "PreviewBubble",
+                            "VariableString(ColorNames[RandomInRange(0, Spawner.SpwanerBehavior::ColorCount() - 1)])"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
                             {
                               "type": {
                                 "value": "MouseButtonReleased"
@@ -3556,122 +3465,46 @@
                                 "",
                                 "Right"
                               ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "ModVarSceneTxt"
-                              },
-                              "parameters": [
-                                "animationName",
-                                "=",
-                                "PreviewBubble.AnimationName()"
-                              ]
                             },
                             {
                               "type": {
-                                "value": "SetAnimationName"
+                                "value": "KeyReleased"
                               },
                               "parameters": [
-                                "PreviewBubble",
-                                "AimingBubble.AnimationName()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetAnimationName"
-                              },
-                              "parameters": [
-                                "AimingBubble",
-                                "VariableString(animationName)"
+                                "",
+                                "LShift"
                               ]
                             }
                           ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "animationName",
+                            "=",
+                            "PreviewBubble.AnimationName()"
+                          ]
                         },
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::Or"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "value": "KeyReleased"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "LShift"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "MouseButtonReleased"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "Left"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "FireBullet::FireBullet::IsReadyToShoot"
-                              },
-                              "parameters": [
-                                "AimingBubble",
-                                "FireBullet",
-                                ""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "FireBullet::FireBullet::Fire"
-                              },
-                              "parameters": [
-                                "AimingBubble",
-                                "FireBullet",
-                                "AimingBubble.X()",
-                                "AimingBubble.Y()",
-                                "MovingBubble",
-                                "Launcher.Turret::AimingAngle()",
-                                "690",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetAnimationName"
-                              },
-                              "parameters": [
-                                "MovingBubble",
-                                "AimingBubble.AnimationName()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetAnimationName"
-                              },
-                              "parameters": [
-                                "AimingBubble",
-                                "PreviewBubble.AnimationName()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetAnimationName"
-                              },
-                              "parameters": [
-                                "PreviewBubble",
-                                "VariableString(ColorNames[RandomInRange(0, Spawner.SpwanerBehavior::ColorCount() - 1)])"
-                              ]
-                            }
+                          "type": {
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "PreviewBubble",
+                            "AimingBubble.AnimationName()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAnimationName"
+                          },
+                          "parameters": [
+                            "AimingBubble",
+                            "VariableString(animationName)"
                           ]
                         }
                       ]
@@ -14369,7 +14202,6 @@
                   "actions": [],
                   "events": [
                     {
-                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
