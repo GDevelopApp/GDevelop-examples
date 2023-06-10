@@ -1,0 +1,1 @@
+A 3D shooting gallery game example featuring a timer, score system, 3D first person movement on the X and Y planes, pointer lock, and hitscan gun mechanics.

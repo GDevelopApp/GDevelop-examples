@@ -1,0 +1,1 @@
+Learn how to use the Shake Gesture extension.

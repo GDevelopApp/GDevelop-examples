@@ -1,0 +1,1 @@
+A tower defense game example that shows users how to select, deselect, and purchase towers. Create instances of enemies using arrays, and moving enemies along a path using their own object arrays and point objects in scene.
