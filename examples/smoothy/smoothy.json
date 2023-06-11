@@ -2759,7 +2759,7 @@
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "6",
+                          "repeatExpression": "4",
                           "conditions": [],
                           "actions": [
                             {
@@ -2834,7 +2834,7 @@
                         },
                         {
                           "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "6",
+                          "repeatExpression": "4",
                           "conditions": [],
                           "actions": [
                             {
@@ -11148,6 +11148,15 @@
                         "Variable(headComboLevel)",
                         ""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "RemoveObjectTimer"
+                      },
+                      "parameters": [
+                        "BubbleQueue",
+                        "\"HeadSplit\""
+                      ]
                     }
                   ],
                   "events": [
@@ -11160,7 +11169,7 @@
                           },
                           "parameters": [
                             "headSplitTimerExists",
-                            ""
+                            "True"
                           ]
                         }
                       ],
@@ -12613,16 +12622,6 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "insertedBubbleIndex",
-                        "=",
-                        "BubbleQueue.ObjectStack::Height() - 1"
-                      ]
-                    },
-                    {
-                      "type": {
                         "value": "ObjectStack::ObjectStack::MoveAllOnTop"
                       },
                       "parameters": [
@@ -12631,16 +12630,6 @@
                         "BubbleClipboard",
                         "ObjectStack",
                         "ObjectStack"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::SetHeadJustMerged"
-                      },
-                      "parameters": [
-                        "BubbleQueue",
-                        "BubbleQueueBehavior",
-                        "="
                       ]
                     }
                   ],
@@ -12684,6 +12673,15 @@
                             "Variable(tailComboLevel)",
                             ""
                           ]
+                        },
+                        {
+                          "type": {
+                            "value": "RemoveObjectTimer"
+                          },
+                          "parameters": [
+                            "BubbleQueue",
+                            "\"TailSplit\""
+                          ]
                         }
                       ],
                       "events": [
@@ -12696,7 +12694,7 @@
                               },
                               "parameters": [
                                 "tailSplitTimerExists",
-                                ""
+                                "True"
                               ]
                             }
                           ],
@@ -14101,7 +14099,7 @@
                             "value": "DebuggerTools::ConsoleLog"
                           },
                           "parameters": [
-                            "GetArgumentAsString(\"QueueIndexFromTail\") + \": \" + Object.Behavior::PropertyTailState() + \" - \" + Object.Behavior::PropertyHeadState()",
+                            "ToString(Gutter.ObjectStack::HeightOf(Object)) + \": \" + Object.Behavior::PropertyTailState() + \" - \" + Object.Behavior::PropertyHeadState()",
                             "",
                             ""
                           ]
@@ -14154,6 +14152,38 @@
                           ],
                           "actions": [],
                           "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": true,
+                                    "value": "ObjectStack::HasOnTop"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Gutter",
+                                    "ObjectStack",
+                                    "Object",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                                  },
+                                  "parameters": [
+                                    "BoardBubble",
+                                    "SpeedPathMovement",
+                                    "=",
+                                    "0",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
                             {
                               "type": "BuiltinCommonInstructions::Comment",
                               "color": {
@@ -14607,17 +14637,37 @@
                               ]
                             }
                           ],
-                          "actions": [
+                          "actions": [],
+                          "events": [
                             {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "64",
-                                "64",
-                                ""
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "ObjectStack::HasOnTop"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Gutter",
+                                    "ObjectStack",
+                                    "Object",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "CurvedMovement::SpeedPathMovement::AccelarateAt"
+                                  },
+                                  "parameters": [
+                                    "BoardBubble",
+                                    "SpeedPathMovement",
+                                    "64",
+                                    "64",
+                                    ""
+                                  ]
+                                }
                               ]
                             }
                           ]
@@ -16035,7 +16085,7 @@
                       "subInstructions": [
                         {
                           "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
                           },
                           "parameters": [
                             "Object",
@@ -16457,76 +16507,6 @@
                           },
                           "parameters": [
                             "\"Head just hit\"",
-                            "",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Head just merged",
-              "functionType": "Action",
-              "name": "SetHeadJustMerged",
-              "sentence": "Change head state of _PARAM0_ to just merged",
-              "events": [
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "\"Rewinding\""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyHeadState"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "\"RewindImpact\""
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "DebuggerTools::ConsoleLog"
-                          },
-                          "parameters": [
-                            "\"Head just merged\"",
                             "",
                             ""
                           ]
@@ -32092,7 +32072,7 @@
               ],
               "parameterObjects": "Object",
               "useStrict": true,
-              "eventsSheetExpanded": false
+              "eventsSheetExpanded": true
             }
           ],
           "parameters": [
@@ -32120,6 +32100,7 @@
           "fullName": "Object timer value",
           "functionType": "ExpressionAndCondition",
           "name": "ObjectTimerElapsedTime",
+          "private": true,
           "sentence": "the timer _PARAM1_ of _PARAM2_",
           "events": [
             {
