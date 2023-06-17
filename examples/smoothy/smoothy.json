@@ -2846,6 +2846,58 @@
                           ]
                         }
                       ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "TODO What if the queue is rewinded completly?"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::SpwanerBehavior::CanUnspawnBubble"
+                          },
+                          "parameters": [
+                            "Spawner",
+                            "SpwanerBehavior",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::SpwanerBehavior::UnspawnBubble"
+                          },
+                          "parameters": [
+                            "Spawner",
+                            "SpwanerBehavior",
+                            "Gutter",
+                            "GutterBehavior",
+                            "ObjectStack",
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            ""
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "parameters": []
@@ -3845,123 +3897,6 @@
                         }
                       ],
                       "parameters": []
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "TODO What if the queue is rewinded completly?"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "Spawner",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "LinkedObjects::PickObjectsLinkedTo"
-                      },
-                      "parameters": [
-                        "",
-                        "Gutter",
-                        "Spawner",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectStack::HasOnTop"
-                          },
-                          "parameters": [
-                            "",
-                            "Gutter",
-                            "ObjectStack",
-                            "BubbleQueue",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectStack::HasOnTop"
-                          },
-                          "parameters": [
-                            "",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::HasReachedOrigin"
-                          },
-                          "parameters": [
-                            "BoardBubble",
-                            "SpeedPathMovement",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ObjectStack::ObjectStack::Remove"
-                          },
-                          "parameters": [
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectStack::ObjectStack::AddOnTop"
-                          },
-                          "parameters": [
-                            "Spawner",
-                            "ObjectStack",
-                            "BoardBubble",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                          },
-                          "parameters": [
-                            "BoardBubble",
-                            "SpeedPathMovement",
-                            "=",
-                            "0",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "SpawnedBubbleCount",
-                            "-",
-                            "1"
-                          ]
-                        }
-                      ]
                     }
                   ]
                 },
@@ -17224,6 +17159,273 @@
               "objectGroups": []
             },
             {
+              "fullName": "Can spawn bubble",
+              "functionType": "Condition",
+              "name": "CanSpawnBubble",
+              "sentence": "_PARAM0_ can spawn _PARAM6_ into _PARAM4_ of _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::HasOnTop"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectStack::HasOnTop"
+                          },
+                          "parameters": [
+                            "",
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "BoardBubble",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CurvedMovement::SpeedPathMovement::PositionOnPath"
+                          },
+                          "parameters": [
+                            "BoardBubble",
+                            "SpeedPathMovement",
+                            ">=",
+                            "32",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectStack::ObjectStack::IsEmpty"
+                          },
+                          "parameters": [
+                            "BubbleQueue",
+                            "ObjectStack",
+                            "ObjectStack"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::SpwanerBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Gutter",
+                  "name": "Gutter",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bubble queue",
+                  "name": "BubbleQueue",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Board bubble",
+                  "name": "BoardBubble",
+                  "supplementaryInformation": "Sprite",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Speed path movement",
+                  "name": "SpeedPathMovement",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Can unspawn bubble",
+              "functionType": "Condition",
+              "name": "CanUnspawnBubble",
+              "sentence": "_PARAM0_ can unspawn _PARAM6_ from _PARAM4_ of _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LinkedObjects::PickObjectsLinkedTo"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::HasOnTop"
+                      },
+                      "parameters": [
+                        "",
+                        "Gutter",
+                        "ObjectStack",
+                        "BubbleQueue",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::HasOnTop"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::HasReachedOrigin"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::SpwanerBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Gutter",
+                  "name": "Gutter",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bubble queue",
+                  "name": "BubbleQueue",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Object stack",
+                  "name": "ObjectStack",
+                  "supplementaryInformation": "ObjectStack::ObjectStack",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Board bubble",
+                  "name": "BoardBubble",
+                  "supplementaryInformation": "Sprite",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Speed path movement",
+                  "name": "SpeedPathMovement",
+                  "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "fullName": "Spawn bubble",
               "functionType": "Action",
               "name": "SpawnBubble",
@@ -17704,10 +17906,10 @@
               "objectGroups": []
             },
             {
-              "fullName": "Can spawn bubble",
-              "functionType": "Condition",
-              "name": "CanSpawnBubble",
-              "sentence": "_PARAM0_ can spawn _PARAM6_ into _PARAM4_ of _PARAM2_",
+              "fullName": "Unspawn bubble",
+              "functionType": "Action",
+              "name": "UnspawnBubble",
+              "sentence": "_PARAM0_ unspawn _PARAM7_ from _PARAM5_ of _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -17734,72 +17936,63 @@
                         "BubbleQueue",
                         ""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectStack::HasOnTop"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
                     }
                   ],
-                  "actions": [],
-                  "events": [
+                  "actions": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectStack::HasOnTop"
-                          },
-                          "parameters": [
-                            "",
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "BoardBubble",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::PositionOnPath"
-                          },
-                          "parameters": [
-                            "BoardBubble",
-                            "SpeedPathMovement",
-                            ">=",
-                            "32",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetReturnBoolean"
-                          },
-                          "parameters": [
-                            "True"
-                          ]
-                        }
+                      "type": {
+                        "value": "ObjectStack::ObjectStack::Remove"
+                      },
+                      "parameters": [
+                        "BubbleQueue",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
                       ]
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ObjectStack::ObjectStack::IsEmpty"
-                          },
-                          "parameters": [
-                            "BubbleQueue",
-                            "ObjectStack",
-                            "ObjectStack"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetReturnBoolean"
-                          },
-                          "parameters": [
-                            "True"
-                          ]
-                        }
+                      "type": {
+                        "value": "ObjectStack::ObjectStack::AddOnTop"
+                      },
+                      "parameters": [
+                        "Object",
+                        "ObjectStack",
+                        "BoardBubble",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                      },
+                      "parameters": [
+                        "BoardBubble",
+                        "SpeedPathMovement",
+                        "=",
+                        "0",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "SpawnedBubbleCount",
+                        "-",
+                        "1"
                       ]
                     }
                   ]
@@ -17821,6 +18014,12 @@
                   "description": "Gutter",
                   "name": "Gutter",
                   "type": "objectList"
+                },
+                {
+                  "description": "Gutter behavior",
+                  "name": "GutterBehavior",
+                  "supplementaryInformation": "Smoothy::GutterBehavior",
+                  "type": "behavior"
                 },
                 {
                   "description": "Object stack",
