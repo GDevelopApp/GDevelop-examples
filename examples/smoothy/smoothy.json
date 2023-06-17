@@ -2355,7 +2355,8 @@
               "TailState": "Idle",
               "HeadState": "Idle",
               "TailComboLevel": 0,
-              "HeadComboLevel": 0
+              "HeadComboLevel": 0,
+              "HitStopDuration": 0.1
             },
             {
               "name": "ObjectStack",
@@ -10396,7 +10397,7 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "When the bubbles are matched at the tail of the queue, the original queue is left empty an must be deleted."
+                      "comment": "When the bubbles are matched at the tail of the queue, the original queue is left empty an must be deleted.\n\nThe tailing queue should never be deleted becausebubble spawn inside it."
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
@@ -10408,6 +10409,19 @@
                           "parameters": [
                             "BubbleQueue",
                             "ObjectStack",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "ObjectStack::HasOnTop"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
                             ""
                           ]
                         }
@@ -11367,7 +11381,7 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "When the bubbles are matched at the tail of the queue, the original queue is left empty an must be deleted."
+                      "comment": "When the bubbles are matched at the tail of the queue, the original queue is left empty an must be deleted.\n\nThe tailing queue should never be deleted becausebubble spawn inside it."
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
@@ -11379,6 +11393,19 @@
                           "parameters": [
                             "BubbleQueue",
                             "ObjectStack",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "ObjectStack::HasOnTop"
+                          },
+                          "parameters": [
+                            "",
+                            "Gutter",
+                            "ObjectStack",
+                            "BubbleQueue",
                             ""
                           ]
                         }
@@ -14994,8 +15021,8 @@
                                   "parameters": [
                                     "Object",
                                     "Behavior",
-                                    "<=",
-                                    "1"
+                                    "=",
+                                    "0"
                                   ]
                                 }
                               ],
@@ -15034,7 +15061,7 @@
                                     "Object",
                                     "Behavior",
                                     ">",
-                                    "1"
+                                    "0"
                                   ]
                                 }
                               ],
@@ -15082,8 +15109,8 @@
                                   "parameters": [
                                     "Object",
                                     "Behavior",
-                                    "<=",
-                                    "1"
+                                    "=",
+                                    "0"
                                   ]
                                 }
                               ],
@@ -15122,7 +15149,7 @@
                                     "Object",
                                     "Behavior",
                                     ">",
-                                    "1"
+                                    "0"
                                   ]
                                 }
                               ],
@@ -18295,7 +18322,7 @@
                     },
                     {
                       "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::HasReachedAnEnd"
+                        "value": "CurvedMovement::SpeedPathMovement::HasReachedTarget"
                       },
                       "parameters": [
                         "BoardBubble",
@@ -19074,7 +19101,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "64"
+                        "Object.Behavior::PropertyNormalSpeed() / Object.Behavior::PropertyAccelerationDuration()"
                       ]
                     }
                   ]
@@ -19117,7 +19144,7 @@
                             "value": "SetReturnNumber"
                           },
                           "parameters": [
-                            "64"
+                            "Object.Behavior::PropertyNormalSpeed() / Object.Behavior::PropertyAccelerationDuration()"
                           ]
                         }
                       ]
@@ -19142,7 +19169,7 @@
                             "value": "SetReturnNumber"
                           },
                           "parameters": [
-                            "17.8"
+                            "Object.Behavior::PropertyNearDeathSpeed() / Object.Behavior::PropertyAccelerationDuration()"
                           ]
                         }
                       ]
@@ -19238,7 +19265,7 @@
                             "value": "SetReturnNumber"
                           },
                           "parameters": [
-                            "64"
+                            "Object.Behavior::PropertyNormalSpeed() / Object.Behavior::PropertyNearDeathTransitionDuration()"
                           ]
                         }
                       ]
@@ -19263,7 +19290,7 @@
                             "value": "SetReturnNumber"
                           },
                           "parameters": [
-                            "64"
+                            "Object.Behavior::PropertyNormalSpeed() / Object.Behavior::PropertyNearDeathTransitionDuration()"
                           ]
                         }
                       ]
@@ -19340,7 +19367,7 @@
               "unit": "PixelSpeed",
               "label": "Near death push speed",
               "description": "",
-              "group": "",
+              "group": "Speed",
               "extraInformation": [],
               "hidden": false,
               "name": "NearDeathSpeed"
@@ -19362,7 +19389,7 @@
               "unit": "Second",
               "label": "Near death transition duration",
               "description": "",
-              "group": "",
+              "group": "Acceleration",
               "extraInformation": [],
               "hidden": false,
               "name": "NearDeathTransitionDuration"
@@ -19373,7 +19400,7 @@
               "unit": "PixelSpeed",
               "label": "Normal push speed",
               "description": "",
-              "group": "",
+              "group": "Speed",
               "extraInformation": [],
               "hidden": false,
               "name": "NormalSpeed"
@@ -19386,8 +19413,19 @@
               "description": "",
               "group": "",
               "extraInformation": [],
-              "hidden": false,
+              "hidden": true,
               "name": "Identifier"
+            },
+            {
+              "value": "2",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Time to get to full speed",
+              "description": "",
+              "group": "Acceleration",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AccelerationDuration"
             }
           ],
           "sharedPropertyDescriptors": []
