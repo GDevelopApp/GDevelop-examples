@@ -622,6 +622,10 @@
           "effects": [],
           "behaviors": [
             {
+              "name": "BoardBubbleBehavior",
+              "type": "Smoothy::BoardBubbleBehavior"
+            },
+            {
               "name": "SpeedPathMovement",
               "type": "CurvedMovement::SpeedPathMovement",
               "Rotation": false,
@@ -2752,12 +2756,11 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "ChangeAnimation"
+                            "value": "SetAnimationName"
                           },
                           "parameters": [
                             "AimingBubble",
-                            "=",
-                            "4"
+                            "\"Purple\""
                           ]
                         }
                       ]
@@ -3651,15 +3654,6 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "Delete"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
                                 "value": "ModVarScene"
                               },
                               "parameters": [
@@ -3667,44 +3661,16 @@
                                 "+",
                                 "10 * PickedInstancesCount(BoardBubble)"
                               ]
-                            }
-                          ],
-                          "events": [
+                            },
                             {
-                              "type": "BuiltinCommonInstructions::ForEach",
-                              "object": "BoardBubble",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "Create"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "BubbleExplosion",
-                                    "BoardBubble.X()",
-                                    "BoardBubble.Y()",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "ParticleSystem::ParticleColor1"
-                                  },
-                                  "parameters": [
-                                    "BubbleExplosion",
-                                    "VariableString(ColorValues[BoardBubble.Animation()])"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "ParticleSystem::ParticleColor2"
-                                  },
-                                  "parameters": [
-                                    "BubbleExplosion",
-                                    "VariableString(ColorValues[BoardBubble.Animation()])"
-                                  ]
-                                }
+                              "type": {
+                                "value": "Smoothy::BoardBubbleBehavior::Explode"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "BoardBubbleBehavior",
+                                "BubbleExplosion",
+                                ""
                               ]
                             }
                           ]
@@ -3832,15 +3798,6 @@
                                     },
                                     {
                                       "type": {
-                                        "value": "Delete"
-                                      },
-                                      "parameters": [
-                                        "BoardBubble",
-                                        ""
-                                      ]
-                                    },
-                                    {
-                                      "type": {
                                         "value": "ModVarScene"
                                       },
                                       "parameters": [
@@ -3858,44 +3815,16 @@
                                         "+",
                                         "100 * BubbleQueue.BubbleQueueBehavior::HeadComboLevel()"
                                       ]
-                                    }
-                                  ],
-                                  "events": [
+                                    },
                                     {
-                                      "type": "BuiltinCommonInstructions::ForEach",
-                                      "object": "BoardBubble",
-                                      "conditions": [],
-                                      "actions": [
-                                        {
-                                          "type": {
-                                            "value": "Create"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            "BubbleExplosion",
-                                            "BoardBubble.X()",
-                                            "BoardBubble.Y()",
-                                            ""
-                                          ]
-                                        },
-                                        {
-                                          "type": {
-                                            "value": "ParticleSystem::ParticleColor1"
-                                          },
-                                          "parameters": [
-                                            "BubbleExplosion",
-                                            "VariableString(ColorValues[BoardBubble.Animation()])"
-                                          ]
-                                        },
-                                        {
-                                          "type": {
-                                            "value": "ParticleSystem::ParticleColor2"
-                                          },
-                                          "parameters": [
-                                            "BubbleExplosion",
-                                            "VariableString(ColorValues[BoardBubble.Animation()])"
-                                          ]
-                                        }
+                                      "type": {
+                                        "value": "Smoothy::BoardBubbleBehavior::Explode"
+                                      },
+                                      "parameters": [
+                                        "BoardBubble",
+                                        "BoardBubbleBehavior",
+                                        "BubbleExplosion",
+                                        ""
                                       ]
                                     }
                                   ]
@@ -4740,6 +4669,10 @@
       ],
       "behaviorsSharedData": [
         {
+          "name": "BoardBubbleBehavior",
+          "type": "Smoothy::BoardBubbleBehavior"
+        },
+        {
           "name": "BubbleQueueBehavior",
           "type": "Smoothy::BubbleQueueBehavior"
         },
@@ -4758,10 +4691,6 @@
         {
           "name": "ObjectStack",
           "type": "ObjectStack::ObjectStack"
-        },
-        {
-          "name": "PlatformerObject",
-          "type": "PlatformBehavior::PlatformerObjectBehavior"
         },
         {
           "name": "SpeedPathMovement",
@@ -18824,6 +18753,90 @@
               "name": "Identifier"
             }
           ],
+          "sharedPropertyDescriptors": []
+        },
+        {
+          "description": "",
+          "fullName": "Board bubble",
+          "name": "BoardBubbleBehavior",
+          "objectType": "Sprite",
+          "eventsFunctions": [
+            {
+              "fullName": "Explode",
+              "functionType": "Action",
+              "name": "Explode",
+              "sentence": "_PARAM0_ explode into _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "BubbleExplosion",
+                        "Object.X()",
+                        "Object.Y()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleSystem::ParticleColor1"
+                      },
+                      "parameters": [
+                        "BubbleExplosion",
+                        "VariableString(ColorValues[Object.Animation()])"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleSystem::ParticleColor2"
+                      },
+                      "parameters": [
+                        "BubbleExplosion",
+                        "VariableString(ColorValues[Object.Animation()])"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BoardBubbleBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bubble explosion",
+                  "name": "BubbleExplosion",
+                  "supplementaryInformation": "ParticleSystem::ParticleEmitter",
+                  "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [],
           "sharedPropertyDescriptors": []
         }
       ],
