@@ -2619,14 +2619,42 @@
               "actions": [
                 {
                   "type": {
-                    "value": "Create"
+                    "value": "ModVarSceneTxt"
                   },
                   "parameters": [
-                    "StartLocation",
+                    "GameState",
+                    "=",
+                    "\"Playing\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "Countdown",
+                    "=",
+                    "3 * 60"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Smoothy::CreateLevel"
+                  },
+                  "parameters": [
+                    "",
                     "Launcher",
-                    "GlobalVariable(Levels[GlobalVariable(Level)].LauncherX)",
-                    "GlobalVariable(Levels[GlobalVariable(Level)].LauncherY)",
-                    ""
+                    "Gutter",
+                    "GutterBehavior",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    "GutterPainter",
+                    "Hole",
+                    "Spawner",
+                    "SpwanerBehavior",
+                    "ObjectStack",
+                    "SpeedPathMovement",
+                    "SpwanerBehavior"
                   ]
                 },
                 {
@@ -2670,243 +2698,9 @@
                     "AimingBubble",
                     "VariableString(ColorNames[RandomInRange(0, Spawner.SpwanerBehavior::ColorCount() - 1)])"
                   ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarSceneTxt"
-                  },
-                  "parameters": [
-                    "GameState",
-                    "=",
-                    "\"Playing\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetSceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "BeginningBoostIsActive",
-                    "True"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "Countdown",
-                    "=",
-                    "3 * 60"
-                  ]
                 }
               ],
               "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "index",
-                        "=",
-                        "0"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Repeat",
-                  "repeatExpression": "GlobalVariableChildCount(Levels[GlobalVariable(Level)].Gutters)",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Create"
-                      },
-                      "parameters": [
-                        "",
-                        "Gutter",
-                        "-100",
-                        "-100",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Create"
-                      },
-                      "parameters": [
-                        "",
-                        "BubbleQueue",
-                        "-100",
-                        "-100",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ObjectStack::ObjectStack::AddOnTop"
-                      },
-                      "parameters": [
-                        "Gutter",
-                        "ObjectStack",
-                        "BubbleQueue",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Smoothy::GutterBehavior::SetPathName"
-                      },
-                      "parameters": [
-                        "Gutter",
-                        "GutterBehavior",
-                        "=",
-                        "\"Gutter\" + VariableString(index)",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Smoothy::GutterBehavior::SetIdentifier"
-                      },
-                      "parameters": [
-                        "Gutter",
-                        "GutterBehavior",
-                        "=",
-                        "Variable(index)",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "CurvedMovement::CreatePathFromSvg"
-                      },
-                      "parameters": [
-                        "",
-                        "Gutter.GutterBehavior::PathName()",
-                        "GlobalVariableString(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].Path)",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Create"
-                      },
-                      "parameters": [
-                        "StartLocation",
-                        "Spawner",
-                        "GlobalVariable(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].StartX)",
-                        "GlobalVariable(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].StartY)",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "LinkedObjects::LinkObjects"
-                      },
-                      "parameters": [
-                        "",
-                        "Spawner",
-                        "Gutter"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Smoothy::SpwanerBehavior::SetPathName"
-                      },
-                      "parameters": [
-                        "Spawner",
-                        "SpwanerBehavior",
-                        "=",
-                        "Gutter.GutterBehavior::PathName()",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                      },
-                      "parameters": [
-                        "Spawner",
-                        "SpeedPathMovement",
-                        "Gutter.GutterBehavior::PathName()",
-                        "1",
-                        "",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "CurvedMovement::SpeedPathMovement::DrawDebug"
-                      },
-                      "parameters": [
-                        "Spawner",
-                        "SpeedPathMovement",
-                        "GutterPainter",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Create"
-                      },
-                      "parameters": [
-                        "StartLocation",
-                        "Hole",
-                        "GlobalVariable(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].StartX) + CurvedMovement::PathEndX(Gutter.GutterBehavior::PathName())",
-                        "GlobalVariable(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].StartY) + CurvedMovement::PathEndY(Gutter.GutterBehavior::PathName())",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Cache"
-                      },
-                      "parameters": [
-                        "Spawner"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Cache"
-                      },
-                      "parameters": [
-                        "Gutter"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Cache"
-                      },
-                      "parameters": [
-                        "BubbleQueue"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "index",
-                            "+",
-                            "1"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
                 {
                   "colorB": 228,
                   "colorG": 176,
@@ -2963,181 +2757,6 @@
                             "AimingBubble",
                             "=",
                             "4"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "index",
-                            "=",
-                            "0"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "disabled": true,
-                      "type": "BuiltinCommonInstructions::Repeat",
-                      "repeatExpression": "2",
-                      "conditions": [],
-                      "actions": [],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "4",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Create"
-                              },
-                              "parameters": [
-                                "",
-                                "BoardBubble",
-                                "Spawner.X()",
-                                "Spawner.Y()",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Create"
-                              },
-                              "parameters": [
-                                "",
-                                "BoardBubble",
-                                "Spawner.X()",
-                                "Spawner.Y()",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "\"Gutter\"",
-                                "1",
-                                "",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ChangeAnimation"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "=",
-                                "Variable(index)"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ObjectStack::ObjectStack::AddOnTop"
-                              },
-                              "parameters": [
-                                "Spawner",
-                                "ObjectStack",
-                                "BoardBubble",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarScene"
-                              },
-                              "parameters": [
-                                "index",
-                                "+",
-                                "1"
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "4",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "ModVarScene"
-                              },
-                              "parameters": [
-                                "index",
-                                "-",
-                                "1"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Create"
-                              },
-                              "parameters": [
-                                "",
-                                "BoardBubble",
-                                "Spawner.X()",
-                                "Spawner.Y()",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Create"
-                              },
-                              "parameters": [
-                                "",
-                                "BoardBubble",
-                                "Spawner.X()",
-                                "Spawner.Y()",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CurvedMovement::SpeedPathMovement::SetPath"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "SpeedPathMovement",
-                                "\"Gutter\"",
-                                "1",
-                                "",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ChangeAnimation"
-                              },
-                              "parameters": [
-                                "BoardBubble",
-                                "=",
-                                "Variable(index)"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ObjectStack::ObjectStack::AddOnTop"
-                              },
-                              "parameters": [
-                                "Spawner",
-                                "ObjectStack",
-                                "BoardBubble",
-                                ""
-                              ]
-                            }
                           ]
                         }
                       ]
@@ -10820,6 +10439,305 @@
       "dependencies": [],
       "eventsFunctions": [
         {
+          "fullName": "Create gutters",
+          "functionType": "Action",
+          "name": "CreateLevel",
+          "sentence": "Create a level with _PARAM1_  and _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "StartLocation",
+                    "Launcher",
+                    "GlobalVariable(Levels[GlobalVariable(Level)].LauncherX)",
+                    "GlobalVariable(Levels[GlobalVariable(Level)].LauncherY)",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "index",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "GlobalVariableChildCount(Levels[GlobalVariable(Level)].Gutters)",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Gutter",
+                    "-100",
+                    "-100",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "BubbleQueue",
+                    "-100",
+                    "-100",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ObjectStack::ObjectStack::AddOnTop"
+                  },
+                  "parameters": [
+                    "Gutter",
+                    "ObjectStack",
+                    "BubbleQueue",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Smoothy::GutterBehavior::SetPathName"
+                  },
+                  "parameters": [
+                    "Gutter",
+                    "GutterBehavior",
+                    "=",
+                    "\"Gutter\" + VariableString(index)",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Smoothy::GutterBehavior::SetIdentifier"
+                  },
+                  "parameters": [
+                    "Gutter",
+                    "GutterBehavior",
+                    "=",
+                    "Variable(index)",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CurvedMovement::CreatePathFromSvg"
+                  },
+                  "parameters": [
+                    "",
+                    "Gutter.GutterBehavior::PathName()",
+                    "GlobalVariableString(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].Path)",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "StartLocation",
+                    "Spawner",
+                    "GlobalVariable(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].StartX)",
+                    "GlobalVariable(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].StartY)",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "LinkedObjects::LinkObjects"
+                  },
+                  "parameters": [
+                    "",
+                    "Spawner",
+                    "Gutter"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Smoothy::SpwanerBehavior::SetPathName"
+                  },
+                  "parameters": [
+                    "Spawner",
+                    "SpwanerBehavior",
+                    "=",
+                    "Gutter.GutterBehavior::PathName()",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                  },
+                  "parameters": [
+                    "Spawner",
+                    "SpeedPathMovement",
+                    "Gutter.GutterBehavior::PathName()",
+                    "1",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "CurvedMovement::SpeedPathMovement::DrawDebug"
+                  },
+                  "parameters": [
+                    "Spawner",
+                    "SpeedPathMovement",
+                    "GutterPainter",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "StartLocation",
+                    "Hole",
+                    "GlobalVariable(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].StartX) + CurvedMovement::PathEndX(Gutter.GutterBehavior::PathName())",
+                    "GlobalVariable(Levels[GlobalVariable(Level)].Gutters[VariableString(index)].StartY) + CurvedMovement::PathEndY(Gutter.GutterBehavior::PathName())",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "Spawner"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "Gutter"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "BubbleQueue"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "index",
+                        "+",
+                        "1"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Launcher",
+              "name": "Launcher",
+              "type": "objectList"
+            },
+            {
+              "description": "Gutter",
+              "name": "Gutter",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "Gutter behavior",
+              "name": "GutterBehavior",
+              "supplementaryInformation": "Smoothy::GutterBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Object stack",
+              "name": "ObjectStack",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Bubble queue",
+              "name": "BubbleQueue",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "Gutter painter",
+              "name": "GutterPainter",
+              "supplementaryInformation": "PrimitiveDrawing::Drawer",
+              "type": "objectList"
+            },
+            {
+              "description": "Hole",
+              "name": "Hole",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "Spawner",
+              "name": "Spawner",
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
+            },
+            {
+              "description": "Spwaner behavior",
+              "name": "SpwanerBehavior",
+              "supplementaryInformation": "Smoothy::SpwanerBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Object stack",
+              "name": "ObjectStack",
+              "supplementaryInformation": "ObjectStack::ObjectStack",
+              "type": "behavior"
+            },
+            {
+              "description": "Movement on a curve",
+              "name": "SpeedPathMovement",
+              "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
+              "type": "behavior"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
           "fullName": "Match bubbles",
           "functionType": "Condition",
           "name": "MatchBubbles",
@@ -17580,6 +17498,193 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Debug",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "index",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "disabled": true,
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "2",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Repeat",
+                          "repeatExpression": "4",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "BoardBubble",
+                                "Object.X()",
+                                "Object.Y()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "BoardBubble",
+                                "Object.X()",
+                                "Object.Y()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "Object.Behavior::PathName()",
+                                "1",
+                                "",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "=",
+                                "Variable(index)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectStack::ObjectStack::AddOnTop"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ObjectStack",
+                                "BoardBubble",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "index",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Repeat",
+                          "repeatExpression": "4",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "index",
+                                "-",
+                                "1"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "BoardBubble",
+                                "Object.X()",
+                                "Object.Y()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "BoardBubble",
+                                "Object.X()",
+                                "Object.Y()",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetPath"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "Object.Behavior::PathName()",
+                                "1",
+                                "",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "=",
+                                "Variable(index)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ObjectStack::ObjectStack::AddOnTop"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ObjectStack",
+                                "BoardBubble",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
                 }
               ],
               "parameters": [
