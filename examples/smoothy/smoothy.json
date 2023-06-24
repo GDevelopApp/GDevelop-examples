@@ -3316,6 +3316,7 @@
                                     "BubbleQueue",
                                     "ObjectStack",
                                     "BoardBubble",
+                                    "BoardBubbleBehavior",
                                     "SpeedPathMovement",
                                     "Variable(queueIndex)",
                                     ""
@@ -3428,6 +3429,7 @@
                                         "BubbleQueueBehavior",
                                         "ObjectStack",
                                         "BoardBubble",
+                                        "BoardBubbleBehavior",
                                         "SpeedPathMovement",
                                         "Variable(queueIndex)",
                                         "BubbleClipboard",
@@ -11508,7 +11510,7 @@
           "fullName": "Queue collision",
           "functionType": "Condition",
           "name": "IsQueueColliding",
-          "sentence": "_PARAM5_ from _PARAM1_ at _PARAM3_ number _PARAM7_ is in collision with the bubble queue ahaed",
+          "sentence": "_PARAM5_ from _PARAM1_ at _PARAM3_ number _PARAM8_ is in collision with the bubble queue ahaed",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -11611,7 +11613,7 @@
                         "value": "DebuggerTools::ConsoleLog"
                       },
                       "parameters": [
-                        "\"delta: \" + ToString(Variable(firstBubblePathPosition) + 32 - BoardBubble.SpeedPathMovement::PositionOnPath())",
+                        "\"delta: \" + ToString(Variable(firstBubblePathPosition) + BoardBubble.BoardBubbleBehavior::BubbleSize() - BoardBubble.SpeedPathMovement::PositionOnPath())",
                         "",
                         ""
                       ]
@@ -11629,7 +11631,7 @@
                         "BoardBubble",
                         "SpeedPathMovement",
                         "<=",
-                        "Variable(firstBubblePathPosition) + 32",
+                        "Variable(firstBubblePathPosition) + BoardBubble.BoardBubbleBehavior::BubbleSize()",
                         ""
                       ]
                     }
@@ -11679,6 +11681,12 @@
               "type": "objectList"
             },
             {
+              "description": "Board bubble behavior",
+              "name": "BoardBubbleBehavior",
+              "supplementaryInformation": "Smoothy::BoardBubbleBehavior",
+              "type": "behavior"
+            },
+            {
               "description": "Speed path movement",
               "name": "SpeedPathMovement",
               "supplementaryInformation": "CurvedMovement::SpeedPathMovement",
@@ -11698,7 +11706,7 @@
           "fullName": "Merge queue",
           "functionType": "Action",
           "name": "MergeQueue",
-          "sentence": "Merge _PARAM6_ from _PARAM1_ at _PARAM3_ number _PARAM8_ with the bubble queue ahead",
+          "sentence": "Merge _PARAM6_ from _PARAM1_ at _PARAM3_ number _PARAM9_ with the bubble queue ahead",
           "events": [
             {
               "disabled": true,
@@ -11905,7 +11913,7 @@
                             "BoardBubble",
                             "SpeedPathMovement",
                             "+",
-                            "Variable(firstBubblePathPosition) + 32 - Variable(lastBubblePathPosition)",
+                            "Variable(firstBubblePathPosition) + BoardBubble.BoardBubbleBehavior::BubbleSize() - Variable(lastBubblePathPosition)",
                             ""
                           ]
                         },
@@ -12232,6 +12240,12 @@
               "name": "BoardBubble",
               "supplementaryInformation": "Sprite",
               "type": "objectList"
+            },
+            {
+              "description": "Board bubble behavior",
+              "name": "BoardBubbleBehavior",
+              "supplementaryInformation": "Smoothy::BoardBubbleBehavior",
+              "type": "behavior"
             },
             {
               "description": "Speed path movement",
@@ -17422,7 +17436,7 @@
                                 "BoardBubble",
                                 "SpeedPathMovement",
                                 "=",
-                                "Variable(lastBubblePathPosition) - 32",
+                                "Variable(lastBubblePathPosition) - Object.Behavior::PropertyBubbleSize()",
                                 ""
                               ]
                             },
@@ -19617,9 +19631,62 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the bubble size.",
+              "fullName": "Bubble size",
+              "functionType": "ExpressionAndCondition",
+              "name": "BubbleSize",
+              "sentence": "the bubble size",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyBubbleSize()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BoardBubbleBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
-          "propertyDescriptors": [],
+          "propertyDescriptors": [
+            {
+              "value": "32",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Bubble size",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "BubbleSize"
+            }
+          ],
           "sharedPropertyDescriptors": []
         }
       ],
