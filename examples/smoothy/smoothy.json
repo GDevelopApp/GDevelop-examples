@@ -12003,11 +12003,12 @@
                         },
                         {
                           "type": {
-                            "value": "SetSceneVariableAsBoolean"
+                            "value": "ModVarScene"
                           },
                           "parameters": [
-                            "tailSplitTimerExists",
-                            "="
+                            "tailSplitTimerValue",
+                            "=",
+                            "-1"
                           ]
                         }
                       ],
@@ -12021,7 +12022,7 @@
                               },
                               "parameters": [
                                 "BubbleQueue",
-                                "\"TailSplit\"",
+                                "\"TimeFromTailImpact\"",
                                 ">=",
                                 "0"
                               ]
@@ -12030,21 +12031,12 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "SetSceneVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "tailSplitTimerExists",
-                                "True"
-                              ]
-                            },
-                            {
-                              "type": {
                                 "value": "ModVarScene"
                               },
                               "parameters": [
                                 "tailSplitTimerValue",
                                 "=",
-                                "BubbleQueue.ObjectTimerElapsedTime(\"TailSplit\")"
+                                "BubbleQueue.ObjectTimerElapsedTime(\"TimeFromTailImpact\")"
                               ]
                             }
                           ]
@@ -12082,89 +12074,18 @@
                         "ObjectStack",
                         "ObjectStack"
                       ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Set back the tail state."
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetTailState"
-                          },
-                          "parameters": [
-                            "BubbleQueue",
-                            "BubbleQueueBehavior",
-                            "=",
-                            "VariableString(tailState)",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetTailComboLevel"
-                          },
-                          "parameters": [
-                            "BubbleQueue",
-                            "BubbleQueueBehavior",
-                            "=",
-                            "Variable(tailComboLevel)",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "RemoveObjectTimer"
-                          },
-                          "parameters": [
-                            "BubbleQueue",
-                            "\"TailSplit\""
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "SceneVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "tailSplitTimerExists",
-                                "True"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "AdvancedTimer::SetObjectTimerElapsedTime"
-                              },
-                              "parameters": [
-                                "",
-                                "=",
-                                "Variable(tailSplitTimerValue)",
-                                "BubbleQueue",
-                                "\"TailSplit\"",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetJustMerged"
+                      },
+                      "parameters": [
+                        "BubbleQueue",
+                        "BubbleQueueBehavior",
+                        "VariableString(tailState)",
+                        "Variable(tailComboLevel)",
+                        "Variable(tailSplitTimerValue)",
+                        ""
                       ]
                     }
                   ]
@@ -16145,6 +16066,212 @@
               "objectGroups": []
             },
             {
+              "description": "Change the state of the tail when the queue merge with anothe one.",
+              "fullName": "Just merged",
+              "functionType": "Action",
+              "name": "SetJustMerged",
+              "sentence": "Change tail state of _PARAM0_ after a merge of a queue with tail state: _PARAM2_, tail combo level: _PARAM3_ and time from tail impact: _PARAM4_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "The leading queue rewind back to the tailing queue and they merged (because there were only 2 bubbles of the same color)."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Rewinding\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::BubbleQueueBehavior::SetPropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"RewindImpact\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "The tailing queue reached the leading queue and they merged."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Rewinding\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"RewindImpact\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Set back the tail state."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "GetArgumentAsString(\"TailState\")",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetTailComboLevel"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "GetArgumentAsNumber(\"TailComboLevel\")",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "RemoveObjectTimer"
+                          },
+                          "parameters": [
+                            "Object",
+                            "\"TimeFromTailImpact\""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CompareArgumentAsNumber"
+                              },
+                              "parameters": [
+                                "\"TimeFromTailImpact\"",
+                                ">=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "AdvancedTimer::SetObjectTimerElapsedTime"
+                              },
+                              "parameters": [
+                                "",
+                                "=",
+                                "GetArgumentAsNumber(\"TimeFromTailImpact\")",
+                                "Object",
+                                "\"TimeFromTailImpact\"",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Smoothy::BubbleQueueBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tail state",
+                  "name": "TailState",
+                  "type": "string"
+                },
+                {
+                  "description": "Tail combo level",
+                  "name": "TailComboLevel",
+                  "type": "expression"
+                },
+                {
+                  "description": "Time from tail impact",
+                  "name": "TimeFromTailImpact",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "Change the state of the tail to \"StopOrTaillingPush\" to go back to idle.",
               "fullName": "Tail idle",
               "functionType": "Action",
@@ -16332,6 +16459,7 @@
               "functionType": "ActionWithOperator",
               "getterName": "TailState",
               "name": "SetTailState",
+              "private": true,
               "sentence": "",
               "events": [
                 {
@@ -16431,6 +16559,7 @@
               "functionType": "ActionWithOperator",
               "getterName": "HeadState",
               "name": "SetHeadState",
+              "private": true,
               "sentence": "",
               "events": [
                 {
@@ -16786,6 +16915,7 @@
                       "comment": "Enable this event to test the combos."
                     },
                     {
+                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
