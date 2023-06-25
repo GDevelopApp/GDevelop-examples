@@ -1,1 +1,1 @@
-A Bust-a-Move clone to show how to make a match 3 game.
+A Zuma clone to show how to orginize a project with behaviors.
