@@ -2315,7 +2315,9 @@
               "HeadState": "Idle",
               "TailComboLevel": 0,
               "HeadComboLevel": 0,
-              "HitStopDuration": 0.1
+              "HitStopDuration": 0.1,
+              "RewindDelay": 0.3,
+              "HitStopAfterComboDuration": 0.3
             },
             {
               "name": "ObjectStack",
@@ -15718,68 +15720,30 @@
                                 "=",
                                 "\"WillMagnet\""
                               ]
-                            }
-                          ],
-                          "actions": [],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::BubbleQueueBehavior::PropertyTailComboLevel"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "<=",
-                                    "1"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::BubbleQueueBehavior::SetTailState"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "\"HitStopEndBeforeRewind\"",
-                                    ""
-                                  ]
-                                }
-                              ]
                             },
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::BubbleQueueBehavior::PropertyTailComboLevel"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    ">",
-                                    "1"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::BubbleQueueBehavior::SetTailState"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "\"HitStopBeforeRewind\"",
-                                    ""
-                                  ]
-                                }
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailComboLevel"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ">",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::SetTailState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"HitStopBeforeRewind\"",
+                                ""
                               ]
                             }
                           ]
@@ -15789,17 +15753,6 @@
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
-                        {
-                          "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "\"HitStopBeforeRewind\""
-                          ]
-                        },
                         {
                           "type": {
                             "value": "CompareObjectTimer"
@@ -15812,26 +15765,98 @@
                           ]
                         }
                       ],
-                      "actions": [
+                      "actions": [],
+                      "events": [
                         {
-                          "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::SetTailState"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "\"HitStopEndBeforeRewind\"",
-                            ""
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"HitStopBeforeRewind\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::SetTailState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"HitStopEndBeforeRewind\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "RemoveObjectTimer"
+                              },
+                              "parameters": [
+                                "Object",
+                                "\"TimeFromTailImpact\""
+                              ]
+                            }
                           ]
                         },
                         {
-                          "type": {
-                            "value": "RemoveObjectTimer"
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
                           },
-                          "parameters": [
-                            "Object",
-                            "\"TimeFromTailImpact\""
+                          "comment": "There is no hit-stop before the first rewinding but the total delay is still the same."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"WillMagnet\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailComboLevel"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "<=",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::SetTailState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"HitStopEndBeforeRewind\"",
+                                ""
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -15979,75 +16004,17 @@
                               ]
                             }
                           ],
-                          "actions": [],
-                          "events": [
+                          "actions": [
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::BubbleQueueBehavior::PropertyHeadComboLevel"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::BubbleQueueBehavior::SetHeadState"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "\"Rewinding\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "RemoveObjectTimer"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "\"TimeFromHeadImpact\""
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::BubbleQueueBehavior::PropertyHeadComboLevel"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    ">",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::BubbleQueueBehavior::SetHeadState"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "\"HitStopBeforeRewind\"",
-                                    ""
-                                  ]
-                                }
+                              "type": {
+                                "value": "Smoothy::BubbleQueueBehavior::SetHeadState"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"HitStopBeforeRewind\"",
+                                ""
                               ]
                             }
                           ]
