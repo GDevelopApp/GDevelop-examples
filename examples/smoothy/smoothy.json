@@ -14999,7 +14999,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "\"HitStop\""
+                                "\"HitStopBeforeIdle\""
                               ]
                             }
                           ],
@@ -15239,36 +15239,6 @@
                             "Object",
                             "Behavior",
                             "=",
-                            "\"HitStop\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                          },
-                          "parameters": [
-                            "BoardBubble",
-                            "SpeedPathMovement",
-                            "=",
-                            "0",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
                             "\"HitStopBeforeRewind\""
                           ]
                         }
@@ -15312,8 +15282,27 @@
                             "BoardBubble",
                             "SpeedPathMovement",
                             "=",
-                            "Object.Behavior::ImpactSpeed(Object.Behavior::PropertyTailComboLevel())",
+                            "Object.Behavior::ImpactSpeed(max(1, Object.Behavior::PropertyTailComboLevel() - 1))",
                             ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "disabled": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"Set speed for the tail for rewind: \" + ToString(Object.Behavior::ImpactSpeed(max(1, Object.Behavior::PropertyTailComboLevel() - 1)))",
+                                "",
+                                ""
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -15388,7 +15377,7 @@
                                 "value": "DebuggerTools::ConsoleLog"
                               },
                               "parameters": [
-                                "\"Set speed for the tail imact: \" + ToString(Object.Behavior::ImpactSpeed(Object.Behavior::PropertyTailComboLevel()))",
+                                "\"Set speed for the tail impact: \" + ToString(Object.Behavior::ImpactSpeed(Object.Behavior::PropertyTailComboLevel()))",
                                 "",
                                 ""
                               ]
@@ -15709,7 +15698,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "\"HitStop\"",
+                                "\"StopOrTaillingPush\"",
                                 ""
                               ]
                             }
@@ -15801,17 +15790,40 @@
                       "conditions": [
                         {
                           "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"HitStopBeforeRewind\""
+                          ]
+                        },
+                        {
+                          "type": {
                             "value": "CompareObjectTimer"
                           },
                           "parameters": [
                             "Object",
                             "\"TimeFromTailImpact\"",
                             ">=",
-                            "Object.Behavior::PropertyRewindDelay() + Object.Behavior::PropertyHitStopDuration()"
+                            "Object.Behavior::PropertyRewindDelay() + Object.Behavior::PropertyHitStopBeforeRewindDuration()"
                           ]
                         }
                       ],
                       "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetTailState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"HitStopEndBeforeRewind\"",
+                            ""
+                          ]
+                        },
                         {
                           "type": {
                             "value": "RemoveObjectTimer"
@@ -15819,68 +15831,6 @@
                           "parameters": [
                             "Object",
                             "\"TimeFromTailImpact\""
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"HitStop\""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::SetTailState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"StopOrTaillingPush\"",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyTailState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"HitStopBeforeRewind\""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::SetTailState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"HitStopEndBeforeRewind\"",
-                                ""
-                              ]
-                            }
                           ]
                         }
                       ]
@@ -16007,7 +15957,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "\"HitStop\"",
+                                "\"HitStopBeforeIdle\"",
                                 ""
                               ]
                             }
@@ -16108,17 +16058,40 @@
                       "conditions": [
                         {
                           "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"HitStopBeforeRewind\""
+                          ]
+                        },
+                        {
+                          "type": {
                             "value": "CompareObjectTimer"
                           },
                           "parameters": [
                             "Object",
                             "\"TimeFromHeadImpact\"",
                             ">=",
-                            "Object.Behavior::PropertyRewindDelay() + Object.Behavior::PropertyHitStopDuration()"
+                            "Object.Behavior::PropertyRewindDelay() + Object.Behavior::PropertyHitStopBeforeRewindDuration()"
                           ]
                         }
                       ],
                       "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Rewinding\"",
+                            ""
+                          ]
+                        },
                         {
                           "type": {
                             "value": "RemoveObjectTimer"
@@ -16128,66 +16101,54 @@
                             "\"TimeFromHeadImpact\""
                           ]
                         }
-                      ],
-                      "events": [
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"HitStop\""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::SetHeadState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"StopOrTaillingPush\"",
-                                ""
-                              ]
-                            }
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"HitStopBeforeIdle\""
                           ]
                         },
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"HitStopBeforeRewind\""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Smoothy::BubbleQueueBehavior::SetHeadState"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "\"Rewinding\"",
-                                ""
-                              ]
-                            }
+                          "type": {
+                            "value": "CompareObjectTimer"
+                          },
+                          "parameters": [
+                            "Object",
+                            "\"TimeFromHeadImpact\"",
+                            ">=",
+                            "Object.Behavior::PropertyRewindDelay() + Object.Behavior::PropertyHitStopAfterComboDuration()"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::SetHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"StopOrTaillingPush\"",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "RemoveObjectTimer"
+                          },
+                          "parameters": [
+                            "Object",
+                            "\"TimeFromHeadImpact\""
                           ]
                         }
                       ]
@@ -16490,6 +16451,17 @@
                             "Behavior",
                             "=",
                             "\"Idle\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Smoothy::BubbleQueueBehavior::PropertyHeadState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"HitStopBeforeIdle\""
                           ]
                         },
                         {
@@ -17758,7 +17730,7 @@
               "unit": "PixelSpeed",
               "label": "Rewinding maximum speed",
               "description": "",
-              "group": "",
+              "group": "Speed",
               "extraInformation": [],
               "hidden": false,
               "name": "RewindingSpeedMax"
@@ -17769,7 +17741,7 @@
               "unit": "PixelAcceleration",
               "label": "Rewinding acceleration",
               "description": "",
-              "group": "",
+              "group": "Speed",
               "extraInformation": [],
               "hidden": false,
               "name": "RewindingAcceleration"
@@ -17780,7 +17752,7 @@
               "unit": "Second",
               "label": "Rewind delay",
               "description": "Before the hit-stop",
-              "group": "",
+              "group": "Hit-stop",
               "extraInformation": [],
               "hidden": false,
               "name": "RewindDelay"
@@ -17789,12 +17761,23 @@
               "value": "0.1",
               "type": "Number",
               "unit": "Second",
-              "label": "Hit-stop duration",
-              "description": "Before rewinding",
-              "group": "",
+              "label": "Hit-stop duration before rewinding",
+              "description": "",
+              "group": "Hit-stop",
               "extraInformation": [],
               "hidden": false,
-              "name": "HitStopDuration"
+              "name": "HitStopBeforeRewindDuration"
+            },
+            {
+              "value": "0.4",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Hit-stop at the end of a combo",
+              "description": "",
+              "group": "Hit-stop",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "HitStopAfterComboDuration"
             },
             {
               "value": "133.3",
@@ -17802,7 +17785,7 @@
               "unit": "PixelSpeed",
               "label": "Impact speed gain at each combo level",
               "description": "",
-              "group": "",
+              "group": "Speed",
               "extraInformation": [],
               "hidden": false,
               "name": "ImpactSpeedGain"
@@ -17813,7 +17796,7 @@
               "unit": "PixelSpeed",
               "label": "Impact speed maximum",
               "description": "",
-              "group": "",
+              "group": "Speed",
               "extraInformation": [],
               "hidden": false,
               "name": "ImpactSpeedMax"
