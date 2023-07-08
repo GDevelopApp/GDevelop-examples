@@ -1049,7 +1049,7 @@
               "name": "SpwanerBehavior",
               "type": "Smoothy::SpwanerBehavior",
               "ObjectStack": "ObjectStack",
-              "ColorCount": 4
+              "ColorCount": 2
             }
           ],
           "animations": [
@@ -2737,6 +2737,24 @@
                       "parameters": [
                         "AimingBubble",
                         "\"Purple\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MettreXY"
+                      },
+                      "parameters": [
+                        "Launcher",
+                        "=",
+                        "50",
+                        "=",
+                        "150"
                       ]
                     }
                   ]
@@ -18550,66 +18568,17 @@
                                 "+",
                                 "1"
                               ]
-                            }
-                          ],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Smoothy::GutterBehavior::IsBeginningBostEnabled"
-                                  },
-                                  "parameters": [
-                                    "Gutter",
-                                    "GutterBehavior",
-                                    ""
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                                  },
-                                  "parameters": [
-                                    "BoardBubble",
-                                    "SpeedPathMovement",
-                                    "=",
-                                    "Gutter.GutterBehavior::BoostBeginningSpeed()",
-                                    ""
-                                  ]
-                                }
-                              ]
                             },
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "inverted": true,
-                                    "value": "Smoothy::GutterBehavior::IsBeginningBostEnabled"
-                                  },
-                                  "parameters": [
-                                    "Gutter",
-                                    "GutterBehavior",
-                                    ""
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
-                                  },
-                                  "parameters": [
-                                    "BoardBubble",
-                                    "SpeedPathMovement",
-                                    "=",
-                                    "Gutter.GutterBehavior::PushSpeed()",
-                                    ""
-                                  ]
-                                }
+                              "type": {
+                                "value": "CurvedMovement::SpeedPathMovement::SetSpeed"
+                              },
+                              "parameters": [
+                                "BoardBubble",
+                                "SpeedPathMovement",
+                                "=",
+                                "Gutter.GutterBehavior::PushSpeed()",
+                                ""
                               ]
                             }
                           ]
@@ -19326,6 +19295,35 @@
                         "Object",
                         "Behavior",
                         ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "The PushingQueueProgression property is used to calculate the initial boost speed.\nThis is to make sure the boost doesn't start back to full speed when a match happens during the boost."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Smoothy::GutterBehavior::SetPropertyPushingQueueFarestProgression"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "max(Object.Behavior::PropertyPushingQueueFarestProgression(), Object.Behavior::PropertyPushingQueueProgression())"
                       ]
                     }
                   ]
@@ -20106,7 +20104,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "ExtendedMath::Map(Object.Behavior::PropertyPushingQueueProgression(), 0, Object.Behavior::PropertyBeginningFillRatio(), Object.Behavior::BoostBeginningSpeed(), Object.Behavior::PropertySafeZoneEndSpeed())"
+                        "ExtendedMath::Map(Object.Behavior::PropertyPushingQueueFarestProgression(), 0, Object.Behavior::PropertyBeginningFillRatio(), Object.Behavior::BoostBeginningSpeed(), Object.Behavior::PropertySafeZoneEndSpeed())"
                       ]
                     }
                   ]
@@ -20575,6 +20573,17 @@
               "extraInformation": [],
               "hidden": false,
               "name": "NearDeathZoneBeginningLengthRatio"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "PushingQueueFarestProgression"
             }
           ],
           "sharedPropertyDescriptors": []
