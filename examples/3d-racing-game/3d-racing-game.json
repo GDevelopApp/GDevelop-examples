@@ -3815,7 +3815,6 @@
           }
         },
         {
-          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Grass",
           "tags": "",
@@ -3858,7 +3857,6 @@
           ]
         },
         {
-          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Camera",
           "tags": "",
@@ -4575,7 +4573,6 @@
           }
         },
         {
-          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "CarHitBox",
           "tags": "",
@@ -4744,7 +4741,6 @@
           }
         },
         {
-          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "BlackBackground",
           "tags": "",
@@ -6714,7 +6710,7 @@
         "gridColor": 0,
         "gridAlpha": 0.57,
         "snap": true,
-        "zoomFactor": 1.2530387740590123,
+        "zoomFactor": 0.7370816317994208,
         "windowMask": false
       },
       "objectsGroups": [
@@ -10226,7 +10222,6 @@
           }
         },
         {
-          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Grass",
           "tags": "",
@@ -10269,7 +10264,6 @@
           ]
         },
         {
-          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Camera",
           "tags": "",
@@ -10593,7 +10587,7 @@
             {
               "name": "RoadTileBehavior",
               "type": "Level::RoadTileBehavior",
-              "Path": "m-40 0v-160",
+              "Path": "m-40 0v160",
               "StartX": 0,
               "StartY": -80
             }
@@ -10720,7 +10714,6 @@
           }
         },
         {
-          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "CarHitBox",
           "tags": "",
@@ -10889,7 +10882,6 @@
           }
         },
         {
-          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "BlackBackground",
           "tags": "",
@@ -10931,7 +10923,6 @@
           ]
         },
         {
-          "adaptCollisionMaskAutomatically": true,
           "assetStoreId": "",
           "name": "Start",
           "tags": "",
@@ -20533,7 +20524,7 @@
                 "      const clone = curve.clone();",
                 "      for (const point of clone.points) {",
                 "        point[0] += endX;",
-                "        point[1] *= path.scaleY / this.speedScaleY;",
+                "        point[1] *= path.speedScaleY / this.speedScaleY;",
                 "        point[1] += endY;",
                 "      }",
                 "      this._add(clone);",
@@ -20763,8 +20754,17 @@
                 "   * @param {number} angle",
                 "   */",
                 "  CurvedPath.prototype.rotate = function (angle) {",
-                "    const cos = Math.cos(angle);",
-                "    const sin = Math.sin(angle);",
+                "    let cos = Math.cos(angle);",
+                "    let sin = Math.sin(angle);",
+                "",
+                "    // Avoid rounding errors around 0.",
+                "    if (cos === -1 || cos === 1) {",
+                "      sin = 0;",
+                "    }",
+                "    if (sin === -1 || sin === 1) {",
+                "      cos = 0;",
+                "    }",
+                "    ",
                 "    for (const curve of this.curves) {",
                 "      for (const point of curve.points) {",
                 "        const x = point[0];",
@@ -20876,6 +20876,7 @@
                 "    const clone = new CubicBezierCurve();",
                 "    clone.points = this.points.map(point => [...point]);",
                 "    clone.arcLengths = [...this.arcLengths];",
+                "    clone.speedScaleY = this.speedScaleY;",
                 "    return clone;",
                 "  }",
                 "",
@@ -21656,6 +21657,7 @@
                 "        curvedPaths.set(modifiedPathName, modifiedPath);",
                 "    }",
                 "    console.log(modifiedPathName + \": \" + gdjs.__curvedMovementExtension.CurvedPath.toSvg(modifiedPath));",
+                "    console.log(\"+ \" + addedPathName + \": \" + gdjs.__curvedMovementExtension.CurvedPath.toSvg(modifiedPath));",
                 "    modifiedPath.append(addedPath);",
                 "    console.log(modifiedPathName + \": \" + gdjs.__curvedMovementExtension.CurvedPath.toSvg(modifiedPath));",
                 "}"
