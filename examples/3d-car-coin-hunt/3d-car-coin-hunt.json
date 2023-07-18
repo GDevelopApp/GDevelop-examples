@@ -504,7 +504,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.5468750000000148,
+        "zoomFactor": 1.2530387740590179,
         "windowMask": false
       },
       "objectsGroups": [
@@ -563,13 +563,12 @@
         },
         {
           "angle": 0,
-          "customSize": true,
-          "depth": 0,
-          "height": 174,
+          "customSize": false,
+          "height": 46,
           "layer": "UI",
-          "name": "InfoUI",
+          "name": "BestTimeText",
           "persistentUuid": "30596d44-7cf8-4fee-8fdd-c76c86c9e777",
-          "width": 539,
+          "width": 187,
           "x": 5,
           "y": 50,
           "zOrder": 23,
@@ -582,7 +581,7 @@
           "customSize": false,
           "height": 0,
           "layer": "UI",
-          "name": "TimeUI",
+          "name": "TimeText",
           "persistentUuid": "cec96115-b593-411f-93ad-8ed85b3ea2eb",
           "width": 0,
           "x": 5,
@@ -1285,7 +1284,7 @@
           "customSize": false,
           "height": 0,
           "layer": "",
-          "name": "SedanPlayer",
+          "name": "Player",
           "persistentUuid": "247c784b-e3e3-4309-8bcf-2f1a15a6137a",
           "width": 0,
           "x": -960,
@@ -2785,6 +2784,21 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "UI",
+          "name": "RemainingText",
+          "persistentUuid": "2b76bb1d-a62d-49db-ba85-d80a0aeb0572",
+          "width": 0,
+          "x": 5,
+          "y": 110,
+          "zOrder": 41,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -2896,7 +2910,7 @@
           "assetStoreId": "",
           "bold": false,
           "italic": false,
-          "name": "InfoUI",
+          "name": "BestTimeText",
           "smoothed": true,
           "tags": "",
           "type": "TextObject::Text",
@@ -2904,7 +2918,7 @@
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "string": "Best: 0\n-----\nRemaining: 0",
+          "string": "Best: 0",
           "font": "27d4da0f7767cf3fbf14eb2c8da758dbcfc7b5038c9214d5e6ed62db6476a6e5_Chango-Regular.ttf",
           "textAlignment": "left",
           "characterSize": 25,
@@ -2918,7 +2932,29 @@
           "assetStoreId": "",
           "bold": false,
           "italic": false,
-          "name": "TimeUI",
+          "name": "RemainingText",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Remaining: 0",
+          "font": "27d4da0f7767cf3fbf14eb2c8da758dbcfc7b5038c9214d5e6ed62db6476a6e5_Chango-Regular.ttf",
+          "textAlignment": "left",
+          "characterSize": 25,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "TimeText",
           "smoothed": true,
           "tags": "",
           "type": "TextObject::Text",
@@ -3135,7 +3171,7 @@
         },
         {
           "assetStoreId": "cddab55130dbd5a0b36f763200e876fb514aa608e1b057a136ebdb5f80006e2c",
-          "name": "SedanPlayer",
+          "name": "Player",
           "tags": "",
           "type": "Scene3D::Model3DObject",
           "variables": [],
@@ -3466,11 +3502,21 @@
           "actions": [
             {
               "type": {
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "GameState",
+                "=",
+                "\"Playing\""
+              ]
+            },
+            {
+              "type": {
                 "value": "CentreCamera"
               },
               "parameters": [
                 "",
-                "SedanPlayer",
+                "Player",
                 "",
                 "\"\"",
                 ""
@@ -3492,9 +3538,19 @@
                 "value": "TextObject::String"
               },
               "parameters": [
-                "InfoUI",
+                "BestTimeText",
                 "=",
-                "\"Best: \" + ToString(ceilTo(Variable(HighScore), 2)) + \"\n-----\nRemaining: \" + ToString(SceneInstancesCount(Coin))"
+                "\"Best: \" + ToString(ceilTo(Variable(HighScore), 2))"
+              ]
+            },
+            {
+              "type": {
+                "value": "TextObject::String"
+              },
+              "parameters": [
+                "RemainingText",
+                "=",
+                "\"Remaining: \" + ToString(SceneInstancesCount(Coin))"
               ]
             },
             {
@@ -3569,95 +3625,11 @@
           ]
         },
         {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "Start timer only when the SedanPlayer starts moving."
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "Physics2::LinearVelocityLength"
-              },
-              "parameters": [
-                "SedanPlayer",
-                "Physics2",
-                ">",
-                "0"
-              ]
-            },
-            {
-              "type": {
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "ResetTimer"
-              },
-              "parameters": [
-                "",
-                "\"Time\""
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "Display the timer."
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "TimeScale"
-              },
-              "parameters": [
-                "",
-                "=",
-                "1"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "TextObject::String"
-              },
-              "parameters": [
-                "TimeUI",
-                "=",
-                "\"Time: \" + ToString(ceilTo(TimerElapsedTime(\"Time\"), 2))"
-              ]
-            }
-          ]
-        },
-        {
           "colorB": 228,
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "SedanPlayer controls",
+          "name": "When the game is playing",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -3666,159 +3638,58 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "TimeScale"
+                    "value": "VarSceneTxt"
                   },
                   "parameters": [
-                    "",
+                    "GameState",
                     "=",
-                    "1"
+                    "\"Playing\""
                   ]
                 }
               ],
               "actions": [],
               "events": [
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Start timer only when the SedanPlayer starts moving."
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
+                  "conditions": [
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "Physics2::LinearVelocityLength"
                       },
                       "parameters": [
-                        "SedanPlayer",
-                        "Force",
-                        "=",
+                        "Player",
+                        "Physics2",
+                        ">",
                         "0"
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                    },
                     {
                       "type": {
-                        "value": "KeyPressed"
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ResetTimer"
                       },
                       "parameters": [
                         "",
-                        "Down"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "SedanPlayer",
-                        "Force",
-                        "=",
-                        "-4"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "KeyPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "Up"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "SedanPlayer",
-                        "Force",
-                        "=",
-                        "6"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                      },
-                      "parameters": [
-                        "PedalJoystick",
-                        "\"Down\"",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "SedanPlayer",
-                        "Force",
-                        "=",
-                        "-4 * PedalJoystick.StickForce()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                      },
-                      "parameters": [
-                        "PedalJoystick",
-                        "\"Up\"",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "SedanPlayer",
-                        "Force",
-                        "=",
-                        "6 * PedalJoystick.StickForce()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Physics2::ApplyPolarForce"
-                      },
-                      "parameters": [
-                        "SedanPlayer",
-                        "Physics2",
-                        "SedanPlayer.Angle()",
-                        "SedanPlayer.Variable(Force)",
-                        "SedanPlayer.CenterX()",
-                        "SedanPlayer.CenterY()"
+                        "\"Time\""
                       ]
                     }
                   ]
@@ -3833,172 +3704,358 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "When going backward, a car go back in its trail without direction change."
+                  "comment": "Display the timer."
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "KeyPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ]
-                    }
-                  ],
+                  "conditions": [],
                   "actions": [
                     {
                       "type": {
-                        "value": "Physics2::ApplyTorque"
+                        "value": "TextObject::String"
                       },
                       "parameters": [
-                        "SedanPlayer",
-                        "Physics2",
-                        "0.002 * SedanPlayer.Physics2::LinearVelocity() * sign(SedanPlayer.Variable(Force))"
+                        "TimeText",
+                        "=",
+                        "\"Time: \" + ToString(ceilTo(TimerElapsedTime(\"Time\"), 2))"
                       ]
                     }
                   ]
                 },
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "SedanPlayer controls",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
                     {
-                      "type": {
-                        "value": "KeyPressed"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Force",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Down"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Force",
+                            "=",
+                            "-4"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Up"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Force",
+                            "=",
+                            "6"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                          },
+                          "parameters": [
+                            "PedalJoystick",
+                            "\"Down\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Force",
+                            "=",
+                            "-4 * PedalJoystick.StickForce()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                          },
+                          "parameters": [
+                            "PedalJoystick",
+                            "\"Up\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Force",
+                            "=",
+                            "6 * PedalJoystick.StickForce()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::ApplyPolarForce"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Physics2",
+                            "Player.Angle()",
+                            "Player.Variable(Force)",
+                            "Player.CenterX()",
+                            "Player.CenterY()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
                       },
-                      "parameters": [
-                        "",
-                        "Left"
+                      "comment": "When going backward, a car go back in its trail without direction change."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Right"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::ApplyTorque"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Physics2",
+                            "0.002 * Player.Physics2::LinearVelocity() * sign(Player.Variable(Force))"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::ApplyTorque"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Physics2",
+                            "-0.002 * Player.Physics2::LinearVelocity() * sign(Player.Variable(Force))"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                          },
+                          "parameters": [
+                            "SteeringJoystick",
+                            "\"Right\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::ApplyTorque"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Physics2",
+                            "0.002 * Player.Physics2::LinearVelocity() * sign(Player.Variable(Force)) * SteeringJoystick.StickForce()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                          },
+                          "parameters": [
+                            "SteeringJoystick",
+                            "\"Left\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::ApplyTorque"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Physics2",
+                            "-0.002 * Player.Physics2::LinearVelocity() * sign(Player.Variable(Force)) * SteeringJoystick.StickForce()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "If on/off road, increase/decrease linear damping."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::LinearDamping"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Physics2",
+                            "=",
+                            "9"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Road",
+                            "",
+                            "",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics2::LinearDamping"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Physics2",
+                            "=",
+                            "4"
+                          ]
+                        }
                       ]
                     }
                   ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Physics2::ApplyTorque"
-                      },
-                      "parameters": [
-                        "SedanPlayer",
-                        "Physics2",
-                        "-0.002 * SedanPlayer.Physics2::LinearVelocity() * sign(SedanPlayer.Variable(Force))"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                      },
-                      "parameters": [
-                        "SteeringJoystick",
-                        "\"Right\"",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Physics2::ApplyTorque"
-                      },
-                      "parameters": [
-                        "SedanPlayer",
-                        "Physics2",
-                        "0.002 * SedanPlayer.Physics2::LinearVelocity() * sign(SedanPlayer.Variable(Force)) * SteeringJoystick.StickForce() "
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                      },
-                      "parameters": [
-                        "SteeringJoystick",
-                        "\"Left\"",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Physics2::ApplyTorque"
-                      },
-                      "parameters": [
-                        "SedanPlayer",
-                        "Physics2",
-                        "-0.002 * SedanPlayer.Physics2::LinearVelocity() * sign(SedanPlayer.Variable(Force)) * SteeringJoystick.StickForce()"
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "If on/off road, increase/decrease linear damping."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Physics2::LinearDamping"
-                  },
-                  "parameters": [
-                    "SedanPlayer",
-                    "Physics2",
-                    "=",
-                    "9"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "SedanPlayer",
-                    "Road",
-                    "",
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Physics2::LinearDamping"
-                  },
-                  "parameters": [
-                    "SedanPlayer",
-                    "Physics2",
-                    "=",
-                    "4"
-                  ]
+                  "parameters": []
                 }
               ]
             }
@@ -4024,7 +4081,7 @@
                   },
                   "parameters": [
                     "",
-                    "SedanPlayer",
+                    "Player",
                     "",
                     "",
                     ""
@@ -4037,7 +4094,7 @@
                   "parameters": [
                     "Dust",
                     "=",
-                    "SedanPlayer.Angle() + 180"
+                    "Player.Angle() + 180"
                   ]
                 },
                 {
@@ -4046,9 +4103,9 @@
                   },
                   "parameters": [
                     "Dust",
-                    "SedanPlayer",
+                    "Player",
                     "10",
-                    "SedanPlayer.Angle() - 180"
+                    "Player.Angle() - 180"
                   ]
                 },
                 {
@@ -4059,7 +4116,7 @@
                     "",
                     "0",
                     "=",
-                    "min((SedanPlayer.Physics2::LinearVelocity() / 300), 1)"
+                    "min((Player.Physics2::LinearVelocity() / 300), 1)"
                   ]
                 },
                 {
@@ -4070,7 +4127,7 @@
                     "",
                     "0",
                     "=",
-                    "min((SedanPlayer.Physics2::LinearVelocity()) * 10, 25)"
+                    "min((Player.Physics2::LinearVelocity()) * 10, 25)"
                   ]
                 }
               ]
@@ -4083,7 +4140,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Coin check and restart game",
+          "name": "Coins",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -4104,6 +4161,18 @@
               ]
             },
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Coins indicator"
+            },
+            {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -4112,8 +4181,8 @@
                   },
                   "parameters": [
                     "Coin",
-                    "SedanPlayer.CenterX()",
-                    "SedanPlayer.CenterY()",
+                    "Player.CenterX()",
+                    "Player.CenterY()",
                     ""
                   ]
                 }
@@ -4126,9 +4195,9 @@
                   "parameters": [
                     "Arrow",
                     "=",
-                    "SedanPlayer.CenterX()",
+                    "Player.CenterX()",
                     "=",
-                    "SedanPlayer.CenterY()"
+                    "Player.CenterY()"
                   ]
                 },
                 {
@@ -4210,7 +4279,7 @@
                   },
                   "parameters": [
                     "Coin",
-                    "SedanPlayer",
+                    "Player",
                     "",
                     "",
                     ""
@@ -4266,9 +4335,9 @@
                     "value": "TextObject::String"
                   },
                   "parameters": [
-                    "InfoUI",
+                    "RemainingText",
                     "=",
-                    "\"Best: \" + ToString(ceilTo(Variable(HighScore), 2)) + \"\n-----\nRemaining: \" + ToString(SceneInstancesCount(Coin))"
+                    "\"Remaining: \" + ToString(SceneInstancesCount(Coin))"
                   ]
                 },
                 {
@@ -4314,12 +4383,22 @@
                       "parameters": [
                         "",
                         "Coin",
-                        "<=",
+                        "=",
                         "0"
                       ]
                     }
                   ],
                   "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarSceneTxt"
+                      },
+                      "parameters": [
+                        "GameState",
+                        "=",
+                        "\"GameOver\""
+                      ]
+                    },
                     {
                       "type": {
                         "value": "ChangeTimeScale"
@@ -4371,7 +4450,7 @@
                             "value": "TextObject::ChangeColor"
                           },
                           "parameters": [
-                            "InfoUI",
+                            "BestTimeText",
                             "\"248;231;28\""
                           ]
                         }
@@ -4465,7 +4544,7 @@
                     "value": "Physics2::Collision"
                   },
                   "parameters": [
-                    "SedanPlayer",
+                    "Player",
                     "Physics2",
                     "Hazards",
                     ""
