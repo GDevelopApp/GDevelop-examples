@@ -504,7 +504,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.16031528804547066,
+        "zoomFactor": 0.5468750000000148,
         "windowMask": false
       },
       "objectsGroups": [
@@ -3494,7 +3494,7 @@
               "parameters": [
                 "InfoUI",
                 "=",
-                "\"Best: \" + ToString(Variable(HighScore)) + \"\n-----\nRemaining: \" + ToString(SceneInstancesCount(Coin))"
+                "\"Best: \" + ToString(ceilTo(Variable(HighScore), 2)) + \"\n-----\nRemaining: \" + ToString(SceneInstancesCount(Coin))"
               ]
             },
             {
@@ -3647,7 +3647,7 @@
               "parameters": [
                 "TimeUI",
                 "=",
-                "\"Time: \" + ToString(ceilTo(TimerElapsedTime(\"Time\"),2))"
+                "\"Time: \" + ToString(ceilTo(TimerElapsedTime(\"Time\"), 2))"
               ]
             }
           ]
@@ -3679,6 +3679,23 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "SedanPlayer",
+                        "Force",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
@@ -3693,15 +3710,13 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Physics2::ApplyPolarForce"
+                        "value": "ModVarObjet"
                       },
                       "parameters": [
                         "SedanPlayer",
-                        "Physics2",
-                        "SedanPlayer.Angle()+180",
-                        "4",
-                        "SedanPlayer.CenterX()",
-                        "SedanPlayer.CenterY()"
+                        "Force",
+                        "=",
+                        "-4"
                       ]
                     }
                   ]
@@ -3722,18 +3737,103 @@
                   "actions": [
                     {
                       "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "SedanPlayer",
+                        "Force",
+                        "=",
+                        "6"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                      },
+                      "parameters": [
+                        "PedalJoystick",
+                        "\"Down\"",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "SedanPlayer",
+                        "Force",
+                        "=",
+                        "-4 * PedalJoystick.StickForce()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                      },
+                      "parameters": [
+                        "PedalJoystick",
+                        "\"Up\"",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "SedanPlayer",
+                        "Force",
+                        "=",
+                        "6 * PedalJoystick.StickForce()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
                         "value": "Physics2::ApplyPolarForce"
                       },
                       "parameters": [
                         "SedanPlayer",
                         "Physics2",
                         "SedanPlayer.Angle()",
-                        "6",
+                        "SedanPlayer.Variable(Force)",
                         "SedanPlayer.CenterX()",
                         "SedanPlayer.CenterY()"
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "When going backward, a car go back in its trail without direction change."
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -3756,7 +3856,7 @@
                       "parameters": [
                         "SedanPlayer",
                         "Physics2",
-                        "0.002*(SedanPlayer.Physics2::LinearVelocity())"
+                        "0.002 * SedanPlayer.Physics2::LinearVelocity() * sign(SedanPlayer.Variable(Force))"
                       ]
                     }
                   ]
@@ -3782,7 +3882,7 @@
                       "parameters": [
                         "SedanPlayer",
                         "Physics2",
-                        "-0.002*(SedanPlayer.Physics2::LinearVelocity())"
+                        "-0.002 * SedanPlayer.Physics2::LinearVelocity() * sign(SedanPlayer.Variable(Force))"
                       ]
                     }
                   ]
@@ -3792,125 +3892,51 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "SystemInfo::IsMobile"
+                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
                       },
-                      "parameters": []
+                      "parameters": [
+                        "SteeringJoystick",
+                        "\"Right\"",
+                        ""
+                      ]
                     }
                   ],
-                  "actions": [],
-                  "events": [
+                  "actions": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                          },
-                          "parameters": [
-                            "PedalJoystick",
-                            "\"Up\"",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics2::ApplyPolarForce"
-                          },
-                          "parameters": [
-                            "SedanPlayer",
-                            "Physics2",
-                            "SedanPlayer.Angle()",
-                            "4*PedalJoystick.StickForce()",
-                            "SedanPlayer.CenterX()",
-                            "SedanPlayer.CenterY()"
-                          ]
-                        }
+                      "type": {
+                        "value": "Physics2::ApplyTorque"
+                      },
+                      "parameters": [
+                        "SedanPlayer",
+                        "Physics2",
+                        "0.002 * SedanPlayer.Physics2::LinearVelocity() * sign(SedanPlayer.Variable(Force)) * SteeringJoystick.StickForce() "
                       ]
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                          },
-                          "parameters": [
-                            "PedalJoystick",
-                            "\"Down\"",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics2::ApplyPolarForce"
-                          },
-                          "parameters": [
-                            "SedanPlayer",
-                            "Physics2",
-                            "SedanPlayer.Angle()+180",
-                            "6*PedalJoystick.StickForce()",
-                            "SedanPlayer.CenterX()",
-                            "SedanPlayer.CenterY()"
-                          ]
-                        }
+                      "type": {
+                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                      },
+                      "parameters": [
+                        "SteeringJoystick",
+                        "\"Left\"",
+                        ""
                       ]
-                    },
+                    }
+                  ],
+                  "actions": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                          },
-                          "parameters": [
-                            "SteeringJoystick",
-                            "\"Right\"",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics2::ApplyTorque"
-                          },
-                          "parameters": [
-                            "SedanPlayer",
-                            "Physics2",
-                            "0.002*(SedanPlayer.Physics2::LinearVelocity())*SteeringJoystick.StickForce()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                          },
-                          "parameters": [
-                            "SteeringJoystick",
-                            "\"Left\"",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics2::ApplyTorque"
-                          },
-                          "parameters": [
-                            "SedanPlayer",
-                            "Physics2",
-                            "-0.002*(SedanPlayer.Physics2::LinearVelocity())*SteeringJoystick.StickForce()"
-                          ]
-                        }
+                      "type": {
+                        "value": "Physics2::ApplyTorque"
+                      },
+                      "parameters": [
+                        "SedanPlayer",
+                        "Physics2",
+                        "-0.002 * SedanPlayer.Physics2::LinearVelocity() * sign(SedanPlayer.Variable(Force)) * SteeringJoystick.StickForce()"
                       ]
                     }
                   ]
@@ -3931,6 +3957,23 @@
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Physics2::LinearDamping"
+                  },
+                  "parameters": [
+                    "SedanPlayer",
+                    "Physics2",
+                    "=",
+                    "9"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
@@ -3943,12 +3986,6 @@
                     "",
                     ""
                   ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
                 }
               ],
               "actions": [
@@ -3961,37 +3998,6 @@
                     "Physics2",
                     "=",
                     "4"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "SedanPlayer",
-                    "Road",
-                    "",
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Physics2::LinearDamping"
-                  },
-                  "parameters": [
-                    "SedanPlayer",
-                    "Physics2",
-                    "=",
-                    "9"
                   ]
                 }
               ]
@@ -4014,34 +4020,24 @@
               "actions": [
                 {
                   "type": {
+                    "value": "CentreCamera"
+                  },
+                  "parameters": [
+                    "",
+                    "SedanPlayer",
+                    "",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
                     "value": "SetAngle"
                   },
                   "parameters": [
                     "Dust",
                     "=",
-                    "SedanPlayer.Angle()+180"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModPitchSoundChannel"
-                  },
-                  "parameters": [
-                    "",
-                    "0",
-                    "=",
-                    "min((SedanPlayer.Physics2::LinearVelocity()/300), 1)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVolumeSoundCanal"
-                  },
-                  "parameters": [
-                    "",
-                    "0",
-                    "=",
-                    "min((SedanPlayer.Physics2::LinearVelocity())*10, 25)"
+                    "SedanPlayer.Angle() + 180"
                   ]
                 },
                 {
@@ -4052,19 +4048,29 @@
                     "Dust",
                     "SedanPlayer",
                     "10",
-                    "SedanPlayer.Angle()-180"
+                    "SedanPlayer.Angle() - 180"
                   ]
                 },
                 {
                   "type": {
-                    "value": "CentreCamera"
+                    "value": "ModPitchSoundChannel"
                   },
                   "parameters": [
                     "",
-                    "SedanPlayer",
+                    "0",
+                    "=",
+                    "min((SedanPlayer.Physics2::LinearVelocity() / 300), 1)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVolumeSoundCanal"
+                  },
+                  "parameters": [
                     "",
-                    "",
-                    ""
+                    "0",
+                    "=",
+                    "min((SedanPlayer.Physics2::LinearVelocity()) * 10, 25)"
                   ]
                 }
               ]
@@ -4152,12 +4158,6 @@
                         "0",
                         ""
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
                     }
                   ],
                   "actions": [
@@ -4185,12 +4185,6 @@
                         "10",
                         ""
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
                     }
                   ],
                   "actions": [
@@ -4274,7 +4268,7 @@
                   "parameters": [
                     "InfoUI",
                     "=",
-                    "\"Best: \" + ToString(Variable(HighScore)) + \"\n-----\nRemaining: \" + ToString(SceneInstancesCount(Coin))"
+                    "\"Best: \" + ToString(ceilTo(Variable(HighScore), 2)) + \"\n-----\nRemaining: \" + ToString(SceneInstancesCount(Coin))"
                   ]
                 },
                 {
@@ -4342,12 +4336,12 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                            "value": "VarScene"
                           },
                           "parameters": [
-                            "Variable(HighScore)",
-                            ">",
-                            "ceilTo(TimerElapsedTime(\"Time\"),2)"
+                            "HighScore",
+                            "<",
+                            "TimerElapsedTime(\"Time\")"
                           ]
                         }
                       ],
@@ -4359,7 +4353,7 @@
                           "parameters": [
                             "HighScore",
                             "=",
-                            "ceilTo(TimerElapsedTime(\"Time\"),2)"
+                            "TimerElapsedTime(\"Time\")"
                           ]
                         },
                         {
@@ -4369,7 +4363,7 @@
                           "parameters": [
                             "\"HighScore\"",
                             "\"HighScore\"",
-                            "Variable(HighScore)"
+                            "GlobalVariable(HighScore)"
                           ]
                         },
                         {
