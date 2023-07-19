@@ -1958,104 +1958,195 @@
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Movement controls for the player character"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateControl"
+                          },
+                          "parameters": [
+                            "Player",
+                            "PlatformerObject",
+                            "\"Right\""
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "Player.Variable(Lane)",
+                            "!=",
+                            "Player.Variable(LaneMove)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectPositionZTween"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Tween",
+                            "\"Move\"",
+                            "Player.Variable(LaneMove) * 160",
+                            "\"linear\"",
+                            "300",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Wait"
+                          },
+                          "parameters": [
+                            "0.3"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Lane",
+                            "=",
+                            "Player.Variable(LaneMove)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Model3DObject::SetAnimationName"
+                          },
+                          "parameters": [
+                            "Player",
+                            "=",
+                            "\"Run\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Space"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::And"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "SwipeGesture::SwipeDirection_4way"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "\"Up\"",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SwipeGesture::Distance"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    ">",
+                                    "100",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SwipeGesture::HasSwipeJustEnded"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateControl"
+                          },
+                          "parameters": [
+                            "Player",
+                            "PlatformerObject",
+                            "\"Jump\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "Tween::IsPlaying"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Tween",
+                            "\"Move\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "Player",
+                            "GroundElevated",
+                            "",
+                            "",
+                            "yes"
+                          ]
+                        }
+                      ],
                       "actions": [],
                       "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "PlatformBehavior::SimulateControl"
-                              },
-                              "parameters": [
-                                "Player",
-                                "PlatformerObject",
-                                "\"Right\""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::CompareNumbers"
-                              },
-                              "parameters": [
-                                "Player.Variable(Lane)",
-                                "!=",
-                                "Player.Variable(LaneMove)"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::Once"
-                              },
-                              "parameters": []
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Tween::AddObjectPositionZTween"
-                              },
-                              "parameters": [
-                                "Player",
-                                "Tween",
-                                "\"Move\"",
-                                "Player.Variable(LaneMove) * 160",
-                                "\"linear\"",
-                                "300",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Wait"
-                              },
-                              "parameters": [
-                                "0.3"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "Player",
-                                "Lane",
-                                "=",
-                                "Player.Variable(LaneMove)"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Scene3D::Model3DObject::SetAnimationName"
-                              },
-                              "parameters": [
-                                "Player",
-                                "=",
-                                "\"Run\""
-                              ]
-                            }
-                          ]
-                        },
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
@@ -2071,7 +2162,16 @@
                                   },
                                   "parameters": [
                                     "",
-                                    "Space"
+                                    "d"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "KeyPressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Right"
                                   ]
                                 },
                                 {
@@ -2086,7 +2186,7 @@
                                       },
                                       "parameters": [
                                         "",
-                                        "\"Up\"",
+                                        "\"Right\"",
                                         ""
                                       ]
                                     },
@@ -2116,6 +2216,17 @@
                             },
                             {
                               "type": {
+                                "value": "VarObjet"
+                              },
+                              "parameters": [
+                                "Player",
+                                "Lane",
+                                "<",
+                                "2"
+                              ]
+                            },
+                            {
+                              "type": {
                                 "value": "BuiltinCommonInstructions::Once"
                               },
                               "parameters": []
@@ -2124,12 +2235,23 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PlatformBehavior::SimulateControl"
+                                "value": "ModVarObjet"
                               },
                               "parameters": [
                                 "Player",
-                                "PlatformerObject",
-                                "\"Jump\""
+                                "LaneMove",
+                                "+",
+                                "1"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Scene3D::Model3DObject::SetAnimationName"
+                              },
+                              "parameters": [
+                                "Player",
+                                "=",
+                                "\"RunRight\""
                               ]
                             }
                           ]
@@ -2139,247 +2261,106 @@
                           "conditions": [
                             {
                               "type": {
-                                "inverted": true,
-                                "value": "Tween::IsPlaying"
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "KeyPressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "a"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "KeyPressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Left"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::And"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "SwipeGesture::SwipeDirection_4way"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "\"Left\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SwipeGesture::Distance"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        ">",
+                                        "100",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SwipeGesture::HasSwipeJustEnded"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarObjet"
                               },
                               "parameters": [
                                 "Player",
-                                "Tween",
-                                "\"Move\""
+                                "Lane",
+                                ">",
+                                "0"
                               ]
                             },
                             {
                               "type": {
-                                "inverted": true,
-                                "value": "CollisionNP"
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
                               },
                               "parameters": [
                                 "Player",
-                                "GroundElevated",
-                                "",
-                                "",
-                                "yes"
-                              ]
-                            }
-                          ],
-                          "actions": [],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "BuiltinCommonInstructions::Or"
-                                  },
-                                  "parameters": [],
-                                  "subInstructions": [
-                                    {
-                                      "type": {
-                                        "value": "KeyPressed"
-                                      },
-                                      "parameters": [
-                                        "",
-                                        "d"
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "KeyPressed"
-                                      },
-                                      "parameters": [
-                                        "",
-                                        "Right"
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "BuiltinCommonInstructions::And"
-                                      },
-                                      "parameters": [],
-                                      "subInstructions": [
-                                        {
-                                          "type": {
-                                            "value": "SwipeGesture::SwipeDirection_4way"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            "\"Right\"",
-                                            ""
-                                          ]
-                                        },
-                                        {
-                                          "type": {
-                                            "value": "SwipeGesture::Distance"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            ">",
-                                            "100",
-                                            ""
-                                          ]
-                                        },
-                                        {
-                                          "type": {
-                                            "value": "SwipeGesture::HasSwipeJustEnded"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            ""
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "VarObjet"
-                                  },
-                                  "parameters": [
-                                    "Player",
-                                    "Lane",
-                                    "<",
-                                    "2"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "BuiltinCommonInstructions::Once"
-                                  },
-                                  "parameters": []
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "ModVarObjet"
-                                  },
-                                  "parameters": [
-                                    "Player",
-                                    "LaneMove",
-                                    "+",
-                                    "1"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Scene3D::Model3DObject::SetAnimationName"
-                                  },
-                                  "parameters": [
-                                    "Player",
-                                    "=",
-                                    "\"RunRight\""
-                                  ]
-                                }
+                                "LaneMove",
+                                "-",
+                                "1"
                               ]
                             },
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "BuiltinCommonInstructions::Or"
-                                  },
-                                  "parameters": [],
-                                  "subInstructions": [
-                                    {
-                                      "type": {
-                                        "value": "KeyPressed"
-                                      },
-                                      "parameters": [
-                                        "",
-                                        "a"
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "KeyPressed"
-                                      },
-                                      "parameters": [
-                                        "",
-                                        "Left"
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "BuiltinCommonInstructions::And"
-                                      },
-                                      "parameters": [],
-                                      "subInstructions": [
-                                        {
-                                          "type": {
-                                            "value": "SwipeGesture::SwipeDirection_4way"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            "\"Left\"",
-                                            ""
-                                          ]
-                                        },
-                                        {
-                                          "type": {
-                                            "value": "SwipeGesture::Distance"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            ">",
-                                            "100",
-                                            ""
-                                          ]
-                                        },
-                                        {
-                                          "type": {
-                                            "value": "SwipeGesture::HasSwipeJustEnded"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            ""
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "VarObjet"
-                                  },
-                                  "parameters": [
-                                    "Player",
-                                    "Lane",
-                                    ">",
-                                    "0"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "BuiltinCommonInstructions::Once"
-                                  },
-                                  "parameters": []
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "ModVarObjet"
-                                  },
-                                  "parameters": [
-                                    "Player",
-                                    "LaneMove",
-                                    "-",
-                                    "1"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Scene3D::Model3DObject::SetAnimationName"
-                                  },
-                                  "parameters": [
-                                    "Player",
-                                    "=",
-                                    "\"RunLeft\""
-                                  ]
-                                }
+                              "type": {
+                                "value": "Scene3D::Model3DObject::SetAnimationName"
+                              },
+                              "parameters": [
+                                "Player",
+                                "=",
+                                "\"RunLeft\""
                               ]
                             }
                           ]
