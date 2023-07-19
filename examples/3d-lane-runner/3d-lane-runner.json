@@ -2052,17 +2052,99 @@
                       ]
                     },
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Lane change end"
+                    },
+                    {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "inverted": true,
-                            "value": "Tween::IsPlaying"
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Lane",
+                            "!=",
+                            "Player.Variable(TargetedLane)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::HasFinished"
                           },
                           "parameters": [
                             "Player",
                             "Tween",
                             "\"Move\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Lane",
+                            "=",
+                            "Player.Variable(TargetedLane)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Tween::RemoveTween"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Tween",
+                            "\"Move\""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Checking which objects are valid after the player changes lanes."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Link",
+                          "include": {
+                            "includeConfig": 0
+                          },
+                          "target": "LaneCheck"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Lane",
+                            "=",
+                            "Player.Variable(TargetedLane)"
                           ]
                         },
                         {
@@ -2302,6 +2384,18 @@
                       ]
                     },
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Avoid to cut animation when players move from 2 lanes in a row"
+                    },
+                    {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
@@ -2310,16 +2404,71 @@
                           },
                           "parameters": [
                             "Player",
-                            "TargetedLane",
-                            "!=",
-                            "Player.Variable(Lane)"
+                            "Lane",
+                            "=",
+                            "Player.Variable(TargetedLane)"
                           ]
                         },
                         {
                           "type": {
-                            "value": "BuiltinCommonInstructions::Once"
+                            "value": "Scene3D::Model3DObject::AnimationName"
                           },
-                          "parameters": []
+                          "parameters": [
+                            "Player",
+                            "!=",
+                            "\"Run\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Scene3D::Model3DObject::SetAnimationName"
+                          },
+                          "parameters": [
+                            "Player",
+                            "=",
+                            "\"Run\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Lane change start"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Lane",
+                            "!=",
+                            "Player.Variable(TargetedLane)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "Tween::Exists"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Tween",
+                            "\"Move\""
+                          ]
                         }
                       ],
                       "actions": [
@@ -2335,35 +2484,6 @@
                             "\"linear\"",
                             "300",
                             ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Wait"
-                          },
-                          "parameters": [
-                            "0.3"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "Player",
-                            "Lane",
-                            "=",
-                            "Player.Variable(TargetedLane)"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Scene3D::Model3DObject::SetAnimationName"
-                          },
-                          "parameters": [
-                            "Player",
-                            "=",
-                            "\"Run\""
                           ]
                         }
                       ]
@@ -2400,7 +2520,7 @@
                             "value": "VarObjet"
                           },
                           "parameters": [
-                            "Collison",
+                            "Coin",
                             "Lane",
                             "=",
                             "Player.Variable(Lane)"
@@ -2562,7 +2682,7 @@
                             "value": "VarObjet"
                           },
                           "parameters": [
-                            "Collison",
+                            "SpikeGroup",
                             "Lane",
                             "=",
                             "Player.Variable(Lane)"
@@ -2833,50 +2953,6 @@
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Checking which objects are valid after the player changes lanes."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "Tween::IsPlaying"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Tween",
-                    "\"Move\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "LaneCheck"
-                }
-              ]
-            },
             {
               "type": "BuiltinCommonInstructions::Comment",
               "color": {
