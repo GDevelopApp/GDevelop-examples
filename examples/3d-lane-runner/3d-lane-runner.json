@@ -472,7 +472,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.19561100536769435,
+        "zoomFactor": 0.36732575450588595,
         "windowMask": false
       },
       "objectsGroups": [
@@ -1104,8 +1104,7 @@
         },
         {
           "angle": 0,
-          "customSize": true,
-          "depth": 0,
+          "customSize": false,
           "height": 160,
           "layer": "UI",
           "name": "CoinsScore",
@@ -1129,6 +1128,21 @@
           "x": 8,
           "y": 1218,
           "zOrder": 10,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 57,
+          "layer": "",
+          "name": "HighScore",
+          "persistentUuid": "8376ce96-1bed-45b6-8b3c-d2b50a1207d9",
+          "width": 291,
+          "x": 8,
+          "y": 57,
+          "zOrder": 11,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -1523,7 +1537,29 @@
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "string": "Coins: 0\nHighScore: 0",
+          "string": "Coins: 0",
+          "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
+          "textAlignment": "left",
+          "characterSize": 50,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "HighScore",
+          "smoothed": true,
+          "tags": "",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "HighScore: 0",
           "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
           "textAlignment": "left",
           "characterSize": 50,
@@ -1558,14 +1594,77 @@
       ],
       "events": [
         {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Load in score",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ModVarSceneTxt"
+              },
+              "parameters": [
+                "GameState",
+                "=",
+                "\"Playing\""
+              ]
+            },
+            {
+              "type": {
+                "value": "SceneBackground"
+              },
+              "parameters": [
+                "",
+                "\"0;0;0\""
+              ]
+            },
+            {
+              "type": {
+                "value": "SwipeGesture::EnableSwipeDetection"
+              },
+              "parameters": [
+                "",
+                "True",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SwipeGesture::SetLayer"
+              },
+              "parameters": [
+                "",
+                "=",
+                "\"UI\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "Scene3D::Model3DObject::SetAnimationSpeedScale"
+              },
+              "parameters": [
+                "Player",
+                "=",
+                "1.3"
+              ]
+            }
+          ],
           "events": [
+            {
+              "type": "BuiltinCommonInstructions::Link",
+              "include": {
+                "includeConfig": 0
+              },
+              "target": "LaneCheck"
+            },
             {
               "type": "BuiltinCommonInstructions::Comment",
               "color": {
@@ -1580,16 +1679,7 @@
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "DepartScene"
-                  },
-                  "parameters": [
-                    ""
-                  ]
-                }
-              ],
+              "conditions": [],
               "actions": [
                 {
                   "type": {
@@ -1609,13 +1699,67 @@
                   "parameters": [
                     "CoinsScore",
                     "=",
-                    "\"Coins: \" + ToString(Variable(Coins)) + \"\nHighscore: \" + ToString(Variable(HighScore))"
+                    "\"Coins: \" + ToString(Variable(Coins))"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "HighScore",
+                    "=",
+                    "\"Highscore: \" + ToString(Variable(HighScore))"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Adjusting the tutorial text for a mobile game."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SystemInfo::IsMobile"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "TutorialText",
+                    "=",
+                    "\"Swipe to move and jump.\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextObject::Text::SetFontSize"
+                  },
+                  "parameters": [
+                    "TutorialText",
+                    "=",
+                    "40"
                   ]
                 }
               ]
             }
-          ],
-          "parameters": []
+          ]
         },
         {
           "colorB": 228,
@@ -1658,7 +1802,7 @@
                   "parameters": [
                     "",
                     "=",
-                    "Camera.Z()+5",
+                    "Camera.Z() + 5",
                     "",
                     ""
                   ]
@@ -1712,15 +1856,6 @@
                 },
                 {
                   "type": {
-                    "value": "SceneBackground"
-                  },
-                  "parameters": [
-                    "",
-                    "\"0;0;0\""
-                  ]
-                },
-                {
-                  "type": {
                     "value": "SetCameraCenterY"
                   },
                   "parameters": [
@@ -1729,84 +1864,6 @@
                     "100",
                     "",
                     ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Model3DObject::SetAnimationSpeedScale"
-                  },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "1.3"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SwipeGesture::EnableSwipeDetection"
-                  },
-                  "parameters": [
-                    "",
-                    "True",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SwipeGesture::SetLayer"
-                  },
-                  "parameters": [
-                    "",
-                    "=",
-                    "\"UI\"",
-                    ""
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Adjusting the tutorial text for a mobile game."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SystemInfo::IsMobile"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "TextObject::String"
-                      },
-                      "parameters": [
-                        "TutorialText",
-                        "=",
-                        "\"Swipe to move and jump.\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "TextObject::Text::SetFontSize"
-                      },
-                      "parameters": [
-                        "TutorialText",
-                        "=",
-                        "40"
-                      ]
-                    }
                   ]
                 }
               ]
@@ -1829,6 +1886,18 @@
               "actions": [
                 {
                   "type": {
+                    "value": "Scene3D::SetCameraZ"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "lerp(Scene3D::CameraZ(), Player.Z(), 0.05 * 60 * TimeDelta())",
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
                     "value": "SetCameraCenterX"
                   },
                   "parameters": [
@@ -1848,18 +1917,6 @@
                     "=",
                     "Player.X() + Camera.Variable(StartXPosition)"
                   ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::SetCameraZ"
-                  },
-                  "parameters": [
-                    "",
-                    "=",
-                    "lerp(Scene3D::CameraZ(), Player.Z(), 0.05)",
-                    "",
-                    ""
-                  ]
                 }
               ]
             }
@@ -1867,100 +1924,730 @@
           "parameters": []
         },
         {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Player movement controls",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "VarSceneTxt"
+              },
+              "parameters": [
+                "GameState",
+                "=",
+                "\"Playing\""
+              ]
+            }
+          ],
+          "actions": [],
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "When the game is playing",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
                 {
-                  "type": {
-                    "value": "DepartScene"
-                  },
-                  "parameters": [
-                    ""
-                  ]
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Player movement controls",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Movement controls for the player character"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PlatformBehavior::SimulateControl"
+                              },
+                              "parameters": [
+                                "Player",
+                                "PlatformerObject",
+                                "\"Right\""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::CompareNumbers"
+                              },
+                              "parameters": [
+                                "Player.Variable(Lane)",
+                                "!=",
+                                "Player.Variable(LaneMove)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Tween::AddObjectPositionZTween"
+                              },
+                              "parameters": [
+                                "Player",
+                                "Tween",
+                                "\"Move\"",
+                                "Player.Variable(LaneMove) * 160",
+                                "\"linear\"",
+                                "300",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Wait"
+                              },
+                              "parameters": [
+                                "0.3"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Player",
+                                "Lane",
+                                "=",
+                                "Player.Variable(LaneMove)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Scene3D::Model3DObject::SetAnimationName"
+                              },
+                              "parameters": [
+                                "Player",
+                                "=",
+                                "\"Run\""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "KeyPressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Space"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::And"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "SwipeGesture::SwipeDirection_4way"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "\"Up\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SwipeGesture::Distance"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        ">",
+                                        "100",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SwipeGesture::HasSwipeJustEnded"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PlatformBehavior::SimulateControl"
+                              },
+                              "parameters": [
+                                "Player",
+                                "PlatformerObject",
+                                "\"Jump\""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "Tween::IsPlaying"
+                              },
+                              "parameters": [
+                                "Player",
+                                "Tween",
+                                "\"Move\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "CollisionNP"
+                              },
+                              "parameters": [
+                                "Player",
+                                "GroundElevated",
+                                "",
+                                "",
+                                "yes"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "KeyPressed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "d"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "KeyPressed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "Right"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::And"
+                                      },
+                                      "parameters": [],
+                                      "subInstructions": [
+                                        {
+                                          "type": {
+                                            "value": "SwipeGesture::SwipeDirection_4way"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            "\"Right\"",
+                                            ""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "SwipeGesture::Distance"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            ">",
+                                            "100",
+                                            ""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "SwipeGesture::HasSwipeJustEnded"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            ""
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "Lane",
+                                    "<",
+                                    "2"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Once"
+                                  },
+                                  "parameters": []
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "LaneMove",
+                                    "+",
+                                    "1"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Scene3D::Model3DObject::SetAnimationName"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "=",
+                                    "\"RunRight\""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "KeyPressed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "a"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "KeyPressed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "Left"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::And"
+                                      },
+                                      "parameters": [],
+                                      "subInstructions": [
+                                        {
+                                          "type": {
+                                            "value": "SwipeGesture::SwipeDirection_4way"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            "\"Left\"",
+                                            ""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "SwipeGesture::Distance"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            ">",
+                                            "100",
+                                            ""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "SwipeGesture::HasSwipeJustEnded"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            ""
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "VarObjet"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "Lane",
+                                    ">",
+                                    "0"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Once"
+                                  },
+                                  "parameters": []
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ModVarObjet"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "LaneMove",
+                                    "-",
+                                    "1"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Scene3D::Model3DObject::SetAnimationName"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "=",
+                                    "\"RunLeft\""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Coins",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Collision checks if objects are in the proper lane."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "Collison",
+                            "Lane",
+                            "=",
+                            "Player.Variable(Lane)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "Coin",
+                            "Player",
+                            "",
+                            "",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlaySound"
+                          },
+                          "parameters": [
+                            "",
+                            "CoinPickUp",
+                            "",
+                            "50",
+                            "Variable(RisingPitch)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "RisingPitch",
+                            "*",
+                            "1.03"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "Coin",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResetTimer"
+                          },
+                          "parameters": [
+                            "",
+                            "\"RisingPitch\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeTimeScale"
+                          },
+                          "parameters": [
+                            "",
+                            "TimeScale()*1.003"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "Coins",
+                            "+",
+                            "1"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "TextObject::String"
+                          },
+                          "parameters": [
+                            "CoinsScore",
+                            "=",
+                            "\"Coins: \" + ToString(Variable(Coins))"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Death",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Player falling."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PosY"
+                          },
+                          "parameters": [
+                            "Player",
+                            ">",
+                            "FallDeath.Y()"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "GameState",
+                            "=",
+                            "\"GameOver\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Collision checks if objects are in the proper lane."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "VarObjet"
+                          },
+                          "parameters": [
+                            "Collison",
+                            "Lane",
+                            "=",
+                            "Player.Variable(Lane)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CollisionNP"
+                          },
+                          "parameters": [
+                            "SpikeGroup",
+                            "Player",
+                            "",
+                            "",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarSceneTxt"
+                          },
+                          "parameters": [
+                            "GameState",
+                            "=",
+                            "\"GameOver\""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
                 }
               ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Tween::AddObjectPositionZTween"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Tween",
-                    "\"Move\"",
-                    "Player.Variable(LaneMove) * 160",
-                    "\"linear\"",
-                    "10",
-                    ""
-                  ]
-                }
-              ]
-            },
+              "parameters": []
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
             {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
+              "type": {
+                "value": "VarSceneTxt"
               },
-              "comment": "Movement controls for the player character"
-            },
+              "parameters": [
+                "GameState",
+                "=",
+                "\"GameOver\""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Scene3D::Model3DObject::AnimationName"
-                  },
-                  "parameters": [
-                    "Player",
-                    "!=",
-                    "\"Death\""
-                  ]
-                }
-              ],
-              "actions": [],
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "When the game is over",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PlatformBehavior::SimulateControl"
-                      },
-                      "parameters": [
-                        "Player",
-                        "PlatformerObject",
-                        "\"Right\""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::CompareNumbers"
-                      },
-                      "parameters": [
-                        "Player.Variable(Lane)",
-                        "!=",
-                        "Player.Variable(LaneMove)"
-                      ]
-                    },
                     {
                       "type": {
                         "value": "BuiltinCommonInstructions::Once"
@@ -1971,35 +2658,14 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Tween::AddObjectPositionZTween"
+                        "value": "PlaySound"
                       },
                       "parameters": [
-                        "Player",
-                        "Tween",
-                        "\"Move\"",
-                        "Player.Variable(LaneMove) * 160",
-                        "\"linear\"",
-                        "300",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Wait"
-                      },
-                      "parameters": [
-                        "0.3"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Lane",
-                        "=",
-                        "Player.Variable(LaneMove)"
+                        "",
+                        "DeathSound",
+                        "",
+                        "50",
+                        "0.7"
                       ]
                     },
                     {
@@ -2009,343 +2675,86 @@
                       "parameters": [
                         "Player",
                         "=",
-                        "\"Run\""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "KeyPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Space"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::And"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "SwipeGesture::SwipeDirection_4way"
-                              },
-                              "parameters": [
-                                "",
-                                "\"Up\"",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SwipeGesture::Distance"
-                              },
-                              "parameters": [
-                                "",
-                                ">",
-                                "100",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SwipeGesture::HasSwipeJustEnded"
-                              },
-                              "parameters": [
-                                "",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
+                        "\"Death\""
                       ]
                     },
                     {
                       "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PlatformBehavior::SimulateControl"
+                        "value": "ChangeTimeScale"
                       },
                       "parameters": [
-                        "Player",
-                        "PlatformerObject",
-                        "\"Jump\""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "Tween::IsPlaying"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Tween",
-                        "\"Move\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "CollisionNP"
-                      },
-                      "parameters": [
-                        "Player",
-                        "GroundElevated",
                         "",
-                        "",
-                        "yes"
+                        "0.5"
                       ]
                     }
                   ],
-                  "actions": [],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "value": "BuiltinCommonInstructions::Or"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "KeyPressed"
-                              },
-                              "parameters": [
-                                "",
-                                "d"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "KeyPressed"
-                              },
-                              "parameters": [
-                                "",
-                                "Right"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::And"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "value": "SwipeGesture::SwipeDirection_4way"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "\"Right\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "SwipeGesture::Distance"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    ">",
-                                    "100",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "SwipeGesture::HasSwipeJustEnded"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    ""
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "VarObjet"
+                            "value": "VarScene"
                           },
                           "parameters": [
-                            "Player",
-                            "Lane",
-                            "<",
-                            "2"
+                            "Coins",
+                            ">",
+                            "Variable(HighScore)"
                           ]
-                        },
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Once"
-                          },
-                          "parameters": []
                         }
                       ],
                       "actions": [
                         {
                           "type": {
-                            "value": "ModVarObjet"
+                            "value": "EcrireFichierExp"
                           },
                           "parameters": [
-                            "Player",
-                            "LaneMove",
-                            "+",
-                            "1"
+                            "\"GameHighscore\"",
+                            "\"GameHighscore\"",
+                            "Variable(Coins)"
                           ]
                         },
                         {
                           "type": {
-                            "value": "Scene3D::Model3DObject::SetAnimationName"
+                            "value": "TextObject::ChangeColor"
                           },
                           "parameters": [
-                            "Player",
-                            "=",
-                            "\"RunRight\""
+                            "CoinsScore",
+                            "\"248;231;28\""
                           ]
                         }
                       ]
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Or"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "KeyPressed"
-                              },
-                              "parameters": [
-                                "",
-                                "a"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "KeyPressed"
-                              },
-                              "parameters": [
-                                "",
-                                "Left"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::And"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "value": "SwipeGesture::SwipeDirection_4way"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "\"Left\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "SwipeGesture::Distance"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    ">",
-                                    "100",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "SwipeGesture::HasSwipeJustEnded"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    ""
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "VarObjet"
-                          },
-                          "parameters": [
-                            "Player",
-                            "Lane",
-                            ">",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Once"
-                          },
-                          "parameters": []
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
-                            "value": "ModVarObjet"
+                            "value": "Wait"
                           },
                           "parameters": [
-                            "Player",
-                            "LaneMove",
-                            "-",
                             "1"
                           ]
                         },
                         {
                           "type": {
-                            "value": "Scene3D::Model3DObject::SetAnimationName"
+                            "value": "Scene"
                           },
                           "parameters": [
-                            "Player",
-                            "=",
-                            "\"RunLeft\""
+                            "",
+                            "\"Untitled scene\"",
+                            ""
                           ]
                         }
                       ]
                     }
                   ]
                 }
-              ]
+              ],
+              "parameters": []
             }
-          ],
-          "parameters": []
+          ]
         },
         {
           "colorB": 228,
@@ -2380,189 +2789,6 @@
                     "Coin",
                     "+",
                     "1"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Player falling."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "PosY"
-                  },
-                  "parameters": [
-                    "Player",
-                    ">",
-                    "FallDeath.Y()"
-                  ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "PlayerDeath"
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Collision checks if objects are in the proper lane."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "VarObjet"
-                  },
-                  "parameters": [
-                    "Collison",
-                    "Lane",
-                    "=",
-                    "Player.Variable(Lane)"
-                  ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CollisionNP"
-                      },
-                      "parameters": [
-                        "SpikeGroup",
-                        "Player",
-                        "",
-                        "",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Link",
-                      "include": {
-                        "includeConfig": 0
-                      },
-                      "target": "PlayerDeath"
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CollisionNP"
-                      },
-                      "parameters": [
-                        "Coin",
-                        "Player",
-                        "",
-                        "",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PlaySound"
-                      },
-                      "parameters": [
-                        "",
-                        "CoinPickUp",
-                        "",
-                        "50",
-                        "Variable(RisingPitch)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "RisingPitch",
-                        "*",
-                        "1.03"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Delete"
-                      },
-                      "parameters": [
-                        "Coin",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ResetTimer"
-                      },
-                      "parameters": [
-                        "",
-                        "\"RisingPitch\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ChangeTimeScale"
-                      },
-                      "parameters": [
-                        "",
-                        "TimeScale()*1.003"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "Coins",
-                        "+",
-                        "1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "TextObject::String"
-                      },
-                      "parameters": [
-                        "CoinsScore",
-                        "=",
-                        "\"Coins: \" + ToString(Variable(Coins)) + \"\nHighscore: \" + ToString(Variable(HighScore))"
-                      ]
-                    }
                   ]
                 }
               ]
@@ -2704,16 +2930,6 @@
                     "StartMarker",
                     ""
                   ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "Randomizer",
-                    "=",
-                    "RandomInRange(0,8)"
-                  ]
                 }
               ],
               "events": [
@@ -2732,260 +2948,20 @@
                       ]
                     }
                   ],
-                  "actions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Layout\" + ToString(RandomInRange(1, 9))",
+                        "StartMarker.X()+2048",
+                        "StartMarker.Y()"
+                      ]
+                    }
+                  ],
                   "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout1\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "1"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout2\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "2"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout3\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "3"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout4\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "4"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout5\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "5"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout6\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "6"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout7\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "7"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout8\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "Randomizer",
-                            "=",
-                            "8"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Layout9\"",
-                            "StartMarker.X()+2048",
-                            "StartMarker.Y()"
-                          ]
-                        }
-                      ]
-                    },
                     {
                       "type": "BuiltinCommonInstructions::Link",
                       "include": {
@@ -3200,131 +3176,6 @@
                 "Platforms",
                 "Platform",
                 "yes"
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "associatedLayout": "Untitled scene",
-      "lastChangeTimeStamp": 0,
-      "name": "PlayerDeath",
-      "events": [
-        {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "The event that triggers when the player dies."
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "PlaySound"
-              },
-              "parameters": [
-                "",
-                "DeathSound",
-                "",
-                "50",
-                "0.7"
-              ]
-            },
-            {
-              "type": {
-                "value": "Scene3D::Model3DObject::SetAnimationName"
-              },
-              "parameters": [
-                "Player",
-                "=",
-                "\"Death\""
-              ]
-            },
-            {
-              "type": {
-                "value": "ChangeTimeScale"
-              },
-              "parameters": [
-                "",
-                "0.5"
-              ]
-            }
-          ],
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "VarScene"
-                  },
-                  "parameters": [
-                    "Coins",
-                    ">",
-                    "Variable(HighScore)"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "EcrireFichierExp"
-                  },
-                  "parameters": [
-                    "\"GameHighscore\"",
-                    "\"GameHighscore\"",
-                    "Variable(Coins)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TextObject::ChangeColor"
-                  },
-                  "parameters": [
-                    "CoinsScore",
-                    "\"248;231;28\""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Wait"
-                  },
-                  "parameters": [
-                    "1"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene"
-                  },
-                  "parameters": [
-                    "",
-                    "\"Untitled scene\"",
-                    ""
-                  ]
-                }
               ]
             }
           ]
@@ -5679,7 +5530,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.39251611754882265,
+        "zoomFactor": 0.4633111824513984,
         "windowMask": false
       }
     },
@@ -5914,7 +5765,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.35534345588169847,
+        "zoomFactor": 0.4633111824513984,
         "windowMask": false
       }
     },
