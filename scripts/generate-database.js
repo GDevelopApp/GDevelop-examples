@@ -177,7 +177,7 @@ const sortedStarterSlugs = new Set([
   'top-down-rpg',
   'spherez',
   '3d-tile-based-city-builder',
-  
+
   'plinko',
   'parking-jam',
   'tappy-plane',
