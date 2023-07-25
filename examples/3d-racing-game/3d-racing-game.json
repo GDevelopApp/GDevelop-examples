@@ -549,7 +549,7 @@
         "gridColor": 0,
         "gridAlpha": 0.25,
         "snap": false,
-        "zoomFactor": 0.6244537826600168,
+        "zoomFactor": 0.7130377630690611,
         "windowMask": false
       },
       "objectsGroups": [
@@ -1198,6 +1198,7 @@
           }
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Grass",
           "tags": "",
@@ -1240,6 +1241,7 @@
           ]
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Camera",
           "tags": "",
@@ -1996,6 +1998,7 @@
           }
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "CarHitBox",
           "tags": "",
@@ -2164,6 +2167,7 @@
           }
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "BlackBackground",
           "tags": "",
@@ -2205,6 +2209,7 @@
           ]
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Start",
           "tags": "",
@@ -3826,58 +3831,29 @@
           "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Car::Car::IsOnRoad"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Car",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ShakeObject3D::ShakeModel3D::StopShaking"
-                  },
-                  "parameters": [
-                    "Player",
-                    "ShakeModel3D",
-                    "0.5",
-                    ""
-                  ]
-                }
-              ]
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Car rotation and shaking is done after the camera following to avoid to rotate the camera."
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
-                    "inverted": true,
-                    "value": "Car::Car::IsOnRoad"
+                    "value": "VarSceneTxt"
                   },
                   "parameters": [
-                    "Player",
-                    "Car",
-                    ""
+                    "GameState",
+                    "=",
+                    "\"Started\""
                   ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
                 }
               ],
               "actions": [],
@@ -3887,10 +3863,72 @@
                   "conditions": [
                     {
                       "type": {
-                        "inverted": true,
-                        "value": "DepartScene"
+                        "value": "Car::Car::IsOnRoad"
                       },
                       "parameters": [
+                        "Car",
+                        "Car",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::IsShaking"
+                      },
+                      "parameters": [
+                        "Car",
+                        "ShakeModel3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "ShakeObject3D::ShakeModel3D::IsStopping"
+                      },
+                      "parameters": [
+                        "Car",
+                        "ShakeModel3D",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::StopShaking"
+                      },
+                      "parameters": [
+                        "Car",
+                        "ShakeModel3D",
+                        "0.5",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Car::Car::IsOnRoad"
+                      },
+                      "parameters": [
+                        "Car",
+                        "Car",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "ShakeObject3D::ShakeModel3D::IsShaking"
+                      },
+                      "parameters": [
+                        "Car",
+                        "ShakeModel3D",
                         ""
                       ]
                     }
@@ -3901,160 +3939,160 @@
                         "value": "ShakeObject3D::ShakeModel3D::StartShaking"
                       },
                       "parameters": [
-                        "Player",
+                        "Car",
                         "ShakeModel3D",
-                        "1",
+                        "0",
                         ""
                       ]
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
+                },
                 {
-                  "type": {
-                    "value": "ShakeObject3D::ShakeModel3D::SetFrequency"
-                  },
-                  "parameters": [
-                    "Player",
-                    "ShakeModel3D",
-                    "=",
-                    "10 * Player.SpeedPathMovement::Speed() / 250",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Car::Car::TurnSpeed"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Car",
-                    "<",
-                    "0",
-                    ""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::SetFrequency"
+                      },
+                      "parameters": [
+                        "Car",
+                        "ShakeModel3D",
+                        "=",
+                        "10 * Player.SpeedPathMovement::Speed() / 250",
+                        ""
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Tween::TweenSceneVariableNumber2"
-                  },
-                  "parameters": [
-                    "",
-                    "\"CarRotation\"",
-                    "CarRotation",
-                    "-10",
-                    "500",
-                    "\"easeOutCubic\""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Car::Car::TurnSpeed"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Car",
-                    ">",
-                    "0",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Tween::TweenSceneVariableNumber2"
-                  },
-                  "parameters": [
-                    "",
-                    "\"CarRotation\"",
-                    "CarRotation",
-                    "10",
-                    "500",
-                    "\"easeOutCubic\""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Car::Car::TurnSpeed"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Car",
-                    "=",
-                    "0",
-                    ""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Car::Car::TurnSpeed"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Car",
+                        "<",
+                        "0",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::TweenSceneVariableNumber2"
+                      },
+                      "parameters": [
+                        "",
+                        "\"CarRotation\"",
+                        "CarRotation",
+                        "-10",
+                        "500",
+                        "\"easeOutCubic\""
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Tween::TweenSceneVariableNumber2"
-                  },
-                  "parameters": [
-                    "",
-                    "\"CarRotation\"",
-                    "CarRotation",
-                    "0",
-                    "500",
-                    "\"easeOutCubic\""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Car::Car::TurnSpeed"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Car",
+                        ">",
+                        "0",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::TweenSceneVariableNumber2"
+                      },
+                      "parameters": [
+                        "",
+                        "\"CarRotation\"",
+                        "CarRotation",
+                        "10",
+                        "500",
+                        "\"easeOutCubic\""
+                      ]
+                    }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
+                },
                 {
-                  "type": {
-                    "value": "SetAngle"
-                  },
-                  "parameters": [
-                    "Player",
-                    "+",
-                    "Variable(CarRotation)"
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Car::Car::TurnSpeed"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Car",
+                        "=",
+                        "0",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::TweenSceneVariableNumber2"
+                      },
+                      "parameters": [
+                        "",
+                        "\"CarRotation\"",
+                        "CarRotation",
+                        "0",
+                        "500",
+                        "\"easeOutCubic\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Player",
+                        "+",
+                        "Variable(CarRotation)"
+                      ]
+                    }
                   ]
                 }
               ]
@@ -4547,52 +4585,6 @@
       ],
       "objects": [
         {
-          "assetStoreId": "",
-          "bold": false,
-          "italic": false,
-          "name": "ScoreText",
-          "smoothed": true,
-          "tags": "",
-          "type": "TextObject::Text",
-          "underlined": false,
-          "variables": [],
-          "effects": [],
-          "behaviors": [],
-          "string": "Score",
-          "font": "",
-          "textAlignment": "",
-          "characterSize": 60,
-          "color": {
-            "b": 79,
-            "g": 72,
-            "r": 72
-          }
-        },
-        {
-          "assetStoreId": "",
-          "name": "PlayerNameInput",
-          "tags": "",
-          "type": "TextInput::TextInputObject",
-          "variables": [],
-          "effects": [],
-          "behaviors": [],
-          "content": {
-            "initialValue": "",
-            "placeholder": "PlayerName",
-            "fontResourceName": "",
-            "fontSize": 60,
-            "inputType": "text",
-            "textColor": "72;72;79",
-            "fillColor": "231;232;243",
-            "fillOpacity": 255,
-            "borderColor": "255;255;255",
-            "borderOpacity": 255,
-            "borderWidth": 6,
-            "readOnly": false,
-            "disabled": false
-          }
-        },
-        {
           "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
           "name": "LevelButton",
           "tags": "",
@@ -4751,6 +4743,7 @@
           ]
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Grass",
           "tags": "",
@@ -4792,6 +4785,7 @@
           ]
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Tree",
           "tags": "",
@@ -4831,23 +4825,6 @@
               ]
             }
           ]
-        },
-        {
-          "assetStoreId": "",
-          "bottomMargin": 32,
-          "height": 128,
-          "leftMargin": 16,
-          "name": "NewPanelSprite",
-          "rightMargin": 16,
-          "tags": "",
-          "texture": "assets\\Grey Button_Idle.png",
-          "tiled": false,
-          "topMargin": 16,
-          "type": "PanelSpriteObject::PanelSprite",
-          "width": 128,
-          "variables": [],
-          "effects": [],
-          "behaviors": []
         }
       ],
       "events": [
@@ -5514,6 +5491,7 @@
           ]
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Grass",
           "tags": "",
@@ -5555,6 +5533,7 @@
           ]
         },
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Tree",
           "tags": "",
@@ -12258,7 +12237,7 @@
       "name": "ShakeObject3D",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/vector-difference-ab.svg",
       "shortDescription": "Shake 3D objects.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Shake 3D objects with translation and rotation.",
       "tags": [
         "shaking",
@@ -14683,7 +14662,7 @@
               "name": "RotationAmplitudeZ"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14693,7 +14672,7 @@
               "name": "Time"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14703,7 +14682,7 @@
               "name": "Duration"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14713,7 +14692,7 @@
               "name": "StartEasingDuration"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14723,7 +14702,7 @@
               "name": "StopEasingDuration"
             },
             {
-              "value": "",
+              "value": "5",
               "type": "Number",
               "label": "Frequency",
               "description": "",
@@ -14733,7 +14712,7 @@
               "name": "Frequency"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14743,7 +14722,7 @@
               "name": "DeltaX"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14753,7 +14732,7 @@
               "name": "DeltaY"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14763,7 +14742,7 @@
               "name": "DeltaZ"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14773,7 +14752,7 @@
               "name": "DeltaAngleX"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14783,7 +14762,7 @@
               "name": "DeltaAngleY"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14793,7 +14772,7 @@
               "name": "DeltaAngleZ"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -14854,17 +14833,6 @@
                         "+",
                         "TimeDelta()"
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "ShakeObject3D::ShakeModel3D::SetPropertyNoiseTime"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "+",
-                        "TimeDelta() * Object.Behavior::Frequency()"
-                      ]
                     }
                   ]
                 },
@@ -14885,104 +14853,28 @@
                   "actions": [
                     {
                       "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::SetPropertyNoiseTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "+",
+                        "TimeDelta() * Object.Behavior::Frequency()"
+                      ]
+                    },
+                    {
+                      "type": {
                         "value": "ShakeObject3D::ShakeModel3D::SetSharedPropertyEasingFactor"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
                         "=",
-                        "1"
+                        "min(Object.Behavior::StartEasingFactor(), Object.Behavior::StopEasingFactor())"
                       ]
                     }
                   ],
                   "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ShakeObject3D::ShakeModel3D::PropertyTime"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "<",
-                            "Object.Behavior::PropertyStartEasingDuration()"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ShakeObject3D::ShakeModel3D::PropertyTime"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "<",
-                            "Object.Behavior::PropertyDuration() - Object.Behavior::PropertyStopEasingDuration()"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ShakeObject3D::ShakeModel3D::SetSharedPropertyEasingFactor"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "clamp(0, 1, Object.Behavior::PropertyTime() / Object.Behavior::PropertyStartEasingDuration())"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ShakeObject3D::ShakeModel3D::PropertyTime"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            ">",
-                            "Object.Behavior::PropertyDuration() - Object.Behavior::PropertyStopEasingDuration()"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ShakeObject3D::ShakeModel3D::SetSharedPropertyEasingFactor"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "clamp(0, 1, (Object.Behavior::PropertyDuration() - Object.Behavior::PropertyTime()) / Object.Behavior::PropertyStopEasingDuration())"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "disabled": true,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ShakeObject3D::SetFrequency"
-                          },
-                          "parameters": [
-                            "",
-                            "Object.Behavior::PropertyFrequency()",
-                            "\"\"",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
                     {
                       "type": "BuiltinCommonInstructions::Comment",
                       "color": {
@@ -15786,6 +15678,78 @@
                         "<",
                         "Object.Behavior::PropertyDuration()"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::PropertyTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ShakeObject3D::ShakeModel3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object is stopping to shake.",
+              "fullName": "Is stopping to shake",
+              "functionType": "Condition",
+              "name": "IsStopping",
+              "sentence": "_PARAM0_ is stopping to shake",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::IsShaking"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::StopEasingFactor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "<",
+                        "1",
+                        ""
+                      ]
                     }
                   ],
                   "actions": [
@@ -15898,6 +15862,211 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "Return the easing factor according to start properties.",
+              "fullName": "Start easing factor",
+              "functionType": "Expression",
+              "name": "StartEasingFactor",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::PropertyStartEasingDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "<=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::PropertyStartEasingDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "clamp(Object.Behavior::PropertyTime() / Object.Behavior::PropertyStartEasingDuration(), 0, 1)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ShakeObject3D::ShakeModel3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the easing factor according to stop properties.",
+              "fullName": "Stop easing factor",
+              "functionType": "ExpressionAndCondition",
+              "name": "StopEasingFactor",
+              "private": true,
+              "sentence": "stop easing factor",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::PropertyStopEasingDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "<=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ShakeObject3D::ShakeModel3D::PropertyTime"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "<",
+                            "Object.Behavior::PropertyDuration()"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnNumber"
+                          },
+                          "parameters": [
+                            "1"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ShakeObject3D::ShakeModel3D::PropertyTime"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            ">=",
+                            "Object.Behavior::PropertyDuration()"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnNumber"
+                          },
+                          "parameters": [
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ShakeObject3D::ShakeModel3D::PropertyStopEasingDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "clamp((Object.Behavior::PropertyDuration() - Object.Behavior::PropertyTime()) / Object.Behavior::PropertyStopEasingDuration(), 0, 1)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ShakeObject3D::ShakeModel3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "propertyDescriptors": [
@@ -15968,7 +16137,7 @@
               "name": "RotationAmplitudeZ"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -15978,7 +16147,7 @@
               "name": "Time"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -15988,7 +16157,7 @@
               "name": "Duration"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -15998,7 +16167,7 @@
               "name": "StartEasingDuration"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -16008,7 +16177,7 @@
               "name": "StopEasingDuration"
             },
             {
-              "value": "",
+              "value": "5",
               "type": "Number",
               "label": "Frequency",
               "description": "",
@@ -16018,7 +16187,7 @@
               "name": "Frequency"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -16028,7 +16197,7 @@
               "name": "DeltaX"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -16038,7 +16207,7 @@
               "name": "DeltaY"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -16048,7 +16217,7 @@
               "name": "DeltaZ"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -16058,7 +16227,7 @@
               "name": "DeltaAngleX"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -16068,7 +16237,7 @@
               "name": "DeltaAngleY"
             },
             {
-              "value": "",
+              "value": "0",
               "type": "Number",
               "label": "",
               "description": "",
@@ -16078,7 +16247,7 @@
               "name": "DeltaAngleZ"
             },
             {
-              "value": "",
+              "value": "123456789",
               "type": "Number",
               "label": "",
               "description": "",
