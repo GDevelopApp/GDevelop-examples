@@ -253,7 +253,8 @@
           "behaviors": [],
           "content": {
             "EndColor": "80;227;194",
-            "StartColor": "0;86;255"
+            "StartColor": "0;86;255",
+            "Flow": 2000
           },
           "childrenContent": {
             "Particle": {
@@ -3373,7 +3374,6 @@
                     "        this.systems.add(system);",
                     "    }",
                     "    removeSystem(system) {",
-                    "        console.trace();",
                     "        this.systems.delete(system);",
                     "    }",
                     "}",
@@ -3732,7 +3732,6 @@
                     "        }",
                     "    }",
                     "    emit(delta, emissionState, emitterMatrix) {",
-                    "        console.log(\"emit: \" + delta);",
                     "        if (emissionState.time > this.duration) {",
                     "            if (this.looping) {",
                     "                emissionState.time -= this.duration;",
@@ -3750,7 +3749,6 @@
                     "        this.normalMatrix.getNormalMatrix(emitterMatrix);",
                     "        // spawn",
                     "        const totalSpawn = Math.ceil(emissionState.waitEmiting);",
-                    "        console.log(\"totalSpawn: \" + totalSpawn);",
                     "        this.spawn(totalSpawn, emissionState, emitterMatrix);",
                     "        emissionState.waitEmiting -= totalSpawn;",
                     "        // spawn burst",
@@ -6043,11 +6041,12 @@
                     "",
                     "// Here runtimeScene is the gdjs.CustomRuntimeObjectInstanceContainer inside the custom object.",
                     "const gameScene = object.getRuntimeScene();",
+                    "const layer = gameScene.getLayer(object.getLayer());",
                     "",
                     "gameScene.__particleEmmiter3DExtension = gameScene.__particleEmmiter3DExtension || {};",
                     "if (!gameScene.__particleEmmiter3DExtension.batchSystem) {",
                     "    const batchSystem = new BatchedRenderer();",
-                    "    gameScene.getLayer('').getRenderer().getThreeScene().add(batchSystem);",
+                    "    layer.getRenderer().getThreeScene().add(batchSystem);",
                     "    gameScene.__particleEmmiter3DExtension.batchSystem = batchSystem;",
                     "}",
                     "const batchSystem = gameScene.__particleEmmiter3DExtension.batchSystem;",
@@ -6060,18 +6059,29 @@
                     "      .getGame()",
                     "      .getImageManager().getThreeTexture(resourceName);",
                     "",
+                    "object.__oldPropertyValues = object.__oldPropertyValues || {};",
+                    "object.__EmitterProperties = object.__EmitterProperties || {};",
+                    "",
+                    "object.__EmitterProperties.startColor = new THREE.Vector4(1, 0.3882312, 0.125, 1);",
+                    "object.__EmitterProperties.endColor = new THREE.Vector4(1, 0.826827, 0.3014706, 1);",
+                    "object.__EmitterProperties.emissionOverTime = new ConstantValue(50);",
+                    "object.__EmitterProperties.startSize = new IntervalValue(20, 50);",
+                    "object.__EmitterProperties.sizeOverLife = new Bezier(1, 2/3, 1/3, 0);",
+                    "object.__EmitterProperties.startSpeed = new IntervalValue(100, 200);",
+                    "object.__EmitterProperties.startLife = new IntervalValue(1, 2);",
+                    "",
                     "// Particle system configuration",
                     "const muzzle = {",
                     "    duration: 10,",
                     "    looping: false,",
                     "    startLife: new IntervalValue(1, 2),",
-                    "    startSpeed: new ConstantValue(100),",
-                    "    startSize: new IntervalValue(20, 50),",
+                    "    startSpeed: object.__EmitterProperties.startSpeed,",
+                    "    startSize: object.__EmitterProperties.startSize,",
                     "    startColor: new ConstantColor(new THREE.Vector4(1, 1, 1, 1)),",
                     "    worldSpace: false,",
                     "",
                     "    maxParticle: 5,",
-                    "    emissionOverTime: new ConstantValue(50),",
+                    "    emissionOverTime: object.__EmitterProperties.emissionOverTime,",
                     "    emissionBursts: [{",
                     "        time: 0,",
                     "        count: 1,",
@@ -6081,31 +6091,29 @@
                     "    }],",
                     "",
                     "    shape: new PointEmitter(),",
-                    "    material: new THREE.MeshBasicMaterial({map: texture, blending: THREE.AdditiveBlending, transparent: true}),",
+                    "    material: new THREE.MeshBasicMaterial({",
+                    "        map: texture,",
+                    "        blending: THREE.AdditiveBlending,",
+                    "        transparent: true,",
+                    "        side: THREE.DoubleSide",
+                    "    }),",
                     "    startTileIndex: 0,",
                     "    uTileCount: 1,",
                     "    vTileCount: 1,",
                     "    renderOrder: 2,",
-                    "    renderMode: RenderMode.Mesh",
+                    "    renderMode: RenderMode.BillBoard",
                     "};",
                     "",
                     "// Create particle system based on your configuration",
                     "const particleSystem = new ParticleSystem(muzzle);",
                     "object.__particleSystem = particleSystem;",
                     "",
-                    "",
-                    "object.__oldPropertyValues = object.__oldPropertyValues || {};",
-                    "object.__EmitterProperties = object.__EmitterProperties || {};",
-                    "",
-                    "object.__EmitterProperties.startColor = new THREE.Vector4(1, 0.3882312, 0.125, 1);",
-                    "object.__EmitterProperties.endColor = new THREE.Vector4(1, 0.826827, 0.3014706, 1);",
-                    "",
                     "// developers can customize how the particle system works by ",
                     "// using existing behavior or adding their own Behavior.",
                     "particleSystem.addBehavior(new ColorOverLife(new ColorRange(",
                     "    object.__EmitterProperties.startColor,",
                     "    object.__EmitterProperties.endColor)));",
-                    "particleSystem.addBehavior(new SizeOverLife(new PiecewiseBezier([[new Bezier(1, 0.95, 0.75, 0), 0]])));",
+                    "particleSystem.addBehavior(new SizeOverLife(new PiecewiseBezier([[new Bezier(1, 2/3, 1/3, 0), 0]])));",
                     "particleSystem.emitter.name = object.getName() + object.getNameId();",
                     "",
                     "batchSystem.addSystem(particleSystem);",
@@ -6113,7 +6121,7 @@
                     "object.__z = 0;",
                     "object.__emitter = particleSystem.emitter;",
                     "",
-                    "gameScene.getLayer('').get3DRendererObject().add(particleSystem.emitter);",
+                    "layer.get3DRendererObject().add(particleSystem.emitter);",
                     "",
                     "const ParticleEmitter3D = Object.getPrototypeOf(object);",
                     "if (!ParticleEmitter3D.__isDefined) {",
@@ -6187,6 +6195,147 @@
               "objectGroups": []
             },
             {
+              "description": "Update from properties.",
+              "fullName": "Update from properties",
+              "functionType": "Action",
+              "name": "UpdateFromProperties",
+              "sentence": "Update from properties of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartColor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.StartColor()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetEndColor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.EndColor()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartOpacity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.StartOpacity()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetEndOpacity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.EndOpacity()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetFlow"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.Flow()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSizeMin"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.StartSizeMin()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSizeMax"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.StartSizeMax()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartSpeedMin"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.StartSpeedMin()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartSpeedMax"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.StartSpeedMax()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyLifespanMin"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.LifespanMin()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyLifespanMax"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.LifespanMax()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPostEvents",
@@ -6207,11 +6356,11 @@
                     "object.__emitter.position.y = -object.getY();",
                     "object.__emitter.position.z = object.__z;",
                     "",
-                    "console.log(object.__particleSystem.time + \": \" + object.__particleSystem.particleNum);",
-                    "console.log(object.__particleSystem.particles.filter((particle, index) => index < object.__particleSystem.particleNum).map(particle => {",
-                    "    const position = particle.position;",
-                    "    return position.x + \" \" + position.y + \" \" + position.z;",
-                    "}));",
+                    "// console.log(object.__particleSystem.time + \": \" + object.__particleSystem.particleNum);",
+                    "// console.log(object.__particleSystem.particles.filter((particle, index) => index < object.__particleSystem.particleNum).map(particle => {",
+                    "//     const position = particle.position;",
+                    "//     return position.x + \" \" + position.y + \" \" + position.z;",
+                    "// }));",
                     ""
                   ],
                   "parameterObjects": "Object",
@@ -6628,11 +6777,12 @@
               "objectGroups": []
             },
             {
-              "description": "Update from properties.",
-              "fullName": "Update from properties",
-              "functionType": "Action",
-              "name": "UpdateFromProperties",
-              "sentence": "Update from properties of _PARAM0_",
+              "description": "the flow of particles of the object  (particles per second).",
+              "fullName": "Flow of particles",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "Flow",
+              "sentence": "the flow of particles",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -6640,49 +6790,655 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartColor"
+                        "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object",
-                        "=",
-                        "Object.StartColor()",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetEndColor"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.EndColor()",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartOpacity"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.StartOpacity()",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetEndOpacity"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.EndOpacity()",
-                        ""
+                        "Object.PropertyFlow()"
                       ]
                     }
                   ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Flow",
+              "name": "SetFlow",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyFlow"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const flow = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.flow = flow;\r",
+                    "\r",
+                    "object.__EmitterProperties.emissionOverTime.value = flow;\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the start min size of the object.",
+              "fullName": "Start min size",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "StartSizeMin",
+              "sentence": "the start min size",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyStartSizeMin()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "StartSizeMin",
+              "name": "SetStartSizeMin",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSizeMin"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const startMinSize = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.startMinSize = startMinSize;\r",
+                    "\r",
+                    "object.__EmitterProperties.startSize.a = startMinSize;\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the start max size of the object.",
+              "fullName": "Start max size",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "StartSizeMax",
+              "sentence": "the start max size",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyStartSizeMax()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "StartSizeMax",
+              "name": "SetStartSizeMax",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSizeMax"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const startMaxSize = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.startMaxSize = startMaxSize;\r",
+                    "\r",
+                    "object.__EmitterProperties.startSize.b = startMaxSize;\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the end scale of the object.",
+              "fullName": "End scale",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "EndScale",
+              "sentence": "the end scale",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyEndScale()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "EndScale",
+              "name": "SetEndScale",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyEndScale"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const endScale = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.endScale = endScale;\r",
+                    "\r",
+                    "object.__EmitterProperties.sizeOverLife.p[0] = 1;\r",
+                    "object.__EmitterProperties.sizeOverLife.p[1] = gdjs.evtTools.common.lerp(1, endScale, 1/3);\r",
+                    "object.__EmitterProperties.sizeOverLife.p[2] = gdjs.evtTools.common.lerp(1, endScale, 2/3);\r",
+                    "object.__EmitterProperties.sizeOverLife.p[3] = endScale;\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the min start speed of the object.",
+              "fullName": "Min start speed",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter speed configuration",
+              "name": "StartSpeedMin",
+              "sentence": "the min start speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyStartSpeedMin()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "StartSpeedMin",
+              "name": "SetStartSpeedMin",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSpeedMin"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const startSpeedMin = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.startSpeedMin = startSpeedMin;\r",
+                    "\r",
+                    "object.__EmitterProperties.startSpeed.a = startSpeedMin;\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the max start speed of the object.",
+              "fullName": "Max start speed",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter speed configuration",
+              "name": "StartSpeedMax",
+              "sentence": "the max start speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyStartSpeedMax()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "StartSpeedMax",
+              "name": "SetStartSpeedMax",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSpeedMax"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const startSpeedMax = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.startSpeedMax = startSpeedMax;\r",
+                    "\r",
+                    "object.__EmitterProperties.startSpeed.b = startSpeedMax;\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the min lifespan of the object.",
+              "fullName": "Min lifespan",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "LifespanMin",
+              "sentence": "the min lifespan",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyLifespanMin()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "LifespanMin",
+              "name": "SetLifespanMin",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyLifespanMin"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const lifespanMin = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.lifespanMin = lifespanMin;\r",
+                    "\r",
+                    "object.__EmitterProperties.startLife.a = lifespanMin;\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the max lifespan of the object.",
+              "fullName": "Max lifespan",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "LifespanMax",
+              "sentence": "the max lifespan",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyLifespanMax()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "LifespanMax",
+              "name": "SetLifespanMax",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyLifespanMax"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const lifespanMax = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.lifespanMax = lifespanMax;\r",
+                    "\r",
+                    "object.__EmitterProperties.startLife.b = lifespanMax;\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
                 }
               ],
               "parameters": [
@@ -6702,7 +7458,7 @@
               "type": "Color",
               "label": "Start color",
               "description": "",
-              "group": "",
+              "group": "Color",
               "extraInformation": [],
               "hidden": false,
               "name": "StartColor"
@@ -6712,7 +7468,7 @@
               "type": "Color",
               "label": "End color",
               "description": "",
-              "group": "",
+              "group": "Color",
               "extraInformation": [],
               "hidden": false,
               "name": "EndColor"
@@ -6723,7 +7479,7 @@
               "unit": "Dimensionless",
               "label": "Start opacity",
               "description": "",
-              "group": "",
+              "group": "Color",
               "extraInformation": [],
               "hidden": false,
               "name": "StartOpacity"
@@ -6734,10 +7490,97 @@
               "unit": "Dimensionless",
               "label": "End opacity",
               "description": "",
-              "group": "",
+              "group": "Color",
               "extraInformation": [],
               "hidden": false,
               "name": "EndOpacity"
+            },
+            {
+              "value": "50",
+              "type": "Number",
+              "label": "Flow of particles (particles per second)",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Flow"
+            },
+            {
+              "value": "10",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Start min size",
+              "description": "",
+              "group": "Size",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "StartSizeMin"
+            },
+            {
+              "value": "20",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Start max size",
+              "description": "",
+              "group": "Size",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "StartSizeMax"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "End scale",
+              "description": "",
+              "group": "Size",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "EndScale"
+            },
+            {
+              "value": "100",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Start min speed",
+              "description": "",
+              "group": "Speed",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "StartSpeedMin"
+            },
+            {
+              "value": "100",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Start max speed",
+              "description": "",
+              "group": "Speed",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "StartSpeedMax"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Min lifespan",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "LifespanMin"
+            },
+            {
+              "value": "2",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Max lifespan",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "LifespanMax"
             }
           ],
           "objects": [
@@ -6753,7 +7596,7 @@
               "behaviors": [],
               "animations": [
                 {
-                  "name": "",
+                  "name": "Image",
                   "useMultipleDirections": false,
                   "directions": [
                     {
