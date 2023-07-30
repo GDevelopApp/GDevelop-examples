@@ -1,0 +1,1 @@
+Test how GDevelop performs under load by creating thousands and thousands of objects of various types.
