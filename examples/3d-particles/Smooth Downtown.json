@@ -251,7 +251,10 @@
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "content": {},
+          "content": {
+            "EndColor": "80;227;194",
+            "StartColor": "0;86;255"
+          },
           "childrenContent": {
             "Particle": {
               "adaptCollisionMaskAutomatically": true,
@@ -309,6 +312,52 @@
               ]
             }
           }
+        },
+        {
+          "additive": false,
+          "assetStoreId": "",
+          "destroyWhenNoParticles": true,
+          "emitterAngleA": 0,
+          "emitterAngleB": 90,
+          "emitterForceMax": 85,
+          "emitterForceMin": 45,
+          "flow": 45,
+          "jumpForwardInTimeOnCreation": 0,
+          "maxParticleNb": 300,
+          "name": "NewParticlesEmitter",
+          "particleAlpha1": 204,
+          "particleAlpha2": 0,
+          "particleAlphaRandomness1": 0,
+          "particleAlphaRandomness2": 0,
+          "particleAngle1": 0,
+          "particleAngle2": 0,
+          "particleAngleRandomness1": 0,
+          "particleAngleRandomness2": 0,
+          "particleBlue1": 51,
+          "particleBlue2": 0,
+          "particleGravityX": 0,
+          "particleGravityY": 0,
+          "particleGreen1": 51,
+          "particleGreen2": 255,
+          "particleLifeTimeMax": 2.5,
+          "particleLifeTimeMin": 0.5,
+          "particleRed1": 255,
+          "particleRed2": 255,
+          "particleSize1": 100,
+          "particleSize2": 100,
+          "particleSizeRandomness1": 0,
+          "particleSizeRandomness2": 0,
+          "rendererParam1": 3,
+          "rendererParam2": 1,
+          "rendererType": "Point",
+          "tags": "",
+          "tank": -1,
+          "textureParticleName": "",
+          "type": "ParticleSystem::ParticleEmitter",
+          "zoneRadius": 3,
+          "variables": [],
+          "effects": [],
+          "behaviors": []
         }
       ],
       "events": [
@@ -1012,6 +1061,26 @@
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": [
                     "gdjs.__particleEmmiter3DExtension = gdjs.__particleEmmiter3DExtension || {};",
+                    "",
+                    "",
+                    "/**",
+                    " * @param {string} colorString",
+                    " * @param {THREE.Vector4} threeColor",
+                    " */",
+                    "gdjs.__particleEmmiter3DExtension.setThreeColor = (colorString, threeColor = new THREE.Vector4()) => {",
+                    "    const integerColor = gdjs.rgbOrHexToRGBColor(colorString);",
+                    "    threeColor.x = integerColor[0] / 255;",
+                    "    threeColor.y = integerColor[1] / 255;",
+                    "    threeColor.z = integerColor[2] / 255;",
+                    "};",
+                    "",
+                    "/**",
+                    " * @param {string} integerOpacity",
+                    " * @param {THREE.Vector4} threeColor",
+                    " */",
+                    "gdjs.__particleEmmiter3DExtension.setThreeOpacity = (integerOpacity, threeColor = new THREE.Vector4()) => {",
+                    "    threeColor.w = integerOpacity / 255;",
+                    "};",
                     "",
                     "/**",
                     " * three.quarks v0.10.3 build Fri Jul 28 2023",
@@ -5990,6 +6059,7 @@
                     "      .getInstanceContainer()",
                     "      .getGame()",
                     "      .getImageManager().getThreeTexture(resourceName);",
+                    "",
                     "// Particle system configuration",
                     "const muzzle = {",
                     "    duration: 10,",
@@ -6021,11 +6091,20 @@
                     "",
                     "// Create particle system based on your configuration",
                     "const particleSystem = new ParticleSystem(muzzle);",
-                    "object.particleSystem = particleSystem;",
+                    "object.__particleSystem = particleSystem;",
+                    "",
+                    "",
+                    "object.__oldPropertyValues = object.__oldPropertyValues || {};",
+                    "object.__EmitterProperties = object.__EmitterProperties || {};",
+                    "",
+                    "object.__EmitterProperties.startColor = new THREE.Vector4(1, 0.3882312, 0.125, 1);",
+                    "object.__EmitterProperties.endColor = new THREE.Vector4(1, 0.826827, 0.3014706, 1);",
                     "",
                     "// developers can customize how the particle system works by ",
                     "// using existing behavior or adding their own Behavior.",
-                    "particleSystem.addBehavior(new ColorOverLife(new ColorRange(new THREE.Vector4(1, 0.3882312, 0.125, 1), new THREE.Vector4(1, 0.826827, 0.3014706, 1))));",
+                    "particleSystem.addBehavior(new ColorOverLife(new ColorRange(",
+                    "    object.__EmitterProperties.startColor,",
+                    "    object.__EmitterProperties.endColor)));",
                     "particleSystem.addBehavior(new SizeOverLife(new PiecewiseBezier([[new Bezier(1, 0.95, 0.75, 0), 0]])));",
                     "particleSystem.emitter.name = object.getName() + object.getNameId();",
                     "",
@@ -6048,6 +6127,53 @@
                   "parameterObjects": "Object",
                   "useStrict": true,
                   "eventsSheetExpanded": true
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::UpdateFromProperties"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onHotReloading",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::UpdateFromProperties"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ]
                 }
               ],
               "parameters": [
@@ -6081,8 +6207,8 @@
                     "object.__emitter.position.y = -object.getY();",
                     "object.__emitter.position.z = object.__z;",
                     "",
-                    "console.log(object.particleSystem.time + \": \" + object.particleSystem.particleNum);",
-                    "console.log(object.particleSystem.particles.filter((particle, index) => index < object.particleSystem.particleNum).map(particle => {",
+                    "console.log(object.__particleSystem.time + \": \" + object.__particleSystem.particleNum);",
+                    "console.log(object.__particleSystem.particles.filter((particle, index) => index < object.__particleSystem.particleNum).map(particle => {",
                     "    const position = particle.position;",
                     "    return position.x + \" \" + position.y + \" \" + position.z;",
                     "}));",
@@ -6155,9 +6281,465 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the start color of the object.",
+              "fullName": "Start color",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "StartColor",
+              "sentence": "the start color",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "Object.PropertyStartColor()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "color"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "StartColor",
+              "name": "SetStartColor",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartColorAndOpacity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "GetArgumentAsString(\"Value\")",
+                        "Object.PropertyStartOpacity()",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const startColor = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.startColor = startColor;\r",
+                    "\r",
+                    "gdjs.__particleEmmiter3DExtension.setThreeColor(\r",
+                    "    startColor,\r",
+                    "    object.__EmitterProperties.startColor);\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the end color of the object.",
+              "fullName": "End color",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "EndColor",
+              "sentence": "the end color",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "Object.PropertyEndColor()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "color"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "EndColor",
+              "name": "SetEndColor",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyEndColor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const endColor = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.endColor = endColor;\r",
+                    "\r",
+                    "gdjs.__particleEmmiter3DExtension.setThreeColor(\r",
+                    "    endColor,\r",
+                    "    object.__EmitterProperties.endColor);\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the start opacity of the object.",
+              "fullName": "Start opacity",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "StartOpacity",
+              "sentence": "the start opacity",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyStartOpacity()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "StartOpacity",
+              "name": "SetStartOpacity",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartOpacity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const startOpacity = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.startOpacity = startOpacity;\r",
+                    "\r",
+                    "gdjs.__particleEmmiter3DExtension.setThreeOpacity(\r",
+                    "    startOpacity,\r",
+                    "    object.__EmitterProperties.startColor);\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the end opacity of the object.",
+              "fullName": "End opacity",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter configuration",
+              "name": "EndOpacity",
+              "sentence": "the end opacity",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyEndOpacity()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "EndOpacity",
+              "name": "SetEndOpacity",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyEndOpacity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const endOpacity = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "object.__oldPropertyValues.endOpacity = endOpacity;\r",
+                    "\r",
+                    "gdjs.__particleEmmiter3DExtension.setThreeOpacity(\r",
+                    "    endOpacity,\r",
+                    "    object.__EmitterProperties.endColor);\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Update from properties.",
+              "fullName": "Update from properties",
+              "functionType": "Action",
+              "name": "UpdateFromProperties",
+              "sentence": "Update from properties of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartColor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.StartColor()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetEndColor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.EndColor()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartOpacity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.StartOpacity()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetEndOpacity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.EndOpacity()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
             }
           ],
-          "propertyDescriptors": [],
+          "propertyDescriptors": [
+            {
+              "value": "255;0;0",
+              "type": "Color",
+              "label": "Start color",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "StartColor"
+            },
+            {
+              "value": "255;255;0",
+              "type": "Color",
+              "label": "End color",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "EndColor"
+            },
+            {
+              "value": "255",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Start opacity",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "StartOpacity"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "End opacity",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "EndOpacity"
+            }
+          ],
           "objects": [
             {
               "adaptCollisionMaskAutomatically": true,
