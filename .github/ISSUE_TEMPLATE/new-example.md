@@ -20,7 +20,7 @@ A clear and concise description of what the example is, how useful it is.
 
 - [ ] I've followed all of [the best practices](http://wiki.compilgames.net/doku.php/gdevelop5/community/guide-for-submitting-an-example).
 - [ ] My game has a proper name in the game properties.
-- [ ] My game package name behind with `com.example.`.
+- [ ] My game package name begins with `com.example.`.
 - [ ] My game has all events unfolded.
 - [ ] I've added myself as the author in the game properties.
 - [ ] I've included a file called "README.md" with a description in proper English, explaining what this example is doing.
