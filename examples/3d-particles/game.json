@@ -214,6 +214,8 @@
           "effects": [],
           "behaviors": [
             {
+              "name": "TopDownMovement",
+              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
               "acceleration": 400,
               "allowDiagonals": true,
               "angleOffset": 0,
@@ -223,9 +225,7 @@
               "ignoreDefaultControls": false,
               "maxSpeed": 200,
               "movementAngleOffset": 0,
-              "name": "TopDownMovement",
               "rotateObject": true,
-              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
               "viewpoint": "TopDown"
             }
           ],
@@ -329,7 +329,8 @@
             "Flow": 2000,
             "Duration": 200,
             "AreParticlesRelative": true,
-            "SpayConeAngle": 0
+            "SpayConeAngle": 0,
+            "Blending": "Additive"
           },
           "childrenContent": {
             "Particle": {
@@ -402,7 +403,10 @@
             "StartColor": "255;53;0",
             "Flow": 2000,
             "Duration": 200,
-            "AreParticlesRelative": false
+            "AreParticlesRelative": false,
+            "Blending": "Additive",
+            "Gravity": 500,
+            "GravityTop": "Z+"
           },
           "childrenContent": {
             "Particle": {
@@ -475,7 +479,8 @@
             "StartColor": "190;0;255",
             "Flow": 2000,
             "Duration": 200,
-            "AreParticlesRelative": false
+            "AreParticlesRelative": false,
+            "Blending": "Additive"
           },
           "childrenContent": {
             "Particle": {
@@ -1496,11 +1501,13 @@
                     "     * @param particleSystem {ParticleSystem}",
                     "     * @param colorOverLife {ColorOverLife}",
                     "     * @param sizeOverLife {SizeOverLife}",
+                    "     * @param applyForce {ApplyForce}",
                     "     */",
-                    "    constructor(particleSystem, colorOverLife, sizeOverLife) {",
+                    "    constructor(particleSystem, colorOverLife, sizeOverLife, applyForce) {",
                     "        this.particleSystem = particleSystem;",
                     "        this.colorOverLife = colorOverLife;",
                     "        this.sizeOverLife = sizeOverLife;",
+                    "        this.applyForce = applyForce;",
                     "    }",
                     "",
                     "    /**",
@@ -1620,6 +1627,59 @@
                     "            if (this.particleSystem.emitterShape.angle) {",
                     "                this.particleSystem.emitterShape = new PointEmitter();",
                     "            }",
+                    "        }",
+                    "    }",
+                    "",
+                    "    /**",
+                    "     * @param blending {string}",
+                    "     */",
+                    "    setBlending(blendingString) {",
+                    "        let blending = THREE.NormalBlending",
+                    "        switch (blendingString) {",
+                    "            case \"Normal\":",
+                    "                blending = THREE.NormalBlending;",
+                    "                break;",
+                    "",
+                    "            case \"Additive\":",
+                    "                blending = THREE.AdditiveBlending;",
+                    "                break;",
+                    "",
+                    "            case \"Subtractive\":",
+                    "                blending = THREE.SubtractiveBlending;",
+                    "                break;",
+                    "",
+                    "            case \"Multiply\":",
+                    "                blending = THREE.MultiplyBlending;",
+                    "                break;",
+                    "",
+                    "            case \"None\":",
+                    "                blending = THREE.NoBlending;",
+                    "                break;",
+                    "        }",
+                    "        // TODO This doesn't work.",
+                    "        this.particleSystem.blending = blending;",
+                    "    }",
+                    "    ",
+                    "    /**",
+                    "     * @param gravity {number}",
+                    "     */",
+                    "    setGravity(gravity) {",
+                    "        this.applyForce.magnitude.value = gravity;",
+                    "    }",
+                    "    ",
+                    "    /**",
+                    "     * @param gravityTop {string}",
+                    "     */",
+                    "    setGravityTop(gravityTop) {",
+                    "        // TODO Make gravity absolute even when \"relative\" is enabled. ",
+                    "        switch (gravityTop) {",
+                    "            case \"Z+\":",
+                    "                this.applyForce.direction.set(0, 0, -1);",
+                    "                break;",
+                    "",
+                    "            case \"Y-\":",
+                    "                this.applyForce.direction.set(0, 1, 0);",
+                    "                break;",
                     "        }",
                     "    }",
                     "}",
@@ -6573,6 +6633,7 @@
                     "const ConstantColor = gdjs.__particleEmmiter3DExtension.ConstantColor;",
                     "const ColorOverLife = gdjs.__particleEmmiter3DExtension.ColorOverLife;",
                     "const SizeOverLife = gdjs.__particleEmmiter3DExtension.SizeOverLife;",
+                    "const ApplyForce = gdjs.__particleEmmiter3DExtension.ApplyForce;",
                     "const ColorRange = gdjs.__particleEmmiter3DExtension.ColorRange;",
                     "const PiecewiseBezier = gdjs.__particleEmmiter3DExtension.PiecewiseBezier;",
                     "const Bezier = gdjs.__particleEmmiter3DExtension.Bezier;",
@@ -6605,6 +6666,29 @@
                     "    .getGame()",
                     "    .getImageManager().getThreeTexture(resourceName);",
                     "",
+                    "let blending = THREE.NormalBlending",
+                    "switch (object._getBlending()) {",
+                    "    case \"Normal\":",
+                    "        blending = THREE.NormalBlending;",
+                    "        break;",
+                    "",
+                    "    case \"Additive\":",
+                    "        blending = THREE.AdditiveBlending;",
+                    "        break;",
+                    "",
+                    "    case \"Subtractive\":",
+                    "        blending = THREE.SubtractiveBlending;",
+                    "        break;",
+                    "",
+                    "    case \"Multiply\":",
+                    "        blending = THREE.MultiplyBlending;",
+                    "        break;",
+                    "",
+                    "    case \"None\":",
+                    "        blending = THREE.NoBlending;",
+                    "        break;",
+                    "}",
+                    "",
                     "// Particle system configuration",
                     "const muzzle = {",
                     "    duration: 10,",
@@ -6630,6 +6714,8 @@
                     "    material: new THREE.MeshBasicMaterial({",
                     "        map: texture,",
                     "        blending: THREE.AdditiveBlending,",
+                    "        //blending: THREE.NormalBlending,",
+                    "        blending: blending,",
                     "        transparent: true,",
                     "        side: THREE.DoubleSide",
                     "    }),",
@@ -6652,11 +6738,13 @@
                     "particleSystem.addBehavior(colorOverLife);",
                     "const sizeOverLife = new SizeOverLife(new PiecewiseBezier([[new Bezier(1, 2 / 3, 1 / 3, 0), 0]]));",
                     "particleSystem.addBehavior(sizeOverLife);",
+                    "const applyForce = new ApplyForce(new THREE.Vector3(0, 0, -1), new ConstantValue(0));",
+                    "particleSystem.addBehavior(applyForce);",
                     "",
                     "particleSystem.emitter.name = object.getName() + object.getNameId();",
                     "batchSystem.addSystem(particleSystem);",
                     "",
-                    "object.__particleEmitterAdapter = new ParticleEmitterAdapter(particleSystem, colorOverLife, sizeOverLife);",
+                    "object.__particleEmitterAdapter = new ParticleEmitterAdapter(particleSystem, colorOverLife, sizeOverLife, applyForce);",
                     "object.__z = 0;",
                     "object.__emitter = particleSystem.emitter;",
                     "",
@@ -6886,9 +6974,49 @@
                         "Object.SpayConeAngle()",
                         ""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetGravity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.Gravity()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetGravityTop"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.GravityTop()",
+                        ""
+                      ]
                     }
                   ],
                   "events": [
+                    {
+                      "disabled": true,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ParticleEmitter3D::ParticleEmitter3D::SetBlending"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Object.Blending()",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
@@ -7057,7 +7185,7 @@
               "description": "the start color of the object.",
               "fullName": "Start color",
               "functionType": "ExpressionAndCondition",
-              "group": "3D particle emitter configuration",
+              "group": "3D particle emitter color configuration",
               "name": "StartColor",
               "sentence": "the start color",
               "events": [
@@ -7139,7 +7267,7 @@
               "description": "the end color of the object.",
               "fullName": "End color",
               "functionType": "ExpressionAndCondition",
-              "group": "3D particle emitter configuration",
+              "group": "3D particle emitter color configuration",
               "name": "EndColor",
               "sentence": "the end color",
               "events": [
@@ -7221,7 +7349,7 @@
               "description": "the start opacity of the object.",
               "fullName": "Start opacity",
               "functionType": "ExpressionAndCondition",
-              "group": "3D particle emitter configuration",
+              "group": "3D particle emitter color configuration",
               "name": "StartOpacity",
               "sentence": "the start opacity",
               "events": [
@@ -7303,7 +7431,7 @@
               "description": "the end opacity of the object.",
               "fullName": "End opacity",
               "functionType": "ExpressionAndCondition",
-              "group": "3D particle emitter configuration",
+              "group": "3D particle emitter color configuration",
               "name": "EndOpacity",
               "sentence": "the end opacity",
               "events": [
@@ -8337,6 +8465,258 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the blending of the object.",
+              "fullName": "Blending",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter color configuration",
+              "name": "Blending",
+              "sentence": "the blending",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "Object.PropertyBlending()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "supplementaryInformation": "[\"Normal\",\"Additive\",\"Substractive\",\"Multiply\",\"None\"]",
+                "type": "stringWithSelector"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Blending",
+              "name": "SetBlending",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyBlending"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const blending = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "\r",
+                    "object.__particleEmitterAdapter.setBlending(blending);\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the gravity top of the object.",
+              "fullName": "Gravity top",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter speed configuration",
+              "name": "GravityTop",
+              "sentence": "the gravity top",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "Object.PropertyGravityTop()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "supplementaryInformation": "[\"Y-\",\"Z+\"]",
+                "type": "stringWithSelector"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "GravityTop",
+              "name": "SetGravityTop",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyGravityTop"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const gravityTop = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "\r",
+                    "object.__particleEmitterAdapter.setGravityTop(gravityTop);\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the gravity of the object.",
+              "fullName": "Gravity",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D particle emitter speed configuration",
+              "name": "Gravity",
+              "sentence": "the gravity",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.PropertyGravity()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Gravity",
+              "name": "SetGravity",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyGravity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];\r",
+                    "const gravity = eventsFunctionContext.getArgument(\"Value\");\r",
+                    "\r",
+                    "object.__particleEmitterAdapter.setGravity(gravity);\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "propertyDescriptors": [
@@ -8500,6 +8880,46 @@
               "extraInformation": [],
               "hidden": false,
               "name": "SpayConeAngle"
+            },
+            {
+              "value": "Normal",
+              "type": "Choice",
+              "label": "Blending",
+              "description": "",
+              "group": "Color",
+              "extraInformation": [
+                "Normal",
+                "Additive",
+                "Substractive",
+                "Multiply",
+                "None"
+              ],
+              "hidden": false,
+              "name": "Blending"
+            },
+            {
+              "value": "Y-",
+              "type": "Choice",
+              "label": "Gravity top",
+              "description": "",
+              "group": "Speed",
+              "extraInformation": [
+                "Y-",
+                "Z+"
+              ],
+              "hidden": false,
+              "name": "GravityTop"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "PixelAcceleration",
+              "label": "Gravity",
+              "description": "",
+              "group": "Speed",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Gravity"
             }
           ],
           "objects": [
