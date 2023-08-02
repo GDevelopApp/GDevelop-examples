@@ -122,7 +122,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 2.432347728232824,
+        "zoomFactor": 1.061571430521998,
         "windowMask": false
       },
       "objectsGroups": [],
@@ -893,7 +893,7 @@
                 "ParticleEmitter",
                 "Bunny",
                 "200",
-                "90 + TimeFromStart() * 90"
+                "90 + TimeFromStart() * 90 + ParticleEmitter.Variable(Offset)"
               ]
             }
           ]
@@ -960,6 +960,79 @@
                 "ParticleEmitter3",
                 "=",
                 "180 + TimeFromStart() * 90"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyReleased"
+              },
+              "parameters": [
+                "",
+                "c"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Create"
+              },
+              "parameters": [
+                "ParticleEmitter",
+                "ParticleEmitter",
+                "0",
+                "0",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "ModVarObjet"
+              },
+              "parameters": [
+                "ParticleEmitter",
+                "Offset",
+                "=",
+                "Random(360)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyReleased"
+              },
+              "parameters": [
+                "",
+                "x"
+              ]
+            },
+            {
+              "type": {
+                "value": "AjoutHasard"
+              },
+              "parameters": [
+                "",
+                "ParticleEmitter"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Delete"
+              },
+              "parameters": [
+                "ParticleEmitter",
+                ""
               ]
             }
           ]
@@ -6746,7 +6819,6 @@
                     "",
                     "object.__particleEmitterAdapter = new ParticleEmitterAdapter(particleSystem, colorOverLife, sizeOverLife, applyForce);",
                     "object.__z = 0;",
-                    "object.__emitter = particleSystem.emitter;",
                     "",
                     "layer.get3DRendererObject().add(particleSystem.emitter);",
                     "",
@@ -6777,6 +6849,39 @@
                       ]
                     }
                   ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onDestroy",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.CustomRuntimeObject} */",
+                    "const object = objects[0];",
+                    "// Here runtimeScene is the gdjs.CustomRuntimeObjectInstanceContainer inside the custom object.",
+                    "const gameScene = object.getRuntimeScene();",
+                    "const layer = gameScene.getLayer(object.getLayer());",
+                    "",
+                    "gameScene.__particleEmmiter3DExtension.batchSystem.deleteSystem(object.__particleSystem);",
+                    "layer.get3DRendererObject().remove(object.__particleSystem.emitter);"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
                 }
               ],
               "parameters": [
@@ -7097,14 +7202,14 @@
                     "// update batched renderer",
                     "gameScene.__particleEmmiter3DExtension.batchSystem.update(object.getElapsedTime() / 1000);",
                     "",
+                    "const emitter = object.__particleSystem.emitter;",
+                    "emitter.position.x = object.getX();",
+                    "emitter.position.y = -object.getY();",
+                    "emitter.position.z = object.__z;",
                     "",
-                    "object.__emitter.position.x = object.getX();",
-                    "object.__emitter.position.y = -object.getY();",
-                    "object.__emitter.position.z = object.__z;",
-                    "",
-                    "object.__emitter.rotation.order = 'ZYX';",
-                    "object.__emitter.rotation.y = Math.PI / 2;",
-                    "object.__emitter.rotation.z = -object.getAngle() * Math.PI / 180;",
+                    "emitter.rotation.order = 'ZYX';",
+                    "emitter.rotation.y = Math.PI / 2;",
+                    "emitter.rotation.z = -object.getAngle() * Math.PI / 180;",
                     "",
                     "// console.log(object.__particleSystem.time + \": \" + object.__particleSystem.particleNum);",
                     "// console.log(object.__particleSystem.particles.filter((particle, index) => index < object.__particleSystem.particleNum).map(particle => {",
