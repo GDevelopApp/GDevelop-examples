@@ -3593,7 +3593,7 @@
               "parameters": [
                 "BestTimeText",
                 "=",
-                "\"Best: \" + TimeFormatter::SecondsToHHMMSS000(GlobalVariable(HighScore))"
+                "\"Best: \" + TimeFormatter::SecondsToHHMMSS000(Variable(HighScore))"
               ]
             },
             {
@@ -3730,9 +3730,15 @@
                     },
                     {
                       "type": {
-                        "value": "BuiltinCommonInstructions::Once"
+                        "inverted": true,
+                        "value": "CompareTimer"
                       },
-                      "parameters": []
+                      "parameters": [
+                        "",
+                        "\"Time\"",
+                        ">",
+                        "0"
+                      ]
                     }
                   ],
                   "actions": [
@@ -4468,12 +4474,13 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "VarScene"
+                            "value": "CompareTimer"
                           },
                           "parameters": [
-                            "HighScore",
+                            "",
+                            "\"Time\"",
                             ">=",
-                            "TimerElapsedTime(\"Time\")"
+                            "Variable(HighScore)"
                           ]
                         }
                       ],
@@ -4503,12 +4510,31 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "VarScene"
+                            "value": "BuiltinCommonInstructions::Or"
                           },
-                          "parameters": [
-                            "HighScore",
-                            "<",
-                            "TimerElapsedTime(\"Time\")"
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "CompareTimer"
+                              },
+                              "parameters": [
+                                "",
+                                "\"Time\"",
+                                "<",
+                                "Variable(HighScore)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "VarScene"
+                              },
+                              "parameters": [
+                                "HighScore",
+                                "=",
+                                "0"
+                              ]
+                            }
                           ]
                         }
                       ],
@@ -4540,7 +4566,7 @@
                           "parameters": [
                             "\"HighScore\"",
                             "\"HighScore\"",
-                            "GlobalVariable(HighScore)"
+                            "Variable(HighScore)"
                           ]
                         },
                         {
