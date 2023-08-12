@@ -615,6 +615,7 @@
                   "parameters": [
                     "New3DModel",
                     "StretchTween3D",
+                    "\"Unstretch\"",
                     "1",
                     "4",
                     "\"elastic\"",
@@ -905,6 +906,1231 @@
   "externalEvents": [],
   "eventsFunctionsExtensions": [
     {
+      "author": "@Bouh, D8H",
+      "category": "General",
+      "extensionNamespace": "",
+      "fullName": "Extended variables support",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZhcmlhYmxlLWJveCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOSAzSDVDMy45IDMgMyAzLjkgMyA1VjE5QzMgMjAuMSAzLjkgMjEgNSAyMUgxOUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlWNUMyMSAzLjkgMjAuMSAzIDE5IDNNNy40IDE4QzUuOSAxNi41IDUgMTQuMyA1IDEyUzUuOSA3LjUgNy40IDZMOSA2LjdDNy43IDcuOSA3IDkuOSA3IDEyUzcuNyAxNi4xIDkgMTcuM0w3LjQgMThNMTIuNyAxNUwxMS45IDEzTDEwLjUgMTVIOUwxMS4zIDExLjlMMTAgOUgxMS4zTDEyLjEgMTFMMTMuNSA5SDE1TDEyLjggMTJMMTQuMSAxNUgxMi43TTE2LjYgMThMMTUgMTcuM0MxNi4zIDE2IDE3IDE0LjEgMTcgMTJTMTYuMyA3LjkgMTUgNi43TDE2LjYgNkMxOC4xIDcuNSAxOSA5LjcgMTkgMTJTMTguMSAxNi41IDE2LjYgMThaIiAvPjwvc3ZnPg==",
+      "name": "ExtendedVariables",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/variable-box.svg",
+      "shortDescription": "Add conditions, actions and expressions to check for the existence of a variable, copy variables, delete existing ones from memory, and create dynamic variables.",
+      "version": "1.0.2",
+      "description": [
+        "This extension provides: ",
+        "- Conditions to check if a global/scene/object variable exists.",
+        "- Actions to copy object variables, global and scene variables.",
+        "- Actions to delete an existing global/scene variable from memory.",
+        "- Actions to create a global/scene variable using a text expression, rather than a variable name input.",
+        "- Expressions to get the value or text from a global/scene variable using a text expression, rather than a variable name.",
+        "",
+        "Text expressions allows to enter the name of the variable with an expression like `\"MyVar\"+ ToString(Variable(Health))`"
+      ],
+      "origin": {
+        "identifier": "ExtendedVariables",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "variable",
+        "scene",
+        "global",
+        "object",
+        "remove",
+        "expression",
+        "copy",
+        "structure",
+        "array",
+        "boolean",
+        "duplication"
+      ],
+      "authorIds": [
+        "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "Check if a global variable exists.",
+          "fullName": "Global variable exists",
+          "functionType": "Condition",
+          "group": "Deprecated",
+          "name": "C_global_variable_exist",
+          "private": true,
+          "sentence": "If the global variable _PARAM1_ exist",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "False"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::GlobalVariableExist"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsString(\"GlobalVariableName\")",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the global variable",
+              "name": "GlobalVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the global variable exists.",
+          "fullName": "Global variable exists",
+          "functionType": "Condition",
+          "group": "Global variables",
+          "name": "GlobalVariableExist",
+          "sentence": "If the global variable _PARAM1_ exist",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const globalVariables = runtimeScene.getGame().getVariables();\r",
+                "eventsFunctionContext.returnValue = globalVariables.has(eventsFunctionContext.getArgument(\"GlobalVariableName\"));"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the global variable",
+              "name": "GlobalVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if a scene variable exists.",
+          "fullName": "Scene variable exists",
+          "functionType": "Condition",
+          "group": "Deprecated",
+          "name": "C_scene_variable_exist",
+          "private": true,
+          "sentence": "If the scene variable _PARAM1_ exist",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "False"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::SceneVariableExist"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsString(\"SceneVariableName\")",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the scene variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the scene variable exists.",
+          "fullName": "Scene variable exists",
+          "functionType": "Condition",
+          "group": "Scene variables",
+          "name": "SceneVariableExist",
+          "sentence": "If the scene variable _PARAM1_ exist",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const sceneVariables = runtimeScene.getVariables();\r",
+                "eventsFunctionContext.returnValue = sceneVariables.has(eventsFunctionContext.getArgument(\"SceneVariableName\"));"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the scene variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if an object variable exists.",
+          "fullName": "Object variable exists",
+          "functionType": "Condition",
+          "group": "Deprecated",
+          "name": "C_object_variable_exist",
+          "private": true,
+          "sentence": "Object _PARAM1_ has object variable _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "False"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::ObjectVariableExist"
+                  },
+                  "parameters": [
+                    "",
+                    "ObjectToCheck",
+                    "GetArgumentAsString(\"ObjectVariableName\")",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "ObjectToCheck",
+              "type": "objectList"
+            },
+            {
+              "description": "Name of object variable",
+              "name": "ObjectVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if an object variable exists.",
+          "fullName": "Object variable exists",
+          "functionType": "Condition",
+          "group": "Object variables",
+          "name": "ObjectVariableExist",
+          "sentence": "Object _PARAM1_ has object variable _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "let returnValue = true;\r",
+                "if (!objects.length) {\r",
+                "    returnValue = false;\r",
+                "} else {\r",
+                "    const objectVariableName = eventsFunctionContext.getArgument(\"ObjectVariableName\");\r",
+                "    for (let i = 0; i < objects.length; i++) {\r",
+                "        if (!objects[i].hasVariable(objectVariableName)) {\r",
+                "            // If any object does NOT have the variable, return false.\r",
+                "            returnValue = false;\r",
+                "            break;\r",
+                "        }\r",
+                "    }\r",
+                "}\r",
+                "\r",
+                "eventsFunctionContext.returnValue = returnValue;"
+              ],
+              "parameterObjects": "ObjectToCheck",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "ObjectToCheck",
+              "type": "objectList"
+            },
+            {
+              "description": "Name of object variable",
+              "name": "ObjectVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Delete a global variable, removing it from memory.",
+          "fullName": "Delete global variable",
+          "functionType": "Action",
+          "group": "Deprecated",
+          "name": "A_Delete_global_variable",
+          "private": true,
+          "sentence": "Delete global variable _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::DeleteGlobalVariable"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsString(\"GlobalVariableName\")",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the global variable to delete",
+              "name": "GlobalVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Delete the global variable, removing it from memory.",
+          "fullName": "Delete global variable",
+          "functionType": "Action",
+          "group": "Global variables",
+          "name": "DeleteGlobalVariable",
+          "sentence": "Delete the global variable _PARAM1_ from memory",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "runtimeScene.getGame().getVariables().remove(eventsFunctionContext.getArgument(\"GlobalVariableName\"));",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the global variable to delete",
+              "name": "GlobalVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Modify the text of a scene variable.",
+          "fullName": "String of a scene variable",
+          "functionType": "Action",
+          "group": "Deprecated",
+          "name": "A_Modify_scene_variable_string",
+          "private": true,
+          "sentence": "Change the text of scene variable _PARAM1_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::ModifySceneVariableString"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsString(\"SceneVariableName\")",
+                    "GetArgumentAsNumber(\"SceneVariableValue\")",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the scene variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Value",
+              "name": "SceneVariableValue",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Modify the text of a scene variable.",
+          "fullName": "String of a scene variable",
+          "functionType": "Action",
+          "group": "Scene variables",
+          "name": "ModifySceneVariableString",
+          "sentence": "Change the text of scene variable _PARAM1_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const variable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"SceneVariableName\"));\r",
+                "variable.setString(eventsFunctionContext.getArgument(\"SceneVariableValue\"));"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the scene variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Value",
+              "name": "SceneVariableValue",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Modify the text of a global variable.",
+          "fullName": "String of a global variable",
+          "functionType": "Action",
+          "group": "Global variables",
+          "name": "ModifyGlobalVariableString",
+          "sentence": "Change the text of global variable _PARAM1_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const variable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"GlobalVariableName\"));\r",
+                "variable.setString(eventsFunctionContext.getArgument(\"GlobalVariableValue\"));"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the global variable",
+              "name": "GlobalVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Value",
+              "name": "GlobalVariableValue",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Modify the value of a global variable.",
+          "fullName": "Value of a global variable",
+          "functionType": "Action",
+          "group": "Deprecated",
+          "name": "A_Modify_global_variable",
+          "private": true,
+          "sentence": "Change the global variable _PARAM1_ with value: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::ModifyGlobalVariable"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsString(\"SceneVariableName\")",
+                    "GetArgumentAsNumber(\"SceneVariableValue\")",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the global variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Value",
+              "name": "SceneVariableValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Modify the text of a global variable.",
+          "fullName": "String of a global variable",
+          "functionType": "Action",
+          "group": "Deprecated",
+          "name": "A_Modify_global_variable_string",
+          "private": true,
+          "sentence": "Change the text of global variable _PARAM1_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::ModifyGlobalVariableString"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsString(\"SceneVariableName\")",
+                    "GetArgumentAsNumber(\"SceneVariableValue\")",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the global variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Value",
+              "name": "SceneVariableValue",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Modify the value of a global variable.",
+          "fullName": "Value of a global variable",
+          "functionType": "Action",
+          "group": "Global variables",
+          "name": "ModifyGlobalVariable",
+          "sentence": "Change the global variable _PARAM1_ with value: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const variable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"GlobalVariableName\"));\r",
+                "variable.setNumber(eventsFunctionContext.getArgument(\"GlobalVariableValue\"));"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the global variable",
+              "name": "GlobalVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Value",
+              "name": "GlobalVariableValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Modify the value of a scene variable.",
+          "fullName": "Value of a scene variable",
+          "functionType": "Action",
+          "group": "Deprecated",
+          "name": "A_Modify_scene_variable",
+          "private": true,
+          "sentence": "Change the scene variable _PARAM1_ with value: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::ModifySceneVariable"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsString(\"SceneVariableName\")",
+                    "GetArgumentAsNumber(\"SceneVariableValue\")",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the scene variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Value",
+              "name": "SceneVariableValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Modify the value of a scene variable.",
+          "fullName": "Value of a scene variable",
+          "functionType": "Action",
+          "group": "Scene variables",
+          "name": "ModifySceneVariable",
+          "sentence": "Change the scene variable _PARAM1_ with value: _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const variable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"SceneVariableName\"));\r",
+                "variable.setNumber(eventsFunctionContext.getArgument(\"SceneVariableValue\"));"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the scene variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Value",
+              "name": "SceneVariableValue",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Delete scene variable, the variable will be deleted from the memory.",
+          "fullName": "Delete scene variable",
+          "functionType": "Action",
+          "group": "Deprecated",
+          "name": "A_Delete_scene_variable",
+          "private": true,
+          "sentence": "Delete the scene variable _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::DeleteSceneVariable"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsString(\"SceneVariableName\")",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the scene variable to delete",
+              "name": "SceneVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Delete the scene variable, the variable will be deleted from the memory.",
+          "fullName": "Delete scene variable",
+          "functionType": "Action",
+          "group": "Scene variables",
+          "name": "DeleteSceneVariable",
+          "sentence": "Delete the scene variable _PARAM1_ from memory",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "runtimeScene.getVariables().remove(eventsFunctionContext.getArgument(\"SceneVariableName\"));",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Name of the scene variable to delete",
+              "name": "SceneVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Copy an object variable from one object to another.",
+          "fullName": "Copy an object variable",
+          "functionType": "Action",
+          "group": "Deprecated",
+          "name": "A_CopyObjectVariable",
+          "private": true,
+          "sentence": "Copy the variable _PARAM1_ of _PARAM2_ to the variable _PARAM3_ of _PARAM4_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::CopyObjectVariable"
+                  },
+                  "parameters": [
+                    "",
+                    "SourceObject",
+                    "GetArgumentAsString(\"SourceVariableName\")",
+                    "TargetObject",
+                    "GetArgumentAsString(\"TargetVariableName\")",
+                    "no",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Source object",
+              "name": "SourceObject",
+              "type": "objectList"
+            },
+            {
+              "description": "Variable to copy",
+              "name": "SourceVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Destination object",
+              "longDescription": "To copy the variable between 2 instances of the same object, the variable has to be copied to another object first.",
+              "name": "TargetObject",
+              "type": "objectList"
+            },
+            {
+              "description": "Destination variable",
+              "name": "TargetVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Copy the object variable from one object to another.",
+          "fullName": "Copy an object variable",
+          "functionType": "Action",
+          "group": "Object variables",
+          "name": "CopyObjectVariable",
+          "sentence": "Copy the variable _PARAM2_ of _PARAM1_ to the variable _PARAM4_ of _PARAM3_ (clear destination first: _PARAM5_)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const sourceObject = eventsFunctionContext.getObjects(\"SourceObject\")[0];",
+                "const targetObject = eventsFunctionContext.getObjects(\"TargetObject\")[0];",
+                "const sourceVariableName = eventsFunctionContext.getArgument(\"SourceVariableName\");",
+                "const targetVariableName = eventsFunctionContext.getArgument(\"TargetVariableName\");",
+                "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+                "",
+                "const sourceVariables = sourceObject.getVariables();",
+                "const targetVariables = targetObject.getVariables();",
+                "",
+                "if (sourceVariables.has(sourceVariableName))",
+                "{",
+                "    gdjs.Variable.copy",
+                "    (",
+                "        sourceVariables.get(sourceVariableName),",
+                "        targetVariables.get(targetVariableName),",
+                "        isExactCopy",
+                "    );",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Source object",
+              "name": "SourceObject",
+              "type": "objectList"
+            },
+            {
+              "description": "Variable to copy",
+              "name": "SourceVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Destination object",
+              "longDescription": "To copy the variable between 2 instances of the same object, the variable has to be copied to another object first.",
+              "name": "TargetObject",
+              "type": "objectList"
+            },
+            {
+              "description": "Destination variable",
+              "name": "TargetVariableName",
+              "type": "string"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "Clear the destination variable before copying",
+              "name": "isExactCopy",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Copy all object variables from one object to another.",
+          "fullName": "Copy all object variables",
+          "functionType": "Action",
+          "group": "Deprecated",
+          "name": "A_CopyAllObjectVariables",
+          "private": true,
+          "sentence": "Copy all variables from _PARAM1_ to _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ExtendedVariables::CopyAllObjectVariables"
+                  },
+                  "parameters": [
+                    "",
+                    "SourceObject",
+                    "TargetObject",
+                    "no",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Source object",
+              "name": "SourceObject",
+              "type": "objectList"
+            },
+            {
+              "description": "Destination object",
+              "name": "TargetObject",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Copy all object variables from one object to another.",
+          "fullName": "Copy all object variables",
+          "functionType": "Action",
+          "group": "Object variables",
+          "name": "CopyAllObjectVariables",
+          "sentence": "Copy all variables from object _PARAM1_ to object _PARAM2_ (clear destination first: _PARAM3_)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// This JS event use private scope from the API, this can be borken at anytime.",
+                "",
+                "const sourceObject = eventsFunctionContext.getObjects(\"SourceObject\")[0];",
+                "const targetObject = eventsFunctionContext.getObjects(\"TargetObject\")[0];",
+                "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+                "",
+                "const targetVariables = targetObject.getVariables();",
+                "const sourceVariables = sourceObject.getVariables()._variables.items;",
+                "for (const variableName in sourceVariables)",
+                "{",
+                "    if (sourceVariables.hasOwnProperty(variableName))",
+                "    {",
+                "        gdjs.Variable.copy(sourceVariables[variableName], targetVariables.get(variableName), isExactCopy);",
+                "    }",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Source object",
+              "name": "SourceObject",
+              "type": "objectList"
+            },
+            {
+              "description": "Destination object",
+              "name": "TargetObject",
+              "type": "objectList"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "Clear the destination variable before copying",
+              "name": "isExactCopy",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Delete an object variable, removing it from memory.",
+          "fullName": "Delete object variable",
+          "functionType": "Action",
+          "group": "Object variables",
+          "name": "DeleteObjectVariable",
+          "sentence": "Delete for the object _PARAM1_ the object variable _PARAM2_ from the memory",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const object = eventsFunctionContext.getObjects(\"Object\")[0];\r",
+                "const objectVariables = object.getVariables();\r",
+                "\r",
+                "objectVariables.remove(eventsFunctionContext.getArgument(\"VariableName\"));"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "objectList"
+            },
+            {
+              "description": "Name of object variable",
+              "name": "VariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the text of a global variable.",
+          "fullName": "Text of a global variable",
+          "functionType": "StringExpression",
+          "group": "Global variables",
+          "name": "GlobalVariableString",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const globalVariables = runtimeScene.getGame().getVariables();\r",
+                "const variableExist = globalVariables.has(eventsFunctionContext.getArgument(\"GlobalVariableName\"));\r",
+                "\r",
+                "if (variableExist) {\r",
+                "    eventsFunctionContext.returnValue = globalVariables.get(eventsFunctionContext.getArgument(\"GlobalVariableName\")).getAsString();\r",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Name of the global variable",
+              "name": "GlobalVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the text of a scene variable.",
+          "fullName": "Text of a scene variable",
+          "functionType": "StringExpression",
+          "group": "Scene variables",
+          "name": "VariableString",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const sceneVariables = runtimeScene.getVariables();\r",
+                "const variableExist = sceneVariables.has(eventsFunctionContext.getArgument(\"SceneVariableName\"));\r",
+                "\r",
+                "if (variableExist) {\r",
+                "    eventsFunctionContext.returnValue = sceneVariables.get(eventsFunctionContext.getArgument(\"SceneVariableName\")).getAsString();\r",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Name of the scene variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the value of a global variable.",
+          "fullName": "Value of a global variable",
+          "functionType": "Expression",
+          "group": "Global variables",
+          "name": "GlobalVariable",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const globalVariables = runtimeScene.getGame().getVariables();\r",
+                "const variableExist = globalVariables.has(eventsFunctionContext.getArgument(\"GlobalVariableName\"));\r",
+                "\r",
+                "if (variableExist) {\r",
+                "    eventsFunctionContext.returnValue = globalVariables.get(eventsFunctionContext.getArgument(\"GlobalVariableName\")).getAsNumber();\r",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Name of the global variable",
+              "name": "GlobalVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the value of a scene variable.",
+          "fullName": "Value of a scene variable",
+          "functionType": "Expression",
+          "group": "Scene variables",
+          "name": "Variable",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const sceneVariables = runtimeScene.getVariables();\r",
+                "const variableExist = sceneVariables.has(eventsFunctionContext.getArgument(\"SceneVariableName\"));\r",
+                "\r",
+                "if (variableExist) {\r",
+                "    eventsFunctionContext.returnValue = sceneVariables.get(eventsFunctionContext.getArgument(\"SceneVariableName\")).getAsNumber();\r",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Name of the scene variable",
+              "name": "SceneVariableName",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Copy the global variable to scene. This copy everything from the types to the values.",
+          "fullName": "Copy a global variable to scene",
+          "functionType": "Action",
+          "group": "Convert",
+          "name": "CopyGlobalVariableToScene",
+          "sentence": "Copy the global variable:_PARAM1_ to a scene variable:_PARAM2_ (clear destination first: _PARAM3_)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const globalVariable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"globalVariableName\"));",
+                "const sceneVariable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"sceneVariableName\"));",
+                "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+                "",
+                "gdjs.Variable.copy(globalVariable, sceneVariable, isExactCopy);",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Global variable to copy",
+              "name": "globalVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Scene variable destination",
+              "name": "sceneVariableName",
+              "type": "string"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "Clear the destination variable before copying",
+              "name": "isExactCopy",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Copy the scene variable to global. This copy everything from the types to the values.",
+          "fullName": "Copy a scene variable to global ",
+          "functionType": "Action",
+          "group": "Copy variables",
+          "name": "CopySceneVariableToGlobal",
+          "sentence": "Copy the scene variable:_PARAM1_ to a global variable:_PARAM2_ (clear destination first: _PARAM3_)",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const sceneVariable = runtimeScene.getVariables().get(eventsFunctionContext.getArgument(\"sceneVariableName\"));",
+                "const globalVariable = runtimeScene.getGame().getVariables().get(eventsFunctionContext.getArgument(\"globalVariableName\"));",
+                "const isExactCopy = eventsFunctionContext.getArgument(\"isExactCopy\");",
+                "",
+                "gdjs.Variable.copy(sceneVariable, globalVariable, isExactCopy);"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Scene variable to copy",
+              "name": "sceneVariableName",
+              "type": "string"
+            },
+            {
+              "description": "Global variable destination",
+              "name": "globalVariableName",
+              "type": "string"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "Clear the destination variable before copying",
+              "name": "isExactCopy",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": []
+    },
+    {
       "author": "",
       "category": "",
       "extensionNamespace": "",
@@ -1055,10 +2281,12 @@
           "objectType": "Scene3D::Model3DObject",
           "eventsFunctions": [
             {
+              "description": "Tweens an object stretch from its current value to a new one. The stretch can never be 0 or less.",
               "fullName": "Tween stretch",
               "functionType": "Action",
+              "group": "Size",
               "name": "TweenStretch",
-              "sentence": "Tween the stretch of object _PARAM0_ to _PARAM2_ over _PARAM3_ seconds with _PARAM4_ easing",
+              "sentence": "Tween the stretch of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with _PARAM5_ easing as _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -1066,64 +2294,16 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ResetObjectTimer"
-                      },
-                      "parameters": [
-                        "Object",
-                        "\"_StretchTween3D.Time\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SquashAndStretch3D::StretchTween3D::SetPropertyDuration"
+                        "value": "SquashAndStretch3D::StretchTween3D::StartTween"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "=",
-                        "GetArgumentAsNumber(\"Duration\")"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SquashAndStretch3D::StretchTween3D::SetPropertyEasing"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "GetArgumentAsString(\"Easing\")"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SquashAndStretch3D::StretchTween3D::SetPropertyInitialValue"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "SquashAndStretch3D::StretchZ(Object)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SquashAndStretch3D::StretchTween3D::SetPropertyTargetedValue"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "GetArgumentAsNumber(\"Stretch\")"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "ToString(SquashAndStretch3D::StretchZ(Object))",
-                        "",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        "GetArgumentAsNumber(\"TargetedValue\")",
+                        "GetArgumentAsNumber(\"Duration\")",
+                        "GetArgumentAsString(\"Easing\")",
+                        "\"Stretch\"",
                         ""
                       ]
                     }
@@ -1144,8 +2324,14 @@
                   "type": "behavior"
                 },
                 {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                },
+                {
                   "description": "Stretch",
-                  "name": "Stretch",
+                  "name": "TargetedValue",
                   "type": "expression"
                 },
                 {
@@ -1170,57 +2356,116 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CompareObjectTimer"
-                      },
-                      "parameters": [
-                        "Object",
-                        "\"_StretchTween3D.Time\"",
-                        ">",
-                        "Object.Behavior::PropertyDuration()"
-                      ]
-                    }
-                  ],
+                  "conditions": [],
                   "actions": [
                     {
                       "type": {
-                        "value": "RemoveObjectTimer"
+                        "value": "ModVarScene"
                       },
                       "parameters": [
-                        "Object",
-                        "\"_StretchTween3D.Time\""
+                        "_Tween3D.Index",
+                        "=",
+                        "0"
                       ]
                     }
                   ]
                 },
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CompareObjectTimer"
-                      },
-                      "parameters": [
-                        "Object",
-                        "\"_StretchTween3D.Time\"",
-                        ">",
-                        "0"
-                      ]
-                    }
-                  ],
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "Object.VariableChildCount(_Tween3D.Tweens)",
+                  "conditions": [],
                   "actions": [
                     {
                       "type": {
-                        "value": "SquashAndStretch3D::SetStretchZ"
+                        "value": "ModVarSceneTxt"
                       },
                       "parameters": [
-                        "",
+                        "_Tween3D.Identifier",
                         "=",
-                        "Tween::Ease(Object.Behavior::PropertyEasing(), Object.Behavior::PropertyInitialValue(), Object.Behavior::PropertyTargetedValue(), Object.ObjectTimerElapsedTime(\"_StretchTween3D.Time\") / Object.Behavior::PropertyDuration())",
-                        "Object",
-                        ""
+                        "Object.Behavior::TweenIdentifier(Variable(_Tween3D.Index))"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SquashAndStretch3D::StretchTween3D::IsPlaying"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "VariableString(_Tween3D.Identifier)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SquashAndStretch3D::StretchTween3D::SetTime"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "min(Object.Behavior::Time(VariableString(_Tween3D.Identifier)) + TimeDelta() * LayerTimeScale(Object.Layer()), Object.Behavior::Duration(VariableString(_Tween3D.Identifier)))",
+                            "VariableString(_Tween3D.Identifier)",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SquashAndStretch3D::StretchTween3D::Type"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "\"Stretch\"",
+                                "VariableString(_Tween3D.Identifier)",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SquashAndStretch3D::SetStretchZ"
+                              },
+                              "parameters": [
+                                "",
+                                "=",
+                                "Object.Behavior::TweenedValue(VariableString(_Tween3D.Identifier))",
+                                "Object",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "_Tween3D.Index",
+                            "+",
+                            "1"
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -1241,53 +2486,1552 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the tweened value",
+              "fullName": "Tweened value",
+              "functionType": "ExpressionAndCondition",
+              "name": "TweenedValue",
+              "private": true,
+              "sentence": "the value of tween _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Tween::Ease(Object.Behavior::Easing(VariableString(_Tween3D.Identifier)), Object.Behavior::InitialValue(VariableString(_Tween3D.Identifier)), Object.Behavior::TargetedValue(VariableString(_Tween3D.Identifier)), Object.Behavior::Progress(VariableString(_Tween3D.Identifier)))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Start tween",
+              "functionType": "Action",
+              "name": "StartTween",
+              "private": true,
+              "sentence": "Tween the _PARAM6_ of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with _PARAM5_ easing as _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SquashAndStretch3D::StretchTween3D::Exists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::InvalidateTweenIdentifiers"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetType"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"Type\")",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"Duration\")",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetEasing"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"Easing\")",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetInitialValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "SquashAndStretch3D::StretchZ(Object)",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetTargetedValue"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"TargetedValue\")",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                },
+                {
+                  "description": "Stretch",
+                  "name": "TargetedValue",
+                  "type": "expression"
+                },
+                {
+                  "description": "Duration (in seconds)",
+                  "name": "Duration",
+                  "type": "expression"
+                },
+                {
+                  "description": "Easing",
+                  "name": "Easing",
+                  "supplementaryInformation": "[\"linear\",\"elastic\"]",
+                  "type": "stringWithSelector"
+                },
+                {
+                  "description": "Type",
+                  "name": "Type",
+                  "type": "string"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the tween type",
+              "fullName": "Type",
+              "functionType": "ExpressionAndCondition",
+              "name": "Type",
+              "private": true,
+              "sentence": "the type of tween _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "Object.VariableString(_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].Type)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "string"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Type",
+              "name": "SetType",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjetTxt"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].Type",
+                        "=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the elapsed time",
+              "fullName": "Time",
+              "functionType": "ExpressionAndCondition",
+              "name": "Time",
+              "private": true,
+              "sentence": "the elapsed time of tween _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].Time)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Time",
+              "name": "SetTime",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].Time",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the tween duration",
+              "fullName": "Duration",
+              "functionType": "ExpressionAndCondition",
+              "name": "Duration",
+              "private": true,
+              "sentence": "the duration of tween _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].Duration)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Duration",
+              "name": "SetDuration",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].Duration",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the tween easing",
+              "fullName": "Easing",
+              "functionType": "ExpressionAndCondition",
+              "name": "Easing",
+              "private": true,
+              "sentence": "the easing of tween _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "Object.VariableString(_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].Easing)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "string"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Easing",
+              "name": "SetEasing",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjetTxt"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].Easing",
+                        "=",
+                        "GetArgumentAsString(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the tween initial value",
+              "fullName": "Initial value",
+              "functionType": "ExpressionAndCondition",
+              "name": "InitialValue",
+              "private": true,
+              "sentence": "the initial value of tween _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].InitialValue)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "InitialValue",
+              "name": "SetInitialValue",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].InitialValue",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the tween targeted value",
+              "fullName": "Targeted value",
+              "functionType": "ExpressionAndCondition",
+              "name": "TargetedValue",
+              "private": true,
+              "sentence": "the targeted value of tween _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].TargetedValue)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the tween is paused",
+              "fullName": "Paused",
+              "functionType": "Condition",
+              "name": "IsPaused",
+              "private": true,
+              "sentence": "The tween _PARAM2_ of _PARAM0_ is paused",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].IsPaused",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change if the tween is paused",
+              "fullName": "Paused",
+              "functionType": "Action",
+              "name": "SetPaused",
+              "private": true,
+              "sentence": "The tween _PARAM2_ of _PARAM0_ is paused: _PARAM3_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"IsPaused\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].IsPaused",
+                        "True"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"IsPaused\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].IsPaused",
+                        "False"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                },
+                {
+                  "description": "Paused",
+                  "name": "IsPaused",
+                  "type": "yesorno"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "TargetedValue",
+              "name": "SetTargetedValue",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens[GetArgumentAsString(\"TweenIdentifier\")].TargetedValue",
+                        "=",
+                        "GetArgumentAsNumber(\"Value\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Stop the running tween animation.",
+              "fullName": "Stop a tween",
+              "functionType": "Action",
+              "name": "StopTween",
+              "sentence": "Stop the tween _PARAM2_ on _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::Exists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Behavior::Duration(GetArgumentAsString(\"TweenIdentifier\"))",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "GetArgumentAsBoolean"
+                          },
+                          "parameters": [
+                            "\"JumpToEnd\""
+                          ]
+                        }
+                      ],
+                      "actions": []
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                },
+                {
+                  "description": "Jump to end",
+                  "name": "JumpToEnd",
+                  "type": "yesorno"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Pause the running tween animation.",
+              "fullName": "Pause a tween",
+              "functionType": "Action",
+              "name": "PauseTween",
+              "sentence": "Pause the tween _PARAM2_ on _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::Exists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetPaused"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        "yes",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Resume the tween animation.",
+              "fullName": "Resume a tween",
+              "functionType": "Action",
+              "name": "ResumeTween",
+              "sentence": "Resume the tween _PARAM2_ on _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::Exists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::SetPaused"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        "no",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Remove the tween animation from the object.",
+              "fullName": "Remove a tween",
+              "functionType": "Action",
+              "name": "RemoveTween",
+              "sentence": "Remove the tween _PARAM2_ from _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::Exists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableRemoveChild"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens",
+                        "GetArgumentAsString(\"TweenIdentifier\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::InvalidateTweenIdentifiers"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the tween animation exists.",
+              "fullName": "Tween exists",
+              "functionType": "Condition",
+              "name": "Exists",
+              "sentence": "Tween _PARAM2_ on _PARAM0_ exists",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableChildExists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "_Tween3D.Tweens",
+                        "GetArgumentAsString(\"TweenIdentifier\")"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the tween animation is currently playing.",
+              "fullName": "Tween is playing",
+              "functionType": "Condition",
+              "name": "IsPlaying",
+              "sentence": "Tween _PARAM2_ on _PARAM0_ is playing",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::Exists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SquashAndStretch3D::StretchTween3D::HasFinished"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SquashAndStretch3D::StretchTween3D::IsPaused"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the tween animation has finished playing.",
+              "fullName": "Tween finished playing",
+              "functionType": "Condition",
+              "name": "HasFinished",
+              "sentence": "Tween _PARAM2_ on _PARAM0_ has finished playing",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::Progress"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">=",
+                        "1",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Progress of a tween (between 0.0 and 1.0)",
+              "fullName": "Progress of a tween",
+              "functionType": "ExpressionAndCondition",
+              "name": "Progress",
+              "sentence": "The progress of tween _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SquashAndStretch3D::StretchTween3D::Exists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "GetArgumentAsString(\"TweenIdentifier\")",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::Time(GetArgumentAsString(\"TweenIdentifier\")) / Object.Behavior::Duration(GetArgumentAsString(\"TweenIdentifier\"))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Tween identifier",
+                  "name": "TweenIdentifier",
+                  "supplementaryInformation": "objectTween3D",
+                  "type": "identifier"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the tween identifier for a given index.",
+              "fullName": "Tween identifier",
+              "functionType": "StringExpression",
+              "name": "TweenIdentifier",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "",
+                    "const childIndex = eventsFunctionContext.getArgument(\"ChildIndex\");",
+                    "",
+                    "object.__Tween3D = object.__Tween3D || {};",
+                    "object.__Tween3D.variableIdentifiers =",
+                    "    object.__Tween3D.variableIdentifiers",
+                    "    || Object.keys(object.getVariables().get(\"_Tween3D\").getChild(\"Tweens\").getAllChildren());",
+                    "",
+                    "eventsFunctionContext.returnValue = object.__Tween3D.variableIdentifiers[childIndex];",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "string"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Child index",
+                  "name": "ChildIndex",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Invalidate tween identifiers.",
+              "fullName": "Invalidate tween identifiers",
+              "functionType": "Action",
+              "name": "InvalidateTweenIdentifiers",
+              "private": true,
+              "sentence": "Invalidate tween identifiers of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "",
+                    "object.__Tween3D = object.__Tween3D || {};",
+                    "object.__Tween3D.variableIdentifiers = null;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SquashAndStretch3D::StretchTween3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
-          "propertyDescriptors": [
-            {
-              "value": "",
-              "type": "Number",
-              "unit": "Second",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "Duration"
-            },
-            {
-              "value": "",
-              "type": "String",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "Easing"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "unit": "Dimensionless",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "InitialValue"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "unit": "Dimensionless",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "TargetedValue"
-            }
-          ],
+          "propertyDescriptors": [],
           "sharedPropertyDescriptors": []
         }
       ],
