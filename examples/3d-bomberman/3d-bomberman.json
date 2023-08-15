@@ -1129,7 +1129,12 @@
           "behaviors": [
             {
               "name": "PlayerModel",
-              "type": "Player::PlayerModel"
+              "type": "Player::PlayerModel",
+              "Tween": "Tween"
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
             }
           ],
           "content": {
@@ -1387,7 +1392,12 @@
           "behaviors": [
             {
               "name": "PlayerModel",
-              "type": "Player::PlayerModel"
+              "type": "Player::PlayerModel",
+              "Tween": "Tween"
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
             }
           ],
           "content": {
@@ -1645,7 +1655,12 @@
           "behaviors": [
             {
               "name": "PlayerModel",
-              "type": "Player::PlayerModel"
+              "type": "Player::PlayerModel",
+              "Tween": "Tween"
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
             }
           ],
           "content": {
@@ -1903,7 +1918,12 @@
           "behaviors": [
             {
               "name": "PlayerModel",
-              "type": "Player::PlayerModel"
+              "type": "Player::PlayerModel",
+              "Tween": "Tween"
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
             }
           ],
           "content": {
@@ -3707,6 +3727,36 @@
                       "conditions": [
                         {
                           "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "PlayerModel",
+                            "Player",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Player::PlayerModel::PlayDeathAnimation"
+                          },
+                          "parameters": [
+                            "PlayerModel",
+                            "PlayerModel",
+                            "Explosion.Variable(DirectionX)",
+                            "Explosion.Variable(DirectionY)",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
                             "value": "VarObjet"
                           },
                           "parameters": [
@@ -3791,6 +3841,16 @@
                         "Player",
                         "Death",
                         "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::CanRespawn"
+                      },
+                      "parameters": [
+                        "PlayerModel",
+                        "PlayerModel",
+                        ""
                       ]
                     }
                   ],
@@ -3976,6 +4036,16 @@
               "conditions": [
                 {
                   "type": {
+                    "value": "ObjectVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Death",
+                    "False"
+                  ]
+                },
+                {
+                  "type": {
                     "value": "LinkedObjects::PickObjectsLinkedTo"
                   },
                   "parameters": [
@@ -4009,6 +4079,16 @@
                     "=",
                     "Player.TopDownMovement::Angle()",
                     ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Model3DObject::SetZ"
+                  },
+                  "parameters": [
+                    "PlayerModel",
+                    "=",
+                    "0"
                   ]
                 }
               ],
@@ -25579,6 +25659,28 @@
                     },
                     {
                       "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Explosion",
+                        "DirectionX",
+                        "=",
+                        "GetArgumentAsNumber(\"ExplosionDirectionX\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Explosion",
+                        "DirectionY",
+                        "=",
+                        "GetArgumentAsNumber(\"ExplosionDirectionY\")"
+                      ]
+                    },
+                    {
+                      "type": {
                         "value": "Cache"
                       },
                       "parameters": [
@@ -26228,7 +26330,13 @@
                         "Behavior",
                         ""
                       ]
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
                     {
                       "type": {
                         "value": "Cache"
@@ -26583,7 +26691,88 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"CanRespawn\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::SetPropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Alive\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Player::PlayerModel::IsPlayingDeathAnimation"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"DeathAnimation\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::SetPropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"CanRespawn\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Alive\""
+                      ]
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
@@ -26633,6 +26822,42 @@
                       "parameters": [
                         "Object",
                         "45"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"DeathAnimation\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Scene3D::Model3DObject::TurnAroundY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object.Variable(ExplosionDirectionX) * 4 * 360 * TimeDelta()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Model3DObject::TurnAroundX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object.Variable(ExplosionDirectionY) * 4 * 360 * TimeDelta()"
                       ]
                     }
                   ]
@@ -26736,6 +26961,325 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "fullName": "Play death animation",
+              "functionType": "Action",
+              "name": "PlayDeathAnimation",
+              "sentence": "Play death animation of _PARAM0_ toward _PARAM2_ ; _PARAM3_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareArgumentAsNumber"
+                      },
+                      "parameters": [
+                        "\"ExplosionDirectionY\"",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::AddObjectPositionXTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"FlyAwayX\"",
+                        "Object.X() + GetArgumentAsNumber(\"ExplosionDirectionX\") * 1000",
+                        "\"easeOutQuad\"",
+                        "2000",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::AddObjectPositionZTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"FlyAwayZ\"",
+                        "400",
+                        "\"easeOutQuad\"",
+                        "1000",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareArgumentAsNumber"
+                      },
+                      "parameters": [
+                        "\"ExplosionDirectionX\"",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::AddObjectPositionYTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"FlyAwayY\"",
+                        "Object.Y() + GetArgumentAsNumber(\"ExplosionDirectionY\") * 400",
+                        "\"easeOutQuad\"",
+                        "1000",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Model3DObject::TurnAroundY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "45"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "CompareArgumentAsNumber"
+                          },
+                          "parameters": [
+                            "\"ExplosionDirectionY\"",
+                            "<",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectPositionZTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Tween",
+                            "\"FlyAwayZ\"",
+                            "400",
+                            "\"easeOutQuad\"",
+                            "1000",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "CompareArgumentAsNumber"
+                          },
+                          "parameters": [
+                            "\"ExplosionDirectionY\"",
+                            ">",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Tween::AddObjectPositionZTween"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Tween",
+                            "\"FlyAwayZ\"",
+                            "600",
+                            "\"easeOutQuad\"",
+                            "1000",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "ExplosionDirectionX",
+                        "=",
+                        "GetArgumentAsNumber(\"ExplosionDirectionX\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "ExplosionDirectionY",
+                        "=",
+                        "GetArgumentAsNumber(\"ExplosionDirectionY\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::SetPropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"DeathAnimation\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerModel",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Explosion direction X",
+                  "name": "ExplosionDirectionX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Explosion direction Y",
+                  "name": "ExplosionDirectionY",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Death animation playing",
+              "functionType": "Condition",
+              "name": "IsPlayingDeathAnimation",
+              "private": true,
+              "sentence": "Death animation of _PARAM0_ is playing",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Tween::IsPlaying"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"FlyAwayZ\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerModel",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Can respawn",
+              "functionType": "Condition",
+              "name": "CanRespawn",
+              "sentence": "_PARAM0_ can respawn",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Player::PlayerModel::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"CanRespawn\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerModel",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "propertyDescriptors": [
@@ -26749,6 +27293,32 @@
               "extraInformation": [],
               "hidden": true,
               "name": "MovementAngle"
+            },
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "2D tween",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Tween::TweenBehavior"
+              ],
+              "hidden": false,
+              "name": "Tween"
+            },
+            {
+              "value": "Alive",
+              "type": "Choice",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Alive",
+                "DeathAnimation",
+                "CanRespawn"
+              ],
+              "hidden": true,
+              "name": "State"
             }
           ],
           "sharedPropertyDescriptors": []
