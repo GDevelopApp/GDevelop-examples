@@ -133,7 +133,7 @@ const updateResources = (gd, project, baseUrl) => {
     return baseUrl + '/' + file;
   };
 
-  gd.ResourceExposer.ExposeWholeProjectResources(project, worker);
+  gd.ResourceExposer.exposeWholeProjectResources(project, worker);
 };
 
 /**
