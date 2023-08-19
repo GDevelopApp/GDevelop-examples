@@ -1130,11 +1130,16 @@
             {
               "name": "PlayerModel",
               "type": "Player::PlayerModel",
-              "Tween": "Tween"
+              "Tween": "Tween",
+              "Tween3D": "Tween3D"
             },
             {
               "name": "Tween",
               "type": "Tween::TweenBehavior"
+            },
+            {
+              "name": "Tween3D",
+              "type": "Tween3D::Tween3D"
             }
           ],
           "content": {
@@ -1393,11 +1398,16 @@
             {
               "name": "PlayerModel",
               "type": "Player::PlayerModel",
-              "Tween": "Tween"
+              "Tween": "Tween",
+              "Tween3D": "Tween3D"
             },
             {
               "name": "Tween",
               "type": "Tween::TweenBehavior"
+            },
+            {
+              "name": "Tween3D",
+              "type": "Tween3D::Tween3D"
             }
           ],
           "content": {
@@ -1656,11 +1666,16 @@
             {
               "name": "PlayerModel",
               "type": "Player::PlayerModel",
-              "Tween": "Tween"
+              "Tween": "Tween",
+              "Tween3D": "Tween3D"
             },
             {
               "name": "Tween",
               "type": "Tween::TweenBehavior"
+            },
+            {
+              "name": "Tween3D",
+              "type": "Tween3D::Tween3D"
             }
           ],
           "content": {
@@ -1919,11 +1934,16 @@
             {
               "name": "PlayerModel",
               "type": "Player::PlayerModel",
-              "Tween": "Tween"
+              "Tween": "Tween",
+              "Tween3D": "Tween3D"
             },
             {
               "name": "Tween",
               "type": "Tween::TweenBehavior"
+            },
+            {
+              "name": "Tween3D",
+              "type": "Tween3D::Tween3D"
             }
           ],
           "content": {
@@ -3905,6 +3925,36 @@
                         "Player",
                         "Bonus",
                         ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                          },
+                          "parameters": [
+                            "",
+                            "PlayerModel",
+                            "Player",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Player::PlayerModel::PlayRespawnAnimation"
+                          },
+                          "parameters": [
+                            "PlayerModel",
+                            "PlayerModel",
+                            ""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -26671,6 +26721,56 @@
             {
               "fullName": "",
               "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "90"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Angle",
+                        "=",
+                        "90"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerModel",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
               "name": "doStepPostEvents",
               "sentence": "",
               "events": [
@@ -26782,6 +26882,34 @@
                   ],
                   "events": [
                     {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Angle",
+                            "+",
+                            "sign(AngleDifference(Object.Behavior::MovementAngle(), Object.Variable(Angle))) * min(abs(AngleDifference(Object.Behavior::MovementAngle(), Object.Variable(Angle))), 720 * TimeDelta())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Object.Variable(Angle)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "disabled": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
@@ -27352,18 +27480,9 @@
               "sentence": "Update the position of _PARAM0_ according to _PARAM2_",
               "events": [
                 {
+                  "disabled": true,
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "TopDownMovementBehavior::IsMoving"
-                      },
-                      "parameters": [
-                        "Player",
-                        "TopDownMovement"
-                      ]
-                    }
-                  ],
+                  "conditions": [],
                   "actions": [
                     {
                       "type": {
@@ -27418,7 +27537,17 @@
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::IsMoving"
+                          },
+                          "parameters": [
+                            "Player",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ],
                       "actions": [
                         {
                           "type": {
@@ -27516,6 +27645,82 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "fullName": "Play respwan animation",
+              "functionType": "Action",
+              "name": "PlayRespawnAnimation",
+              "sentence": "Play respwan animation of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "90"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Angle",
+                        "=",
+                        "90"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween3D::SetStretchZ"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "8",
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween3D::Tween3D::TweenStretchZ"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween3D",
+                        "\"Unstrentch\"",
+                        "1",
+                        "1",
+                        "\"elastic\"",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerModel",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "propertyDescriptors": [
@@ -27555,6 +27760,18 @@
               ],
               "hidden": true,
               "name": "State"
+            },
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "3D tween",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Tween3D::Tween3D"
+              ],
+              "hidden": false,
+              "name": "Tween3D"
             }
           ],
           "sharedPropertyDescriptors": []
@@ -28218,60 +28435,60 @@
           "initialVariables": []
         },
         {
-          "angle": 180,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "BlueBunny",
           "persistentUuid": "0e59664b-d4d7-45df-a225-576dd3049dd1",
           "width": 0,
-          "x": 1054,
-          "y": 606,
+          "x": 1036,
+          "y": 624,
           "zOrder": 14,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "PurpleBunny",
           "persistentUuid": "a0917fc0-983f-44f6-8fe3-ae14f0398f39",
           "width": 0,
-          "x": 224,
-          "y": 54,
+          "x": 244,
+          "y": 34,
           "zOrder": 15,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "OrangeBunny",
           "persistentUuid": "ff41b690-4336-4ff1-b2be-1247be2900f1",
           "width": 0,
-          "x": 214,
-          "y": 606,
+          "x": 244,
+          "y": 624,
           "zOrder": 16,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 180,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "PinkBunny",
           "persistentUuid": "4b6723f8-7101-429b-88c4-62783fdd6a69",
           "width": 0,
-          "x": 1064,
-          "y": 54,
+          "x": 1036,
+          "y": 24,
           "zOrder": 17,
           "numberProperties": [],
           "stringProperties": [],
@@ -29426,60 +29643,60 @@
           "initialVariables": []
         },
         {
-          "angle": 180,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "BlueBunny",
           "persistentUuid": "d215408a-951f-495f-aef7-94849aa89639",
           "width": 0,
-          "x": 1054,
-          "y": 606,
+          "x": 1036,
+          "y": 624,
           "zOrder": 14,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 180,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "PinkBunny",
           "persistentUuid": "bec5a1c6-d7cc-498d-b458-c32de613db3e",
           "width": 0,
-          "x": 1064,
-          "y": 54,
+          "x": 1036,
+          "y": 24,
           "zOrder": 15,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "OrangeBunny",
           "persistentUuid": "dbe90f46-ae68-4863-bde9-44f85ca2b2bd",
           "width": 0,
-          "x": 214,
-          "y": 606,
+          "x": 244,
+          "y": 624,
           "zOrder": 16,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "PurpleBunny",
           "persistentUuid": "6aa5c9ea-48f7-4813-9359-7bddcf707535",
           "width": 0,
-          "x": 214,
-          "y": 54,
+          "x": 244,
+          "y": 34,
           "zOrder": 17,
           "numberProperties": [],
           "stringProperties": [],
@@ -30602,15 +30819,15 @@
           "initialVariables": []
         },
         {
-          "angle": 180,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "BlueBunny",
           "persistentUuid": "3cc5034c-7d2b-4e8b-937f-32ee4bcd07e1",
           "width": 0,
-          "x": 1066,
-          "y": 606,
+          "x": 1036,
+          "y": 624,
           "zOrder": 14,
           "numberProperties": [],
           "stringProperties": [],
@@ -31625,15 +31842,15 @@
           "initialVariables": []
         },
         {
-          "angle": 180,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "PinkBunny",
           "persistentUuid": "049d618c-239e-4c7b-b1bc-d9b9927bb44c",
           "width": 0,
-          "x": 1056,
-          "y": 54,
+          "x": 1036,
+          "y": 24,
           "zOrder": 15,
           "numberProperties": [],
           "stringProperties": [],
@@ -31688,30 +31905,30 @@
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "PurpleBunny",
           "persistentUuid": "64524959-335e-4bc8-a0ce-dc510e61e25d",
           "width": 0,
-          "x": 224,
-          "y": 54,
+          "x": 244,
+          "y": 24,
           "zOrder": 19,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 90,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "OrangeBunny",
           "persistentUuid": "3c33e146-7812-4e39-8176-31d418fc3c98",
           "width": 0,
-          "x": 214,
-          "y": 606,
+          "x": 244,
+          "y": 624,
           "zOrder": 20,
           "numberProperties": [],
           "stringProperties": [],
