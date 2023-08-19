@@ -4054,16 +4054,6 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "ObjectVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Death",
-                    "False"
-                  ]
-                },
-                {
-                  "type": {
                     "value": "LinkedObjects::PickObjectsLinkedTo"
                   },
                   "parameters": [
@@ -4077,91 +4067,14 @@
               "actions": [
                 {
                   "type": {
-                    "value": "SetCenter"
-                  },
-                  "parameters": [
-                    "PlayerModel",
-                    "=",
-                    "Player.CenterX()",
-                    "=",
-                    "Player.CenterY() + 16"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Player::PlayerModel::SetMovementAngle"
+                    "value": "Player::PlayerModel::UpdatePosition"
                   },
                   "parameters": [
                     "PlayerModel",
                     "PlayerModel",
-                    "=",
-                    "Player.TopDownMovement::Angle()",
+                    "Player",
+                    "TopDownMovement",
                     ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Model3DObject::SetZ"
-                  },
-                  "parameters": [
-                    "PlayerModel",
-                    "=",
-                    "0"
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "TopDownMovementBehavior::IsMoving"
-                      },
-                      "parameters": [
-                        "Player",
-                        "TopDownMovement"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Scene3D::Model3DObject::SetAnimationName"
-                      },
-                      "parameters": [
-                        "PlayerModel",
-                        "=",
-                        "\"Idle\""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "TopDownMovementBehavior::IsMoving"
-                      },
-                      "parameters": [
-                        "Player",
-                        "TopDownMovement"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Scene3D::Model3DObject::SetAnimationName"
-                      },
-                      "parameters": [
-                        "PlayerModel",
-                        "=",
-                        "\"Run\""
-                      ]
-                    }
                   ]
                 }
               ]
@@ -26794,27 +26707,6 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Angle",
-                        "+",
-                        "sign(AngleDifference(Object.Behavior::MovementAngle(), Object.Variable(Angle))) * min(abs(AngleDifference(Object.Behavior::MovementAngle(), Object.Variable(Angle))), 720 * TimeDelta())"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.Variable(Angle)"
-                      ]
-                    },
-                    {
-                      "type": {
                         "value": "Scene3D::Model3DObject::SetRotationY"
                       },
                       "parameters": [
@@ -26832,14 +26724,60 @@
                         "=",
                         "0"
                       ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "ObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Object",
+                            "HasEverMoved",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Angle",
+                            "+",
+                            "sign(AngleDifference(Object.Behavior::MovementAngle(), Object.Variable(Angle))) * min(abs(AngleDifference(Object.Behavior::MovementAngle(), Object.Variable(Angle))), 720 * TimeDelta())"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Object.Variable(Angle)"
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "type": {
-                        "value": "Scene3D::Model3DObject::TurnAroundX"
-                      },
-                      "parameters": [
-                        "Object",
-                        "45"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Scene3D::Model3DObject::TurnAroundX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "45"
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -27348,6 +27286,178 @@
                   "description": "Behavior",
                   "name": "Behavior",
                   "supplementaryInformation": "Player::PlayerModel",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Update position",
+              "functionType": "Action",
+              "name": "UpdatePosition",
+              "sentence": "Update the position of _PARAM0_ according to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementBehavior::IsMoving"
+                      },
+                      "parameters": [
+                        "Player",
+                        "TopDownMovement"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Object",
+                        "HasEverMoved",
+                        "True"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Death",
+                        "False"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetCenter"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Player.CenterX()",
+                        "=",
+                        "Player.CenterY() + 16"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Model3DObject::SetZ"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Player::PlayerModel::SetMovementAngle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Player.TopDownMovement::Angle()",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "TopDownMovementBehavior::IsMoving"
+                          },
+                          "parameters": [
+                            "Player",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Scene3D::Model3DObject::SetAnimationName"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "\"Idle\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "TopDownMovementBehavior::IsMoving"
+                          },
+                          "parameters": [
+                            "Player",
+                            "TopDownMovement"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Scene3D::Model3DObject::SetAnimationName"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "\"Run\""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerModel",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Player",
+                  "name": "Player",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Top-down movement",
+                  "name": "TopDownMovement",
+                  "supplementaryInformation": "TopDownMovementBehavior::TopDownMovementBehavior",
                   "type": "behavior"
                 }
               ],
@@ -28054,7 +28164,7 @@
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 180,
           "customSize": false,
           "height": 0,
           "layer": "",
@@ -28099,7 +28209,7 @@
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 180,
           "customSize": false,
           "height": 0,
           "layer": "",
@@ -28172,7 +28282,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.43028208721630734,
+        "zoomFactor": 0.7561452800822535,
         "windowMask": false
       }
     },
@@ -29262,7 +29372,7 @@
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 180,
           "customSize": false,
           "height": 0,
           "layer": "",
@@ -29277,7 +29387,7 @@
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 180,
           "customSize": false,
           "height": 0,
           "layer": "",
@@ -29405,15 +29515,14 @@
         },
         {
           "angle": 0,
-          "customSize": true,
-          "depth": 0,
+          "customSize": false,
           "height": 68,
           "layer": "",
           "name": "Player2",
           "persistentUuid": "2b89c85e-e86a-48d5-ac4d-a90dcda0f833",
           "width": 82,
-          "x": 182,
-          "y": -9,
+          "x": 199,
+          "y": 6,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -29427,8 +29536,8 @@
           "name": "Player3",
           "persistentUuid": "513d236d-ffbc-4367-917a-dd9eaa59ce66",
           "width": 82,
-          "x": 190,
-          "y": 600,
+          "x": 199,
+          "y": 606,
           "zOrder": 9,
           "numberProperties": [],
           "stringProperties": [],
@@ -29442,7 +29551,7 @@
           "name": "Player4",
           "persistentUuid": "7e397593-ecf8-4d95-b0c6-ea43b45731f2",
           "width": 82,
-          "x": 1030,
+          "x": 1039,
           "y": 6,
           "zOrder": 10,
           "numberProperties": [],
@@ -30439,14 +30548,14 @@
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 180,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "BlueBunny",
           "persistentUuid": "3cc5034c-7d2b-4e8b-937f-32ee4bcd07e1",
           "width": 0,
-          "x": 1054,
+          "x": 1066,
           "y": 606,
           "zOrder": 14,
           "numberProperties": [],
@@ -31462,14 +31571,14 @@
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": 180,
           "customSize": false,
           "height": 0,
           "layer": "",
           "name": "PinkBunny",
           "persistentUuid": "049d618c-239e-4c7b-b1bc-d9b9927bb44c",
           "width": 0,
-          "x": 1064,
+          "x": 1056,
           "y": 54,
           "zOrder": 15,
           "numberProperties": [],
@@ -31523,6 +31632,36 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "PurpleBunny",
+          "persistentUuid": "64524959-335e-4bc8-a0ce-dc510e61e25d",
+          "width": 0,
+          "x": 224,
+          "y": 54,
+          "zOrder": 19,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "OrangeBunny",
+          "persistentUuid": "3c33e146-7812-4e39-8176-31d418fc3c98",
+          "width": 0,
+          "x": 214,
+          "y": 606,
+          "zOrder": 20,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "editionSettings": {
@@ -31535,7 +31674,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.24141454161229675,
+        "zoomFactor": 0.6749291901856892,
         "windowMask": false
       }
     }
