@@ -74,7 +74,7 @@ describe('exampleShortHeaders.json post build checks', () => {
           'Checkpoints',
           'Gamepads (controllers)',
           'Multitouch joystick and buttons (sprite)',
-          'Shake Object (position, angle, scale)',
+          'Shake Object',
           'Volume Falloff',
         ]),
         codeSizeLevel: 'small',
