@@ -2019,12 +2019,18 @@
           "effects": [],
           "behaviors": [
             {
-              "name": "Billboard",
-              "type": "Billboard::Billboard",
-              "ShouldRotateX": true,
-              "ShouldRotateY": true,
-              "ShouldRotateZ": true,
-              "OffsetPositionMode": "No change"
+              "name": "BonusAnimator",
+              "type": "Bonus::BonusAnimator",
+              "Tween3D": "Tween3D",
+              "Tween": "Tween"
+            },
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            },
+            {
+              "name": "Tween3D",
+              "type": "Tween3D::Tween3D"
             }
           ],
           "content": {
@@ -4217,12 +4223,12 @@
           "type": "AnimatableCapability::AnimatableBehavior"
         },
         {
-          "name": "Billboard",
-          "type": "Billboard::Billboard"
-        },
-        {
           "name": "BombAnimator",
           "type": "Bomb::BombAnimator"
+        },
+        {
+          "name": "BonusAnimator",
+          "type": "Bonus::BonusAnimator"
         },
         {
           "name": "Effect",
@@ -6693,7 +6699,7 @@
                   "parameters": [
                     "RandomInRange(1, 4)",
                     "<=",
-                    "1"
+                    "4"
                   ]
                 }
               ],
@@ -10835,6 +10841,10 @@
       "shortDescription": "Smoothly animate scale and rotation of 3d models.",
       "version": "0.0.2",
       "description": "Change models proportions and orientation over time to make smooth animations.",
+      "origin": {
+        "identifier": "Tween3D",
+        "name": "gdevelop-extension-store"
+      },
       "tags": [
         "3d",
         "tween",
@@ -11481,7 +11491,7 @@
               "description": "Tweens an object rotation X from its current value to a new one.",
               "fullName": "Tween rotation X",
               "functionType": "Action",
-              "group": "Size",
+              "group": "Angle",
               "name": "TweenRotationX",
               "sentence": "Tween the rotation X of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with _PARAM5_ easing as _PARAM2_",
               "events": [
@@ -11549,7 +11559,7 @@
               "description": "Tweens an object rotation Y from its current value to a new one.",
               "fullName": "Tween rotation Y",
               "functionType": "Action",
-              "group": "Size",
+              "group": "Angle",
               "name": "TweenRotationY",
               "sentence": "Tween the rotation Y of object _PARAM0_ to _PARAM3_ over _PARAM4_ seconds with _PARAM5_ easing as _PARAM2_",
               "events": [
@@ -33430,18 +33440,138 @@
           "description": "",
           "fullName": "",
           "name": "BonusAnimator",
-          "objectType": "",
+          "objectType": "Scene3D::Cube3DObject",
           "eventsFunctions": [
             {
               "fullName": "",
               "functionType": "Action",
               "name": "onCreated",
               "sentence": "",
-              "events": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Tween::AddObjectPositionZTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"Jump\"",
+                        "120",
+                        "\"easeOutQuad\"",
+                        "500",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "0.5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::AddObjectPositionZTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"Jump\"",
+                        "20",
+                        "\"easeOutBounce\"",
+                        "1000",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "-180"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::AddObjectAngleTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"Turn\"",
+                        "0",
+                        "\"linear\"",
+                        "1000",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetRotationX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Object3D",
+                        "=",
+                        "-20"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "1000"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween3D::Tween3D::TweenRotationX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween3D",
+                        "\"Billboard\"",
+                        "20",
+                        "1000",
+                        "\"linear\"",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
+                  "supplementaryInformation": "Scene3D::Cube3DObject",
                   "type": "object"
                 },
                 {
