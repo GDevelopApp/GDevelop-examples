@@ -3620,16 +3620,6 @@
                         "hasNewBombExploded",
                         "True"
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "\"------STEP-----\"",
-                        "",
-                        ""
-                      ]
                     }
                   ]
                 },
@@ -3678,6 +3668,15 @@
                         }
                       ],
                       "actions": [
+                        {
+                          "type": {
+                            "value": "AjoutObjConcern"
+                          },
+                          "parameters": [
+                            "",
+                            "Explosion"
+                          ]
+                        },
                         {
                           "type": {
                             "value": "Bomb::Explode"
@@ -6843,34 +6842,6 @@
       "lastChangeTimeStamp": 0,
       "name": "Check explosion collision",
       "events": [
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "CollisionNP"
-              },
-              "parameters": [
-                "Explosion",
-                "Wall",
-                "",
-                "",
-                ""
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "Delete"
-              },
-              "parameters": [
-                "Explosion",
-                ""
-              ]
-            }
-          ]
-        },
         {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
@@ -34340,15 +34311,32 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Bomb::IsExplosionAlreadyCreated"
+                            "value": "Bomb::ExplosionBehavior::HasJustBeenCreated"
                           },
                           "parameters": [
-                            "",
                             "Explosion",
                             "ExplosionBehavior",
-                            "Bomb.X() + GetArgumentAsNumber(\"ExplosionDirectionX\") * 60 * Variable(iteration)",
-                            "Bomb.Y() + GetArgumentAsNumber(\"ExplosionDirectionY\") * 60 * Variable(iteration)",
                             ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PosX"
+                          },
+                          "parameters": [
+                            "Explosion",
+                            "=",
+                            "Bomb.X() + GetArgumentAsNumber(\"ExplosionDirectionX\") * 60 * Variable(iteration)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PosY"
+                          },
+                          "parameters": [
+                            "Explosion",
+                            "=",
+                            "Bomb.Y() + GetArgumentAsNumber(\"ExplosionDirectionY\") * 60 * Variable(iteration)"
                           ]
                         }
                       ],
@@ -34366,17 +34354,7 @@
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SceneVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "isExplosionAlreadyCreated",
-                            "="
-                          ]
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
@@ -34387,30 +34365,6 @@
                             "Explosion",
                             "Bomb.X() + GetArgumentAsNumber(\"ExplosionDirectionX\") * 60 * Variable(iteration)",
                             "Bomb.Y() + GetArgumentAsNumber(\"ExplosionDirectionY\") * 60 * Variable(iteration)",
-                            "\"\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Create"
-                          },
-                          "parameters": [
-                            "",
-                            "ParticleEmitter",
-                            "Explosion.CenterX()",
-                            "Explosion.CenterY()",
-                            "\"\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Create"
-                          },
-                          "parameters": [
-                            "",
-                            "ParticleEmitter",
-                            "Explosion.CenterX() - GetArgumentAsNumber(\"ExplosionDirectionX\") * 30",
-                            "Explosion.CenterY() - GetArgumentAsNumber(\"ExplosionDirectionY\") * 30",
                             "\"\""
                           ]
                         },
@@ -34457,6 +34411,46 @@
                         }
                       ],
                       "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "isExplosionAlreadyCreated",
+                                "="
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "ParticleEmitter",
+                                "Explosion.CenterX()",
+                                "Explosion.CenterY()",
+                                "\"\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "ParticleEmitter",
+                                "Explosion.CenterX() - GetArgumentAsNumber(\"ExplosionDirectionX\") * 30",
+                                "Explosion.CenterY() - GetArgumentAsNumber(\"ExplosionDirectionY\") * 30",
+                                "\"\""
+                              ]
+                            }
+                          ]
+                        },
                         {
                           "type": "BuiltinCommonInstructions::Comment",
                           "color": {
@@ -34563,111 +34557,6 @@
             {
               "description": "Explosion direction Y",
               "name": "ExplosionDirectionY",
-              "type": "expression"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "fullName": "Explosion already created",
-          "functionType": "Condition",
-          "name": "IsExplosionAlreadyCreated",
-          "private": true,
-          "sentence": "_PARAM1_ already created at _PARAM3_ ; _PARAM4_",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Bomb::ExplosionBehavior::HasJustBeenCreated"
-                  },
-                  "parameters": [
-                    "Explosion",
-                    "ExplosionBehavior",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "PosX"
-                  },
-                  "parameters": [
-                    "Explosion",
-                    "=",
-                    "GetArgumentAsNumber(\"PositionX\")"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "PosY"
-                  },
-                  "parameters": [
-                    "Explosion",
-                    "=",
-                    "GetArgumentAsNumber(\"PositionY\")"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetReturnBoolean"
-                  },
-                  "parameters": [
-                    "True"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "DebuggerTools::ConsoleLog"
-                  },
-                  "parameters": [
-                    "\"Exists at: \" + GetArgumentAsString(\"PositionX\") + \" \" + GetArgumentAsString(\"PositionY\")",
-                    "",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "Explosion",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "DebuggerTools::ConsoleLog"
-                  },
-                  "parameters": [
-                    "GetArgumentAsString(\"PositionX\") + \" \" + GetArgumentAsString(\"PositionY\") + \" = \" + ToString(Explosion.X()) + \" \" + ToString(Explosion.Y())",
-                    "",
-                    ""
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Explosion",
-              "name": "Explosion",
-              "type": "objectList"
-            },
-            {
-              "description": "Explosion",
-              "name": "ExplosionBehavior",
-              "supplementaryInformation": "Bomb::ExplosionBehavior",
-              "type": "behavior"
-            },
-            {
-              "description": "Position on X axis",
-              "name": "PositionX",
-              "type": "expression"
-            },
-            {
-              "description": "Position on Y axis",
-              "name": "PositionY",
               "type": "expression"
             }
           ],
@@ -35069,16 +34958,6 @@
                       },
                       "parameters": [
                         "True"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "DebuggerTools::ConsoleLog"
-                      },
-                      "parameters": [
-                        "\"Just created\"",
-                        "",
-                        ""
                       ]
                     }
                   ]
