@@ -2364,7 +2364,7 @@
         },
         {
           "assetStoreId": "",
-          "name": "ParticleEmitter",
+          "name": "ExplosionParticleEmitter",
           "tags": "",
           "type": "ParticleEmitter3D::ParticleEmitter3D",
           "variables": [],
@@ -2385,6 +2385,97 @@
             "Flow": 120,
             "EndColor": "255;255;0",
             "EndOpacity": 0
+          },
+          "childrenContent": {
+            "Particle": {
+              "adaptCollisionMaskAutomatically": true,
+              "updateIfNotVisible": false,
+              "animations": [
+                {
+                  "name": "Image",
+                  "useMultipleDirections": false,
+                  "directions": [
+                    {
+                      "looping": false,
+                      "metadata": "{\"pskl\":{}}",
+                      "timeBetweenFrames": 0.08,
+                      "sprites": [
+                        {
+                          "hasCustomCollisionMask": true,
+                          "image": "assets\\SmoothParticle.png",
+                          "points": [],
+                          "originPoint": {
+                            "name": "origine",
+                            "x": 0,
+                            "y": 0
+                          },
+                          "centerPoint": {
+                            "automatic": true,
+                            "name": "centre",
+                            "x": 0,
+                            "y": 0
+                          },
+                          "customCollisionMask": [
+                            [
+                              {
+                                "x": 20,
+                                "y": 21
+                              },
+                              {
+                                "x": 44,
+                                "y": 21
+                              },
+                              {
+                                "x": 44,
+                                "y": 46
+                              },
+                              {
+                                "x": 20,
+                                "y": 46
+                              }
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "UpgradeParticleEmitter",
+          "tags": "",
+          "type": "ParticleEmitter3D::ParticleEmitter3D",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Sticker",
+              "type": "Sticker::Sticker",
+              "OnlyFollowPosition": true,
+              "IsDestroyedWithParent": false
+            }
+          ],
+          "content": {
+            "Z": 20,
+            "Duration": 0.125,
+            "GravityTop": "Z+",
+            "StartSpeedMax": 200,
+            "SpayConeAngle": 360,
+            "StartSizeMin": 125,
+            "StartSizeMax": 256,
+            "EndScale": 0.25,
+            "StartSpeedMin": 200,
+            "LifespanMax": 0.5,
+            "LifespanMin": 0.5,
+            "Flow": 120,
+            "EndColor": "255;255;255",
+            "EndOpacity": 0,
+            "StartColor": "255;255;255",
+            "AreParticlesRelative": true
           },
           "childrenContent": {
             "Particle": {
@@ -2935,6 +3026,29 @@
                     "Bonus",
                     ""
                   ]
+                },
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "UpgradeParticleEmitter",
+                    "Player.CenterX()",
+                    "Player.CenterY() - 15",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Sticker::Sticker::Stick"
+                  },
+                  "parameters": [
+                    "UpgradeParticleEmitter",
+                    "Sticker",
+                    "Player",
+                    ""
+                  ]
                 }
               ]
             }
@@ -3441,7 +3555,7 @@
                         "Bomb",
                         "Explosion",
                         "Obstacle",
-                        "ParticleEmitter",
+                        "ExplosionParticleEmitter",
                         ""
                       ]
                     }
@@ -3495,7 +3609,7 @@
                         "Bomb",
                         "Explosion",
                         "Obstacle",
-                        "ParticleEmitter",
+                        "ExplosionParticleEmitter",
                         ""
                       ]
                     }
@@ -3917,6 +4031,7 @@
                         "Player",
                         "Player",
                         "Bonus",
+                        "BonusAnimator",
                         ""
                       ]
                     }
@@ -32498,6 +32613,16 @@
                         "+",
                         "1"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "Bonus::BonusAnimator::PlaySpawnAnimation"
+                      },
+                      "parameters": [
+                        "Bonus",
+                        "BonusAnimator",
+                        ""
+                      ]
                     }
                   ]
                 },
@@ -32534,6 +32659,12 @@
                   "name": "Bonus",
                   "supplementaryInformation": "Scene3D::Cube3DObject",
                   "type": "objectList"
+                },
+                {
+                  "description": "Bonus animator",
+                  "name": "BonusAnimator",
+                  "supplementaryInformation": "Bonus::BonusAnimator",
+                  "type": "behavior"
                 }
               ],
               "objectGroups": []
@@ -33683,6 +33814,45 @@
               "functionType": "Action",
               "name": "onCreated",
               "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Bonus::BonusAnimator::PlaySpawnAnimation"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Cube3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bonus::BonusAnimator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Play spwan animation",
+              "functionType": "Action",
+              "name": "PlaySpawnAnimation",
+              "sentence": "Play spwan animation of _PARAM0_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
