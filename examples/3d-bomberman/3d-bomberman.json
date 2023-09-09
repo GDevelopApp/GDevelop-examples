@@ -830,8 +830,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 9,
-                        "y": 6
+                        "x": 0,
+                        "y": 0
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1108,8 +1108,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 9,
-                        "y": 6
+                        "x": 0,
+                        "y": 0
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1386,8 +1386,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 9,
-                        "y": 6
+                        "x": 0,
+                        "y": 0
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1664,8 +1664,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 9,
-                        "y": 6
+                        "x": 0,
+                        "y": 0
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -2391,8 +2391,8 @@
             "GravityTop": "Z+",
             "StartSpeedMax": 100,
             "SpayConeAngle": 360,
-            "StartSizeMin": 125,
-            "StartSizeMax": 256,
+            "StartSizeMin": 42,
+            "StartSizeMax": 84,
             "EndScale": 0.25,
             "StartSpeedMin": 100,
             "LifespanMax": 0.5,
@@ -2480,8 +2480,8 @@
             "GravityTop": "Z+",
             "StartSpeedMax": 300,
             "SpayConeAngle": 360,
-            "StartSizeMin": 125,
-            "StartSizeMax": 256,
+            "StartSizeMin": 42,
+            "StartSizeMax": 84,
             "EndScale": 0.25,
             "StartSpeedMin": 300,
             "LifespanMax": 0.333,
@@ -3138,126 +3138,73 @@
                             "textG": 0,
                             "textR": 0
                           },
-                          "comment": "Check that no bomb is already on this square.\nThe negation of \"Is there at least one bomb on this square?\" is equivalent to \"Is there no bomb on this square?\".\nThis is not the same as having the negation directly on the condition because it would mean \"Is there a bomb that is not on this square?\"."
+                          "comment": "canPutBomb variable is used to forget the bombs picked by the condition and be able to access the created one."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "canPutBomb",
+                                "False"
+                              ]
+                            }
+                          ]
                         },
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
                             {
                               "type": {
-                                "value": "VarObjet"
+                                "value": "Player::Player::CanPutBomb"
                               },
                               "parameters": [
                                 "Player",
-                                "BombPut",
-                                "<",
-                                "Player.Variable(BombCapacity)"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::Not"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "value": "CollisionPoint"
-                                  },
-                                  "parameters": [
-                                    "Bomb",
-                                    "10 + round((Player.X() - 10) / 60) * 60 + 30",
-                                    "round(Player.Y() / 60) * 60 + 30"
-                                  ]
-                                }
+                                "Player",
+                                "Bomb",
+                                ""
                               ]
                             }
                           ],
                           "actions": [
                             {
                               "type": {
-                                "value": "Create"
+                                "value": "SetSceneVariableAsBoolean"
                               },
                               "parameters": [
-                                "",
-                                "Bomb",
-                                "10 + round((Player.X() - 10) / 60) * 60",
-                                "round(Player.Y() / 60) * 60",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ResetObjectTimer"
-                              },
-                              "parameters": [
-                                "Bomb",
-                                "\"Detonator\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "Player",
-                                "BombPut",
-                                "+",
-                                "1"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "Bomb",
-                                "Range",
-                                "=",
-                                "Player.Variable(Range)"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "Player",
-                                "BombX",
-                                "=",
-                                "Bomb.X()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "Player",
-                                "BombY",
-                                "=",
-                                "Bomb.Y()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "Bomb",
-                                "PlayerNum",
-                                "=",
-                                "Player.Variable(Number)"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetObjectVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "Bomb",
-                                "IsNew",
+                                "canPutBomb",
                                 "True"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "canPutBomb",
+                                "True"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Player::Player::PutBomb"
+                              },
+                              "parameters": [
+                                "Player",
+                                "Player",
+                                "Bomb",
+                                ""
                               ]
                             },
                             {
@@ -3303,90 +3250,68 @@
                                 "Bomb"
                               ]
                             }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "The variable IsNew allows to apply some actions on the created bombes without the player in the context.\nOtherwise, the loop on the players wouldn't work because GDevelop couldn't tell on which player to apply actions."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "Bomb",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "ObjectVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "Bomb",
-                        "IsNew",
-                        "True"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetObjectVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "Bomb",
-                        "IsNew",
-                        "="
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Other players can be on the square where the bomb is put."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "Player",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "CollisionNP"
-                          },
-                          "parameters": [
-                            "Player",
-                            "Bomb",
-                            "",
-                            "",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "Bomb",
-                            "IsOverlaping[ToString(Player.Variable(Number))]",
-                            "True"
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "AjoutObjConcern"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Player"
+                                  ]
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "Other players can be on the square where the bomb is put."
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::ForEach",
+                                  "object": "Player",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "CollisionNP"
+                                      },
+                                      "parameters": [
+                                        "Player",
+                                        "Bomb",
+                                        "",
+                                        "",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "Player::Player::AllowToWalkOnBomb"
+                                      },
+                                      "parameters": [
+                                        "Player",
+                                        "Player",
+                                        "Bomb",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -3406,100 +3331,18 @@
               "type": "BuiltinCommonInstructions::Group",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "Player",
+                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
-                  "actions": [],
-                  "events": [
+                  "actions": [
                     {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
+                      "type": {
+                        "value": "Player::Player::SeparateFromBomb"
                       },
-                      "comment": "The player no longer overlaps the bomb. It becomes solid for this player."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "Distance"
-                          },
-                          "parameters": [
-                            "Player",
-                            "Bomb",
-                            "59.9",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "Bomb",
-                            "IsOverlaping[ToString(Player.Variable(Number))]",
-                            "True"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ObjectVariableRemoveChild"
-                          },
-                          "parameters": [
-                            "Bomb",
-                            "IsOverlaping",
-                            "Player.VariableString(Number)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "CollisionNP"
-                          },
-                          "parameters": [
-                            "Player",
-                            "Bomb",
-                            "",
-                            "",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "ObjectVariableAsBoolean"
-                          },
-                          "parameters": [
-                            "Bomb",
-                            "IsOverlaping[ToString(Player.Variable(Number))]",
-                            "True"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SeparateFromObjects"
-                          },
-                          "parameters": [
-                            "Player",
-                            "Bomb",
-                            ""
-                          ]
-                        }
+                      "parameters": [
+                        "Player",
+                        "Player",
+                        "Bomb",
+                        ""
                       ]
                     }
                   ]
@@ -5829,7 +5672,7 @@
                   "parameters": [
                     "RandomInRange(1, 4)",
                     "<=",
-                    "4"
+                    "1"
                   ]
                 }
               ],
@@ -16287,13 +16130,16 @@
       "name": "ParticleEmitter3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/f2e5a34bf465f781866677762d385d6c8e9e8d203383f2df9a3b7e0fad6a2cb5_fire.svg",
       "shortDescription": "Display a large number of particles to create visual effects.",
-      "version": "0.0.2",
+      "version": "1.0.0",
       "description": [
         "Particle emitters can be used to display:",
         "- Fire",
         "- Smoke",
         "- Splashes",
-        "- Lights"
+        "- Lights",
+        "",
+        "Breaking change from 1.0.0:",
+        "- Particles were 3 times too small"
       ],
       "origin": {
         "identifier": "ParticleEmitter3D",
@@ -19070,7 +18916,7 @@
                     "            }",
                     "            if (this.worldSpace) {",
                     "                particle.position.applyMatrix4(matrix);",
-                    "                particle.startSize = (particle.startSize * (scale.x + scale.y + scale.z)) / 3;",
+                    "                particle.startSize = (particle.startSize * (Math.abs(scale.x) + Math.abs(scale.y) + Math.abs(scale.z))) / 3;",
                     "                particle.size = particle.startSize;",
                     "                particle.velocity.multiply(scale).applyMatrix3(this.normalMatrix);",
                     "                if (particle.rotation && particle.rotation instanceof THREE.Quaternion) {",
@@ -20118,7 +19964,7 @@
                     "                        this.sizeBuffer.setX(index, particle.size);",
                     "                    }",
                     "                    else {",
-                    "                        this.sizeBuffer.setX(index, (particle.size * (scale.x + scale.y + scale.z)) / 3);",
+                    "                        this.sizeBuffer.setX(index, (particle.size * (Math.abs(scale.x) + Math.abs(scale.y) + Math.abs(scale.z))) / 3);",
                     "                    }",
                     "                }",
                     "                this.uvTileBuffer.setX(index, particle.uvTile);",
@@ -20472,8 +20318,8 @@
                     "                            this.widthBuffer.setX(index + 1, current.size);",
                     "                        }",
                     "                        else {",
-                    "                            this.widthBuffer.setX(index, (current.size * (scale.x + scale.y + scale.z)) / 3);",
-                    "                            this.widthBuffer.setX(index + 1, (current.size * (scale.x + scale.y + scale.z)) / 3);",
+                    "                            this.widthBuffer.setX(index, (current.size * (Math.abs(scale.x) + Math.abs(scale.y) + Math.abs(scale.z))) / 3);",
+                    "                            this.widthBuffer.setX(index + 1, (current.size * (Math.abs(scale.x) + Math.abs(scale.y) + Math.abs(scale.z))) / 3);",
                     "                        }",
                     "                    }",
                     "                    this.uvBuffer.setXY(index, (i / particle.previous.length + col) * tileWidth, (vTileCount - row - 1) * tileHeight);",
@@ -21606,8 +21452,6 @@
                     "",
                     "particleSystem.emitter.rotation.order = 'ZYX';",
                     "particleSystem.emitter.name = object.getName() + object.getNameId();",
-                    "particleSystem.emitter.position.x = object.getX();",
-                    "particleSystem.emitter.position.y = -object.getY();",
                     "batchSystem.addSystem(particleSystem);",
                     "",
                     "object.__particleEmitterAdapter = new ParticleEmitterAdapter(particleSystem, colorOverLife, sizeOverLife, applyForce);",
@@ -32690,6 +32534,363 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "Separate players from bombs. Players can overlap a bomb when it's created but they cant walk on a bomb that is already there.",
+              "fullName": "Separate from bomb",
+              "functionType": "Action",
+              "name": "SeparateFromBomb",
+              "sentence": "Separate _PARAM0_ from _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "When the player no longer overlaps the bomb, it becomes solid for this player."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Distance"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Bomb",
+                        "59",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Bomb",
+                        "IsOverlaping[ToString(Object.Variable(Number))]",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ObjectVariableRemoveChild"
+                      },
+                      "parameters": [
+                        "Bomb",
+                        "IsOverlaping",
+                        "Object.VariableString(Number)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Bomb",
+                        "",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "ObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Bomb",
+                        "IsOverlaping[ToString(Object.Variable(Number))]",
+                        "True"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SeparateFromObjects"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Bomb",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::Player",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bomb",
+                  "name": "Bomb",
+                  "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if a player can put a bomb.",
+              "fullName": "Can put a bomb",
+              "functionType": "Condition",
+              "name": "CanPutBomb",
+              "sentence": "_PARAM0_ can put a _PARAM2_ on the ground",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Check that no bomb is already on this square.\nThe negation of \"Is there at least one bomb on this square?\" is equivalent to \"Is there no bomb on this square?\".\nThis is not the same as having the negation directly on the condition because it would mean \"Is there a bomb that is not on this square?\"."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "BombPut",
+                        "<",
+                        "Object.Variable(BombCapacity)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Not"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Bomb",
+                            "10 + round((Object.X() - 10) / 60) * 60 + 30",
+                            "round(Object.Y() / 60) * 60 + 30"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::Player",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bomb",
+                  "name": "Bomb",
+                  "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The player put a bomb in its curent square",
+              "fullName": "Put a bomb",
+              "functionType": "Action",
+              "name": "PutBomb",
+              "sentence": "_PARAM0_ put a _PARAM2_ on the ground",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Bomb",
+                        "10 + round((Object.X() - 10) / 60) * 60",
+                        "round(Object.Y() / 60) * 60",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Bomb",
+                        "\"Detonator\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "BombPut",
+                        "+",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Bomb",
+                        "Range",
+                        "=",
+                        "Object.Variable(Range)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "BombX",
+                        "=",
+                        "Bomb.X()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Object",
+                        "BombY",
+                        "=",
+                        "Bomb.Y()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Bomb",
+                        "PlayerNum",
+                        "=",
+                        "Object.Variable(Number)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::Player",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bomb",
+                  "name": "Bomb",
+                  "type": "objectListOrEmptyIfJustDeclared"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Allow a player to walk on a bomb created under their foot.",
+              "fullName": "Allow to walk on a bomb",
+              "functionType": "Action",
+              "name": "AllowToWalkOnBomb",
+              "sentence": "Allow _PARAM0_ to walk on a _PARAM2_ created under their foot.",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetObjectVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "Bomb",
+                        "IsOverlaping[ToString(Object.Variable(Number))]",
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::Player",
+                  "type": "behavior"
+                },
+                {
+                  "description": "",
+                  "name": "Bomb",
+                  "type": "objectList"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "propertyDescriptors": [],
@@ -34049,8 +34250,8 @@
           "name": "Player1",
           "persistentUuid": "ec337b4f-25b3-464d-8aa2-e53d451b9e82",
           "width": 82,
-          "x": 1039,
-          "y": 606,
+          "x": 1030,
+          "y": 600,
           "zOrder": 4,
           "numberProperties": [],
           "stringProperties": [],
@@ -34064,8 +34265,8 @@
           "name": "Player2",
           "persistentUuid": "0168e5a1-c6c6-4470-a8a9-31a2b47790e9",
           "width": 82,
-          "x": 199,
-          "y": 6,
+          "x": 190,
+          "y": 0,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -34079,8 +34280,8 @@
           "name": "Player3",
           "persistentUuid": "dca8110e-8871-49a7-9d12-e00eaf0e8b53",
           "width": 82,
-          "x": 199,
-          "y": 606,
+          "x": 190,
+          "y": 600,
           "zOrder": 9,
           "numberProperties": [],
           "stringProperties": [],
@@ -34094,8 +34295,8 @@
           "name": "Player4",
           "persistentUuid": "c39be22f-ce00-44f2-b33f-b70a864832df",
           "width": 82,
-          "x": 1039,
-          "y": 6,
+          "x": 1030,
+          "y": 0,
           "zOrder": 10,
           "numberProperties": [],
           "stringProperties": [],
@@ -34714,7 +34915,7 @@
           "persistentUuid": "a0917fc0-983f-44f6-8fe3-ae14f0398f39",
           "width": 0,
           "x": 244,
-          "y": 34,
+          "y": 24,
           "zOrder": 15,
           "numberProperties": [],
           "stringProperties": [],
@@ -34825,8 +35026,8 @@
           "name": "Player1",
           "persistentUuid": "fb6afea8-f5bc-4b0e-bbc4-5900aed2ef63",
           "width": 82,
-          "x": 1039,
-          "y": 606,
+          "x": 1030,
+          "y": 600,
           "zOrder": 4,
           "numberProperties": [],
           "stringProperties": [],
@@ -34840,8 +35041,8 @@
           "name": "Player2",
           "persistentUuid": "fef840da-ee13-4b0b-b471-204c1fc10718",
           "width": 82,
-          "x": 199,
-          "y": 6,
+          "x": 190,
+          "y": 0,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -34855,8 +35056,8 @@
           "name": "Player3",
           "persistentUuid": "ef729714-8ec8-40c8-ae75-deba82602488",
           "width": 82,
-          "x": 199,
-          "y": 606,
+          "x": 190,
+          "y": 600,
           "zOrder": 9,
           "numberProperties": [],
           "stringProperties": [],
@@ -34870,8 +35071,8 @@
           "name": "Player4",
           "persistentUuid": "8dc2fe23-d26b-4191-8ce6-da199392145c",
           "width": 82,
-          "x": 1039,
-          "y": 6,
+          "x": 1030,
+          "y": 0,
           "zOrder": 10,
           "numberProperties": [],
           "stringProperties": [],
@@ -36033,8 +36234,8 @@
           "name": "Player1",
           "persistentUuid": "6d8912b5-6de2-4cf4-926c-2952e708a590",
           "width": 82,
-          "x": 1039,
-          "y": 606,
+          "x": 1030,
+          "y": 600,
           "zOrder": 4,
           "numberProperties": [],
           "stringProperties": [],
@@ -36048,8 +36249,8 @@
           "name": "Player2",
           "persistentUuid": "2b89c85e-e86a-48d5-ac4d-a90dcda0f833",
           "width": 82,
-          "x": 199,
-          "y": 6,
+          "x": 190,
+          "y": 0,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -36063,8 +36264,8 @@
           "name": "Player3",
           "persistentUuid": "513d236d-ffbc-4367-917a-dd9eaa59ce66",
           "width": 82,
-          "x": 199,
-          "y": 606,
+          "x": 190,
+          "y": 600,
           "zOrder": 9,
           "numberProperties": [],
           "stringProperties": [],
@@ -36078,8 +36279,8 @@
           "name": "Player4",
           "persistentUuid": "7e397593-ecf8-4d95-b0c6-ea43b45731f2",
           "width": 82,
-          "x": 1039,
-          "y": 6,
+          "x": 1030,
+          "y": 0,
           "zOrder": 10,
           "numberProperties": [],
           "stringProperties": [],
