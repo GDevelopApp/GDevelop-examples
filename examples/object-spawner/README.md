@@ -1,0 +1,1 @@
+Learn how to use the Object Spawner extension to spawn waves of enemies in stages.
