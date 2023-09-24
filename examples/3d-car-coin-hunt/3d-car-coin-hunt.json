@@ -1761,65 +1761,40 @@
           }
         },
         {
-          "adaptCollisionMaskAutomatically": true,
           "assetStoreId": "",
           "name": "CameraTarget",
           "tags": "",
-          "type": "Sprite",
-          "updateIfNotVisible": false,
+          "type": "Scene3D::Cube3DObject",
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "animations": [
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 0.08,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": true,
-                      "image": "Cross.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 2,
-                            "y": 2
-                          },
-                          {
-                            "x": 28,
-                            "y": 2
-                          },
-                          {
-                            "x": 28,
-                            "y": 28
-                          },
-                          {
-                            "x": 2,
-                            "y": 28
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          "content": {
+            "width": 30,
+            "height": 30,
+            "depth": 74,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Y",
+            "frontFaceResourceName": "Cross.png",
+            "backFaceResourceName": "",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "",
+            "rightFaceResourceName": "",
+            "topFaceResourceName": "",
+            "bottomFaceResourceName": "",
+            "frontFaceVisible": true,
+            "backFaceVisible": false,
+            "leftFaceVisible": false,
+            "rightFaceVisible": false,
+            "topFaceVisible": false,
+            "bottomFaceVisible": false,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "materialType": "Basic"
+          }
         }
       ],
       "events": [
@@ -2475,13 +2450,22 @@
                     "0",
                     ""
                   ]
-                },
+                }
+              ],
+              "events": [
                 {
-                  "type": {
-                    "value": "Cache"
-                  },
-                  "parameters": [
-                    "CameraTarget"
+                  "disabled": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "CameraTarget"
+                      ]
+                    }
                   ]
                 }
               ]
@@ -2507,17 +2491,18 @@
                   "parameters": [
                     "CameraTarget",
                     "Player",
-                    "150",
+                    "200",
                     "Variable(CameraAngle)"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ThirdPersonCamera::LookFromDistanceAtObject"
+                    "value": "ThirdPersonCamera::LookFromDistanceAtObject3D"
                   },
                   "parameters": [
                     "",
                     "CameraTarget",
+                    "Object3D",
                     "800",
                     "Variable(CameraAngle) + 90",
                     "80",
@@ -4312,9 +4297,10 @@
       "eventsFunctions": [
         {
           "description": "Move the camera to look at a position from a distance.",
-          "fullName": "Look at a position from a distance",
+          "fullName": "Look at a position from a distance (deprecated)",
           "functionType": "Action",
           "name": "LookFromDistanceAtPosition",
+          "private": true,
           "sentence": "Move the camera of _PARAM6_ to look at _PARAM1_; _PARAM2_ from _PARAM3_ pixels with a rotation of _PARAM4_° and an elevation of _PARAM5_°",
           "events": [
             {
@@ -4410,9 +4396,10 @@
         },
         {
           "description": "Move the camera to look at an object from a distance.",
-          "fullName": "Look at an object from a distance",
+          "fullName": "Look at an object from a distance (deprecated)",
           "functionType": "Action",
           "name": "LookFromDistanceAtObject",
+          "private": true,
           "sentence": "Move the camera of _PARAM5_ to look at _PARAM1_ from _PARAM2_ pixels with a rotation of _PARAM3_° and an elevation of _PARAM4_°",
           "events": [
             {
@@ -4442,6 +4429,174 @@
               "description": "Object",
               "name": "Object",
               "type": "objectList"
+            },
+            {
+              "description": "Distance",
+              "name": "Distance",
+              "type": "expression"
+            },
+            {
+              "description": "Rotation angle (around Z axis)",
+              "name": "RotationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Elevation angle (around Y axis)",
+              "name": "ElevationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move the camera to look at a position from a distance.",
+          "fullName": "Look at a position from a distance",
+          "functionType": "Action",
+          "name": "LookFromDistanceAtPosition3D",
+          "sentence": "Move the camera of _PARAM7_ to look at _PARAM1_; _PARAM2_; _PARAM3_ from _PARAM4_ pixels with a rotation of _PARAM5_° and an elevation of _PARAM6_°",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCameraCenterX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "GetArgumentAsNumber(\"PositionX\") + GetArgumentAsNumber(\"Distance\") * cos(ToRad(GetArgumentAsNumber(\"RotationAngle\") + 90)) * cos(ToRad(GetArgumentAsNumber(\"ElevationAngle\")))",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCameraCenterY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "GetArgumentAsNumber(\"PositionY\") + GetArgumentAsNumber(\"Distance\") * sin(ToRad(GetArgumentAsNumber(\"RotationAngle\") + 90)) * cos(ToRad(GetArgumentAsNumber(\"ElevationAngle\")))",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraZ"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "GetArgumentAsNumber(\"PositionZ\") + GetArgumentAsNumber(\"Distance\") * sin(ToRad(GetArgumentAsNumber(\"ElevationAngle\")))",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::TurnCameraTowardPosition"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsNumber(\"PositionX\")",
+                    "GetArgumentAsNumber(\"PositionY\")",
+                    "GetArgumentAsNumber(\"PositionZ\")",
+                    "GetArgumentAsString(\"Layer\")",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Position on X axis",
+              "name": "PositionX",
+              "type": "expression"
+            },
+            {
+              "description": "Position on Y axis",
+              "name": "PositionY",
+              "type": "expression"
+            },
+            {
+              "description": "Position on Z axis",
+              "name": "PositionZ",
+              "type": "expression"
+            },
+            {
+              "description": "Distance",
+              "name": "Distance",
+              "type": "expression"
+            },
+            {
+              "description": "Rotation angle (around Z axis)",
+              "name": "RotationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Elevation angle (around Y axis)",
+              "name": "ElevationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move the camera to look at an object from a distance.",
+          "fullName": "Look at an object from a distance",
+          "functionType": "Action",
+          "name": "LookFromDistanceAtObject3D",
+          "sentence": "Move the camera of _PARAM6_ to look at _PARAM1_ from _PARAM3_ pixels with a rotation of _PARAM4_° and an elevation of _PARAM5_°",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ThirdPersonCamera::LookFromDistanceAtPosition3D"
+                  },
+                  "parameters": [
+                    "",
+                    "Object.CenterX()",
+                    "Object.CenterY()",
+                    "Object.Object3D::CenterZ()",
+                    "GetArgumentAsNumber(\"Distance\")",
+                    "GetArgumentAsNumber(\"RotationAngle\")",
+                    "GetArgumentAsNumber(\"ElevationAngle\")",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "objectList"
+            },
+            {
+              "description": "3D capability",
+              "name": "Object3D",
+              "supplementaryInformation": "Scene3D::Base3DBehavior",
+              "type": "behavior"
             },
             {
               "description": "Distance",
