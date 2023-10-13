@@ -218,15 +218,6 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/Arrow.png",
-        "kind": "image",
-        "metadata": "",
-        "name": "Arrow.png",
-        "smoothed": true,
-        "userAdded": false
-      },
-      {
-        "alwaysLoaded": false,
         "file": "thumbnail.png",
         "kind": "image",
         "metadata": "",
@@ -630,10 +621,10 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "assets/Arrow.png2.png",
+        "file": "assets/Arrow.png",
         "kind": "image",
         "metadata": "{\"extension\":\".png\",\"pskl\":{}}",
-        "name": "Arrow.png2",
+        "name": "Arrow.png",
         "smoothed": true,
         "userAdded": true
       },
@@ -643,6 +634,15 @@
         "kind": "image",
         "metadata": "{\"extension\":\".png\"}",
         "name": "Particle",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Cross.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Cross.png",
         "smoothed": true,
         "userAdded": false
       }
@@ -1578,7 +1578,7 @@
             "depth": 1,
             "enableTextureTransparency": true,
             "facesOrientation": "Y",
-            "frontFaceResourceName": "Arrow.png2",
+            "frontFaceResourceName": "Arrow.png",
             "backFaceResourceName": "",
             "backFaceUpThroughWhichAxisRotation": "X",
             "leftFaceResourceName": "",
@@ -1730,6 +1730,42 @@
             "enableTextureTransparency": false,
             "facesOrientation": "Y",
             "frontFaceResourceName": "assets\\Grass.png",
+            "backFaceResourceName": "",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "",
+            "rightFaceResourceName": "",
+            "topFaceResourceName": "",
+            "bottomFaceResourceName": "",
+            "frontFaceVisible": true,
+            "backFaceVisible": false,
+            "leftFaceVisible": false,
+            "rightFaceVisible": false,
+            "topFaceVisible": false,
+            "bottomFaceVisible": false,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "materialType": "Basic"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "CameraTarget",
+          "tags": "",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 30,
+            "height": 30,
+            "depth": 74,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Y",
+            "frontFaceResourceName": "Cross.png",
             "backFaceResourceName": "",
             "backFaceUpThroughWhichAxisRotation": "X",
             "leftFaceResourceName": "",
@@ -2383,16 +2419,87 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "CameraTarget",
+                    "0",
+                    "0",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "CameraTarget"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
                 {
                   "type": {
-                    "value": "CentreCamera"
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "CameraAngle",
+                    "=",
+                    "lerp(Variable(CameraAngle), Player.Angle(), TimeDelta() * 4)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "MettreAutour"
+                  },
+                  "parameters": [
+                    "CameraTarget",
+                    "Player",
+                    "200",
+                    "Variable(CameraAngle)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ThirdPersonCamera::LookFromDistanceAtObject3D"
                   },
                   "parameters": [
                     "",
-                    "Player",
+                    "CameraTarget",
+                    "Object3D",
+                    "800",
+                    "Variable(CameraAngle) + 90",
+                    "80",
                     "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraZ"
+                  },
+                  "parameters": [
+                    "",
+                    "+",
+                    "0",
                     "",
                     ""
                   ]
@@ -4138,6 +4245,390 @@
   ],
   "externalEvents": [],
   "eventsFunctionsExtensions": [
+    {
+      "author": "",
+      "category": "Camera",
+      "extensionNamespace": "",
+      "fullName": "Third person camera",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI3LDEwIDEsMTMgNywxNiAxMywxMyAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjEsMTMgMSwyMCA3LDIzIDEzLDIwIDEzLDEzICIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjciIHkxPSIxNiIgeDI9IjciIHkyPSIyMyIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjMxIiB5MT0iMTYiIHgyPSIyMSIgeTI9IjgiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyMSIgeTE9IjI0IiB4Mj0iMzEiIHkyPSIxNiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyLjcsMjIuNkMyMCwyMS43LDE4LDE5LjEsMTgsMTZjMC0zLjEsMi01LjcsNC43LTYuNiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5LjgsMTEuM2MxLjQsMS4xLDIuMiwyLjgsMi4yLDQuN2MwLDEuOS0wLjksMy42LTIuMiw0LjciLz4NCjwvc3ZnPg0K",
+      "name": "ThirdPersonCamera",
+      "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Virtual Reality/94e95d2c318e1f3dc7151a351024e13c574e1e44669c6696aa107d60230073f6_Virtual Reality_3d_vision_eye_vr.svg",
+      "shortDescription": "Move the camera  to look at an object from a given distance.",
+      "version": "1.1.0",
+      "description": [
+        "Move the camera  to look at an object from a given distance with a rotation and an elevation angles.",
+        "",
+        "It can be useful for:",
+        "- Third person camera",
+        "- Isometric-like point of view",
+        ""
+      ],
+      "origin": {
+        "identifier": "ThirdPersonCamera",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "3d",
+        "camera"
+      ],
+      "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "Move the camera to look at a position from a distance.",
+          "fullName": "Look at a position from a distance (deprecated)",
+          "functionType": "Action",
+          "name": "LookFromDistanceAtPosition",
+          "private": true,
+          "sentence": "Move the camera of _PARAM6_ to look at _PARAM1_; _PARAM2_ from _PARAM3_ pixels with a rotation of _PARAM4_° and an elevation of _PARAM5_°",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCameraCenterX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "GetArgumentAsNumber(\"PositionX\") + GetArgumentAsNumber(\"Distance\") * cos(ToRad(GetArgumentAsNumber(\"RotationAngle\") + 90)) * cos(ToRad(GetArgumentAsNumber(\"ElevationAngle\")))",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCameraCenterY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "GetArgumentAsNumber(\"PositionY\") + GetArgumentAsNumber(\"Distance\") * sin(ToRad(GetArgumentAsNumber(\"RotationAngle\") + 90)) * cos(ToRad(GetArgumentAsNumber(\"ElevationAngle\")))",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraZ"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "GetArgumentAsNumber(\"Distance\") * sin(ToRad(GetArgumentAsNumber(\"ElevationAngle\")))",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::TurnCameraTowardPosition"
+                  },
+                  "parameters": [
+                    "",
+                    "GetArgumentAsNumber(\"PositionX\")",
+                    "GetArgumentAsNumber(\"PositionY\")",
+                    "0",
+                    "GetArgumentAsString(\"Layer\")",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Position on X axis",
+              "name": "PositionX",
+              "type": "expression"
+            },
+            {
+              "description": "Position on Y axis",
+              "name": "PositionY",
+              "type": "expression"
+            },
+            {
+              "description": "Distance",
+              "name": "Distance",
+              "type": "expression"
+            },
+            {
+              "description": "Rotation angle (around Z axis)",
+              "name": "RotationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Elevation angle (around Y axis)",
+              "name": "ElevationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move the camera to look at an object from a distance.",
+          "fullName": "Look at an object from a distance (deprecated)",
+          "functionType": "Action",
+          "name": "LookFromDistanceAtObject",
+          "private": true,
+          "sentence": "Move the camera of _PARAM5_ to look at _PARAM1_ from _PARAM2_ pixels with a rotation of _PARAM3_° and an elevation of _PARAM4_°",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ThirdPersonCamera::LookFromDistanceAtPosition"
+                  },
+                  "parameters": [
+                    "",
+                    "Object.CenterX()",
+                    "Object.CenterY()",
+                    "GetArgumentAsNumber(\"Distance\")",
+                    "GetArgumentAsNumber(\"RotationAngle\")",
+                    "GetArgumentAsNumber(\"ElevationAngle\")",
+                    "GetArgumentAsString(\"Layer\")",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "objectList"
+            },
+            {
+              "description": "Distance",
+              "name": "Distance",
+              "type": "expression"
+            },
+            {
+              "description": "Rotation angle (around Z axis)",
+              "name": "RotationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Elevation angle (around Y axis)",
+              "name": "ElevationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move the camera to look at a position from a distance.",
+          "fullName": "Look at a position from a distance",
+          "functionType": "Action",
+          "name": "LookFromDistanceAtPosition3D",
+          "sentence": "Move the camera of _PARAM7_ to look at _PARAM1_; _PARAM2_; _PARAM3_ from _PARAM4_ pixels with a rotation of _PARAM5_° and an elevation of _PARAM6_°",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCameraCenterX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "PositionX + Distance * cos(ToRad(RotationAngle + 90)) * cos(ToRad(ElevationAngle))",
+                    "Layer",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCameraCenterY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "PositionY + Distance * sin(ToRad(RotationAngle + 90)) * cos(ToRad(ElevationAngle))",
+                    "Layer",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraZ"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "PositionZ + Distance * sin(ToRad(ElevationAngle))",
+                    "Layer",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraRotationX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "90 - ElevationAngle",
+                    "Layer",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::SetCameraRotationY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "0",
+                    "Layer",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCameraAngle"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "RotationAngle",
+                    "Layer",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Position on X axis",
+              "name": "PositionX",
+              "type": "expression"
+            },
+            {
+              "description": "Position on Y axis",
+              "name": "PositionY",
+              "type": "expression"
+            },
+            {
+              "description": "Position on Z axis",
+              "name": "PositionZ",
+              "type": "expression"
+            },
+            {
+              "description": "Distance",
+              "name": "Distance",
+              "type": "expression"
+            },
+            {
+              "description": "Rotation angle (around Z axis)",
+              "name": "RotationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Elevation angle (around Y axis)",
+              "name": "ElevationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Move the camera to look at an object from a distance.",
+          "fullName": "Look at an object from a distance",
+          "functionType": "Action",
+          "name": "LookFromDistanceAtObject3D",
+          "sentence": "Move the camera of _PARAM6_ to look at _PARAM1_ from _PARAM3_ pixels with a rotation of _PARAM4_° and an elevation of _PARAM5_°",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ThirdPersonCamera::LookFromDistanceAtPosition3D"
+                  },
+                  "parameters": [
+                    "",
+                    "Object.CenterX()",
+                    "Object.CenterY()",
+                    "Object.Object3D::CenterZ()",
+                    "Distance",
+                    "RotationAngle",
+                    "ElevationAngle",
+                    "Layer",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "type": "objectList"
+            },
+            {
+              "description": "3D capability",
+              "name": "Object3D",
+              "supplementaryInformation": "Scene3D::Base3DBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Distance",
+              "name": "Distance",
+              "type": "expression"
+            },
+            {
+              "description": "Rotation angle (around Z axis)",
+              "name": "RotationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Elevation angle (around Y axis)",
+              "name": "ElevationAngle",
+              "type": "expression"
+            },
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": []
+    },
     {
       "author": "",
       "category": "Visual effect",
@@ -23437,7 +23928,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 1664,
-          "y": 384,
+          "y": 371,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -23454,7 +23945,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 1568,
-          "y": 384,
+          "y": 371,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -23471,7 +23962,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 1472,
-          "y": 384,
+          "y": 371,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -23488,7 +23979,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 1376,
-          "y": 384,
+          "y": 371,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -23573,7 +24064,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 544,
-          "y": 224,
+          "y": 260,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -23590,7 +24081,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 448,
-          "y": 224,
+          "y": 260,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -23607,7 +24098,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 640,
-          "y": 224,
+          "y": 260,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -23624,7 +24115,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 736,
-          "y": 224,
+          "y": 260,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -23998,7 +24489,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 736,
-          "y": -1056,
+          "y": -1036,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -24015,7 +24506,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 640,
-          "y": -1056,
+          "y": -1036,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -24032,7 +24523,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 544,
-          "y": -1056,
+          "y": -1036,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -24049,7 +24540,7 @@
           "rotationY": 90,
           "width": 0,
           "x": 448,
-          "y": -1056,
+          "y": -1036,
           "z": 21,
           "zOrder": 27,
           "numberProperties": [],
@@ -24184,7 +24675,8 @@
           "persistentUuid": "9589bc77-0357-4388-b5ec-e1092d0557fe",
           "width": 0,
           "x": 426,
-          "y": 471,
+          "y": 449,
+          "z": 4,
           "zOrder": 28,
           "numberProperties": [],
           "stringProperties": [],
@@ -24391,7 +24883,8 @@
           "persistentUuid": "fa97679d-81b5-4edf-91ce-a00d4bc798c2",
           "width": 0,
           "x": 472,
-          "y": 170,
+          "y": 192,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24406,7 +24899,8 @@
           "persistentUuid": "2dd3cdfa-a9aa-4fca-969d-a9b53a744eb2",
           "width": 0,
           "x": -391,
-          "y": -810,
+          "y": -835,
+          "z": 4,
           "zOrder": 28,
           "numberProperties": [],
           "stringProperties": [],
@@ -24421,7 +24915,8 @@
           "persistentUuid": "c1c8cd46-9a2b-4927-858b-76316c5a95b6",
           "width": 0,
           "x": -216,
-          "y": -1110,
+          "y": -1087,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24436,7 +24931,8 @@
           "persistentUuid": "32547478-ebd7-4242-8afc-5c8f969bd186",
           "width": 0,
           "x": 1770,
-          "y": 458,
+          "y": 442,
+          "z": 4,
           "zOrder": 28,
           "numberProperties": [],
           "stringProperties": [],
@@ -24451,7 +24947,8 @@
           "persistentUuid": "5f2e97f0-7bb3-457f-925e-d2d38ba0e7ab",
           "width": 0,
           "x": 1930,
-          "y": 458,
+          "y": 442,
+          "z": 4,
           "zOrder": 28,
           "numberProperties": [],
           "stringProperties": [],
@@ -24466,7 +24963,8 @@
           "persistentUuid": "384c861f-fddd-4481-b559-448e68de9746",
           "width": 0,
           "x": 2184,
-          "y": 458,
+          "y": 442,
+          "z": 4,
           "zOrder": 38,
           "numberProperties": [],
           "stringProperties": [],
@@ -24481,7 +24979,8 @@
           "persistentUuid": "478f6d08-f51b-46ce-b5ae-a9ad98378e33",
           "width": 0,
           "x": -1078,
-          "y": 458,
+          "y": 450,
+          "z": 4,
           "zOrder": 28,
           "numberProperties": [],
           "stringProperties": [],
@@ -24496,7 +24995,8 @@
           "persistentUuid": "3fce5402-89bd-4976-a7b4-b4238e485fb3",
           "width": 0,
           "x": -918,
-          "y": 458,
+          "y": 450,
+          "z": 4,
           "zOrder": 28,
           "numberProperties": [],
           "stringProperties": [],
@@ -24511,7 +25011,8 @@
           "persistentUuid": "acb3437b-84fc-4e7f-8260-5e39448bef0f",
           "width": 0,
           "x": -662,
-          "y": 458,
+          "y": 450,
+          "z": 4,
           "zOrder": 38,
           "numberProperties": [],
           "stringProperties": [],
@@ -24526,7 +25027,8 @@
           "persistentUuid": "9d4b0ad2-7092-4d04-83ee-25f42217d50b",
           "width": 0,
           "x": -1014,
-          "y": -809,
+          "y": -834,
+          "z": 4,
           "zOrder": 28,
           "numberProperties": [],
           "stringProperties": [],
@@ -24541,7 +25043,8 @@
           "persistentUuid": "778bca32-1711-492f-a3b0-a7818a0be53a",
           "width": 0,
           "x": -854,
-          "y": -809,
+          "y": -834,
+          "z": 4,
           "zOrder": 28,
           "numberProperties": [],
           "stringProperties": [],
@@ -24556,7 +25059,8 @@
           "persistentUuid": "50e40d07-e62f-4bbc-95f4-31e3a00b13a7",
           "width": 0,
           "x": -598,
-          "y": -809,
+          "y": -834,
+          "z": 4,
           "zOrder": 38,
           "numberProperties": [],
           "stringProperties": [],
@@ -24571,7 +25075,8 @@
           "persistentUuid": "db6379dd-828b-4b97-8c34-1e3aefd16053",
           "width": 0,
           "x": 616,
-          "y": 170,
+          "y": 192,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24586,7 +25091,8 @@
           "persistentUuid": "24c0eb97-df17-4ec3-b525-6775f3e4b171",
           "width": 0,
           "x": -168,
-          "y": 1450,
+          "y": 1474,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24601,7 +25107,8 @@
           "persistentUuid": "3867bff0-bc6b-4cde-bd55-aa0e1acb951f",
           "width": 0,
           "x": -392,
-          "y": 1450,
+          "y": 1474,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24616,7 +25123,8 @@
           "persistentUuid": "573153a2-d34f-4f7d-a078-d591f21417dd",
           "width": 0,
           "x": 935,
-          "y": -1110,
+          "y": -1083,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24631,7 +25139,8 @@
           "persistentUuid": "6c3d140a-a1d9-4713-be38-d77dadcc147a",
           "width": 0,
           "x": 1095,
-          "y": -1110,
+          "y": -1083,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24646,7 +25155,8 @@
           "persistentUuid": "2cc2aad3-8095-45bf-b31c-3ea4c53a54fe",
           "width": 0,
           "x": 2247,
-          "y": -1098,
+          "y": -1086,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24661,7 +25171,8 @@
           "persistentUuid": "e5a60d8e-77ff-4627-af10-ad2af0055da7",
           "width": 0,
           "x": 2102,
-          "y": -1097,
+          "y": -1085,
+          "z": 4,
           "zOrder": 39,
           "numberProperties": [],
           "stringProperties": [],
@@ -24676,7 +25187,8 @@
           "persistentUuid": "bc21ef32-eb2c-4588-8535-9bbaf10b0fe8",
           "width": 0,
           "x": 1642,
-          "y": 170,
+          "y": 195,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24691,7 +25203,8 @@
           "persistentUuid": "634c6020-2d28-47be-b2e4-2f0acdff4326",
           "width": 0,
           "x": 1514,
-          "y": 170,
+          "y": 195,
+          "z": 4,
           "zOrder": 39,
           "numberProperties": [],
           "stringProperties": [],
@@ -24706,7 +25219,8 @@
           "persistentUuid": "c2d673cd-0b27-4ab6-b26b-641469b9514b",
           "width": 0,
           "x": 1962,
-          "y": 1450,
+          "y": 1474,
+          "z": 4,
           "zOrder": 37,
           "numberProperties": [],
           "stringProperties": [],
@@ -24721,7 +25235,8 @@
           "persistentUuid": "f1ea9686-2334-44fb-8dc3-981db82aea0d",
           "width": 0,
           "x": 1834,
-          "y": 1450,
+          "y": 1474,
+          "z": 4,
           "zOrder": 39,
           "numberProperties": [],
           "stringProperties": [],
@@ -25296,7 +25811,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.20220707303601926,
+        "zoomFactor": 0.20220707303602042,
         "windowMask": false
       }
     }
