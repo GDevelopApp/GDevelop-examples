@@ -472,7 +472,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.8993607583666857,
+        "zoomFactor": 0.6672773998330154,
         "windowMask": false
       },
       "objectsGroups": [
@@ -2177,6 +2177,7 @@
           "parameters": []
         },
         {
+          "disabled": true,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -2212,6 +2213,76 @@
                 "SelectionParticleEmitter",
                 "=",
                 "SodaCan.Object3D::CenterZ()",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Raycaster3D::RaycastFromCameraCenter"
+              },
+              "parameters": [
+                "",
+                "Barriers",
+                "1000",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetCenter"
+              },
+              "parameters": [
+                "SelectionParticleEmitter",
+                "=",
+                "Raycaster3D::IntersectionX()",
+                "=",
+                "Raycaster3D::IntersectionY()"
+              ]
+            },
+            {
+              "type": {
+                "value": "ParticleEmitter3D::ParticleEmitter3D::SetZ"
+              },
+              "parameters": [
+                "SelectionParticleEmitter",
+                "=",
+                "Raycaster3D::IntersectionZ()",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "disabled": true,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Raycaster3D::RaycastFromCameraCenter"
+              },
+              "parameters": [
+                "",
+                "Barriers",
+                "1000",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "DebuggerTools::ConsoleLog"
+              },
+              "parameters": [
+                "\"C: \" + ToString(Raycaster3D::IntersectionX()) + \" \" + ToString(Raycaster3D::IntersectionY()) + \" \" + ToString(Raycaster3D::IntersectionZ()) + \" \" + ToString(Raycaster3D::NormalX()) + \" \" + ToString(Raycaster3D::NormalY()) + \" \" + ToString(Raycaster3D::NormalZ())",
+                "",
                 ""
               ]
             }
@@ -2279,35 +2350,6 @@
               },
               "parameters": [
                 "\"B: \" + ToString(Raycaster3D::IntersectionX()) + \" \" + ToString(Raycaster3D::IntersectionY()) + \" \" + ToString(Raycaster3D::IntersectionZ())",
-                "",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "disabled": true,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "Raycaster3D::RaycastFromCameraCenter"
-              },
-              "parameters": [
-                "",
-                "Barriers",
-                "1000",
-                ""
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "DebuggerTools::ConsoleLog"
-              },
-              "parameters": [
-                "\"C: \" + ToString(Raycaster3D::IntersectionX()) + \" \" + ToString(Raycaster3D::IntersectionY()) + \" \" + ToString(Raycaster3D::IntersectionZ()) + \" \" + ToString(Raycaster3D::NormalX()) + \" \" + ToString(Raycaster3D::NormalY()) + \" \" + ToString(Raycaster3D::NormalZ())",
                 "",
                 ""
               ]
@@ -19291,13 +19333,17 @@
       "name": "Raycaster3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/8419f46b76bce482c14b4c03b4141a64d457e4cdc92686f3470381f5d2694abd_ray-start-arrow.svg",
       "shortDescription": "Find 3D objects that cross a line.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": [
         "It can be useful to:",
         "- Find 3D objects under the pointer",
         "- Target objects from a 1st person view",
         "- Make AI that detect objects in their field of view"
       ],
+      "origin": {
+        "identifier": "Raycaster3D",
+        "name": "gdevelop-extension-store"
+      },
       "tags": [
         "3d",
         "recast",
@@ -19308,6 +19354,31 @@
       ],
       "dependencies": [],
       "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onFirstSceneLoaded",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Raycaster3D::DefineHelperClasses"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
         {
           "description": "Define helper classes JavaScript code.",
           "fullName": "Define helper classes",
@@ -19522,20 +19593,6 @@
           "sentence": "Cast a ray from _PARAM2_; _PARAM3_; _PARAM4_ toward a rotation of _PARAM5_°, an elevation of _PARAM6_° and max distance of _PARAM7_ against _PARAM1_",
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetReturnBoolean"
-                  },
-                  "parameters": [
-                    "True"
-                  ]
-                }
-              ]
-            },
-            {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "eventsFunctionContext.returnValue =",
@@ -19602,20 +19659,6 @@
           "name": "RaycastBetweenPosition",
           "sentence": "Cast a ray from _PARAM2_; _PARAM3_; _PARAM4_ to _PARAM5_; _PARAM6_; _PARAM7_ against _PARAM1_",
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetReturnBoolean"
-                  },
-                  "parameters": [
-                    "True"
-                  ]
-                }
-              ]
-            },
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
@@ -19684,21 +19727,6 @@
           "sentence": "Cast a ray from the camera center to a maximum distance of _PARAM2_ against _PARAM1_",
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Raycaster3D::DefineHelperClasses"
-                  },
-                  "parameters": [
-                    "",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "eventsFunctionContext.returnValue =",
@@ -19737,21 +19765,6 @@
           "name": "RaycastFromCameraPoint",
           "sentence": "Cast a ray from the camera point _PARAM2_; _PARAM3_ to a maximum distance of _PARAM4_ against _PARAM1_",
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Raycaster3D::DefineHelperClasses"
-                  },
-                  "parameters": [
-                    "",
-                    ""
-                  ]
-                }
-              ]
-            },
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
