@@ -449,6 +449,9 @@
     "resourceFolders": []
   },
   "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
   "objectsGroups": [],
   "variables": [],
   "layouts": [
@@ -1139,7 +1142,6 @@
         {
           "assetStoreId": "",
           "name": "Walls",
-          "tags": "",
           "type": "Scene3D::Cube3DObject",
           "variables": [],
           "effects": [],
@@ -1175,7 +1177,6 @@
         {
           "assetStoreId": "",
           "name": "Barriers",
-          "tags": "",
           "type": "Scene3D::Cube3DObject",
           "variables": [],
           "effects": [],
@@ -1211,7 +1212,6 @@
         {
           "assetStoreId": "",
           "name": "Floor",
-          "tags": "",
           "type": "Scene3D::Cube3DObject",
           "variables": [],
           "effects": [],
@@ -1247,7 +1247,6 @@
         {
           "assetStoreId": "",
           "name": "Camera",
-          "tags": "",
           "type": "Scene3D::Cube3DObject",
           "variables": [],
           "effects": [],
@@ -1282,7 +1281,6 @@
         {
           "assetStoreId": "9be1b0d0d5a1afad4537db989ea5e3a4a4564dfd123630a9bf61330a73803c63",
           "name": "WalkJoystick",
-          "tags": "",
           "type": "SpriteMultitouchJoystick::SpriteMultitouchJoystick",
           "variables": [],
           "effects": [],
@@ -1364,7 +1362,6 @@
         {
           "assetStoreId": "9be1b0d0d5a1afad4537db989ea5e3a4a4564dfd123630a9bf61330a73803c63",
           "name": "LookJoystick",
-          "tags": "",
           "type": "SpriteMultitouchJoystick::SpriteMultitouchJoystick",
           "variables": [],
           "effects": [],
@@ -1460,7 +1457,6 @@
         {
           "assetStoreId": "5c0c228a0d3e939e7762b559cd6168ae878504b421df06d53ea0b593071449f2",
           "name": "SodaCan",
-          "tags": "",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -1484,7 +1480,6 @@
           "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Crosshair",
-          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1525,7 +1520,6 @@
         {
           "assetStoreId": "",
           "name": "SelectionParticleEmitter",
-          "tags": "",
           "type": "ParticleEmitter3D::ParticleEmitter3D",
           "variables": [],
           "effects": [],
@@ -1603,6 +1597,38 @@
           }
         }
       ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Walls"
+          },
+          {
+            "objectName": "Barriers"
+          },
+          {
+            "objectName": "Floor"
+          },
+          {
+            "objectName": "Camera"
+          },
+          {
+            "objectName": "WalkJoystick"
+          },
+          {
+            "objectName": "LookJoystick"
+          },
+          {
+            "objectName": "SodaCan"
+          },
+          {
+            "objectName": "Crosshair"
+          },
+          {
+            "objectName": "SelectionParticleEmitter"
+          }
+        ]
+      },
       "events": [
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -2177,7 +2203,6 @@
           "parameters": []
         },
         {
-          "disabled": true,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -2219,6 +2244,7 @@
           ]
         },
         {
+          "disabled": true,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -2540,7 +2566,7 @@
       "name": "ParticleEmitter3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/f2e5a34bf465f781866677762d385d6c8e9e8d203383f2df9a3b7e0fad6a2cb5_fire.svg",
       "shortDescription": "Display a large number of particles to create visual effects.",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": [
         "Particle emitters can be used to display:",
         "- Fire",
@@ -8352,10 +8378,17 @@
                         "const layer = gameScene.getLayer(object.getLayer());",
                         "",
                         "const emitter = object.__particleSystem.emitter;",
-                        "emitter.position.x = object.getX();",
-                        "emitter.position.y = -object.getY();",
-                        "",
-                        "emitter.rotation.z = -object.getAngle() * Math.PI / 180;",
+                        "const objectRotationZ = -object.getAngle() * Math.PI / 180;",
+                        "if (emitter.position.x !== object.getX()",
+                        "    || emitter.position.y !== -object.getY()",
+                        "    || emitter.position.z !== object._getZ()",
+                        "    || emitter.rotation.z !== objectRotationZ) {",
+                        "    emitter.position.x = object.getX();",
+                        "    emitter.position.y = -object.getY();",
+                        "    emitter.position.z = object._getZ();",
+                        "    emitter.rotation.z = objectRotationZ;",
+                        "    emitter.updateMatrixWorld(true);",
+                        "}",
                         "",
                         "// Update batch system after having moved every emitter.",
                         "// See onScenePreEvents",
@@ -8589,17 +8622,6 @@
                       ]
                     }
                   ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "",
-                    "object.__particleSystem.emitter.position.z = eventsFunctionContext.getArgument(\"Value\");"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": false
                 }
               ],
               "parameters": [
@@ -10690,7 +10712,6 @@
               "adaptCollisionMaskAutomatically": true,
               "assetStoreId": "",
               "name": "Particle",
-              "tags": "",
               "type": "Sprite",
               "updateIfNotVisible": false,
               "variables": [],
@@ -10710,7 +10731,15 @@
                 }
               ]
             }
-          ]
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Particle"
+              }
+            ]
+          }
         }
       ]
     },
@@ -19078,7 +19107,6 @@
               "adaptCollisionMaskAutomatically": false,
               "assetStoreId": "",
               "name": "Thumb",
-              "tags": "",
               "type": "Sprite",
               "updateIfNotVisible": false,
               "variables": [],
@@ -19102,7 +19130,6 @@
               "adaptCollisionMaskAutomatically": false,
               "assetStoreId": "",
               "name": "Border",
-              "tags": "",
               "type": "Sprite",
               "updateIfNotVisible": false,
               "variables": [],
@@ -19135,7 +19162,18 @@
                 }
               ]
             }
-          ]
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Thumb"
+              },
+              {
+                "objectName": "Border"
+              }
+            ]
+          }
         }
       ]
     },
