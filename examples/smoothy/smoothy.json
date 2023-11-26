@@ -4611,16 +4611,6 @@
                         },
                         {
                           "type": {
-                            "value": "DebuggerTools::ConsoleLog"
-                          },
-                          "parameters": [
-                            "VariableString(pathName)",
-                            "",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
                             "value": "CurvedMovement::CreatePathFromSvg"
                           },
                           "parameters": [
@@ -25890,6 +25880,20 @@
                 "    return;",
                 "}",
                 "",
+                "// Remove from deleted objects from stacks.",
+                "gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {",
+                "    const extension = runtimeScene._objectStackExtension;",
+                "    if (!extension) {",
+                "        return;",
+                "    }",
+                "    if (extension.allUsedObjects.has(obj)) {",
+                "        extension.allUsedObjects.delete(obj);",
+                "        for (const objectStack of extension.allObjectStacks) {",
+                "            objectStack.remove(obj);",
+                "        }",
+                "    }",
+                "});",
+                "",
                 "class ObjectStack {",
                 "    /**",
                 "     * @type {Array<gdjs.RuntimeObject>}",
@@ -25974,9 +25978,9 @@
                 "        }",
                 "    }",
                 "",
-                "    suffle() {",
+                "    shuffle() {",
                 "        // Fisher–Yates shuffle",
-                "        for (let i = stack.length - 1; i >= 1; i--) {",
+                "        for (let i = this.stack.length - 1; i >= 1; i--) {",
                 "            // TODO use a seed",
                 "            const j = Math.floor(Math.random() * (i + 1));",
                 "            const swap = this.stack[i];",
@@ -26326,18 +26330,8 @@
                     "    // deleted objects that have never been in a stack.",
                     "    allUsedObjects: new Set()",
                     "  };",
-                    "  // Remove from deleted objects from stacks.",
-                    "  gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {",
-                    "    const extension = runtimeScene._objectStackExtension;",
-                    "    if (extension.allUsedObjects.has(obj)) {",
-                    "      extension.allUsedObjects.delete(obj);",
-                    "      for (const behavior of extension.allObjectStacks) {",
-                    "        behavior.objectStack.remove(obj);",
-                    "      }",
-                    "    }",
-                    "  });",
                     "}",
-                    "runtimeScene._objectStackExtension.allObjectStacks.add(behavior);",
+                    "runtimeScene._objectStackExtension.allObjectStacks.add(behavior.objectStack);",
                     ""
                   ],
                   "parameterObjects": "Object",
