@@ -3739,7 +3739,17 @@
                   ]
                 }
               ],
-              "actions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ChangeTimeScale"
+                  },
+                  "parameters": [
+                    "",
+                    "16"
+                  ]
+                }
+              ],
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Link",
@@ -3771,6 +3781,15 @@
                         "State",
                         "=",
                         "\"WaitingInput\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangeTimeScale"
+                      },
+                      "parameters": [
+                        "",
+                        "1"
                       ]
                     }
                   ],
@@ -6937,6 +6956,14 @@
               "actions": [
                 {
                   "type": {
+                    "value": "Wait"
+                  },
+                  "parameters": [
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
                     "value": "Sticker::Sticker::Unstick"
                   },
                   "parameters": [
@@ -8461,11 +8488,11 @@
                 "    const allStickers = runtimeScene._stickerExtension.allStickers;",
                 "    for (const behavior of allStickers) {",
                 "        const sticker = behavior._sticker;",
-                "        if (sticker.basisObject === deletedObject) {",
+                "        if (sticker.isStuckTo(deletedObject)) {",
                 "            if (behavior._getIsDestroyedWithParent()) {",
                 "                behavior.owner.deleteFromScene(runtimeScene);",
                 "            }",
-                "            sticker.basisObject = null;",
+                "            sticker.unstick();",
                 "        }",
                 "    }",
                 "});",
@@ -8494,6 +8521,30 @@
                 "     */",
                 "    constructor(behavior) {",
                 "        this.behavior = behavior;",
+                "    }",
+                "",
+                "    /**",
+                "     * @param {gdjs.RuntimeObject} basisObject",
+                "     */",
+                "    isStuckTo(basisObject) {",
+                "        return this.basisObject === basisObject;",
+                "    }",
+                "",
+                "    /**",
+                "     * @param {gdjs.RuntimeObject} basisObject",
+                "     */",
+                "    stickTo(basisObject) {",
+                "        this.basisObject = basisObject;",
+                "        this.updateOldCoordinates();",
+                "        this.updateRelativeCoordinates();",
+                "    }",
+                "",
+                "    unstick() {",
+                "        this.basisObject = null;",
+                "    }",
+                "",
+                "    onStepPreEvents() {",
+                "        this.followingDoneThisFrame = false;",
                 "    }",
                 "",
                 "    /**",
@@ -8526,16 +8577,6 @@
                 "            this.basisOriginalHeight = this.basisObject.getHeight();",
                 "            this.basisOriginalAngle = this.basisObject.getAngle();",
                 "        }",
-                "    }",
-                "",
-                "    stickTo(basisObject) {",
-                "        this.basisObject = basisObject;",
-                "        this.updateOldCoordinates();",
-                "        this.updateRelativeCoordinates();",
-                "    }",
-                "",
-                "    unstick() {",
-                "        this.basisObject = null;",
                 "    }",
                 "",
                 "    /**",
@@ -8582,9 +8623,9 @@
                 "            const behaviorName = this.behavior.getName();",
                 "            if (basisObject.hasBehavior(behaviorName)) {",
                 "                const basisBehavior = basisObject.getBehavior(behaviorName);",
-                "                if (basisBehavior.type === this.type) {",
+                "                if (basisBehavior.type === this.behavior.type) {",
                 "                    // Follow parents 1st to avoid frame delays",
-                "                    basisBehavior.followBasisObject();",
+                "                    basisBehavior._sticker.followBasisObject();",
                 "                }",
                 "            }",
                 "",
@@ -8682,7 +8723,7 @@
                 "eventsFunctionContext.returnValue = gdjs.evtTools.object.twoListsTest(",
                 "  (stickerObject, basisObject) => {",
                 "    const sticker = stickerObject.getBehavior(stickerBehaviorName)._sticker;",
-                "    return sticker.basisObject === basisObject;",
+                "    return sticker.isStuckTo(basisObject);",
                 "  },",
                 "  stickerObjectsLists,",
                 "  basisObjectsLists,",
@@ -8795,7 +8836,7 @@
                     "const object = objects[0];",
                     "const behavior = object.getBehavior(behaviorName);",
                     "",
-                    "behavior._sticker.followingDoneThisFrame = false;"
+                    "behavior._sticker.onStepPreEvents();"
                   ],
                   "parameterObjects": "Object",
                   "useStrict": true,
@@ -10278,12 +10319,6 @@
                         "Behavior",
                         ""
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
                     }
                   ],
                   "actions": [
@@ -10295,6 +10330,16 @@
                         "Object",
                         "DraggableBehavior",
                         "yes"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::RemoveTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "TweenBehavior",
+                        "\"__CancellableDraggable\""
                       ]
                     }
                   ]
@@ -10410,20 +10455,6 @@
               "name": "DraggingIsCancelled",
               "sentence": "_PARAM0_ dragging is cancelled",
               "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnBoolean"
-                      },
-                      "parameters": [
-                        "False"
-                      ]
-                    }
-                  ]
-                },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
