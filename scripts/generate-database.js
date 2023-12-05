@@ -116,7 +116,9 @@ const getAllExampleFiles = (allFiles) => {
  * @param {string} baseUrl
  */
 const updateResources = (gd, project, baseUrl) => {
-  const worker = new gd.ArbitraryResourceWorkerJS();
+  const worker = new gd.ArbitraryResourceWorkerJS(
+    project.getResourcesManager()
+  );
   /** @param {string} file */
   worker.exposeImage = (file) => {
     // Don't do anything
