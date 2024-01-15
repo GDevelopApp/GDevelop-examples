@@ -521,7 +521,7 @@
         {
           "angle": 202,
           "customSize": true,
-          "depth": 1,
+          "depth": 180,
           "height": 40,
           "layer": "",
           "name": "Camera",
@@ -529,7 +529,6 @@
           "width": 40,
           "x": 475,
           "y": 325,
-          "z": 70,
           "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
@@ -955,21 +954,6 @@
           "customSize": false,
           "height": 0,
           "layer": "",
-          "name": "SelectionParticleEmitter",
-          "persistentUuid": "1a296b3f-ec6c-47a0-a35d-dab53f1d69e5",
-          "width": 0,
-          "x": 900,
-          "y": -250,
-          "zOrder": 10,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
           "name": "SodaCan",
           "persistentUuid": "67030a3e-4e15-4fd1-a51b-96b695c8c7f9",
           "width": 0,
@@ -1120,6 +1104,22 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 100,
+          "height": 525,
+          "layer": "",
+          "name": "Barrier",
+          "persistentUuid": "2b1b21d8-5940-4475-acf2-58ecc62a33f3",
+          "width": 300,
+          "x": 525,
+          "y": 75,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -1234,11 +1234,30 @@
           "type": "Scene3D::Cube3DObject",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Jump3D",
+              "type": "Jump3D::Jump3D",
+              "Object3D": "Object3D",
+              "JumpHeight": 150,
+              "Time": 150.00000000011647,
+              "Duration": 150.00000000011647,
+              "MaxFallingSpeed": 700,
+              "Gravity": 1000,
+              "JumpSpeed": 600,
+              "JumpSustainTime": 0.2,
+              "State": "",
+              "CurrentJumpSpeed": 0.19999992847454,
+              "CurrentFallSpeed": 0.19999992847454,
+              "PreviousJumpSpeed": 0.19999992847454,
+              "PreviousFallSpeed": 0.19999992847454,
+              "HasPressedJumpKey": false
+            }
+          ],
           "content": {
             "width": 100,
             "height": 100,
-            "depth": 100,
+            "depth": 180,
             "enableTextureTransparency": false,
             "facesOrientation": "Y",
             "frontFaceResourceName": "Camera.png",
@@ -1911,8 +1930,8 @@
                   },
                   "parameters": [
                     "",
-                    "=",
-                    "180",
+                    "+",
+                    "Camera.Object3D::Depth()",
                     "",
                     ""
                   ]
@@ -1950,6 +1969,145 @@
           "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Jump3D::Jump3D::CurrentVerticalSpeed"
+                  },
+                  "parameters": [
+                    "Camera",
+                    "Jump3D",
+                    "=",
+                    "0",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Jump3D::Jump3D::Fall"
+                  },
+                  "parameters": [
+                    "Camera",
+                    "Jump3D",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Camera",
+                    "Obstacles",
+                    "",
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "Obstacles",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::Z"
+                      },
+                      "parameters": [
+                        "Camera",
+                        "Object3D",
+                        "<",
+                        "Collision3D::TopZ(Obstacles)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::Z"
+                      },
+                      "parameters": [
+                        "Camera",
+                        "Object3D",
+                        ">",
+                        "Collision3D::TopZ(Obstacles) + Camera.Jump3D::CurrentVerticalSpeed() * TimeDelta()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::Land"
+                      },
+                      "parameters": [
+                        "Camera",
+                        "Jump3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Camera",
+                        "Object3D",
+                        "=",
+                        "Collision3D::TopZ(Obstacles)"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::Z"
+                  },
+                  "parameters": [
+                    "Camera",
+                    "Object3D",
+                    "<",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Jump3D::Jump3D::Land"
+                  },
+                  "parameters": [
+                    "Camera",
+                    "Jump3D",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Camera",
+                    "Object3D",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
               "type": "BuiltinCommonInstructions::Comment",
               "color": {
                 "b": 109,
@@ -1966,24 +2124,14 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "Scene3D::Base3DBehavior::Z"
+                    "value": "Collision3D::IsWithinZ"
                   },
                   "parameters": [
+                    "",
                     "Obstacles",
-                    "Object3D",
-                    ">=",
-                    "0"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::Z"
-                  },
-                  "parameters": [
-                    "Obstacles",
-                    "Object3D",
-                    "<=",
-                    "200"
+                    "Collision3D::BottomZ(Camera)",
+                    "Collision3D::TopZ(Camera)",
+                    ""
                   ]
                 }
               ],
@@ -2132,6 +2280,32 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Space"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SimulateJumpKey"
+                      },
+                      "parameters": [
+                        "Camera",
+                        "Jump3D",
+                        ""
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -2262,6 +2436,7 @@
           "camera3DFarPlaneDistance": 10000,
           "camera3DFieldOfView": 45,
           "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "perspective",
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "isLocked": false,
@@ -2316,6 +2491,7 @@
           "camera3DFarPlaneDistance": 10000,
           "camera3DFieldOfView": 45,
           "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "perspective",
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "isLocked": false,
@@ -2332,6 +2508,7 @@
           "camera3DFarPlaneDistance": 10000,
           "camera3DFieldOfView": 45,
           "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "perspective",
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "isLocked": false,
@@ -2376,6 +2553,10 @@
           "type": "FlippableCapability::FlippableBehavior"
         },
         {
+          "name": "Jump3D",
+          "type": "Jump3D::Jump3D"
+        },
+        {
           "name": "Object3D",
           "type": "Scene3D::Base3DBehavior"
         },
@@ -2396,6 +2577,2797 @@
   ],
   "externalEvents": [],
   "eventsFunctionsExtensions": [
+    {
+      "author": "",
+      "category": "Movement",
+      "extensionNamespace": "",
+      "fullName": "3D jump",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI3LDI4aC04LjFjLTEuMiwwLTIuMy0wLjUtMy4yLTEuM0wzLDE0bDctOHYwYzAsMy45LDQuMSw4LDgsOGgxdjBjLTAuMSw0LjUsMS42LDcuOCw2LDkuMg0KCWMwLjMsMC4xLDAuNSwwLjIsMC44LDAuMmwwLDBjMS4yLDAuMywyLDEuNiwxLjcsMi44TDI3LDI4eiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTEsMTZsMTMuNywxMy43YzAuOCwwLjgsMiwxLjMsMy4yLDEuM0gyNyIvPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMTAuNSIgY3k9IjE1LjUiIHI9IjEuNSIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjE1IiB5MT0iMTkiIHgyPSIxOS41IiB5Mj0iMTkiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxNyIgeTE9IjIyIiB4Mj0iMjIuNSIgeTI9IjIyIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjgsMWwtNy4zLDcuM0MxOSwxMCwxOC40LDEyLjQsMTksMTQuN2wwLDAiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMCw3TDEwLDdjMS45LTAuNiwzLjYtMiw0LjYtMy43TDE2LDEiLz4NCjwvc3ZnPg0K",
+      "name": "Jump3D",
+      "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/29b5c1893f81031cca98c9a1c447464b433717bdf3569ce5fac7c7cb0a8a2b82_Sports and Fitness_gym_running_foot_run.svg",
+      "shortDescription": "Jump and fall on th Z axis",
+      "version": "1.0.0",
+      "description": "",
+      "origin": {
+        "identifier": "PlatformerTrajectory",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "jump",
+        "platform",
+        "platformer"
+      ],
+      "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Jump and fall on th Z axis.",
+          "fullName": "3D jump",
+          "name": "Jump3D",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::PropertyJumpHeight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetJumpHeight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Behavior::PropertyJumpHeight()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Jump height",
+              "functionType": "ActionWithOperator",
+              "getterName": "JumpHeight",
+              "name": "SetJumpHeight",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::SetPropertyJumpHeight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "JumpHeight"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyJumpSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Behavior::JumpSpeedToReach(JumpHeight)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Jump height",
+                  "name": "JumpHeight",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the jump height of the object. Its value is always positive.",
+              "fullName": "Jump height",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D jump configuration",
+              "name": "JumpHeight",
+              "sentence": "the jump height",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "JumpHeight"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "!=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Jump speed",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Jump3D::Jump3D::SetPropertyPreviousJumpSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "CurrentJumpSpeed"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "CompareObjectTimer"
+                              },
+                              "parameters": [
+                                "Object",
+                                "\"_Jump3DExtension.SustainJump\"",
+                                ">=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Jump3D::Jump3D::SetPropertyCurrentJumpSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "max(0, CurrentJumpSpeed - Gravity * TimeDelta())"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Verlet integration"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Scene3D::Base3DBehavior::SetZ"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Object3D",
+                                "+",
+                                "(PreviousJumpSpeed + CurrentJumpSpeed) / 2 * TimeDelta()"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
+                    },
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Fall speed",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Verlet integration"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Jump3D::Jump3D::SetPropertyPreviousFallSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "CurrentFallSpeed"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Jump3D::Jump3D::SetPropertyCurrentFallSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "min(CurrentFallSpeed + Gravity * TimeDelta(), MaxFallingSpeed)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Scene3D::Base3DBehavior::SetZ"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Object3D",
+                                "-",
+                                "(PreviousFallSpeed + CurrentFallSpeed) / 2 * TimeDelta()"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Jump3D::Jump3D::PropertyHasPressedJumpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "RemoveObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"_Jump3DExtension.SustainJump\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyHasPressedJumpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "no"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Simulate a press of the jump key.",
+              "fullName": "Simulate jump key press",
+              "functionType": "Action",
+              "group": "3D jump state",
+              "name": "SimulateJumpKey",
+              "sentence": "Simulate pressing Jump key for _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyHasPressedJumpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentFallSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"_Jump3DExtension.SustainJump\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"InTheAir\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentJumpSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "JumpSpeed"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentFallSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"_Jump3DExtension.SustainJump\"",
+                        ">",
+                        "JumpSustainDurationMax"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "RemoveObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"_Jump3DExtension.SustainJump\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Stop the object from falling and land on the floor.",
+              "fullName": "Land on the floor",
+              "functionType": "Action",
+              "group": "3D jump state",
+              "name": "Land",
+              "sentence": "Make _PARAM0_ land on the floor",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentJumpSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentFallSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Make the object fall from the floor.",
+              "fullName": "Fall from the floor",
+              "functionType": "Action",
+              "group": "3D jump state",
+              "name": "Fall",
+              "sentence": "Make _PARAM0_ fall from the floor",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"InTheAir\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentJumpSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentFallSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "When this action is executed, the object is able to jump again, even if it is in the air: this can be useful to allow a double jump for example. This is not a permanent effect: you must call again this action everytime you want to allow the object to jump (apart if it's on the floor).",
+              "fullName": "Allow jumping again",
+              "functionType": "Action",
+              "group": "3D jump state",
+              "name": "SetCanJump",
+              "sentence": "Allow _PARAM0_ to jump again",
+              "events": [],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object can jump.",
+              "fullName": "Can jump",
+              "functionType": "Condition",
+              "group": "3D jump state",
+              "name": "CanJump",
+              "sentence": "_PARAM0_ can jump",
+              "events": [],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object is falling.\\nNote that the object can be flagged as jumping and falling at the same time: at the end of a jump, the fall speed becomes higher than the jump speed.",
+              "fullName": "Is falling",
+              "functionType": "Condition",
+              "group": "3D jump state",
+              "name": "IsFalling",
+              "sentence": "_PARAM0_ is falling",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::CurrentVerticalSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "<",
+                        "0",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object is jumping.",
+              "fullName": "Is jumping",
+              "functionType": "Condition",
+              "group": "3D jump state",
+              "name": "IsJumping",
+              "sentence": "_PARAM0_ is jumping",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::PropertyCurrentJumpSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object is on a platform.",
+              "fullName": "Is on floor",
+              "functionType": "Condition",
+              "group": "3D jump state",
+              "name": "IsOnFloor",
+              "sentence": "_PARAM0_ is on floor",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the jump speed to reach a given height.",
+              "fullName": "Jump height",
+              "functionType": "Expression",
+              "name": "JumpSpeedToReach",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const jumpHeight = -Math.abs(eventsFunctionContext.getArgument(\"JumpHeight\"));",
+                    "",
+                    "/** @type {float} */",
+                    "const gravity = behavior._getGravity();",
+                    "/** @type {float} */",
+                    "const maxFallingSpeed = behavior._getMaxFallingSpeed();",
+                    "/** @type {float} */",
+                    "const jumpSustainTime = behavior._getJumpSustainDurationMax();",
+                    "",
+                    "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                    "",
+                    "// The implementation jumps from one quadratic resolution to another",
+                    "// to find the right formula to use as the time is unknown.",
+                    "",
+                    "const sustainCase = (jumpHeight) => Math.sqrt(-jumpHeight * gravity * 2);",
+                    "const maxFallingCase = (jumpHeight) => -gravity * jumpSustainTime + maxFallingSpeed",
+                    "    + Math.sqrt(gravity * gravity * jumpSustainTime * jumpSustainTime - 2 * jumpHeight * gravity - maxFallingSpeed * maxFallingSpeed);",
+                    "",
+                    "let jumpSpeed = 0;",
+                    "let peakTime = 0;",
+                    "if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                    "    // common case",
+                    "    jumpSpeed = -gravity * jumpSustainTime + Math.sqrt(2 * gravity * gravity * jumpSustainTime * jumpSustainTime - 4 * jumpHeight * gravity);",
+                    "    peakTime = (gravity * jumpSustainTime + jumpSpeed) / (2 * gravity);",
+                    "    if (peakTime < jumpSustainTime) {",
+                    "        jumpSpeed = sustainCase(jumpHeight);",
+                    "    }",
+                    "    else if (peakTime > maxFallingSpeedReachedTime) {",
+                    "        jumpSpeed = maxFallingCase(jumpHeight);",
+                    "    }",
+                    "}",
+                    "else {",
+                    "    // affine case can't have a maximum",
+                    "",
+                    "    // sustain case",
+                    "    jumpSpeed = sustainCase(jumpHeight);",
+                    "    peakTime = jumpSpeed / gravity;",
+                    "    if (peakTime > maxFallingSpeedReachedTime) {",
+                    "        jumpSpeed = maxFallingCase(jumpHeight);",
+                    "    }",
+                    "}",
+                    "",
+                    "eventsFunctionContext.returnValue = jumpSpeed;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Jump height",
+                  "name": "JumpHeight",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The jump Y displacement at a given time from the start of the jump.",
+              "fullName": "Jump Y",
+              "functionType": "Expression",
+              "name": "JumpY",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const t = eventsFunctionContext.getArgument(\"Time\");",
+                    "/** @type {float} */",
+                    "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                    "",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const gravity = character.getGravity();",
+                    "/** @type {float} */",
+                    "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                    "/** @type {float} */",
+                    "const jumpSpeed = character.getJumpSpeed();",
+                    "",
+                    "// Falling and jump speed are integrated independently",
+                    "// and summed at the end to get the Y displacement.",
+                    "",
+                    "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                    "let fallingY = 0;",
+                    "if (t < maxFallingSpeedReachedTime) {",
+                    "    fallingY = gravity * t * t / 2;",
+                    "}",
+                    "else {",
+                    "    fallingY = maxFallingSpeed * (t - maxFallingSpeed / (2 * gravity));",
+                    "}",
+                    "",
+                    "const jumpEndTime = jumpSustainTime + jumpSpeed / gravity;",
+                    "let jumpingY = 0;",
+                    "if (t < jumpSustainTime) {",
+                    "    jumpingY = -jumpSpeed * t;",
+                    "}",
+                    "else if (t < jumpEndTime) {",
+                    "    jumpingY = gravity * jumpSustainTime * jumpSustainTime / 2 + gravity * t * t / 2",
+                    "        - (gravity * jumpSustainTime + jumpSpeed) * t;",
+                    "}",
+                    "else {",
+                    "    jumpingY = (jumpEndTime * jumpEndTime + jumpSustainTime * jumpSustainTime) * gravity / 2",
+                    "        - (gravity * jumpSustainTime + jumpSpeed) * jumpEndTime;",
+                    "}",
+                    "",
+                    "eventsFunctionContext.returnValue = fallingY + jumpingY;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Time",
+                  "name": "Time",
+                  "type": "expression"
+                },
+                {
+                  "description": "Jump sustaining duration",
+                  "name": "JumpSustainTime",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The maximum Y displacement.",
+              "fullName": "Peak Y",
+              "functionType": "Expression",
+              "name": "JumpPeakY",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::JumpY(Object.Behavior::JumpPeakTime(GetArgumentAsNumber(\"JumpSustainTime\")), GetArgumentAsNumber(\"JumpSustainTime\"))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Jump sustaining duration",
+                  "name": "JumpSustainTime",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The time from the start of the jump when it reaches the maximum Y displacement.",
+              "fullName": "Peak time",
+              "functionType": "Expression",
+              "name": "JumpPeakTime",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const y = eventsFunctionContext.getArgument(\"PositionY\");",
+                    "/** @type {float} */",
+                    "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                    "",
+                    "/** @type {float} */",
+                    "const gravity = behavior._getGravity();",
+                    "/** @type {float} */",
+                    "const maxFallingSpeed = behavior._getMaxFallingSpeed();",
+                    "/** @type {float} */",
+                    "const jumpSpeed = behavior._getJumpSpeed();",
+                    "",
+                    "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                    "",
+                    "// The implementation jumps from one quadratic resolution to another",
+                    "// to find the right formula to use as the time is unknown.",
+                    "let peakTime = 0;",
+                    "",
+                    "if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                    "    // common case",
+                    "    peakTime = (gravity * jumpSustainTime + jumpSpeed) / (2 * gravity);",
+                    "    if (peakTime < jumpSustainTime) {",
+                    "        // sustain case",
+                    "        peakTime = jumpSpeed / gravity;",
+                    "    }",
+                    "    else if (peakTime > maxFallingSpeedReachedTime) {",
+                    "        // max falling case",
+                    "        peakTime = jumpSustainTime + (jumpSpeed - maxFallingSpeed) / gravity;",
+                    "    }",
+                    "}",
+                    "else {",
+                    "    // affine case can't have a maximum",
+                    "",
+                    "    // sustain case",
+                    "    peakTime = jumpSpeed / gravity;",
+                    "    if (peakTime > maxFallingSpeedReachedTime) {",
+                    "        // max falling case",
+                    "        peakTime = jumpSustainTime + (jumpSpeed - maxFallingSpeed) / gravity;",
+                    "    }",
+                    "}",
+                    "",
+                    "//console.log(\"peakTime: \" + peakTime);",
+                    "eventsFunctionContext.returnValue = peakTime;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Jump sustaining duration",
+                  "name": "JumpSustainTime",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the current jump speed of the object. Its value is always positive.",
+              "fullName": "Current jump speed",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D jump state",
+              "name": "CurrentJumpSpeed",
+              "sentence": "the current jump speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CurrentJumpSpeed"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "CurrentJumpSpeed",
+              "name": "SetCurrentJumpSpeed",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "!=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentJumpSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the current falling speed of the object. Its value is always positive.",
+              "fullName": "Current falling speed",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D jump state",
+              "name": "CurrentFallSpeed",
+              "sentence": "the current falling speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CurrentFallSpeed"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "CurrentFallSpeed",
+              "name": "SetCurrentFallSpeed",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::PropertyState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "!=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Jump3D::Jump3D::SetPropertyCurrentFallSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the current speed of the object on Z axis. Its value is negative when the object falls.",
+              "fullName": "Current vertical speed",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D jump state",
+              "name": "CurrentVerticalSpeed",
+              "sentence": "the current vertical speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CurrentJumpSpeed - CurrentFallSpeed"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Jump3D::Jump3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "3D capability",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Scene3D::Base3DBehavior"
+              ],
+              "hidden": false,
+              "name": "Object3D"
+            },
+            {
+              "value": "150",
+              "type": "Number",
+              "label": "Jump height",
+              "description": "Its value is always positive.",
+              "group": "3D jump configuration",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "JumpHeight"
+            },
+            {
+              "value": "700",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Maximum falling speed",
+              "description": "Its value is always positive.",
+              "group": "3D jump configuration",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "MaxFallingSpeed"
+            },
+            {
+              "value": "1000",
+              "type": "Number",
+              "unit": "PixelAcceleration",
+              "label": "Gavity",
+              "description": "Its value is always positive.",
+              "group": "3D jump configuration",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Gravity"
+            },
+            {
+              "value": "600",
+              "type": "Number",
+              "label": "Jump speed",
+              "description": "Its value is always positive.",
+              "group": "3D jump configuration",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "JumpSpeed"
+            },
+            {
+              "value": "0.2",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Jump sustain time",
+              "description": "Maximum time (in seconds) during which the jump strength is sustained if the jump key is held - allowing variable height jumps.",
+              "group": "3D jump configuration",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "JumpSustainDurationMax"
+            },
+            {
+              "value": "Idle",
+              "type": "Choice",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Idle",
+                "SustainJump",
+                "InTheAir"
+              ],
+              "hidden": true,
+              "name": "State"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Current jump speed",
+              "description": "Its value is always positive.",
+              "group": "3D jump state",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "CurrentJumpSpeed"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Current falling speed",
+              "description": "Its value is always positive.",
+              "group": "3D jump state",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "CurrentFallSpeed"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "",
+              "description": "",
+              "group": "3D jump state",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "PreviousJumpSpeed"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "",
+              "description": "",
+              "group": "3D jump state",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "PreviousFallSpeed"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "3D jump state",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "HasPressedJumpKey"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "3D jump state",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "CanJump"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        }
+      ],
+      "eventsBasedObjects": []
+    },
+    {
+      "author": "",
+      "category": "Movement",
+      "extensionNamespace": "",
+      "fullName": "Platformer trajectory",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNoYXJ0LWJlbGwtY3VydmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOS45NiwxMS4zMUMxMC44Miw4LjEgMTEuNSw2IDEzLDZDMTQuNSw2IDE1LjE4LDguMSAxNi4wNCwxMS4zMUMxNywxNC45MiAxOC4xLDE5IDIyLDE5VjE3QzE5LjgsMTcgMTksMTQuNTQgMTcuOTcsMTAuOEMxNy4wOCw3LjQ2IDE2LjE1LDQgMTMsNEM5Ljg1LDQgOC45Miw3LjQ2IDguMDMsMTAuOEM3LjAzLDE0LjU0IDYuMiwxNyA0LDE3VjJIMlYyMkgyMlYyMEg0VjE5QzcuOSwxOSA5LDE0LjkyIDkuOTYsMTEuMzFaIiAvPjwvc3ZnPg==",
+      "name": "PlatformerTrajectory",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/chart-bell-curve.svg",
+      "shortDescription": "Platformer character jump easy configuration and platformer AI tools.",
+      "version": "0.0.5",
+      "description": [
+        "This extension allows to:",
+        "* Configure the height of a jump by automatically choosing the right jump speed ([open the project online](https://editor.gdevelop.io/?project=example://platformer-jump-evaluator)).",
+        "* Know when to jump to reach a platform (can be useful for AI).",
+        "* Draw jump trajectories to check a level design."
+      ],
+      "origin": {
+        "identifier": "PlatformerTrajectory",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "jump",
+        "platform",
+        "platformer",
+        "artificial inteligence",
+        "ai"
+      ],
+      "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Configure the height of a jump and evaluate the jump trajectory.",
+          "fullName": "Platformer trajectory evaluator",
+          "name": "PlatformerEvaluator",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::PropertyJumpHeight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::SetJumpHeight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Object.Behavior::PropertyJumpHeight()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Change the jump speed to reach a given height.",
+              "fullName": "Jump height",
+              "functionType": "Action",
+              "name": "SetJumpHeight",
+              "sentence": "Change the jump height of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::SetPropertyJumpHeight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"JumpHeight\")"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const jumpHeight = -Math.abs(eventsFunctionContext.getArgument(\"JumpHeight\"));",
+                    "",
+                    "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const gravity = character.getGravity();",
+                    "/** @type {float} */",
+                    "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                    "/** @type {float} */",
+                    "const jumpSustainTime = character.getJumpSustainTime();",
+                    "",
+                    "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                    "",
+                    "// The implementation jumps from one quadratic resolution to another",
+                    "// to find the right formula to use as the time is unknown.",
+                    "",
+                    "const sustainCase = (jumpHeight) => Math.sqrt(-jumpHeight * gravity * 2);",
+                    "const maxFallingCase = (jumpHeight) => -gravity * jumpSustainTime + maxFallingSpeed",
+                    "    + Math.sqrt(gravity * gravity * jumpSustainTime * jumpSustainTime - 2 * jumpHeight * gravity - maxFallingSpeed * maxFallingSpeed);",
+                    "",
+                    "let jumpSpeed = 0;",
+                    "let peakTime = 0;",
+                    "if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                    "    // common case",
+                    "    jumpSpeed = -gravity * jumpSustainTime + Math.sqrt(2 * gravity * gravity * jumpSustainTime * jumpSustainTime - 4 * jumpHeight * gravity);",
+                    "    peakTime = (gravity * jumpSustainTime + jumpSpeed) / (2 * gravity);",
+                    "    if (peakTime < jumpSustainTime) {",
+                    "        jumpSpeed = sustainCase(jumpHeight);",
+                    "    }",
+                    "    else if (peakTime > maxFallingSpeedReachedTime) {",
+                    "        jumpSpeed = maxFallingCase(jumpHeight);",
+                    "    }",
+                    "}",
+                    "else {",
+                    "    // affine case can't have a maximum",
+                    "",
+                    "    // sustain case",
+                    "    jumpSpeed = sustainCase(jumpHeight);",
+                    "    peakTime = jumpSpeed / gravity;",
+                    "    if (peakTime > maxFallingSpeedReachedTime) {",
+                    "        jumpSpeed = maxFallingCase(jumpHeight);",
+                    "    }",
+                    "}",
+                    "",
+                    "if (jumpSpeed >= 0) {",
+                    "    character.setJumpSpeed(jumpSpeed);",
+                    "}",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Jump height",
+                  "name": "JumpHeight",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Draw the jump trajectories from no sustain to full sustain.",
+              "fullName": "Draw jump",
+              "functionType": "Action",
+              "name": "DrawJump",
+              "sentence": "Draw the jump trajectory of _PARAM0_ on _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "The trajectory with full jump sustaining"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::SetPropertyTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PrimitiveDrawing::BeginFillPath"
+                      },
+                      "parameters": [
+                        "ShapePainter",
+                        "0",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::SetPropertyDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Behavior::JumpDownTime(0, Object.PlatformerCharacter::JumpSustainTime())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::SetPropertyDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "3"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "infiniteLoopWarning": true,
+                  "type": "BuiltinCommonInstructions::While",
+                  "whileConditions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::PropertyTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "<",
+                        "Object.Behavior::PropertyDuration()"
+                      ]
+                    }
+                  ],
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PrimitiveDrawing::PathLineTo"
+                      },
+                      "parameters": [
+                        "ShapePainter",
+                        "Object.PlatformerCharacter::MaxSpeed() * Object.Behavior::PropertyTime()",
+                        "Object.Behavior::JumpY(Object.Behavior::PropertyTime(), Object.PlatformerCharacter::JumpSustainTime())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::SetPropertyTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "+",
+                        "1/30"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "The trajectory without jump sustaining (impossible to do in practice as sustain happens at least one frame)"
+                },
+                {
+                  "infiniteLoopWarning": true,
+                  "type": "BuiltinCommonInstructions::While",
+                  "whileConditions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::PropertyTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformerTrajectory::PlatformerEvaluator::SetPropertyTime"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "-",
+                        "1/30"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PrimitiveDrawing::PathLineTo"
+                      },
+                      "parameters": [
+                        "ShapePainter",
+                        "Object.PlatformerCharacter::MaxSpeed() * Object.Behavior::PropertyTime()",
+                        "Object.Behavior::JumpY(Object.Behavior::PropertyTime(), 0)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PrimitiveDrawing::closePath"
+                      },
+                      "parameters": [
+                        "ShapePainter"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Shape painter",
+                  "name": "ShapePainter",
+                  "supplementaryInformation": "PrimitiveDrawing::Drawer",
+                  "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The jump Y displacement at a given time from the start of the jump.",
+              "fullName": "Jump Y",
+              "functionType": "Expression",
+              "name": "JumpY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const t = eventsFunctionContext.getArgument(\"Time\");",
+                    "/** @type {float} */",
+                    "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                    "",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const gravity = character.getGravity();",
+                    "/** @type {float} */",
+                    "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                    "/** @type {float} */",
+                    "const jumpSpeed = character.getJumpSpeed();",
+                    "",
+                    "// Falling and jump speed are integrated independently",
+                    "// and summed at the end to get the Y displacement.",
+                    "",
+                    "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                    "let fallingY = 0;",
+                    "if (t < maxFallingSpeedReachedTime) {",
+                    "    fallingY = gravity * t * t / 2;",
+                    "}",
+                    "else {",
+                    "    fallingY = maxFallingSpeed * (t - maxFallingSpeed / (2 * gravity));",
+                    "}",
+                    "",
+                    "const jumpEndTime = jumpSustainTime + jumpSpeed / gravity;",
+                    "let jumpingY = 0;",
+                    "if (t < jumpSustainTime) {",
+                    "    jumpingY = -jumpSpeed * t;",
+                    "}",
+                    "else if (t < jumpEndTime) {",
+                    "    jumpingY = gravity * jumpSustainTime * jumpSustainTime / 2 + gravity * t * t / 2",
+                    "        - (gravity * jumpSustainTime + jumpSpeed) * t;",
+                    "}",
+                    "else {",
+                    "    jumpingY = (jumpEndTime * jumpEndTime + jumpSustainTime * jumpSustainTime) * gravity / 2",
+                    "        - (gravity * jumpSustainTime + jumpSpeed) * jumpEndTime;",
+                    "}",
+                    "",
+                    "eventsFunctionContext.returnValue = fallingY + jumpingY;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Time",
+                  "name": "Time",
+                  "type": "expression"
+                },
+                {
+                  "description": "Jump sustaining duration",
+                  "name": "JumpSustainTime",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The maximum Y displacement.",
+              "fullName": "Peak Y",
+              "functionType": "Expression",
+              "name": "JumpPeakY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::JumpY(Object.Behavior::JumpPeakTime(GetArgumentAsNumber(\"JumpSustainTime\")), GetArgumentAsNumber(\"JumpSustainTime\"))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Jump sustaining duration",
+                  "name": "JumpSustainTime",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The time from the start of the jump when it reaches the maximum Y displacement.",
+              "fullName": "Peak time",
+              "functionType": "Expression",
+              "name": "JumpPeakTime",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const y = eventsFunctionContext.getArgument(\"PositionY\");",
+                    "/** @type {float} */",
+                    "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                    "",
+                    "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const gravity = character.getGravity();",
+                    "/** @type {float} */",
+                    "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                    "/** @type {float} */",
+                    "const jumpSpeed = character.getJumpSpeed();",
+                    "",
+                    "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                    "",
+                    "// The implementation jumps from one quadratic resolution to another",
+                    "// to find the right formula to use as the time is unknown.",
+                    "let peakTime = 0;",
+                    "",
+                    "if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                    "    // common case",
+                    "    peakTime = (gravity * jumpSustainTime + jumpSpeed) / (2 * gravity);",
+                    "    if (peakTime < jumpSustainTime) {",
+                    "        // sustain case",
+                    "        peakTime = jumpSpeed / gravity;",
+                    "    }",
+                    "    else if (peakTime > maxFallingSpeedReachedTime) {",
+                    "        // max falling case",
+                    "        peakTime = jumpSustainTime + (jumpSpeed - maxFallingSpeed) / gravity;",
+                    "    }",
+                    "}",
+                    "else {",
+                    "    // affine case can't have a maximum",
+                    "",
+                    "    // sustain case",
+                    "    peakTime = jumpSpeed / gravity;",
+                    "    if (peakTime > maxFallingSpeedReachedTime) {",
+                    "        // max falling case",
+                    "        peakTime = jumpSustainTime + (jumpSpeed - maxFallingSpeed) / gravity;",
+                    "    }",
+                    "}",
+                    "",
+                    "//console.log(\"peakTime: \" + peakTime);",
+                    "eventsFunctionContext.returnValue = peakTime;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Jump sustaining duration",
+                  "name": "JumpSustainTime",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The time from the start of the jump when it reaches a given Y displacement moving upward.",
+              "fullName": "Jump up time",
+              "functionType": "Expression",
+              "name": "JumpUpTime",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::JumpPeakTime(GetArgumentAsNumber(\"JumpSustainTime\"))"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "GetArgumentAsNumber(\"PositionY\")",
+                        ">=",
+                        "Object.Behavior::JumpPeakY(GetArgumentAsNumber(\"JumpSustainTime\"))"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::JsCode",
+                      "inlineCode": [
+                        "// Formulas used in this extension were generated from a math model.",
+                        "// They are probably not understandable on their own.",
+                        "// If you need to modify them or need to write new feature,",
+                        "// please take a look to the platformer extension documentation:",
+                        "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                        "",
+                        "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                        "const behavior = objects[0].getBehavior(behaviorName);",
+                        "/** @type {float} */",
+                        "const y = eventsFunctionContext.getArgument(\"PositionY\");",
+                        "/** @type {float} */",
+                        "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                        "",
+                        "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                        "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                        "/** @type {float} */",
+                        "const gravity = character.getGravity();",
+                        "/** @type {float} */",
+                        "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                        "/** @type {float} */",
+                        "const jumpSpeed = character.getJumpSpeed();",
+                        "",
+                        "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                        "const jumpEndTime = jumpSustainTime + jumpSpeed / gravity;",
+                        "",
+                        "// The implementation jumps from one quadratic resolution to another",
+                        "// to find the right formula to use as the time is unknown.",
+                        "const sustainCase = (y) => (jumpSpeed - Math.sqrt(jumpSpeed * jumpSpeed + 2 * gravity * y)) / gravity;",
+                        "const affineCase = (y) => -(maxFallingSpeed * maxFallingSpeed + 2 * gravity * y) / (gravity * jumpSpeed - gravity * maxFallingSpeed) / 2;",
+                        "const commonCase = (y) => (gravity * jumpSustainTime + jumpSpeed - Math.sqrt(-gravity * gravity * jumpSustainTime * jumpSustainTime",
+                        "    + 2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + 4 * gravity * y)) / (2 * gravity);",
+                        "const maxFallingCase = (y) => (gravity * jumpSustainTime + jumpSpeed - maxFallingSpeed - Math.sqrt(2 * gravity * jumpSpeed * jumpSustainTime",
+                        "    + jumpSpeed * jumpSpeed - 2 * (gravity * jumpSustainTime + jumpSpeed) * maxFallingSpeed + 2 * maxFallingSpeed * maxFallingSpeed + 2 * gravity * y)) / gravity;",
+                        "const freeFallCase = (y) => -Math.sqrt(2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + 2 * gravity * y) / gravity;",
+                        "//const gladdingCase = (y) => (2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + maxFallingSpeed * maxFallingSpeed + 2 * gravity * y) / (2 * gravity * maxFallingSpeed);",
+                        "",
+                        "let time = 0;",
+                        "if (maxFallingSpeedReachedTime > jumpEndTime) {",
+                        "    time = sustainCase(y);",
+                        "    if (time > jumpSustainTime || Number.isNaN(time)) {",
+                        "        time = commonCase(y);",
+                        "        if (time > jumpEndTime || Number.isNaN(time)) {",
+                        "            time = freeFallCase(y);",
+                        "        }",
+                        "    }",
+                        "}",
+                        "else if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                        "    time = sustainCase(y);",
+                        "    if (time > jumpSustainTime || Number.isNaN(time)) {",
+                        "        time = commonCase(y);",
+                        "        if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                        "            time = maxFallingCase(y);",
+                        "        }",
+                        "    }",
+                        "}",
+                        "else {",
+                        "    time = sustainCase(y);",
+                        "    if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                        "        time = maxFallingSpeed <= jumpSpeed ? affineCase(y) : time = Number.MAX_VALUE",
+                        "        if (time > jumpSustainTime || Number.isNaN(time)) {",
+                        "            time = maxFallingCase(y);",
+                        "        }",
+                        "    }",
+                        "}",
+                        "",
+                        "eventsFunctionContext.returnValue = time;",
+                        ""
+                      ],
+                      "parameterObjects": "Object",
+                      "useStrict": true,
+                      "eventsSheetExpanded": true
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Y position",
+                  "name": "PositionY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Jump sustaining duration",
+                  "name": "JumpSustainTime",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The time from the start of the jump when it reaches a given Y displacement moving downward.",
+              "fullName": "Jump down time",
+              "functionType": "Expression",
+              "name": "JumpDownTime",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::JumpPeakTime(GetArgumentAsNumber(\"JumpSustainTime\"))"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "GetArgumentAsNumber(\"PositionY\")",
+                        ">=",
+                        "Object.Behavior::JumpPeakY(GetArgumentAsNumber(\"JumpSustainTime\"))"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::JsCode",
+                      "inlineCode": [
+                        "// Formulas used in this extension were generated from a math model.",
+                        "// They are probably not understandable on their own.",
+                        "// If you need to modify them or need to write new feature,",
+                        "// please take a look to the platformer extension documentation:",
+                        "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                        "",
+                        "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                        "const behavior = objects[0].getBehavior(behaviorName);",
+                        "/** @type {float} */",
+                        "const y = eventsFunctionContext.getArgument(\"PositionY\");",
+                        "/** @type {float} */",
+                        "const jumpSustainTime = eventsFunctionContext.getArgument(\"JumpSustainTime\");",
+                        "",
+                        "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                        "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                        "/** @type {float} */",
+                        "const gravity = character.getGravity();",
+                        "/** @type {float} */",
+                        "const maxFallingSpeed = character.getMaxFallingSpeed();",
+                        "/** @type {float} */",
+                        "const jumpSpeed = character.getJumpSpeed();",
+                        "",
+                        "const maxFallingSpeedReachedTime = maxFallingSpeed / gravity;",
+                        "const jumpEndTime = jumpSustainTime + jumpSpeed / gravity;",
+                        "",
+                        "//console.log(\"y: \" + y);",
+                        "",
+                        "// The implementation jumps from one quadratic resolution to another",
+                        "// to find the right formula to use as the time is unknown.",
+                        "const sustainCase = (y) => (jumpSpeed + Math.sqrt(jumpSpeed * jumpSpeed + 2 * gravity * y)) / gravity;",
+                        "const affineCase = (y) => -(maxFallingSpeed * maxFallingSpeed + 2 * gravity * y) / (gravity * jumpSpeed - gravity * maxFallingSpeed) / 2;",
+                        "const commonCase = (y) => (gravity * jumpSustainTime + jumpSpeed + Math.sqrt(-gravity * gravity * jumpSustainTime * jumpSustainTime",
+                        "    + 2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + 4 * gravity * y)) / (2 * gravity);",
+                        "const maxFallingCase = (y) => (gravity * jumpSustainTime + jumpSpeed - maxFallingSpeed + Math.sqrt(2 * gravity * jumpSpeed * jumpSustainTime",
+                        "    + jumpSpeed * jumpSpeed - 2 * (gravity * jumpSustainTime + jumpSpeed) * maxFallingSpeed + 2 * maxFallingSpeed * maxFallingSpeed + 2 * gravity * y)) / gravity;",
+                        "const freeFallCase = (y) => Math.sqrt(2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + 2 * gravity * y) / gravity;",
+                        "const gladdingCase = (y) => (2 * gravity * jumpSpeed * jumpSustainTime + jumpSpeed * jumpSpeed + maxFallingSpeed * maxFallingSpeed + 2 * gravity * y) / (2 * gravity * maxFallingSpeed);",
+                        "",
+                        "let time = 0;",
+                        "if (maxFallingSpeedReachedTime > jumpEndTime) {",
+                        "    time = sustainCase(y);",
+                        "    if (time > jumpSustainTime || Number.isNaN(time)) {",
+                        "        time = commonCase(y);",
+                        "        if (time > jumpEndTime || Number.isNaN(time)) {",
+                        "            time = freeFallCase(y);",
+                        "            if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                        "                time = gladdingCase(y);",
+                        "            }",
+                        "        }",
+                        "    }",
+                        "}",
+                        "else if (maxFallingSpeedReachedTime > jumpSustainTime) {",
+                        "    time = sustainCase(y);",
+                        "    if (time > jumpSustainTime || Number.isNaN(time)) {",
+                        "        time = commonCase(y);",
+                        "        if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                        "            time = maxFallingCase(y);",
+                        "            if (time > jumpEndTime || Number.isNaN(time)) {",
+                        "                time = gladdingCase(y);",
+                        "            }",
+                        "        }",
+                        "    }",
+                        "}",
+                        "else {",
+                        "    time = sustainCase(y);",
+                        "    if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {",
+                        "        time = maxFallingSpeed >= jumpSpeed ? affineCase(y) : time = Number.MAX_VALUE;",
+                        "        if (time > jumpSustainTime || Number.isNaN(time)) {",
+                        "            time = maxFallingCase(y);",
+                        "            if (time > jumpEndTime || Number.isNaN(time)) {",
+                        "                time = gladdingCase(y);",
+                        "            }",
+                        "        }",
+                        "    }",
+                        "}",
+                        "",
+                        "eventsFunctionContext.returnValue = time;",
+                        ""
+                      ],
+                      "parameterObjects": "Object",
+                      "useStrict": true,
+                      "eventsSheetExpanded": true
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Y position",
+                  "name": "PositionY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Jump sustaining duration",
+                  "name": "JumpSustainTime",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The X displacement before the character stops (always positive).",
+              "fullName": "Stop distance",
+              "functionType": "Expression",
+              "name": "StopXDistance",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const t = eventsFunctionContext.getArgument(\"Time\");",
+                    "",
+                    "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const decelerationX = character.getDeceleration();",
+                    "/** @type {float} */",
+                    "const currentSpeedX = Math.abs(character.getCurrentSpeed());",
+                    "",
+                    "let x = 0;",
+                    "if (currentSpeedX === 0) {",
+                    "    x = 0;",
+                    "}",
+                    "else {",
+                    "    const stopXTime = currentSpeedX / decelerationX;",
+                    "    t = stopXTime;",
+                    "    x = currentSpeedX * t - decelerationX * t * t / 2;",
+                    "}",
+                    "eventsFunctionContext.returnValue = x;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Time",
+                  "name": "Time",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The X displacement at a given time from now if decelerating (always positive).",
+              "fullName": "Stopping X",
+              "functionType": "Expression",
+              "name": "StoppingX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const t = eventsFunctionContext.getArgument(\"Time\");",
+                    "",
+                    "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const decelerationX = character.getDeceleration();",
+                    "/** @type {float} */",
+                    "const currentSpeedX = Math.abs(character.getCurrentSpeed());",
+                    "",
+                    "let x = 0;",
+                    "if (currentSpeedX === 0) {",
+                    "    x = 0;",
+                    "}",
+                    "else {",
+                    "    const stopXTime = currentSpeedX / decelerationX;",
+                    "    t = Math.min(t, stopXTime);",
+                    "    x = currentSpeedX * t - decelerationX * t * t / 2;",
+                    "}",
+                    "eventsFunctionContext.returnValue = x;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Time",
+                  "name": "Time",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The X displacement at a given time from now if accelerating (always positive).",
+              "fullName": "Moving X",
+              "functionType": "Expression",
+              "name": "MovingX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "// Formulas used in this extension were generated from a math model.",
+                    "// They are probably not understandable on their own.",
+                    "// If you need to modify them or need to write new feature,",
+                    "// please take a look to the platformer extension documentation:",
+                    "// https://github.com/4ian/GDevelop/tree/master/Extensions/PlatformBehavior#readme",
+                    "",
+                    "const behaviorName = eventsFunctionContext.getBehaviorName(\"Behavior\");",
+                    "const behavior = objects[0].getBehavior(behaviorName);",
+                    "/** @type {float} */",
+                    "const t = eventsFunctionContext.getArgument(\"Time\");",
+                    "",
+                    "/** @type {gdjs.PlatformerObjectRuntimeBehavior} */",
+                    "const character = objects[0].getBehavior(behavior._getPlatformerCharacter());",
+                    "/** @type {float} */",
+                    "const accelerationX = character.getAcceleration();",
+                    "/** @type {float} */",
+                    "const maxSpeedX = character.getMaxSpeed();",
+                    "/** @type {float} */",
+                    "const currentSpeedX = Math.abs(character.getCurrentSpeed());",
+                    "",
+                    "let x = 0;",
+                    "if (currentSpeedX === maxSpeedX) {",
+                    "    x = maxSpeedX * t;",
+                    "}",
+                    "else {",
+                    "    const maxSpeedXTime = Math.min(0, (maxSpeedX - currentSpeedX) / accelerationX);",
+                    "    if (t < maxSpeedXTime) {",
+                    "        x = currentSpeedX * t + accelerationX * t * t / 2",
+                    "    }",
+                    "    else {",
+                    "        x = currentSpeedX * maxSpeedXTime",
+                    "            + accelerationX * maxSpeedXTime * maxSpeedXTime / 2",
+                    "            + maxSpeedX * (t - maxSpeedXTime);",
+                    "    }",
+                    "}",
+                    "eventsFunctionContext.returnValue = x;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerTrajectory::PlatformerEvaluator",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Time",
+                  "name": "Time",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "Platformer character",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "PlatformBehavior::PlatformerObjectBehavior"
+              ],
+              "hidden": false,
+              "name": "PlatformerCharacter"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "Jump height",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "JumpHeight"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "Time"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "Duration"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        }
+      ],
+      "eventsBasedObjects": []
+    },
     {
       "author": "",
       "category": "Visual effect",
@@ -19853,6 +22825,158 @@
             "type": "expression"
           },
           "parameters": [],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": []
+    },
+    {
+      "author": "",
+      "category": "",
+      "extensionNamespace": "",
+      "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "Collision3D",
+      "previewIconUrl": "",
+      "shortDescription": "",
+      "version": "",
+      "description": "",
+      "tags": [],
+      "authorIds": [],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "the top of the object on Z axis",
+          "fullName": "Top on Z axis",
+          "functionType": "Expression",
+          "group": "Position",
+          "name": "TopZ",
+          "sentence": "The top on Z axis of _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Object3D::Z() + Object.Object3D::Depth()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Scene3D::Cube3DObject",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the bottom of the object on Z axis",
+          "fullName": "Bottom on Z axis",
+          "functionType": "Expression",
+          "group": "Position",
+          "name": "BottomZ",
+          "sentence": "The bottom on Z axis of _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Object.Object3D::Z()"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Scene3D::Cube3DObject",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if an object is overlapping a range on Z axis.",
+          "fullName": "Overlap Z range",
+          "functionType": "Condition",
+          "group": "Collision",
+          "name": "IsWithinZ",
+          "sentence": "_PARAM1_ overlap the range from _PARAM2_ to _PARAM3_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "",
+                "const bottom = eventsFunctionContext.getArgument(\"BottomZ\");",
+                "const top = eventsFunctionContext.getArgument(\"TopZ\");",
+                "",
+                "if (top <= bottom) {",
+                "    return false;",
+                "}",
+                "",
+                "let isAnyObjectPicked = false;",
+                "for (const object of objects) {",
+                "    object.pick = object.getZ() < top && object.getZ() + object.getDepth() > bottom;",
+                "    isAnyObjectPicked = isAnyObjectPicked || object.pick;",
+                "}",
+                "",
+                "const objectsLists = eventsFunctionContext.getObjectsLists(\"Object\");",
+                "for (const name in objectsLists.items) {",
+                "    if (objectsLists.items.hasOwnProperty(name)) {",
+                "        const objectsList = objectsLists.items[name];",
+                "        gdjs.evtTools.object.filterPickedObjectsList(objectsList);",
+                "    }",
+                "}",
+                "eventsFunctionContext.returnValue = isAnyObjectPicked;",
+                ""
+              ],
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Scene3D::Cube3DObject",
+              "type": "objectList"
+            },
+            {
+              "description": "Bottom Z",
+              "name": "BottomZ",
+              "type": "expression"
+            },
+            {
+              "description": "Top Z",
+              "name": "TopZ",
+              "type": "expression"
+            }
+          ],
           "objectGroups": []
         }
       ],
