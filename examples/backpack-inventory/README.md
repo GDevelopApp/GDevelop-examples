@@ -1,0 +1,1 @@
+A simple backpack inventory that displays collected items alphabetically.
