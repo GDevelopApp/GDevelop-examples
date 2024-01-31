@@ -1714,6 +1714,7 @@
           ],
           "events": [
             {
+              "disabled": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -1782,6 +1783,7 @@
               "actions": [],
               "events": [
                 {
+                  "disabled": true,
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
@@ -1860,9 +1862,12 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "SystemInfo::IsMobile"
+                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
                   },
-                  "parameters": []
+                  "parameters": [
+                    "LookJoystick",
+                    ""
+                  ]
                 }
               ],
               "actions": [
@@ -2134,7 +2139,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "TopDownWalk::TopDownWalk::SimulateTurnLeftKey"
+                        "value": "TopDownWalk::TopDownWalk::SimulateMoveLeftKey"
                       },
                       "parameters": [
                         "Camera",
@@ -2177,12 +2182,6 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "SystemInfo::IsMobile"
-                  },
-                  "parameters": []
-                },
-                {
-                  "type": {
                     "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
                   },
                   "parameters": [
@@ -2194,12 +2193,13 @@
               "actions": [
                 {
                   "type": {
-                    "value": "AddForceAL"
+                    "value": "TopDownWalk::TopDownWalk::SimulateMoveStick"
                   },
                   "parameters": [
                     "Camera",
-                    "WalkJoystick.StickAngle() + Camera.Angle() + 90",
-                    "400",
+                    "TopDownWalk",
+                    "WalkJoystick.StickAngle()",
+                    "WalkJoystick.StickForce()",
                     ""
                   ]
                 }
@@ -2217,30 +2217,18 @@
                     "1",
                     ""
                   ]
-                },
-                {
-                  "type": {
-                    "value": "Gamepads::StickForce"
-                  },
-                  "parameters": [
-                    "",
-                    ">",
-                    "0",
-                    "1",
-                    "\"Left\"",
-                    ""
-                  ]
                 }
               ],
               "actions": [
                 {
                   "type": {
-                    "value": "AddForceAL"
+                    "value": "TopDownWalk::TopDownWalk::SimulateMoveStick"
                   },
                   "parameters": [
                     "Camera",
-                    "Gamepads::StickAngle(1, \"Left\") + Camera.Angle() + 90",
-                    "400",
+                    "TopDownWalk",
+                    "Gamepads::StickAngle(1, \"Left\")",
+                    "Gamepads::StickForce(1, \"Left\")",
                     ""
                   ]
                 }
@@ -3039,64 +3027,16 @@
                               ]
                             }
                           ],
-                          "actions": [],
-                          "events": [
+                          "actions": [
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownWalk::TopDownWalk::PropertyPreviousForwardSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "<=",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownWalk::TopDownWalk::SetPropertyCurrentForwardSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "max(CurrentForwardSpeed - TranslationAcceleration * TimeDelta(), -TranslationSpeedMax)"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownWalk::TopDownWalk::PropertyPreviousForwardSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    ">",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownWalk::TopDownWalk::SetPropertyCurrentForwardSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "max(CurrentForwardSpeed - (TranslationAcceleration + TranslationDeceleration) * TimeDelta(), -TranslationSpeedMax)"
-                                  ]
-                                }
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedForwardSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "-TranslationSpeedMax"
                               ]
                             }
                           ]
@@ -3142,6 +3082,112 @@
                               ]
                             }
                           ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedForwardSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "TranslationSpeedMax"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::PropertyTargetedForwardSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "<",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "TopDownWalk::TopDownWalk::PropertyPreviousForwardSpeed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "<=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "TopDownWalk::TopDownWalk::SetPropertyCurrentForwardSpeed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "max(CurrentForwardSpeed - TranslationAcceleration * TimeDelta(), TargetedForwardSpeed)"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "TopDownWalk::TopDownWalk::PropertyPreviousForwardSpeed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    ">",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "TopDownWalk::TopDownWalk::SetPropertyCurrentForwardSpeed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "max(CurrentForwardSpeed - (TranslationAcceleration + TranslationDeceleration) * TimeDelta(), TargetedForwardSpeed)"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::PropertyTargetedForwardSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ">",
+                                "0"
+                              ]
+                            }
+                          ],
                           "actions": [],
                           "events": [
                             {
@@ -3168,7 +3214,7 @@
                                     "Object",
                                     "Behavior",
                                     "=",
-                                    "min(CurrentForwardSpeed + TranslationAcceleration * TimeDelta(), TranslationSpeedMax)"
+                                    "min(CurrentForwardSpeed + TranslationAcceleration * TimeDelta(), TargetedForwardSpeed)"
                                   ]
                                 }
                               ]
@@ -3197,7 +3243,7 @@
                                     "Object",
                                     "Behavior",
                                     "=",
-                                    "min(CurrentForwardSpeed + (TranslationAcceleration + TranslationDeceleration) * TimeDelta(), TranslationSpeedMax)"
+                                    "min(CurrentForwardSpeed + (TranslationAcceleration + TranslationDeceleration) * TimeDelta(), TargetedForwardSpeed)"
                                   ]
                                 }
                               ]
@@ -3209,22 +3255,13 @@
                           "conditions": [
                             {
                               "type": {
-                                "inverted": true,
-                                "value": "TopDownWalk::TopDownWalk::PropertyHasPressedMoveBackward"
+                                "value": "TopDownWalk::TopDownWalk::PropertyTargetedForwardSpeed"
                               },
                               "parameters": [
                                 "Object",
-                                "Behavior"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "TopDownWalk::TopDownWalk::PropertyHasPressedMoveForward"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior"
+                                "Behavior",
+                                "=",
+                                "0"
                               ]
                             }
                           ],
@@ -3419,6 +3456,17 @@
                                 "Behavior",
                                 "no"
                               ]
+                            },
+                            {
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedForwardSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "0"
+                              ]
                             }
                           ]
                         }
@@ -3491,64 +3539,16 @@
                               ]
                             }
                           ],
-                          "actions": [],
-                          "events": [
+                          "actions": [
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownWalk::TopDownWalk::PropertyPreviousSidewaysSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "<=",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownWalk::TopDownWalk::SetPropertyCurrentSidewaysSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "max(CurrentSidewaysSpeed - TranslationAcceleration * TimeDelta(), -TranslationSpeedMax)"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownWalk::TopDownWalk::PropertyPreviousSidewaysSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    ">",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownWalk::TopDownWalk::SetPropertyCurrentSidewaysSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "max(CurrentSidewaysSpeed - (TranslationAcceleration + TranslationDeceleration) * TimeDelta(), -TranslationSpeedMax)"
-                                  ]
-                                }
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedSidewaysSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "-TranslationSpeedMax"
                               ]
                             }
                           ]
@@ -3594,6 +3594,112 @@
                               ]
                             }
                           ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedSidewaysSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "TranslationSpeedMax"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::PropertyTargetedSidewaysSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "<",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "TopDownWalk::TopDownWalk::PropertyPreviousSidewaysSpeed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "<=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "TopDownWalk::TopDownWalk::SetPropertyCurrentSidewaysSpeed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "max(CurrentSidewaysSpeed - TranslationAcceleration * TimeDelta(), TargetedSidewaysSpeed)"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "TopDownWalk::TopDownWalk::PropertyPreviousSidewaysSpeed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    ">",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "TopDownWalk::TopDownWalk::SetPropertyCurrentSidewaysSpeed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "=",
+                                    "max(CurrentSidewaysSpeed - (TranslationAcceleration + TranslationDeceleration) * TimeDelta(), TargetedSidewaysSpeed)"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::PropertyTargetedSidewaysSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ">",
+                                "0"
+                              ]
+                            }
+                          ],
                           "actions": [],
                           "events": [
                             {
@@ -3620,7 +3726,7 @@
                                     "Object",
                                     "Behavior",
                                     "=",
-                                    "min(CurrentSidewaysSpeed + TranslationAcceleration * TimeDelta(), TranslationSpeedMax)"
+                                    "min(CurrentSidewaysSpeed + TranslationAcceleration * TimeDelta(), TargetedSidewaysSpeed)"
                                   ]
                                 }
                               ]
@@ -3649,7 +3755,7 @@
                                     "Object",
                                     "Behavior",
                                     "=",
-                                    "min(CurrentSidewaysSpeed + (TranslationAcceleration + TranslationDeceleration) * TimeDelta(), TranslationSpeedMax)"
+                                    "min(CurrentSidewaysSpeed + (TranslationAcceleration + TranslationDeceleration) * TimeDelta(), TargetedSidewaysSpeed)"
                                   ]
                                 }
                               ]
@@ -3661,22 +3767,13 @@
                           "conditions": [
                             {
                               "type": {
-                                "inverted": true,
-                                "value": "TopDownWalk::TopDownWalk::PropertyHasPressedMoveLeft"
+                                "value": "TopDownWalk::TopDownWalk::PropertyTargetedSidewaysSpeed"
                               },
                               "parameters": [
                                 "Object",
-                                "Behavior"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "TopDownWalk::TopDownWalk::PropertyHasPressedMoveRight"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior"
+                                "Behavior",
+                                "=",
+                                "0"
                               ]
                             }
                           ],
@@ -3870,6 +3967,17 @@
                                 "Object",
                                 "Behavior",
                                 "no"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedSidewaysSpeed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "0"
                               ]
                             }
                           ]
@@ -4322,6 +4430,158 @@
                   "name": "Behavior",
                   "supplementaryInformation": "TopDownWalk::TopDownWalk",
                   "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Simulate a stick control.",
+              "fullName": "Simulate stick control",
+              "functionType": "Action",
+              "group": "Top-down walk state",
+              "name": "SimulateMoveStick",
+              "sentence": "Simulate a stick control for _PARAM0_ with a _PARAM2_ angle and a _PARAM3_ force",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Denormilize the targeted speed.\nIt projects the circle on a square with sides length of the circle diameter."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownWalk::TopDownWalk::SetSharedPropertyCos"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "cos(ToRad(-Angle))"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TopDownWalk::TopDownWalk::SetSharedPropertySin"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "sin(ToRad(-Angle))"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                      },
+                      "parameters": [
+                        "abs(Cos)",
+                        ">=",
+                        "abs(Sin)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedSidewaysSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Force * TranslationSpeedMax * sign(Cos)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedForwardSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Force * TranslationSpeedMax * Sin / abs(Cos)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                      },
+                      "parameters": [
+                        "abs(Cos)",
+                        "<=",
+                        "abs(Sin)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedSidewaysSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Force * TranslationSpeedMax * Cos / abs(Sin)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TopDownWalk::TopDownWalk::SetPropertyTargetedForwardSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Force * TranslationSpeedMax * sign(Sin)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TopDownWalk::TopDownWalk",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Stick angle (in degrees)",
+                  "name": "Angle",
+                  "type": "expression"
+                },
+                {
+                  "description": "Stick force (between 0 and 1)",
+                  "name": "Force",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -5333,9 +5593,50 @@
               "extraInformation": [],
               "hidden": true,
               "name": "HasPressedMoveLeftLast"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "TargetedForwardSpeed"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "TargetedSidewaysSpeed"
             }
           ],
-          "sharedPropertyDescriptors": []
+          "sharedPropertyDescriptors": [
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "Cos"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Sin"
+            }
+          ]
         }
       ],
       "eventsBasedObjects": []
