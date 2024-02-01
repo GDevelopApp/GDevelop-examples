@@ -196,7 +196,6 @@ const sortedStarterSlugs = new Set([
   'geometry-monster',
   'pairs',
   'isometric-game',
-  'tile-based-city-builder',
 ]);
 
 /**
