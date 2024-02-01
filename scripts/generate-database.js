@@ -179,7 +179,6 @@ const sortedStarterSlugs = new Set([
   'top-down-rpg',
   'spherez',
   '3d-tile-based-city-builder',
-
   'plinko',
   'parking-jam',
   'tappy-plane',
@@ -197,7 +196,6 @@ const sortedStarterSlugs = new Set([
   'geometry-monster',
   'pairs',
   'isometric-game',
-  'tile-based-city-builder',
 ]);
 
 /**
@@ -460,12 +458,18 @@ const updateExampleFiles = async (gd, allExampleFiles) => {
  * @return {ExampleShortHeader[]}
  */
 const generateSortedShortHeaders = (allExamples) => {
-  const starters = allExamples.filter(({ slug }) =>
-    sortedStarterSlugs.has(slug)
-  );
-  const nonStarters = allExamples.filter(
-    ({ slug }) => !sortedStarterSlugs.has(slug)
-  );
+  const starters = [];
+  const examplesWithGameTag = [];
+  const examplesWithNeitherStarterNorGameTags = [];
+  for (const example of allExamples) {
+    if (sortedStarterSlugs.has(example.slug)) {
+      starters.push(example);
+    } else if (example.tags.includes('game')) {
+      examplesWithGameTag.push(example);
+    } else {
+      examplesWithNeitherStarterNorGameTags.push(example);
+    }
+  }
   const sortedStarterSlugsArray = [...sortedStarterSlugs];
   const sortedStarters = [...starters].sort((example1, example2) => {
     return (
@@ -474,7 +478,11 @@ const generateSortedShortHeaders = (allExamples) => {
     );
   });
 
-  return [...sortedStarters, ...nonStarters].map((example) => ({
+  return [
+    ...sortedStarters,
+    ...examplesWithGameTag,
+    ...examplesWithNeitherStarterNorGameTags,
+  ].map((example) => ({
     id: example.id,
     name: example.name,
     slug: example.slug,
