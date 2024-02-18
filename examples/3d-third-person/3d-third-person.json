@@ -487,7 +487,6 @@
           "layer": "",
           "name": "Camera",
           "persistentUuid": "ff5eb8ec-abfa-4466-ae38-23ef5e1b1ea8",
-          "rotationY": 20,
           "width": 50,
           "x": 150,
           "y": 319,
@@ -13945,7 +13944,7 @@
       "eventsBasedBehaviors": [
         {
           "description": "Smoothly scroll to follow an object.",
-          "fullName": "Smooth 3D Camera",
+          "fullName": "Third person camera",
           "name": "SmoothCamera3D",
           "objectType": "",
           "eventsFunctions": [
@@ -14230,25 +14229,6 @@
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
                     {
-                      "disabled": true,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetCameraAngle"
-                          },
-                          "parameters": [
-                            "",
-                            "=",
-                            "Object.Angle() + (CameraAngle(Object.Layer(), 0) - Object.Angle()) * exp(TimeDelta() * Object.Behavior::PropertyRotationLogSpeed())",
-                            "Object.Layer()",
-                            "0"
-                          ]
-                        }
-                      ]
-                    },
-                    {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [],
                       "actions": [
@@ -14258,12 +14238,12 @@
                           },
                           "parameters": [
                             "",
-                            "Object.X()",
-                            "Object.Y()",
-                            "CameraZ",
-                            "500",
-                            "Object.Angle() + 90 + (CameraAngle(Object.Layer(), 0) - (Object.Angle() + 90)) * exp(TimeDelta() * Object.Behavior::PropertyRotationLogSpeed())",
-                            "Object.Object3D::RotationY()",
+                            "Object.X() + OffsetX",
+                            "Object.Y() + OffsetY",
+                            "CameraZ + OffsetZ",
+                            "Distance",
+                            "Object.Angle() + 90 + (CameraAngle(Object.Layer(), 0) - (Object.Angle() + 90)) * exp(TimeDelta() * Object.Behavior::PropertyRotationLogSpeed()) + RotationAngleOffset",
+                            "Object.Object3D::RotationY() + ElevationAngleOffset",
                             "",
                             ""
                           ]
@@ -14293,7 +14273,7 @@
               "description": "the halfway time for rotation of the object.",
               "fullName": "Halfway time for rotation",
               "functionType": "ExpressionAndCondition",
-              "group": "Smooth 3D Camera catch-up speed configuration",
+              "group": "Third person camera configuration",
               "name": "RotationHalfwayDuration",
               "sentence": "the halfway time for rotation",
               "events": [
@@ -14397,7 +14377,7 @@
               "description": "the halfway time on Z axis of the object.",
               "fullName": "Halfway time on Z axis",
               "functionType": "ExpressionAndCondition",
-              "group": "Smooth 3D Camera catch-up speed configuration",
+              "group": "Third person camera configuration",
               "name": "TranslationZHalfwayDuration",
               "sentence": "the halfway time on Z axis",
               "events": [
@@ -14515,7 +14495,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.Object3D::CenterZ() + CameraOffsetZ - FollowFreeAreaZMin"
+                        "Object.Object3D::CenterZ() + OffsetZ - FollowFreeAreaZMin"
                       ]
                     }
                   ]
@@ -14557,7 +14537,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.Object3D::CenterZ() + CameraOffsetZ + FollowFreeAreaZMax"
+                        "Object.Object3D::CenterZ() + OffsetZ + FollowFreeAreaZMax"
                       ]
                     }
                   ]
@@ -14585,7 +14565,7 @@
               "description": "the follow free area top border on Z axis of the object.",
               "fullName": "Follow free area top border on Z axis",
               "functionType": "ExpressionAndCondition",
-              "group": "Smooth 3D Camera configuration",
+              "group": "Third person camera configuration",
               "name": "FollowFreeAreaZMax",
               "sentence": "the follow free area top border on Z axis",
               "events": [
@@ -14666,7 +14646,7 @@
               "description": "the follow free area bottom border on Z axis of the object.",
               "fullName": "Follow free area bottom border on Z axis",
               "functionType": "ExpressionAndCondition",
-              "group": "Smooth 3D Camera configuration",
+              "group": "Third person camera configuration",
               "name": "FollowFreeAreaZMin",
               "sentence": "the follow free area bottom border on Z axis",
               "events": [
@@ -14742,6 +14722,492 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the camera distance of the object.",
+              "fullName": "Camera distance",
+              "functionType": "ExpressionAndCondition",
+              "group": "Third person camera configuration",
+              "name": "Distance",
+              "sentence": "the camera distance",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Distance"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Distance",
+              "name": "SetDistance",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera3D::SmoothCamera3D::SetPropertyDistance"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the x offset of the object.",
+              "fullName": "X offset",
+              "functionType": "ExpressionAndCondition",
+              "group": "Third person camera configuration",
+              "name": "OffsetX",
+              "sentence": "the x offset",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "OffsetX"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "OffsetX",
+              "name": "SetOffsetX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera3D::SmoothCamera3D::SetPropertyOffsetX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the y offset of the object.",
+              "fullName": "Y offset",
+              "functionType": "ExpressionAndCondition",
+              "group": "Third person camera configuration",
+              "name": "OffsetY",
+              "sentence": "the y offset",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "OffsetY"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "OffsetY",
+              "name": "SetOffsetY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera3D::SmoothCamera3D::SetPropertyOffsetY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the z offset of the object.",
+              "fullName": "Z offset",
+              "functionType": "ExpressionAndCondition",
+              "group": "Third person camera configuration",
+              "name": "OffsetZ",
+              "sentence": "the z offset",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "OffsetZ"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "OffsetZ",
+              "name": "SetOffsetZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera3D::SmoothCamera3D::SetPropertyOffsetZ"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the rotation angle offset of the object.",
+              "fullName": "Rotation angle offset",
+              "functionType": "ExpressionAndCondition",
+              "group": "Third person camera configuration",
+              "name": "RotationAngleOffset",
+              "sentence": "the rotation angle offset",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "RotationAngleOffset"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "RotationAngleOffset",
+              "name": "SetRotationAngleOffset",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera3D::SmoothCamera3D::SetPropertyRotationAngleOffset"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the elevation angle offset of the object.",
+              "fullName": "Elevation angle offset",
+              "functionType": "ExpressionAndCondition",
+              "group": "Third person camera configuration",
+              "name": "ElevationAngleOffset",
+              "sentence": "the elevation angle offset",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "ElevationAngleOffset"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "ElevationAngleOffset",
+              "name": "SetElevationAngleOffset",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SmoothCamera3D::SmoothCamera3D::SetPropertyElevationAngleOffset"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SmoothCamera3D::SmoothCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "propertyDescriptors": [
@@ -14757,7 +15223,7 @@
               "name": "Object3D"
             },
             {
-              "value": "0.25",
+              "value": "0.125",
               "type": "Number",
               "unit": "Second",
               "label": "Halfway  time for rotation",
@@ -14767,7 +15233,7 @@
               "name": "RotationHalfwayDuration"
             },
             {
-              "value": "0.25",
+              "value": "0.125",
               "type": "Number",
               "unit": "Second",
               "label": "Halfway time on Z axis",
@@ -14777,44 +15243,86 @@
               "name": "TranslationZHalfwayDuration"
             },
             {
-              "value": "0.25",
+              "value": "500",
               "type": "Number",
-              "unit": "Second",
-              "label": "Halfway time on X and Y axis",
+              "unit": "Pixel",
+              "label": "Camera distance",
               "description": "",
-              "group": "Catch-up speed",
+              "group": "Position",
               "extraInformation": [],
-              "name": "TranslationXYHalfwayDuration"
+              "name": "Distance"
             },
             {
               "value": "0",
               "type": "Number",
               "unit": "Pixel",
-              "label": "Camera offset X",
+              "label": "X offset",
               "description": "",
               "group": "Position",
               "extraInformation": [],
-              "name": "CameraOffsetX"
+              "name": "OffsetX"
             },
             {
               "value": "0",
               "type": "Number",
               "unit": "Pixel",
-              "label": "Camera offset Y",
+              "label": "Y offset",
               "description": "",
               "group": "Position",
               "extraInformation": [],
-              "name": "CameraOffsetY"
+              "name": "OffsetY"
             },
             {
               "value": "0",
               "type": "Number",
               "unit": "Pixel",
-              "label": "Camera offset Z",
+              "label": "Z offset",
               "description": "",
               "group": "Position",
               "extraInformation": [],
-              "name": "CameraOffsetZ"
+              "name": "OffsetZ"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Rotation angle offset",
+              "description": "",
+              "group": "Position",
+              "extraInformation": [],
+              "name": "RotationAngleOffset"
+            },
+            {
+              "value": "20",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Elevation angle offset",
+              "description": "",
+              "group": "Position",
+              "extraInformation": [],
+              "name": "ElevationAngleOffset"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Follow free area top border on Z axis",
+              "description": "",
+              "group": "Position",
+              "extraInformation": [],
+              "advanced": true,
+              "name": "FollowFreeAreaZMax"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Follow free area bottom border on Z axis",
+              "description": "",
+              "group": "Position",
+              "extraInformation": [],
+              "advanced": true,
+              "name": "FollowFreeAreaZMin"
             },
             {
               "value": "",
@@ -14838,36 +15346,6 @@
             },
             {
               "value": "",
-              "type": "Number",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "TranslationXYLogSpeed"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "OldX (local variable)",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "OldX"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "OldY (local variable)",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "OldY"
-            },
-            {
-              "value": "",
               "type": "Boolean",
               "label": "",
               "description": "",
@@ -14875,26 +15353,6 @@
               "extraInformation": [],
               "hidden": true,
               "name": "IsCalledManually"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "unit": "Pixel",
-              "label": "Follow free area top border on Z axis",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "name": "FollowFreeAreaZMax"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "unit": "Pixel",
-              "label": "Follow free area bottom border on Z axis",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "name": "FollowFreeAreaZMin"
             },
             {
               "value": "0",
