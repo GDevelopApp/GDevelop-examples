@@ -418,6 +418,18 @@ const extractExamples = async (
 };
 
 /**
+ * @param {ExampleShortHeader} example1
+ * @param {ExampleShortHeader} example2
+ * @returns {number}
+ */
+const examplePreviewImageSortingFunction = (example1, example2) => {
+  const difference =
+    (example2.previewImageUrls.length ? 1 : 0) -
+    (example1.previewImageUrls.length ? 1 : 0);
+  return difference;
+};
+
+/**
  * Update the example game files to use resources on resources.gdevelop-app.com
  * @param {libGDevelop} gd
  * @param {DreeWithMetadata[]} allExampleFiles
@@ -483,6 +495,10 @@ const generateSortedShortHeaders = (allExamples) => {
       sortedStarterSlugsArray.indexOf(example2.slug)
     );
   });
+
+  examplesWithNeitherStarterNorGameTags.sort(
+    examplePreviewImageSortingFunction
+  );
 
   return [
     ...sortedStarters,
