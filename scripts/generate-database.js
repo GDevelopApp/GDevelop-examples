@@ -412,12 +412,11 @@ const extractExamples = async (
 };
 
 /**
- *
  * @param {ExampleShortHeader} example1
  * @param {ExampleShortHeader} example2
  * @returns {number}
  */
-export const examplePreviewImageSortingFunction = (example1, example2) => {
+const examplePreviewImageSortingFunction = (example1, example2) => {
   const difference =
     (example2.previewImageUrls.length ? 1 : 0) -
     (example1.previewImageUrls.length ? 1 : 0);
