@@ -1120,6 +1120,21 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "SelectionParticleEmitter",
+          "persistentUuid": "83ae3384-9dcf-472d-add4-228f97dde705",
+          "width": 0,
+          "x": 775,
+          "y": -200,
+          "zOrder": 15,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -1965,16 +1980,7 @@
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "DepartScene"
-                  },
-                  "parameters": [
-                    ""
-                  ]
-                }
-              ],
+              "conditions": [],
               "actions": [
                 {
                   "type": {
@@ -2238,47 +2244,6 @@
           "conditions": [
             {
               "type": {
-                "value": "Raycaster3D::RaycastFromCameraCenter"
-              },
-              "parameters": [
-                "",
-                "SodaCan",
-                "1000",
-                ""
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "SetCenter"
-              },
-              "parameters": [
-                "SelectionParticleEmitter",
-                "=",
-                "SodaCan.CenterX()",
-                "=",
-                "SodaCan.CenterY()"
-              ]
-            },
-            {
-              "type": {
-                "value": "ParticleEmitter3D::ParticleEmitter3D::SetZ"
-              },
-              "parameters": [
-                "SelectionParticleEmitter",
-                "=",
-                "SodaCan.Object3D::CenterZ()",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
                 "value": "MouseButtonReleased"
               },
               "parameters": [
@@ -2300,77 +2265,47 @@
                 ""
               ]
             }
-          ]
-        },
-        {
-          "disabled": true,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
+          ],
+          "events": [
             {
-              "type": {
-                "value": "CameraShake3D::SpinCamera"
-              },
-              "parameters": [
-                "",
-                "TimeDelta() * 10",
-                "",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "disabled": true,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "value": "CameraShake3D::TurnCameraVertically"
-              },
-              "parameters": [
-                "",
-                "TimeDelta() * 10",
-                "",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "disabled": true,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "value": "CameraShake3D::TurnCameraHorizontally"
-              },
-              "parameters": [
-                "",
-                "TimeDelta() * 10",
-                "",
-                ""
-              ]
-            }
-          ]
-        },
-        {
-          "disabled": true,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "value": "SetCameraAngle"
-              },
-              "parameters": [
-                "",
-                "+",
-                "TimeDelta() * 10",
-                "",
-                ""
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Raycaster3D::RaycastFromCameraCenter"
+                  },
+                  "parameters": [
+                    "",
+                    "SodaCan",
+                    "1000",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCenter"
+                  },
+                  "parameters": [
+                    "SelectionParticleEmitter",
+                    "=",
+                    "SodaCan.CenterX()",
+                    "=",
+                    "SodaCan.CenterY()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ParticleEmitter3D::ParticleEmitter3D::SetZ"
+                  },
+                  "parameters": [
+                    "SelectionParticleEmitter",
+                    "=",
+                    "SodaCan.Object3D::CenterZ()",
+                    ""
+                  ]
+                }
               ]
             }
           ]
@@ -5451,15 +5386,48 @@
               "actions": [
                 {
                   "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__CameraShake.Index",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "CameraShake3D::LayerCount()",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
                     "value": "CameraShake::SetLayerShakable"
                   },
                   "parameters": [
                     "",
                     "",
-                    "\"\"",
+                    "CameraShake3D::LayerName(Variable(__CameraShake.Index))",
                     ""
                   ]
                 },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__CameraShake.Index",
+                    "+",
+                    "1"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
                 {
                   "type": {
                     "value": "CameraShake::SetDefaultShakingFrequency"
@@ -5505,6 +5473,59 @@
             }
           ],
           "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the number of layers the current scene has. ",
+          "fullName": "Layer count",
+          "functionType": "Expression",
+          "name": "LayerCount",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "return runtimeScene.getAllLayerNames().length;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the number of layers the current scene has. ",
+          "fullName": "Layer name",
+          "functionType": "StringExpression",
+          "name": "LayerName",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const layerIndex = eventsFunctionContext.getArgument(\"LayerIndex\");\r",
+                "return runtimeScene.getAllLayerNames()[layerIndex];"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Layer index",
+              "name": "LayerIndex",
+              "type": "expression"
+            }
+          ],
           "objectGroups": []
         },
         {
@@ -8744,7 +8765,7 @@
       "name": "CameraShake3D",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/vector-difference-ab.svg",
       "shortDescription": "Shake 3D layer cameras.",
-      "version": "3.0.3",
+      "version": "0.1.0",
       "description": [
         "Shake layer cameras on 3 rotations.",
         "",
@@ -8782,19 +8803,114 @@
               "actions": [
                 {
                   "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__CameraShake.Index",
+                    "=",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "CameraShake3D::LayerCount()",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
                     "value": "CameraShake3D::SetLayerShakable"
                   },
                   "parameters": [
                     "",
                     "",
-                    "\"\"",
+                    "CameraShake3D::LayerName(Variable(__CameraShake.Index))",
                     ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__CameraShake.Index",
+                    "+",
+                    "1"
                   ]
                 }
               ]
             }
           ],
           "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the number of layers the current scene has. ",
+          "fullName": "Layer count",
+          "functionType": "Expression",
+          "name": "LayerCount",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "gdjs.__CameraShake3D = gdjs.__CameraShake3D || {};\r",
+                "gdjs.__CameraShake3D.layerNames = gdjs.__CameraShake3D.layerNames || [];\r",
+                "const layerNames = gdjs.__CameraShake3D.layerNames;\r",
+                "runtimeScene.getAllLayerNames(layerNames);\r",
+                "\r",
+                "eventsFunctionContext.returnValue = layerNames.length;\r",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the number of layers the current scene has. ",
+          "fullName": "Layer name",
+          "functionType": "StringExpression",
+          "name": "LayerName",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const layerIndex = eventsFunctionContext.getArgument(\"LayerIndex\");\r",
+                "\r",
+                "gdjs.__CameraShake3D = gdjs.__CameraShake3D || {};\r",
+                "gdjs.__CameraShake3D.layerNames = gdjs.__CameraShake3D.layerNames || [];\r",
+                "const layerNames = gdjs.__CameraShake3D.layerNames;\r",
+                "runtimeScene.getAllLayerNames(layerNames);\r",
+                "\r",
+                "eventsFunctionContext.returnValue = layerNames[layerIndex];\r",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "string"
+          },
+          "parameters": [
+            {
+              "description": "Layer index",
+              "name": "LayerIndex",
+              "type": "expression"
+            }
+          ],
           "objectGroups": []
         },
         {
@@ -9407,18 +9523,7 @@
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
@@ -9435,18 +9540,7 @@
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
@@ -9463,18 +9557,7 @@
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
@@ -10409,6 +10492,10 @@
                 "const angle = eventsFunctionContext.getArgument(\"Angle\");",
                 "const layerName = eventsFunctionContext.getArgument(\"Layer\");",
                 "",
+                "if (angle === 0) {",
+                "    return;",
+                "}",
+                "",
                 "const layer = runtimeScene.getLayer(layerName);",
                 "const camera = layer.getRenderer().getThreeCamera();",
                 "if (camera) {",
@@ -10453,6 +10540,10 @@
                 "const angle = eventsFunctionContext.getArgument(\"Angle\");",
                 "const layerName = eventsFunctionContext.getArgument(\"Layer\");",
                 "",
+                "if (angle === 0) {",
+                "    return;",
+                "}",
+                "",
                 "const layer = runtimeScene.getLayer(layerName);",
                 "const camera = layer.getRenderer().getThreeCamera();",
                 "if (camera) {",
@@ -10495,6 +10586,10 @@
               "inlineCode": [
                 "const angle = eventsFunctionContext.getArgument(\"Angle\");",
                 "const layerName = eventsFunctionContext.getArgument(\"Layer\");",
+                "",
+                "if (angle === 0) {",
+                "    return;",
+                "}",
                 "",
                 "const layer = runtimeScene.getLayer(layerName);",
                 "const camera = layer.getRenderer().getThreeCamera();",
