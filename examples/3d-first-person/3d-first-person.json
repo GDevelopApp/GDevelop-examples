@@ -1965,7 +1965,16 @@
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
+              "conditions": [
+                {
+                  "type": {
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
               "actions": [
                 {
                   "type": {
@@ -8737,18 +8746,12 @@
       "shortDescription": "Shake 3D layer cameras.",
       "version": "3.0.3",
       "description": [
-        "Shake layer cameras with translation, rotation and zoom.",
+        "Shake layer cameras on 3 rotations.",
         "",
         "- Short shaking can be used to give impact (explosion, hit)",
         "- Shaking can go indefinitely to set an ambiance (engine vibration, earthquake, pulsing)",
         "- Low frequency shaking allows to simulate slow moving objects (ship rocking back and forth)",
-        "",
-        "Release notes:",
-        "- Version 3.0.0",
-        "    - No adaptation of the game events is needed.",
-        "    - It fixes an issue when used with scrolling, the amplitude will feel bigger in this case.",
-        "    - The shaking relies on noise which could feel a bit different.",
-        "    - This extension can no longer do impulses. For this, another extension \"Camera impulse\" can be used."
+        ""
       ],
       "origin": {
         "identifier": "CameraShake",
@@ -9002,7 +9005,7 @@
                           },
                           "parameters": [
                             "",
-                            "12",
+                            "24",
                             "\"\"",
                             ""
                           ]
@@ -9014,7 +9017,7 @@
                           "parameters": [
                             "__CameraShake.AmplitudeAngleZ",
                             "=",
-                            "0"
+                            "0.5"
                           ]
                         },
                         {
@@ -9024,7 +9027,7 @@
                           "parameters": [
                             "__CameraShake.AmplitudeAngleY",
                             "=",
-                            "0"
+                            "0.5"
                           ]
                         },
                         {
@@ -9034,7 +9037,37 @@
                           "parameters": [
                             "__CameraShake.AmplitudeAngleX",
                             "=",
-                            "2"
+                            "0.5"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX",
+                            "=",
+                            "0"
                           ]
                         }
                       ]
@@ -9183,14 +9216,13 @@
                         },
                         {
                           "type": {
-                            "value": "SetCameraAngle"
+                            "value": "CameraShake3D::SpinCamera"
                           },
                           "parameters": [
                             "",
-                            "+",
                             "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ)",
                             "VariableString(__CameraShake.ActualLayerName)",
-                            "0"
+                            "VariableString(__CameraShake.ActualLayerName)"
                           ]
                         }
                       ]
@@ -9222,14 +9254,13 @@
                         },
                         {
                           "type": {
-                            "value": "Scene3D::SetCameraRotationY"
+                            "value": "CameraShake3D::TurnCameraHorizontally"
                           },
                           "parameters": [
                             "",
-                            "+",
                             "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY)",
                             "VariableString(__CameraShake.ActualLayerName)",
-                            "0"
+                            "VariableString(__CameraShake.ActualLayerName)"
                           ]
                         }
                       ]
@@ -9261,14 +9292,13 @@
                         },
                         {
                           "type": {
-                            "value": "Scene3D::SetCameraRotationX"
+                            "value": "CameraShake3D::TurnCameraVertically"
                           },
                           "parameters": [
                             "",
-                            "+",
                             "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX)",
                             "VariableString(__CameraShake.ActualLayerName)",
-                            "0"
+                            "VariableString(__CameraShake.ActualLayerName)"
                           ]
                         }
                       ]
@@ -9383,7 +9413,7 @@
                             "value": "VarScene"
                           },
                           "parameters": [
-                            "__CameraShake.AmplitudeAngleZ",
+                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ",
                             "!=",
                             "0"
                           ]
@@ -9392,14 +9422,13 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "SetCameraAngle"
+                            "value": "CameraShake3D::SpinCamera"
                           },
                           "parameters": [
                             "",
-                            "-",
-                            "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ)",
+                            "-Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ)",
                             "VariableString(__CameraShake.ActualLayerName)",
-                            "0"
+                            "VariableString(__CameraShake.ActualLayerName)"
                           ]
                         }
                       ]
@@ -9412,7 +9441,7 @@
                             "value": "VarScene"
                           },
                           "parameters": [
-                            "__CameraShake.AmplitudeAngleY",
+                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY",
                             "!=",
                             "0"
                           ]
@@ -9421,14 +9450,13 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Scene3D::SetCameraRotationY"
+                            "value": "CameraShake3D::TurnCameraHorizontally"
                           },
                           "parameters": [
                             "",
-                            "-",
-                            "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY)",
+                            "-Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY)",
                             "VariableString(__CameraShake.ActualLayerName)",
-                            "0"
+                            "VariableString(__CameraShake.ActualLayerName)"
                           ]
                         }
                       ]
@@ -9441,7 +9469,7 @@
                             "value": "VarScene"
                           },
                           "parameters": [
-                            "__CameraShake.AmplitudeAngleX",
+                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX",
                             "!=",
                             "0"
                           ]
@@ -9450,14 +9478,13 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Scene3D::SetCameraRotationX"
+                            "value": "CameraShake3D::TurnCameraVertically"
                           },
                           "parameters": [
                             "",
-                            "-",
-                            "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX)",
+                            "-Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX)",
                             "VariableString(__CameraShake.ActualLayerName)",
-                            "0"
+                            "VariableString(__CameraShake.ActualLayerName)"
                           ]
                         }
                       ]
@@ -9840,12 +9867,90 @@
           "objectGroups": []
         },
         {
-          "description": "Change the rotation amplitude of the shaking (in degrees).",
-          "fullName": "Layer rotation amplitude",
-          "functionType": "Action",
+          "description": "the spinning amplitude of the shaking (in degrees).",
+          "fullName": "Spinning shake amplitude",
+          "functionType": "ExpressionAndCondition",
           "group": "Camera shake configuration",
-          "name": "SetLayerRotationAmplitude",
-          "sentence": "Change the rotation amplitude of the shaking to _PARAM1_ degrees (layer: _PARAM2_)",
+          "name": "SpineAmplitudeAngle",
+          "sentence": "the spinning shake amplitude of layer: _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "Layer"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Layer",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "\"__BaseLayer\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleZ)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "SpineAmplitudeAngle",
+          "group": "Camera shake configuration",
+          "name": "SetSpineAmplitudeAngle",
+          "sentence": "",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -9901,24 +10006,311 @@
                   "parameters": [
                     "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleZ",
                     "=",
-                    "AmplitudeAngle"
+                    "Value"
                   ]
                 }
               ]
             }
           ],
-          "parameters": [
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "the horizontal rotation amplitude of the shaking (in degrees).",
+          "fullName": "Horizontal rotation amplitude",
+          "functionType": "ExpressionAndCondition",
+          "group": "Camera shake configuration",
+          "name": "HorizontalAmplitudeAngle",
+          "sentence": "the horizontal shaking amplitude of layer: _PARAM1_",
+          "events": [
             {
-              "description": "Angle (in degree)",
-              "name": "AmplitudeAngle",
-              "type": "expression"
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "Layer"
+                  ]
+                }
+              ]
             },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Layer",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "\"__BaseLayer\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleY)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
             {
               "description": "Layer",
               "name": "Layer",
               "type": "layer"
             }
           ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "HorizontalAmplitudeAngle",
+          "group": "Camera shake configuration",
+          "name": "SetHorizontalAmplitudeAngle",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "Layer"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Layer",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "\"__BaseLayer\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleY",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "the vertical rotation amplitude of the shaking (in degrees).",
+          "fullName": "Vertical rotation amplitude",
+          "functionType": "ExpressionAndCondition",
+          "group": "Camera shake configuration",
+          "name": "VerticalAmplitudeAngle",
+          "sentence": "the vertical shaking amplitude of layer: _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "Layer"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Layer",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "\"__BaseLayer\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleX)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Layer",
+              "name": "Layer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "VerticalAmplitudeAngle",
+          "group": "Camera shake configuration",
+          "name": "SetVerticalAmplitudeAngle",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "Layer"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareStrings"
+                  },
+                  "parameters": [
+                    "Layer",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__CameraShake.LayerName",
+                    "=",
+                    "\"__BaseLayer\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleX",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [],
           "objectGroups": []
         },
         {
@@ -10004,10 +10396,11 @@
           "objectGroups": []
         },
         {
-          "description": "Rotates the camera around its local X axis.",
+          "description": "Rotates the camera around its own direction.",
           "fullName": "Spin camera",
           "functionType": "Action",
           "name": "SpinCamera",
+          "private": true,
           "sentence": "Spin the camera (layer: _PARAM2_) by _PARAM1_°",
           "events": [
             {
@@ -10047,10 +10440,11 @@
           "objectGroups": []
         },
         {
-          "description": "Rotates the camera around its local Y axis.",
+          "description": "Rotate the camera vertically according to its own direction.",
           "fullName": "Rotate camera vertically",
           "functionType": "Action",
           "name": "TurnCameraVertically",
+          "private": true,
           "sentence": "Rotate the camera (layer: _PARAM2_) vertically by _PARAM1_°",
           "events": [
             {
@@ -10089,10 +10483,11 @@
           "objectGroups": []
         },
         {
-          "description": "Rotates the camera around its local Z axis.",
+          "description": "Rotate the camera horizontally according to its own direction.",
           "fullName": "Rotate camera horizontally",
           "functionType": "Action",
           "name": "TurnCameraHorizontally",
+          "private": true,
           "sentence": "Rotate the camera (layer: _PARAM2_) horizontally by _PARAM1_°",
           "events": [
             {
@@ -10106,7 +10501,7 @@
                 "if (camera) {",
                 "    camera.rotation.z = gdjs.toRad(layer.getCameraRotation());",
                 "    ",
-                "    camera.rotateY(gdjs.toRad(-angle));",
+                "    camera.rotateY(gdjs.toRad(angle));",
                 "",
                 "    layer.setCameraRotation(gdjs.toDegrees(camera.rotation.z));",
                 "}"
