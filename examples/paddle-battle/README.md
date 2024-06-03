@@ -1,0 +1,1 @@
+Based on the classic game Pong, Paddle Battle is a multiplayer game where two players compete to bounce a ball off their paddle.
