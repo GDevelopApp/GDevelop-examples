@@ -212,6 +212,48 @@
           "identifier": "https://asset-resources.gdevelop.io/public-resources/Multitouch joysticks/446729297d485b00428957eb0de56e66d3f5ddf8aa3092ad192f8dd670dd79f2_Transparent light joystick thumb.png",
           "name": "Transparent light joystick thumb.png"
         }
+      },
+      {
+        "file": "assets/Coins 6.aac",
+        "kind": "audio",
+        "metadata": "",
+        "name": "982e7b54cdd141371ad82b0ab7ce659f5b4b7ca6eb1f87c895d4da99d3f98ce2_Coins 6.aac",
+        "preloadAsMusic": false,
+        "preloadAsSound": true,
+        "preloadInCache": false,
+        "userAdded": true,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/Arcade/Sound effects/Coins/982e7b54cdd141371ad82b0ab7ce659f5b4b7ca6eb1f87c895d4da99d3f98ce2_Coins 6.aac",
+          "name": "gdevelop-asset-store"
+        }
+      },
+      {
+        "file": "assets/MetalV2_Run_12.wav",
+        "kind": "audio",
+        "metadata": "",
+        "name": "112fca25d5dec680ec76a4bcc6023bd0d67db475068e17884e31c6c3650e3d8d_MetalV2_Run_12.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": true,
+        "preloadInCache": false,
+        "userAdded": true,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/SoundEffects/Footsteps/Metal/Run/112fca25d5dec680ec76a4bcc6023bd0d67db475068e17884e31c6c3650e3d8d_MetalV2_Run_12.wav",
+          "name": "gdevelop-asset-store"
+        }
+      },
+      {
+        "file": "assets/MetalV2_Walk_11.wav",
+        "kind": "audio",
+        "metadata": "",
+        "name": "88bc686b538c6254678197b712b86fe42ca96f46e34c67637e0d0b5444ce5ae7_MetalV2_Walk_11.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": true,
+        "preloadInCache": false,
+        "userAdded": true,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/SoundEffects/Footsteps/Metal/Walk/88bc686b538c6254678197b712b86fe42ca96f46e34c67637e0d0b5444ce5ae7_MetalV2_Walk_11.wav",
+          "name": "gdevelop-asset-store"
+        }
       }
     ],
     "resourceFolders": []
@@ -271,6 +313,18 @@
           "name": "Player2Score",
           "type": "number",
           "value": 0
+        },
+        {
+          "folded": true,
+          "name": "PointEarned",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "folded": true,
+          "name": "StartingBallSpeed",
+          "type": "number",
+          "value": 300
         }
       ],
       "instances": [
@@ -1862,30 +1916,7 @@
                   "parameters": []
                 }
               ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
-                  },
-                  "parameters": [
-                    "PlayerNumber_Text",
-                    "Text",
-                    "+",
-                    "ToString(Multiplayer::PlayerNumber())"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "AddForceAL"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    "45 + RandomInRange(1,4) * 90",
-                    "300",
-                    "1"
-                  ]
-                }
-              ],
+              "actions": [],
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Comment",
@@ -1897,7 +1928,7 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "Statically set the ownership of objects\n"
+                  "comment": "Set the ownership of objects\n"
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -1928,6 +1959,18 @@
                   ]
                 },
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Set the speed of the player paddles and ball"
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
@@ -1950,22 +1993,76 @@
                         "=",
                         "1500"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "StartingBallSpeed",
+                        "=",
+                        "300"
+                      ]
                     }
                   ]
                 },
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Pick a random starting angle for the ball"
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                  "conditions": [],
+                  "actions": [
                     {
                       "type": {
-                        "value": "SystemInfo::HasTouchScreen"
+                        "value": "AddForceAL"
                       },
                       "parameters": [
-                        ""
+                        "PongBall",
+                        "45 + RandomInRange(1,4) * 90",
+                        "StartingBallSpeed",
+                        "1"
                       ]
                     }
-                  ],
-                  "actions": []
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Show the player number that was assigned"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                      },
+                      "parameters": [
+                        "PlayerNumber_Text",
+                        "Text",
+                        "+",
+                        "ToString(Multiplayer::PlayerNumber())"
+                      ]
+                    }
+                  ]
                 },
                 {
                   "type": "BuiltinCommonInstructions::Comment",
@@ -2049,7 +2146,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Player controls",
+          "name": "Playing game",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -2066,305 +2163,195 @@
               "actions": [],
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "PlayerPaddles",
-                  "conditions": [],
-                  "actions": [],
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Player Controls",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Each player controls their own paddle"
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Multiplayer::MultiplayerObjectBehavior::PlayerObjectOwnership"
-                          },
-                          "parameters": [
-                            "PlayerPaddles",
-                            "MultiplayerObject",
-                            "=",
-                            "Multiplayer::PlayerNumber()"
-                          ]
-                        }
-                      ],
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "PlayerPaddles",
+                      "conditions": [],
                       "actions": [],
                       "events": [
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::Or"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "value": "KeyPressed"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "Up"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Gamepads::C_Axis_pushed"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "1",
-                                    "\"Left\"",
-                                    "\"Up\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Gamepads::C_Axis_pushed"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "1",
-                                    "\"Right\"",
-                                    "\"Up\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Gamepads::C_Button_pressed"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "1",
-                                    "\"Up\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                                  },
-                                  "parameters": [
-                                    "PlayerJoystick",
-                                    "\"Up\"",
-                                    ""
-                                  ]
-                                }
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "TopDownMovementBehavior::SimulateUpKey"
-                              },
-                              "parameters": [
-                                "PlayerPaddles",
-                                "TopDownMovement"
-                              ]
-                            }
-                          ],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Comment",
-                              "color": {
-                                "b": 109,
-                                "g": 230,
-                                "r": 255,
-                                "textB": 0,
-                                "textG": 0,
-                                "textR": 0
-                              },
-                              "comment": "FIx top-down accelleration in opposite direction to include Deceleration"
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownMovementBehavior::YVelocity"
-                                  },
-                                  "parameters": [
-                                    "PlayerPaddles",
-                                    "TopDownMovement",
-                                    "<",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownMovementBehavior::Acceleration"
-                                  },
-                                  "parameters": [
-                                    "PlayerPaddles",
-                                    "TopDownMovement",
-                                    "=",
-                                    "Variable(Acceleration) + Variable(Deceleration)"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownMovementBehavior::YVelocity"
-                                  },
-                                  "parameters": [
-                                    "PlayerPaddles",
-                                    "TopDownMovement",
-                                    ">",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "TopDownMovementBehavior::Acceleration"
-                                  },
-                                  "parameters": [
-                                    "PlayerPaddles",
-                                    "TopDownMovement",
-                                    "=",
-                                    "Variable(Deceleration)"
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Each player controls their own paddle"
                         },
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
                             {
                               "type": {
-                                "value": "BuiltinCommonInstructions::Or"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "value": "KeyPressed"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "Down"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Gamepads::C_Axis_pushed"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "1",
-                                    "\"Left\"",
-                                    "\"Down\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Gamepads::C_Axis_pushed"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "1",
-                                    "\"Right\"",
-                                    "\"Down\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Gamepads::C_Button_pressed"
-                                  },
-                                  "parameters": [
-                                    "",
-                                    "1",
-                                    "\"Down\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                                  },
-                                  "parameters": [
-                                    "PlayerJoystick",
-                                    "\"Down\"",
-                                    ""
-                                  ]
-                                }
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "TopDownMovementBehavior::SimulateDownKey"
+                                "value": "Multiplayer::MultiplayerObjectBehavior::PlayerObjectOwnership"
                               },
                               "parameters": [
                                 "PlayerPaddles",
-                                "TopDownMovement"
+                                "MultiplayerObject",
+                                "=",
+                                "Multiplayer::PlayerNumber()"
                               ]
                             }
                           ],
+                          "actions": [],
                           "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Comment",
-                              "color": {
-                                "b": 109,
-                                "g": 230,
-                                "r": 255,
-                                "textB": 0,
-                                "textG": 0,
-                                "textR": 0
-                              },
-                              "comment": "FIx top-down accelleration in opposite direction to include Deceleration"
-                            },
                             {
                               "type": "BuiltinCommonInstructions::Standard",
                               "conditions": [
                                 {
                                   "type": {
-                                    "value": "TopDownMovementBehavior::YVelocity"
+                                    "value": "BuiltinCommonInstructions::Or"
                                   },
-                                  "parameters": [
-                                    "PlayerPaddles",
-                                    "TopDownMovement",
-                                    "<",
-                                    "0"
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "KeyPressed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "Up"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Gamepads::C_Axis_pushed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1",
+                                        "\"Left\"",
+                                        "\"Up\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Gamepads::C_Axis_pushed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1",
+                                        "\"Right\"",
+                                        "\"Up\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Gamepads::C_Button_pressed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1",
+                                        "\"Up\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                                      },
+                                      "parameters": [
+                                        "PlayerJoystick",
+                                        "\"Up\"",
+                                        ""
+                                      ]
+                                    }
                                   ]
                                 }
                               ],
                               "actions": [
                                 {
                                   "type": {
-                                    "value": "TopDownMovementBehavior::Acceleration"
+                                    "value": "TopDownMovementBehavior::SimulateUpKey"
                                   },
                                   "parameters": [
                                     "PlayerPaddles",
-                                    "TopDownMovement",
-                                    "=",
-                                    "Variable(Acceleration) + Variable(Deceleration)"
+                                    "TopDownMovement"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "FIx top-down acceleration to include Deceleration when moving in the opposite direction"
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "TopDownMovementBehavior::YVelocity"
+                                      },
+                                      "parameters": [
+                                        "PlayerPaddles",
+                                        "TopDownMovement",
+                                        "<",
+                                        "0"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "TopDownMovementBehavior::Acceleration"
+                                      },
+                                      "parameters": [
+                                        "PlayerPaddles",
+                                        "TopDownMovement",
+                                        "=",
+                                        "Variable(Acceleration) + Variable(Deceleration)"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "TopDownMovementBehavior::YVelocity"
+                                      },
+                                      "parameters": [
+                                        "PlayerPaddles",
+                                        "TopDownMovement",
+                                        ">",
+                                        "0"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "TopDownMovementBehavior::Acceleration"
+                                      },
+                                      "parameters": [
+                                        "PlayerPaddles",
+                                        "TopDownMovement",
+                                        "=",
+                                        "Variable(Deceleration)"
+                                      ]
+                                    }
                                   ]
                                 }
                               ]
@@ -2374,26 +2361,147 @@
                               "conditions": [
                                 {
                                   "type": {
-                                    "value": "TopDownMovementBehavior::YVelocity"
+                                    "value": "BuiltinCommonInstructions::Or"
                                   },
-                                  "parameters": [
-                                    "PlayerPaddles",
-                                    "TopDownMovement",
-                                    ">",
-                                    "0"
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "KeyPressed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "Down"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Gamepads::C_Axis_pushed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1",
+                                        "\"Left\"",
+                                        "\"Down\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Gamepads::C_Axis_pushed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1",
+                                        "\"Right\"",
+                                        "\"Down\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Gamepads::C_Button_pressed"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1",
+                                        "\"Down\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                                      },
+                                      "parameters": [
+                                        "PlayerJoystick",
+                                        "\"Down\"",
+                                        ""
+                                      ]
+                                    }
                                   ]
                                 }
                               ],
                               "actions": [
                                 {
                                   "type": {
-                                    "value": "TopDownMovementBehavior::Acceleration"
+                                    "value": "TopDownMovementBehavior::SimulateDownKey"
                                   },
                                   "parameters": [
                                     "PlayerPaddles",
-                                    "TopDownMovement",
-                                    "=",
-                                    "Variable(Acceleration)"
+                                    "TopDownMovement"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "FIx top-down acceleration to include Deceleration when moving in the opposite direction"
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "TopDownMovementBehavior::YVelocity"
+                                      },
+                                      "parameters": [
+                                        "PlayerPaddles",
+                                        "TopDownMovement",
+                                        "<",
+                                        "0"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "TopDownMovementBehavior::Acceleration"
+                                      },
+                                      "parameters": [
+                                        "PlayerPaddles",
+                                        "TopDownMovement",
+                                        "=",
+                                        "Variable(Acceleration) + Variable(Deceleration)"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "TopDownMovementBehavior::YVelocity"
+                                      },
+                                      "parameters": [
+                                        "PlayerPaddles",
+                                        "TopDownMovement",
+                                        ">",
+                                        "0"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "TopDownMovementBehavior::Acceleration"
+                                      },
+                                      "parameters": [
+                                        "PlayerPaddles",
+                                        "TopDownMovement",
+                                        "=",
+                                        "Variable(Acceleration)"
+                                      ]
+                                    }
                                   ]
                                 }
                               ]
@@ -2402,377 +2510,502 @@
                         }
                       ]
                     }
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Slowly boost the speed of ball each time the players touch it",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    "PlayerPaddles",
-                    "Players",
-                    "",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
+                  ],
                   "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Bounce::Bounce::BounceOff"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    "Bounce",
-                    "PlayerPaddles",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "AddForceAL"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    "PongBall.ForceAngle()",
-                    "20",
-                    "1"
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Earn points",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BoundingBoxCenterX"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    "<",
-                    "CameraBorderLeft()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "Player2Score",
-                    "+",
-                    "1"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Tween::TweenBehavior::AddObjectAngleTween2"
-                  },
-                  "parameters": [
-                    "Player2Score_Text",
-                    "Tween",
-                    "\"Spin\"",
-                    "Player2Score_Text.Angle() + 360",
-                    "\"swingFromTo\"",
-                    "1",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Wait"
-                  },
-                  "parameters": [
-                    "0.5"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
-                  },
-                  "parameters": [
-                    "Player2Score_Text",
-                    "Text",
-                    "=",
-                    "ToString(Player2Score)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Wait"
-                  },
-                  "parameters": [
-                    "1.5"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "PongBall",
-                    "CameraCenterX()",
-                    "CameraCenterY()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Wait"
-                  },
-                  "parameters": [
-                    "0.5"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "AddForceAL"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    "45 + RandomInRange(1,4) * 90",
-                    "300",
-                    "1"
-                  ]
                 }
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Slowly boost the speed of the ball when it hits a player paddle",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
                 {
-                  "type": {
-                    "value": "BoundingBoxCenterX"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    ">",
-                    "CameraBorderRight()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "Player1Score",
-                    "+",
-                    "1"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Tween::TweenBehavior::AddObjectAngleTween2"
-                  },
-                  "parameters": [
-                    "Player1Score_Text",
-                    "Tween",
-                    "\"Spin\"",
-                    "Player1Score_Text.Angle() + 360",
-                    "\"swingFromTo\"",
-                    "1",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Wait"
-                  },
-                  "parameters": [
-                    "0.5"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
-                  },
-                  "parameters": [
-                    "Player1Score_Text",
-                    "Text",
-                    "=",
-                    "ToString(Player1Score)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Wait"
-                  },
-                  "parameters": [
-                    "1.5"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "PongBall",
-                    "CameraCenterX()",
-                    "CameraCenterY()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Wait"
-                  },
-                  "parameters": [
-                    "0.5"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "AddForceAL"
-                  },
-                  "parameters": [
-                    "PongBall",
-                    "45 + RandomInRange(1,4) * 90",
-                    "300",
-                    "1"
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Simulate Physics",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "PlayerPaddles",
-                    "Walls",
-                    "",
-                    "",
-                    ""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        "PlayerPaddles",
+                        "Players",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Bounce::Bounce::BounceOff"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        "Bounce",
+                        "PlayerPaddles",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "AddForceAL"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        "PongBall.ForceAngle()",
+                        "20",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlaySound"
+                      },
+                      "parameters": [
+                        "",
+                        "88bc686b538c6254678197b712b86fe42ca96f46e34c67637e0d0b5444ce5ae7_MetalV2_Walk_11.wav",
+                        "",
+                        "100",
+                        "RandomFloatInRange(0.9,1.1)"
+                      ]
+                    }
                   ]
                 }
               ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SeparateFromObjects"
-                  },
-                  "parameters": [
-                    "PlayerPaddles",
-                    "Walls",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TopDownMovementBehavior::TopDownMovementBehavior::SetVelocityY"
-                  },
-                  "parameters": [
-                    "PlayerPaddles",
-                    "TopDownMovement",
-                    "=",
-                    "0"
-                  ]
-                }
-              ]
+              "parameters": []
             },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Simulate Physics",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
                 {
-                  "type": {
-                    "value": "Bounce::Bounce::BounceOff"
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
                   },
-                  "parameters": [
-                    "PongBall",
-                    "Bounce",
-                    "Walls",
-                    ""
+                  "comment": "Prevent player paddles from going through walls"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "PlayerPaddles",
+                        "Walls",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SeparateFromObjects"
+                      },
+                      "parameters": [
+                        "PlayerPaddles",
+                        "Walls",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TopDownMovementBehavior::TopDownMovementBehavior::SetVelocityY"
+                      },
+                      "parameters": [
+                        "PlayerPaddles",
+                        "TopDownMovement",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Bounce the ball off walls"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        "Walls",
+                        "",
+                        "",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Bounce::Bounce::BounceOff"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        "Bounce",
+                        "Walls",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlaySound"
+                      },
+                      "parameters": [
+                        "",
+                        "112fca25d5dec680ec76a4bcc6023bd0d67db475068e17884e31c6c3650e3d8d_MetalV2_Run_12.wav",
+                        "",
+                        "100",
+                        "RandomFloatInRange(0.9,1.1)"
+                      ]
+                    }
                   ]
                 }
-              ]
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Earn points",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Player 1 scored"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BoundingBoxCenterX"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        ">",
+                        "CameraBorderRight()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "PointEarned",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "Player1Score",
+                        "+",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::TweenBehavior::AddObjectAngleTween2"
+                      },
+                      "parameters": [
+                        "Player1Score_Text",
+                        "Tween",
+                        "\"Spin\"",
+                        "Player1Score_Text.Angle() + 360",
+                        "\"swingFromTo\"",
+                        "1",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "0.5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                      },
+                      "parameters": [
+                        "Player1Score_Text",
+                        "Text",
+                        "=",
+                        "ToString(Player1Score)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Player 2 scored"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BoundingBoxCenterX"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        "<",
+                        "CameraBorderLeft()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "PointEarned",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "Player2Score",
+                        "+",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::TweenBehavior::AddObjectAngleTween2"
+                      },
+                      "parameters": [
+                        "Player2Score_Text",
+                        "Tween",
+                        "\"Spin\"",
+                        "Player2Score_Text.Angle() + 360",
+                        "\"swingFromTo\"",
+                        "1",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "0.5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                      },
+                      "parameters": [
+                        "Player2Score_Text",
+                        "Text",
+                        "=",
+                        "ToString(Player2Score)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Play a sound, increase the score, twirl the number, and then launch a new ball"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "PointEarned",
+                        "True"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "0.5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlaySound"
+                      },
+                      "parameters": [
+                        "",
+                        "982e7b54cdd141371ad82b0ab7ce659f5b4b7ca6eb1f87c895d4da99d3f98ce2_Coins 6.aac",
+                        "",
+                        "25",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "1.5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "PongBall",
+                        "CameraCenterX()",
+                        "CameraCenterY()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "0.5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "AddForceAL"
+                      },
+                      "parameters": [
+                        "PongBall",
+                        "45 + RandomInRange(1,4) * 90",
+                        "StartingBallSpeed",
+                        "1"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetSceneVariableAsBoolean"
+                      },
+                      "parameters": [
+                        "PointEarned",
+                        "False"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
             }
           ],
           "parameters": []
