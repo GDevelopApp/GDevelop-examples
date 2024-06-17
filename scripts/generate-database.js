@@ -181,6 +181,8 @@ const sortedStarterSlugs = new Set([
   '3d-tile-based-city-builder',
   'plinko',
   'parking-jam',
+  'multiplayer-platformer-arrow-fight',
+  'multiplayer-platformer-pickup',
   'tappy-plane',
   'game-feel-demo',
   'conviction-of-gun-dude-desktop',
