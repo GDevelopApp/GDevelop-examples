@@ -183,6 +183,7 @@ const sortedStarterSlugs = new Set([
   'parking-jam',
   'multiplayer-platformer-arrow-fight',
   'multiplayer-platformer-pickup',
+  'paddle-battle',
   'tappy-plane',
   'game-feel-demo',
   'conviction-of-gun-dude-desktop',
