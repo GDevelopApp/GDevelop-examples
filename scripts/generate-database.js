@@ -184,6 +184,7 @@ const sortedStarterSlugs = new Set([
   'multiplayer-platformer-arrow-fight',
   'multiplayer-platformer-pickup',
   'paddle-battle',
+  'multiplayer-bounce-puzzle',
   'tappy-plane',
   'game-feel-demo',
   'conviction-of-gun-dude-desktop',
