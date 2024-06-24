@@ -1804,8 +1804,8 @@
                   "parameters": [
                     "",
                     "1",
-                    "0.5",
-                    "0.5",
+                    "0.1",
+                    "0.9",
                     ""
                   ]
                 }
@@ -1841,13 +1841,13 @@
                     },
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetZ"
+                        "value": "Scene3D::Base3DBehavior::SetZ"
                       },
                       "parameters": [
                         "SelectionParticleEmitter",
+                        "Object3D",
                         "=",
-                        "SodaCan.Object3D::CenterZ()",
-                        ""
+                        "SodaCan.Object3D::CenterZ()"
                       ]
                     }
                   ]
@@ -2496,7 +2496,7 @@
       "name": "CameraShake3D",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/vector-difference-ab.svg",
       "shortDescription": "Shake 3D layer cameras.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": [
         "Shake layer cameras on 3 rotations.",
         "",
@@ -2522,7 +2522,111 @@
       ],
       "dependencies": [],
       "globalVariables": [],
-      "sceneVariables": [],
+      "sceneVariables": [
+        {
+          "folded": true,
+          "name": "DefaultFrequency",
+          "type": "number",
+          "value": 24
+        },
+        {
+          "folded": true,
+          "name": "DefaultAmplitudeAngleX",
+          "type": "number",
+          "value": 0.5
+        },
+        {
+          "folded": true,
+          "name": "DefaultAmplitudeAngleY",
+          "type": "number",
+          "value": 0.5
+        },
+        {
+          "folded": true,
+          "name": "DefaultAmplitudeAngleZ",
+          "type": "number",
+          "value": 0.5
+        },
+        {
+          "folded": true,
+          "name": "Duration",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Layers",
+          "type": "structure",
+          "children": []
+        },
+        {
+          "name": "Layer",
+          "type": "structure",
+          "children": [
+            {
+              "name": "AmplitudeAngleX",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "AmplitudeAngleY",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "folded": true,
+              "name": "AmplitudeAngleZ",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "folded": true,
+              "name": "CameraDeltaAngleX",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "CameraDeltaAngleY",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "CameraDeltaAngleZ",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "folded": true,
+              "name": "Frequency",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "folded": true,
+          "name": "LayerName",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "folded": true,
+          "name": "Time",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "StartEaseDuration",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "StopEaseDuration",
+          "type": "number",
+          "value": 0
+        }
+      ],
       "eventsFunctions": [
         {
           "fullName": "",
@@ -2536,41 +2640,51 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Index",
+                    "Index",
                     "=",
                     "0"
                   ]
                 }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Repeat",
-              "repeatExpression": "CameraShake3D::LayerCount()",
-              "conditions": [],
-              "actions": [
+              ],
+              "events": [
                 {
-                  "type": {
-                    "value": "CameraShake3D::SetLayerShakable"
-                  },
-                  "parameters": [
-                    "",
-                    "",
-                    "CameraShake3D::LayerName(Variable(__CameraShake.Index))",
-                    ""
+                  "type": "BuiltinCommonInstructions::Repeat",
+                  "repeatExpression": "CameraShake3D::LayerCount()",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "CameraShake3D::SetLayerShakable"
+                      },
+                      "parameters": [
+                        "",
+                        "",
+                        "CameraShake3D::LayerName(Index)",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "Index",
+                        "+",
+                        "1"
+                      ]
+                    }
                   ]
-                },
+                }
+              ],
+              "variables": [
                 {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "__CameraShake.Index",
-                    "+",
-                    "1"
-                  ]
+                  "folded": true,
+                  "name": "Index",
+                  "type": "number",
+                  "value": 0
                 }
               ]
             }
@@ -2589,9 +2703,9 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "gdjs._cameraShakeExtension = gdjs._cameraShakeExtension || {};\r",
-                "gdjs._cameraShakeExtension.layerNames = gdjs._cameraShakeExtension.layerNames || [];\r",
-                "const layerNames = gdjs._cameraShakeExtension.layerNames;\r",
+                "gdjs._cameraShake3DExtension = gdjs._cameraShake3DExtension || {};\r",
+                "gdjs._cameraShake3DExtension.layerNames = gdjs._cameraShake3DExtension.layerNames || [];\r",
+                "const layerNames = gdjs._cameraShake3DExtension.layerNames;\r",
                 "runtimeScene.getAllLayerNames(layerNames);\r",
                 "\r",
                 "eventsFunctionContext.returnValue = layerNames.length;\r",
@@ -2621,9 +2735,9 @@
               "inlineCode": [
                 "const layerIndex = eventsFunctionContext.getArgument(\"LayerIndex\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension = gdjs._cameraShakeExtension || {};\r",
-                "gdjs._cameraShakeExtension.layerNames = gdjs._cameraShakeExtension.layerNames || [];\r",
-                "const layerNames = gdjs._cameraShakeExtension.layerNames;\r",
+                "gdjs._cameraShake3DExtension = gdjs._cameraShake3DExtension || {};\r",
+                "gdjs._cameraShake3DExtension.layerNames = gdjs._cameraShake3DExtension.layerNames || [];\r",
+                "const layerNames = gdjs._cameraShake3DExtension.layerNames;\r",
                 "runtimeScene.getAllLayerNames(layerNames);\r",
                 "\r",
                 "eventsFunctionContext.returnValue = layerNames[layerIndex];\r",
@@ -2670,10 +2784,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Time",
+                    "Time",
                     "+",
                     "TimeDelta()"
                   ]
@@ -2693,114 +2807,47 @@
                   ]
                 }
               ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "__CameraShake.EaseFactor",
-                    "=",
-                    "1"
-                  ]
-                }
-              ],
+              "actions": [],
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "__CameraShake.Time",
-                        "<",
-                        "Variable(__CameraShake.StartEaseDuration)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "__CameraShake.Time",
-                        ">",
-                        "Variable(__CameraShake.Duration) - Variable(__CameraShake.StopEaseDuration)"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "__CameraShake.EaseFactor",
-                        "=",
-                        "clamp(0, 1, Variable(__CameraShake.Time) / Variable(__CameraShake.StartEaseDuration))"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "VarScene"
-                      },
-                      "parameters": [
-                        "__CameraShake.Time",
-                        ">",
-                        "Variable(__CameraShake.Duration) - Variable(__CameraShake.StopEaseDuration)"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "__CameraShake.EaseFactor",
-                        "=",
-                        "clamp(0, 1, (Variable(__CameraShake.Duration) - Variable(__CameraShake.Time)) / Variable(__CameraShake.StopEaseDuration))"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::ForEachChildVariable",
-                  "iterableVariableName": "__CameraShake.Layers",
-                  "valueIteratorVariableName": "__CameraShake.Layer",
-                  "keyIteratorVariableName": "__CameraShake.LayerName",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].Shakable",
-                        "True"
-                      ]
-                    }
-                  ],
+                  "conditions": [],
                   "actions": [],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "Time",
+                            "<",
+                            "StartEaseDuration"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "Time",
+                            ">",
+                            "Duration - StopEaseDuration"
+                          ]
+                        }
+                      ],
                       "actions": [
                         {
                           "type": {
-                            "value": "ModVarSceneTxt"
+                            "value": "SetNumberVariable"
                           },
                           "parameters": [
-                            "__CameraShake.ActualLayerName",
+                            "EaseFactor",
                             "=",
-                            "VariableString(__CameraShake.LayerName)"
+                            "clamp(Time / StartEaseDuration, 0, 1)"
                           ]
                         }
                       ]
@@ -2810,347 +2857,443 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "VarSceneTxt"
+                            "value": "NumberVariable"
                           },
                           "parameters": [
-                            "__CameraShake.LayerName",
-                            "=",
-                            "\"__BaseLayer\""
+                            "Time",
+                            ">",
+                            "Duration - StopEaseDuration"
                           ]
                         }
                       ],
                       "actions": [
                         {
                           "type": {
-                            "value": "ModVarSceneTxt"
+                            "value": "SetNumberVariable"
                           },
                           "parameters": [
-                            "__CameraShake.ActualLayerName",
+                            "EaseFactor",
                             "=",
-                            "\"\""
+                            "clamp((Duration - Time) / StopEaseDuration, 0, 1)"
                           ]
                         }
                       ]
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Default values when there is no layer specific value set."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CameraShake3D::SetFrequency"
-                          },
-                          "parameters": [
-                            "",
-                            "24",
-                            "\"\"",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleZ",
-                            "=",
-                            "0.5"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleY",
-                            "=",
-                            "0.5"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleX",
-                            "=",
-                            "0.5"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ",
-                            "=",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY",
-                            "=",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX",
-                            "=",
-                            "0"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
+                      "type": "BuiltinCommonInstructions::ForEachChildVariable",
+                      "iterableVariableName": "Layers",
+                      "valueIteratorVariableName": "Layer",
+                      "keyIteratorVariableName": "LayerName",
                       "conditions": [
                         {
                           "type": {
-                            "value": "VariableChildExists"
+                            "value": "BooleanVariable"
                           },
                           "parameters": [
-                            "__CameraShake.Layer",
-                            "\"Frequency\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CameraShake3D::SetFrequency"
-                          },
-                          "parameters": [
-                            "",
-                            "Variable(__CameraShake.Layer.Frequency)",
-                            "\"\"",
+                            "Layers[LayerName].Shakable",
+                            "True",
                             ""
                           ]
                         }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VariableChildExists"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layer",
-                            "\"AmplitudeAngleZ\""
-                          ]
-                        }
                       ],
-                      "actions": [
+                      "actions": [],
+                      "events": [
                         {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleZ",
-                            "=",
-                            "Variable(__CameraShake.Layer.AmplitudeAngleZ)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VariableChildExists"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layer",
-                            "\"AmplitudeAngleY\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleY",
-                            "=",
-                            "Variable(__CameraShake.Layer.AmplitudeAngleY)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VariableChildExists"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layer",
-                            "\"AmplitudeAngleX\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleX",
-                            "=",
-                            "Variable(__CameraShake.Layer.AmplitudeAngleX)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Shake the layer camera.\nSave the camera displacement to revert it in onScenePostEvents."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleZ",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ",
-                            "=",
-                            "CameraShake3D::Noise2d(\"\", TimeFromStart(), 1000) * Variable(__CameraShake.AmplitudeAngleZ) * Variable(__CameraShake.EaseFactor)"
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringVariable"
+                              },
+                              "parameters": [
+                                "ActualLayerName",
+                                "=",
+                                "LayerName"
+                              ]
+                            }
                           ]
                         },
                         {
-                          "type": {
-                            "value": "CameraShake3D::SpinCamera"
-                          },
-                          "parameters": [
-                            "",
-                            "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ)",
-                            "VariableString(__CameraShake.ActualLayerName)",
-                            "VariableString(__CameraShake.ActualLayerName)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleY",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY",
-                            "=",
-                            "CameraShake3D::Noise2d(\"\", TimeFromStart(), 2000) * Variable(__CameraShake.AmplitudeAngleY) * Variable(__CameraShake.EaseFactor)"
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "LayerName",
+                                "=",
+                                "\"__BaseLayer\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringVariable"
+                              },
+                              "parameters": [
+                                "ActualLayerName",
+                                "=",
+                                "\"\""
+                              ]
+                            }
                           ]
                         },
                         {
-                          "type": {
-                            "value": "CameraShake3D::TurnCameraHorizontally"
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
                           },
-                          "parameters": [
-                            "",
-                            "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY)",
-                            "VariableString(__CameraShake.ActualLayerName)",
-                            "VariableString(__CameraShake.ActualLayerName)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
+                          "comment": "Default values when there is no layer specific value set."
+                        },
                         {
-                          "type": {
-                            "value": "VarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.AmplitudeAngleX",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarScene"
-                          },
-                          "parameters": [
-                            "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX",
-                            "=",
-                            "CameraShake3D::Noise2d(\"\", TimeFromStart(), 3000) * Variable(__CameraShake.AmplitudeAngleX) * Variable(__CameraShake.EaseFactor)"
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "CameraShake3D::SetFrequency"
+                              },
+                              "parameters": [
+                                "",
+                                "DefaultFrequency",
+                                "\"\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleZ",
+                                "=",
+                                "DefaultAmplitudeAngleZ"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleY",
+                                "=",
+                                "DefaultAmplitudeAngleY"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleX",
+                                "=",
+                                "DefaultAmplitudeAngleX"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaAngleZ",
+                                "=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaAngleY",
+                                "=",
+                                "0"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaAngleX",
+                                "=",
+                                "0"
+                              ]
+                            }
                           ]
                         },
                         {
-                          "type": {
-                            "value": "CameraShake3D::TurnCameraVertically"
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"Frequency\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "CameraShake3D::SetFrequency"
+                              },
+                              "parameters": [
+                                "",
+                                "Layer.Frequency",
+                                "\"\"",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"AmplitudeAngleZ\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleZ",
+                                "=",
+                                "Layer.AmplitudeAngleZ"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"AmplitudeAngleY\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleY",
+                                "=",
+                                "Layer.AmplitudeAngleY"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "VariableChildExists2"
+                              },
+                              "parameters": [
+                                "Layer",
+                                "\"AmplitudeAngleX\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleX",
+                                "=",
+                                "Layer.AmplitudeAngleX"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
                           },
-                          "parameters": [
-                            "",
-                            "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX)",
-                            "VariableString(__CameraShake.ActualLayerName)",
-                            "VariableString(__CameraShake.ActualLayerName)"
+                          "comment": "Shake the layer camera.\nSave the camera displacement to revert it in onScenePostEvents."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleZ",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaAngleZ",
+                                "=",
+                                "CameraShake3D::Noise2d(\"\", TimeFromStart(), 1000) * AmplitudeAngleZ * EaseFactor"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CameraShake3D::SpinCamera"
+                              },
+                              "parameters": [
+                                "",
+                                "Layers[LayerName].CameraDeltaAngleZ",
+                                "ActualLayerName",
+                                "VariableString(__CameraShake.ActualLayerName)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleY",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaAngleY",
+                                "=",
+                                "CameraShake3D::Noise2d(\"\", TimeFromStart(), 2000) * AmplitudeAngleY * EaseFactor"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CameraShake3D::TurnCameraHorizontally"
+                              },
+                              "parameters": [
+                                "",
+                                "Layers[LayerName].CameraDeltaAngleY",
+                                "ActualLayerName",
+                                "VariableString(__CameraShake.ActualLayerName)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "AmplitudeAngleX",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Layers[LayerName].CameraDeltaAngleX",
+                                "=",
+                                "CameraShake3D::Noise2d(\"\", TimeFromStart(), 3000) * AmplitudeAngleX * EaseFactor"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CameraShake3D::TurnCameraVertically"
+                              },
+                              "parameters": [
+                                "",
+                                "Layers[LayerName].CameraDeltaAngleX",
+                                "ActualLayerName",
+                                "VariableString(__CameraShake.ActualLayerName)"
+                              ]
+                            }
                           ]
                         }
                       ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "folded": true,
+                      "name": "AmplitudeAngleZ",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "folded": true,
+                      "name": "AmplitudeAngleY",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "folded": true,
+                      "name": "AmplitudeAngleX",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "folded": true,
+                      "name": "EaseFactor",
+                      "type": "number",
+                      "value": 1
+                    },
+                    {
+                      "folded": true,
+                      "name": "ActualLayerName",
+                      "type": "string",
+                      "value": ""
                     }
                   ]
                 }
@@ -3194,116 +3337,120 @@
               "actions": [],
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::ForEachChildVariable",
-                  "iterableVariableName": "__CameraShake.Layers",
-                  "valueIteratorVariableName": "__CameraShake.Layer",
-                  "keyIteratorVariableName": "__CameraShake.LayerName",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].Shakable",
-                        "True"
-                      ]
-                    }
-                  ],
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
                   "actions": [],
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarSceneTxt"
-                          },
-                          "parameters": [
-                            "__CameraShake.ActualLayerName",
-                            "=",
-                            "VariableString(__CameraShake.LayerName)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
+                      "type": "BuiltinCommonInstructions::ForEachChildVariable",
+                      "iterableVariableName": "__CameraShake.Layers",
+                      "valueIteratorVariableName": "Layer",
+                      "keyIteratorVariableName": "LayerName",
                       "conditions": [
                         {
                           "type": {
-                            "value": "VarSceneTxt"
+                            "value": "BooleanVariable"
                           },
                           "parameters": [
-                            "__CameraShake.LayerName",
-                            "=",
-                            "\"__BaseLayer\""
+                            "Layers[LayerName].Shakable",
+                            "True",
+                            ""
                           ]
                         }
                       ],
-                      "actions": [
+                      "actions": [],
+                      "events": [
                         {
-                          "type": {
-                            "value": "ModVarSceneTxt"
-                          },
-                          "parameters": [
-                            "__CameraShake.ActualLayerName",
-                            "=",
-                            "\"\""
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringVariable"
+                              },
+                              "parameters": [
+                                "ActualLayerName",
+                                "=",
+                                "LayerName"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "LayerName",
+                                "=",
+                                "\"__BaseLayer\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringVariable"
+                              },
+                              "parameters": [
+                                "ActualLayerName",
+                                "=",
+                                "\"\""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "CameraShake3D::SpinCamera"
+                              },
+                              "parameters": [
+                                "",
+                                "0 - Layers[LayerName].CameraDeltaAngleZ",
+                                "ActualLayerName",
+                                "VariableString(__CameraShake.ActualLayerName)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CameraShake3D::TurnCameraHorizontally"
+                              },
+                              "parameters": [
+                                "",
+                                "0 - Layers[LayerName].CameraDeltaAngleY",
+                                "ActualLayerName",
+                                "VariableString(__CameraShake.ActualLayerName)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "CameraShake3D::TurnCameraVertically"
+                              },
+                              "parameters": [
+                                "",
+                                "0 - Layers[LayerName].CameraDeltaAngleX",
+                                "ActualLayerName",
+                                "VariableString(__CameraShake.ActualLayerName)"
+                              ]
+                            }
                           ]
                         }
                       ]
-                    },
+                    }
+                  ],
+                  "variables": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CameraShake3D::SpinCamera"
-                          },
-                          "parameters": [
-                            "",
-                            "-Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleZ)",
-                            "VariableString(__CameraShake.ActualLayerName)",
-                            "VariableString(__CameraShake.ActualLayerName)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CameraShake3D::TurnCameraHorizontally"
-                          },
-                          "parameters": [
-                            "",
-                            "-Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleY)",
-                            "VariableString(__CameraShake.ActualLayerName)",
-                            "VariableString(__CameraShake.ActualLayerName)"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "CameraShake3D::TurnCameraVertically"
-                          },
-                          "parameters": [
-                            "",
-                            "-Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].CameraDeltaAngleX)",
-                            "VariableString(__CameraShake.ActualLayerName)",
-                            "VariableString(__CameraShake.ActualLayerName)"
-                          ]
-                        }
-                      ]
+                      "folded": true,
+                      "name": "ActualLayerName",
+                      "type": "string",
+                      "value": ""
                     }
                   ]
                 }
@@ -3326,42 +3473,42 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Time",
+                    "Time",
                     "=",
                     "0"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Duration",
+                    "Duration",
                     "=",
-                    "Duration"
+                    "NewDuration"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.StartEaseDuration",
+                    "StartEaseDuration",
                     "=",
-                    "StartEaseDuration"
+                    "NewStartEaseDuration"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.StopEaseDuration",
+                    "StopEaseDuration",
                     "=",
-                    "StopEaseDuration"
+                    "NewStopEaseDuration"
                   ]
                 }
               ]
@@ -3371,34 +3518,34 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "VarScene"
+                    "value": "NumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Duration",
+                    "Duration",
                     "<",
-                    "Variable(__CameraShake.StartEaseDuration) + Variable(__CameraShake.StopEaseDuration)"
+                    "StartEaseDuration + StopEaseDuration"
                   ]
                 }
               ],
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.StartEaseDuration",
+                    "StartEaseDuration",
                     "=",
-                    "StartEaseDuration * Variable(__CameraShake.Duration) / (StartEaseDuration + StopEaseDuration)"
+                    "StartEaseDuration * Duration / (StartEaseDuration + StopEaseDuration)"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.StopEaseDuration",
+                    "StopEaseDuration",
                     "=",
-                    "StopEaseDuration * Variable(__CameraShake.Duration) / (StartEaseDuration + StopEaseDuration)"
+                    "StopEaseDuration * Duration / (StartEaseDuration + StopEaseDuration)"
                   ]
                 }
               ]
@@ -3407,17 +3554,17 @@
           "parameters": [
             {
               "description": "Duration (in seconds)",
-              "name": "Duration",
+              "name": "NewDuration",
               "type": "expression"
             },
             {
               "description": "Ease duration to start (in seconds)",
-              "name": "StartEaseDuration",
+              "name": "NewStartEaseDuration",
               "type": "expression"
             },
             {
               "description": "Ease duration to stop (in seconds)",
-              "name": "StopEaseDuration",
+              "name": "NewStopEaseDuration",
               "type": "expression"
             }
           ],
@@ -3436,30 +3583,30 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Time",
+                    "Time",
                     "=",
                     "0"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Duration",
+                    "Duration",
                     "=",
                     "1234567890"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.StartEaseDuration",
+                    "StartEaseDuration",
                     "=",
                     "EaseDuration"
                   ]
@@ -3489,30 +3636,30 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Time",
+                    "Time",
                     "=",
                     "0"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Duration",
+                    "Duration",
                     "=",
                     "EaseDuration"
                   ]
                 },
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.StopEaseDuration",
+                    "StopEaseDuration",
                     "=",
                     "EaseDuration"
                   ]
@@ -3543,12 +3690,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
-                    "Layer"
+                    "NewLayerName"
                   ]
                 }
               ]
@@ -3561,7 +3708,7 @@
                     "value": "BuiltinCommonInstructions::CompareStrings"
                   },
                   "parameters": [
-                    "Layer",
+                    "NewLayerName",
                     "=",
                     "\"\""
                   ]
@@ -3570,10 +3717,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
                     "\"__BaseLayer\""
                   ]
@@ -3596,11 +3743,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "SetSceneVariableAsBoolean"
+                    "value": "SetBooleanVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].Shakable",
-                    "="
+                    "Layers[LayerName].Shakable",
+                    "False",
+                    ""
                   ]
                 }
               ]
@@ -3620,11 +3768,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "SetSceneVariableAsBoolean"
+                    "value": "SetBooleanVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].Shakable",
-                    "True"
+                    "Layers[LayerName].Shakable",
+                    "True",
+                    ""
                   ]
                 }
               ]
@@ -3640,7 +3789,7 @@
             },
             {
               "description": "Layer",
-              "name": "Layer",
+              "name": "NewLayerName",
               "type": "layer"
             }
           ],
@@ -3658,12 +3807,12 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "VarScene"
+                    "value": "NumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Time",
+                    "Time",
                     "<",
-                    "Variable(__CameraShake.Duration)"
+                    "Duration"
                   ]
                 }
               ],
@@ -3696,12 +3845,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
-                    "Layer"
+                    "NewLayerName"
                   ]
                 }
               ]
@@ -3714,7 +3863,7 @@
                     "value": "BuiltinCommonInstructions::CompareStrings"
                   },
                   "parameters": [
-                    "Layer",
+                    "NewLayerName",
                     "=",
                     "\"\""
                   ]
@@ -3723,10 +3872,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
                     "\"__BaseLayer\""
                   ]
@@ -3742,7 +3891,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleZ)"
+                    "Layers[LayerName].AmplitudeAngleZ"
                   ]
                 }
               ]
@@ -3754,7 +3903,7 @@
           "parameters": [
             {
               "description": "Layer",
-              "name": "Layer",
+              "name": "NewLayerName",
               "type": "layer"
             }
           ],
@@ -3774,12 +3923,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
-                    "Layer"
+                    "NewLayerName"
                   ]
                 }
               ]
@@ -3792,7 +3941,7 @@
                     "value": "BuiltinCommonInstructions::CompareStrings"
                   },
                   "parameters": [
-                    "Layer",
+                    "NewLayerName",
                     "=",
                     "\"\""
                   ]
@@ -3801,10 +3950,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
                     "\"__BaseLayer\""
                   ]
@@ -3817,10 +3966,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleZ",
+                    "Layers[LayerName].AmplitudeAngleZ",
                     "=",
                     "Value"
                   ]
@@ -3845,12 +3994,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
-                    "Layer"
+                    "NewLayerName"
                   ]
                 }
               ]
@@ -3863,7 +4012,7 @@
                     "value": "BuiltinCommonInstructions::CompareStrings"
                   },
                   "parameters": [
-                    "Layer",
+                    "NewLayerName",
                     "=",
                     "\"\""
                   ]
@@ -3872,10 +4021,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
                     "\"__BaseLayer\""
                   ]
@@ -3891,7 +4040,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleY)"
+                    "Layers[LayerName].AmplitudeAngleY"
                   ]
                 }
               ]
@@ -3903,7 +4052,7 @@
           "parameters": [
             {
               "description": "Layer",
-              "name": "Layer",
+              "name": "NewLayerName",
               "type": "layer"
             }
           ],
@@ -3923,12 +4072,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
-                    "Layer"
+                    "NewLayerName"
                   ]
                 }
               ]
@@ -3941,7 +4090,7 @@
                     "value": "BuiltinCommonInstructions::CompareStrings"
                   },
                   "parameters": [
-                    "Layer",
+                    "NewLayerName",
                     "=",
                     "\"\""
                   ]
@@ -3950,10 +4099,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
                     "\"__BaseLayer\""
                   ]
@@ -3966,10 +4115,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleY",
+                    "Layers[LayerName].AmplitudeAngleY",
                     "=",
                     "Value"
                   ]
@@ -3994,12 +4143,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
-                    "Layer"
+                    "NewLayerName"
                   ]
                 }
               ]
@@ -4012,7 +4161,7 @@
                     "value": "BuiltinCommonInstructions::CompareStrings"
                   },
                   "parameters": [
-                    "Layer",
+                    "NewLayerName",
                     "=",
                     "\"\""
                   ]
@@ -4021,10 +4170,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
                     "\"__BaseLayer\""
                   ]
@@ -4040,7 +4189,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleX)"
+                    "Layers[LayerName].AmplitudeAngleX"
                   ]
                 }
               ]
@@ -4052,7 +4201,7 @@
           "parameters": [
             {
               "description": "Layer",
-              "name": "Layer",
+              "name": "NewLayerName",
               "type": "layer"
             }
           ],
@@ -4072,12 +4221,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
-                    "Layer"
+                    "NewLayerName"
                   ]
                 }
               ]
@@ -4090,7 +4239,7 @@
                     "value": "BuiltinCommonInstructions::CompareStrings"
                   },
                   "parameters": [
-                    "Layer",
+                    "NewLayerName",
                     "=",
                     "\"\""
                   ]
@@ -4099,10 +4248,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
                     "\"__BaseLayer\""
                   ]
@@ -4115,10 +4264,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].AmplitudeAngleX",
+                    "Layers[LayerName].AmplitudeAngleX",
                     "=",
                     "Value"
                   ]
@@ -4143,12 +4292,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
-                    "GetArgumentAsString(\"Layer\")"
+                    "NewLayerName"
                   ]
                 }
               ]
@@ -4161,7 +4310,7 @@
                     "value": "BuiltinCommonInstructions::CompareStrings"
                   },
                   "parameters": [
-                    "Layer",
+                    "NewLayerName",
                     "=",
                     "\"\""
                   ]
@@ -4170,10 +4319,10 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__CameraShake.LayerName",
+                    "LayerName",
                     "=",
                     "\"__BaseLayer\""
                   ]
@@ -4186,12 +4335,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarScene"
+                    "value": "SetNumberVariable"
                   },
                   "parameters": [
-                    "__CameraShake.Layers[VariableString(__CameraShake.LayerName)].Frequency",
+                    "Layers[LayerName].Frequency",
                     "=",
-                    "GetArgumentAsNumber(\"Frequency\")"
+                    "Frequency"
                   ]
                 }
               ]
@@ -4205,7 +4354,7 @@
             },
             {
               "description": "Layer",
-              "name": "Layer",
+              "name": "NewLayerName",
               "type": "layer"
             }
           ],
@@ -4362,7 +4511,7 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "if (gdjs._cameraShakeExtension) {",
+                "if (gdjs._cameraShake3DExtension) {",
                 "    return;",
                 "}",
                 "",
@@ -4991,7 +5140,7 @@
                 "    };",
                 "}",
                 "",
-                "gdjs._cameraShakeExtension = {",
+                "gdjs._cameraShake3DExtension = {",
                 "    noiseManager: new NoiseManager(),",
                 "};",
                 ""
@@ -5019,7 +5168,7 @@
                 "const x = eventsFunctionContext.getArgument(\"X\");\r",
                 "const y = eventsFunctionContext.getArgument(\"Y\");\r",
                 "\r",
-                "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).noise(x, y);"
+                "eventsFunctionContext.returnValue = gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).noise(x, y);"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5064,7 +5213,7 @@
                 "const y = eventsFunctionContext.getArgument(\"Y\");\r",
                 "const z = eventsFunctionContext.getArgument(\"Z\");\r",
                 "\r",
-                "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).noise(x, y, z);"
+                "eventsFunctionContext.returnValue = gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).noise(x, y, z);"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5115,7 +5264,7 @@
                 "const z = eventsFunctionContext.getArgument(\"Z\");\r",
                 "const w = eventsFunctionContext.getArgument(\"W\");\r",
                 "\r",
-                "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).noise(x, y, z, w);"
+                "eventsFunctionContext.returnValue = gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).noise(x, y, z, w);"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5167,7 +5316,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension.noiseManager.getGenerator(name);"
+                "gdjs._cameraShake3DExtension.noiseManager.getGenerator(name);"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5196,7 +5345,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension.noiseManager.deleteGenerator(name);"
+                "gdjs._cameraShake3DExtension.noiseManager.deleteGenerator(name);"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5222,7 +5371,7 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "gdjs._cameraShakeExtension.noiseManager.deleteAllGenerators();",
+              "inlineCode": "gdjs._cameraShake3DExtension.noiseManager.deleteAllGenerators();",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -5241,7 +5390,7 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "gdjs._cameraShakeExtension.noiseManager.setSeed(eventsFunctionContext.getArgument(\"Seed\"));",
+              "inlineCode": "gdjs._cameraShake3DExtension.noiseManager.setSeed(eventsFunctionContext.getArgument(\"Seed\"));",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -5270,7 +5419,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).xLoopPeriod = eventsFunctionContext.getArgument(\"LoopPeriod\");"
+                "gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).xLoopPeriod = eventsFunctionContext.getArgument(\"LoopPeriod\");"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5304,7 +5453,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).yLoopPeriod = eventsFunctionContext.getArgument(\"LoopPeriod\");"
+                "gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).yLoopPeriod = eventsFunctionContext.getArgument(\"LoopPeriod\");"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5338,7 +5487,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).frequency = eventsFunctionContext.getArgument(\"Frequency\");"
+                "gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).frequency = eventsFunctionContext.getArgument(\"Frequency\");"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5372,7 +5521,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).octaves = eventsFunctionContext.getArgument(\"Octaves\");"
+                "gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).octaves = eventsFunctionContext.getArgument(\"Octaves\");"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5406,7 +5555,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).persistence = eventsFunctionContext.getArgument(\"Persistence\");"
+                "gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).persistence = eventsFunctionContext.getArgument(\"Persistence\");"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5440,7 +5589,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "gdjs._cameraShakeExtension.noiseManager.getGenerator(name).lacunarity = eventsFunctionContext.getArgument(\"Lacunarity\");"
+                "gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).lacunarity = eventsFunctionContext.getArgument(\"Lacunarity\");"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5471,7 +5620,7 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.seed;",
+              "inlineCode": "eventsFunctionContext.returnValue = gdjs._cameraShake3DExtension.noiseManager.seed;",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -5496,7 +5645,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).frequency;"
+                "eventsFunctionContext.returnValue = gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).frequency;"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5528,7 +5677,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).octaves;"
+                "eventsFunctionContext.returnValue = gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).octaves;"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5560,7 +5709,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).persistence;"
+                "eventsFunctionContext.returnValue = gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).persistence;"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -5592,7 +5741,7 @@
               "inlineCode": [
                 "const name = eventsFunctionContext.getArgument(\"Name\");\r",
                 "\r",
-                "eventsFunctionContext.returnValue = gdjs._cameraShakeExtension.noiseManager.getGenerator(name).lacunarity;"
+                "eventsFunctionContext.returnValue = gdjs._cameraShake3DExtension.noiseManager.getGenerator(name).lacunarity;"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -10999,12 +11148,12 @@
               "objectGroups": []
             },
             {
-              "description": "the gavity of the object. Its value is always positive.",
-              "fullName": "Gavity",
+              "description": "the gravity of the object. Its value is always positive.",
+              "fullName": "Gravity",
               "functionType": "ExpressionAndCondition",
               "group": "3D jump configuration",
               "name": "Gravity",
-              "sentence": "the gavity",
+              "sentence": "the gravity",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -11326,7 +11475,7 @@
               "value": "1000",
               "type": "Number",
               "unit": "PixelAcceleration",
-              "label": "Gavity",
+              "label": "Gravity",
               "description": "Its value is always positive.",
               "group": "",
               "extraInformation": [],
@@ -11459,13 +11608,13 @@
       "author": "",
       "category": "Visual effect",
       "extensionNamespace": "",
-      "fullName": "3D particle emitter (experimental)",
+      "fullName": "3D particle emitter",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZpcmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcuNjYgMTEuMkMxNy40MyAxMC45IDE3LjE1IDEwLjY0IDE2Ljg5IDEwLjM4QzE2LjIyIDkuNzggMTUuNDYgOS4zNSAxNC44MiA4LjcyQzEzLjMzIDcuMjYgMTMgNC44NSAxMy45NSAzQzEzIDMuMjMgMTIuMTcgMy43NSAxMS40NiA0LjMyQzguODcgNi40IDcuODUgMTAuMDcgOS4wNyAxMy4yMkM5LjExIDEzLjMyIDkuMTUgMTMuNDIgOS4xNSAxMy41NUM5LjE1IDEzLjc3IDkgMTMuOTcgOC44IDE0LjA1QzguNTcgMTQuMTUgOC4zMyAxNC4wOSA4LjE0IDEzLjkzQzguMDggMTMuODggOC4wNCAxMy44MyA4IDEzLjc2QzYuODcgMTIuMzMgNi42OSAxMC4yOCA3LjQ1IDguNjRDNS43OCAxMCA0Ljg3IDEyLjMgNSAxNC40N0M1LjA2IDE0Ljk3IDUuMTIgMTUuNDcgNS4yOSAxNS45N0M1LjQzIDE2LjU3IDUuNyAxNy4xNyA2IDE3LjdDNy4wOCAxOS40MyA4Ljk1IDIwLjY3IDEwLjk2IDIwLjkyQzEzLjEgMjEuMTkgMTUuMzkgMjAuOCAxNy4wMyAxOS4zMkMxOC44NiAxNy42NiAxOS41IDE1IDE4LjU2IDEyLjcyTDE4LjQzIDEyLjQ2QzE4LjIyIDEyIDE3LjY2IDExLjIgMTcuNjYgMTEuMk0xNC41IDE3LjVDMTQuMjIgMTcuNzQgMTMuNzYgMTggMTMuNCAxOC4xQzEyLjI4IDE4LjUgMTEuMTYgMTcuOTQgMTAuNSAxNy4yOEMxMS42OSAxNyAxMi40IDE2LjEyIDEyLjYxIDE1LjIzQzEyLjc4IDE0LjQzIDEyLjQ2IDEzLjc3IDEyLjMzIDEzQzEyLjIxIDEyLjI2IDEyLjIzIDExLjYzIDEyLjUgMTAuOTRDMTIuNjkgMTEuMzIgMTIuODkgMTEuNyAxMy4xMyAxMkMxMy45IDEzIDE1LjExIDEzLjQ0IDE1LjM3IDE0LjhDMTUuNDEgMTQuOTQgMTUuNDMgMTUuMDggMTUuNDMgMTUuMjNDMTUuNDYgMTYuMDUgMTUuMSAxNi45NSAxNC41IDE3LjVIMTQuNVoiIC8+PC9zdmc+",
       "name": "ParticleEmitter3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/f2e5a34bf465f781866677762d385d6c8e9e8d203383f2df9a3b7e0fad6a2cb5_fire.svg",
       "shortDescription": "Display a large number of particles to create visual effects.",
-      "version": "1.2.0",
+      "version": "2.0.0",
       "description": [
         "Particle emitters can be used to display:",
         "- Fire",
@@ -11473,8 +11622,11 @@
         "- Splashes",
         "- Lights",
         "",
-        "Breaking change from 1.0.0:",
-        "- Particles were 3 times too small"
+        "Breaking change",
+        "- 2.0.0",
+        "  - Object properties for position and rotation have been removed. They must be set with the instance editor or the action.",
+        "- 1.0.0",
+        "  - Particles were 3 times too small"
       ],
       "origin": {
         "identifier": "ParticleEmitter3D",
@@ -11533,6 +11685,44 @@
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": [
                     "gdjs.__particleEmmiter3DExtension = gdjs.__particleEmmiter3DExtension || {};",
+                    "",
+                    "class ParticleEmitter3DRenderer extends gdjs.CustomRuntimeObject3DRenderer {",
+                    "    constructor(",
+                    "      object,",
+                    "      instanceContainer,",
+                    "      parent",
+                    "    ) {",
+                    "        super(object, instanceContainer, parent);",
+                    "    }",
+                    "",
+                    "    _updateThreeGroup() {",
+                    "      const threeObject3D = this.get3DRendererObject();",
+                    "",
+                    "      threeObject3D.rotation.set(",
+                    "        gdjs.toRad(this._object.getRotationX()),",
+                    "        gdjs.toRad(this._object.getRotationY()),",
+                    "        -gdjs.toRad(this._object.angle)",
+                    "      );",
+                    "",
+                    "      threeObject3D.position.set(",
+                    "        this._object.getX(),",
+                    "        -this._object.getY(),",
+                    "        this._object.getZ()",
+                    "      );",
+                    "",
+                    "      threeObject3D.scale.set(",
+                    "        this._object.isFlippedX() ? -1 : 1,",
+                    "        this._object.isFlippedY() ? -1 : 1,",
+                    "        this._object.isFlippedZ() ? -1 : 1",
+                    "      );",
+                    "",
+                    "      threeObject3D.visible = !this._object.hidden;",
+                    "",
+                    "      this._isContainerDirty = true;",
+                    "    }",
+                    "}",
+                    "",
+                    "gdjs.__particleEmmiter3DExtension.ParticleEmitter3DRenderer = ParticleEmitter3DRenderer;",
                     "",
                     "/**",
                     " * @param {string} colorString",
@@ -11727,9 +11917,6 @@
                     "}",
                     "",
                     "gdjs.__particleEmmiter3DExtension.ParticleEmitterAdapter = ParticleEmitterAdapter;",
-                    "",
-                    "",
-                    "",
                     "",
                     "",
                     "/**",
@@ -18237,7 +18424,7 @@
                     "const ConeEmitter = gdjs.__particleEmmiter3DExtension.ConeEmitter;",
                     "const RenderMode = gdjs.__particleEmmiter3DExtension.RenderMode;",
                     "",
-                    "const ParticleEmitterAdapter = gdjs.__particleEmmiter3DExtension.ParticleEmitterAdapter;",
+                    "const { ParticleEmitterAdapter, ParticleEmitter3DRenderer } = gdjs.__particleEmmiter3DExtension;",
                     "",
                     "/** @type {gdjs.CustomRuntimeObject} */",
                     "const object = objects[0];",
@@ -18317,7 +18504,6 @@
                     "const applyForce = new ApplyForce(new THREE.Vector3(0, 0, -1), new ConstantValue(0));",
                     "particleSystem.addBehavior(applyForce);",
                     "",
-                    "particleSystem.emitter.rotation.order = 'ZYX';",
                     "particleSystem.emitter.name = object.getName() + object.getNameId();",
                     "",
                     "object.__particleEmitterAdapter = new ParticleEmitterAdapter(particleSystem, colorOverLife, sizeOverLife, applyForce);",
@@ -18326,9 +18512,19 @@
                     "// This is a hack that may break in future releases.",
                     "// Replace the group that would hold children objects by the emmiter.",
                     "const layer = gameScene.getLayer(object.getLayer());",
-                    "layer.getRenderer().remove3DRendererObject(object.getRenderer()._threeGroup);",
-                    "object.getRenderer()._threeGroup = particleSystem.emitter;",
+                    "const group = object.getRenderer()._threeGroup;",
+                    "layer.getRenderer().remove3DRendererObject(group);",
+                    "particleSystem.emitter.position.copy(group.position);",
+                    "particleSystem.emitter.rotation.order = 'ZYX';",
+                    "particleSystem.emitter.rotation.copy(group.rotation);",
+                    "",
+                    "const particleEmitter3DRenderer = new ParticleEmitter3DRenderer(object, object._instanceContainer, object.getInstanceContainer());",
+                    "object._renderer = particleEmitter3DRenderer;",
+                    "particleEmitter3DRenderer._threeGroup = particleSystem.emitter;",
                     "layer.getRenderer().add3DRendererObject(particleSystem.emitter);",
+                    "",
+                    "particleSystem.emitter.updateMatrixWorld(true);",
+                    "",
                     "",
                     "// See doStepPostEvents",
                     "gameScene.__particleEmmiter3DExtension = gameScene.__particleEmmiter3DExtension || {};",
@@ -18352,6 +18548,17 @@
                       "parameters": [
                         "Object",
                         ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetRotationCenter"
+                      },
+                      "parameters": [
+                        "Object",
+                        "0",
+                        "0",
+                        "0"
                       ]
                     }
                   ]
@@ -18810,23 +19017,10 @@
                     {
                       "type": "BuiltinCommonInstructions::JsCode",
                       "inlineCode": [
+                        "/** @type {gdjs.CustomRuntimeObject3D} */",
                         "const object = objects[0];",
                         "// Here runtimeScene is the gdjs.CustomRuntimeObjectInstanceContainer inside the custom object.",
                         "const gameScene = object.getRuntimeScene();",
-                        "const layer = gameScene.getLayer(object.getLayer());",
-                        "",
-                        "const emitter = object.__particleSystem.emitter;",
-                        "const objectRotationZ = -object.getAngle() * Math.PI / 180;",
-                        "if (emitter.position.x !== object.getX()",
-                        "    || emitter.position.y !== -object.getY()",
-                        "    || emitter.position.z !== object._getZ()",
-                        "    || emitter.rotation.z !== objectRotationZ) {",
-                        "    emitter.position.x = object.getX();",
-                        "    emitter.position.y = -object.getY();",
-                        "    emitter.position.z = object._getZ();",
-                        "    emitter.rotation.z = objectRotationZ;",
-                        "    emitter.updateMatrixWorld(true);",
-                        "}",
                         "",
                         "// Update batch system after having moved every emitter.",
                         "// See onScenePreEvents",
@@ -19004,10 +19198,11 @@
             },
             {
               "description": "the Z position of the emitter.",
-              "fullName": "Z (elevation)",
+              "fullName": "Z elevaltion (deprecated)",
               "functionType": "ExpressionAndCondition",
               "group": "Position",
               "name": "Z",
+              "private": true,
               "sentence": "the Z position",
               "events": [
                 {
@@ -19043,6 +19238,7 @@
               "functionType": "ActionWithOperator",
               "getterName": "Z",
               "name": "SetZ",
+              "private": true,
               "sentence": "",
               "events": [
                 {
@@ -19074,10 +19270,11 @@
             },
             {
               "description": "the rotation on X axis of the emitter.",
-              "fullName": "Rotation on X axis",
+              "fullName": "Rotation on X axis (deprecated)",
               "functionType": "ExpressionAndCondition",
               "group": "Angle",
               "name": "RotationX",
+              "private": true,
               "sentence": "the rotation on X axis",
               "events": [
                 {
@@ -19113,6 +19310,7 @@
               "functionType": "ActionWithOperator",
               "getterName": "RotationX",
               "name": "SetRotationX",
+              "private": true,
               "sentence": "",
               "events": [
                 {
@@ -19155,10 +19353,11 @@
             },
             {
               "description": "the rotation on Y axis of the emitter.",
-              "fullName": "Rotation on Y axis",
+              "fullName": "Rotation on Y axis (deprecated)",
               "functionType": "ExpressionAndCondition",
               "group": "Angle",
               "name": "RotationY",
+              "private": true,
               "sentence": "the rotation on Y axis",
               "events": [
                 {
@@ -19194,6 +19393,7 @@
               "functionType": "ActionWithOperator",
               "getterName": "RotationY",
               "name": "SetRotationY",
+              "private": true,
               "sentence": "",
               "events": [
                 {
@@ -21097,9 +21297,10 @@
               "type": "Number",
               "unit": "Pixel",
               "label": "Z (elevation)",
-              "description": "",
+              "description": "Deprecated",
               "group": "Position",
               "extraInformation": [],
+              "hidden": true,
               "name": "Z"
             },
             {
@@ -21110,6 +21311,7 @@
               "description": "",
               "group": "Position",
               "extraInformation": [],
+              "hidden": true,
               "name": "RotationX"
             },
             {
@@ -21120,6 +21322,7 @@
               "description": "",
               "group": "Position",
               "extraInformation": [],
+              "hidden": true,
               "name": "RotationY"
             }
           ],
@@ -21331,7 +21534,10 @@
         "joysticks",
         "axis",
         "xbox",
-        "ps4"
+        "ps4",
+        "platformer",
+        "platform",
+        "top-down"
       ],
       "authorIds": [
         "2OwwM8ToR9dx9RJ2sAKTcrLmCB92",
