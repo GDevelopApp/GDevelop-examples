@@ -21,7 +21,7 @@
     "useExternalSourceFiles": false,
     "version": "1.0.0",
     "name": "ArrowFight Multiplayer",
-    "description": "A pvp platformer game where up to 4 players fire arrows at each other in order to be the last player left.\n\nThis game example includes:\n-Multiplayer lobby\n-Platformer behavior\n-Screen wrap behavior\n-Sound effects\n-Resource bars\n-Forces",
+    "description": "A player vs player platformer game where up to 4 players fire arrows at each other in order to be the last player left.\n\nControls:\n\nMove\n- Arrow keys\n- Left-stick of gamepad\n- D-pad on gamepad\n- Left virtual joystick (mobile)\n\nJump (and Double Jump)\n- Up arrow\n- Up on left-stick of gamepad\n- Up on D-pad of gamepad\n- Up on left virtual joystick (mobile)\n\nAiming\n- Left-Click and mouse cursor\n- Right-stick of gamepad\n- Right virtual joystick (mobile)\n\nFire arrow (while aiming):\n- Release left-click on mouse\n- Right-Bumper or Right-Trigger on gamepad\n- Release right virtual joystick (mobile)\n\nThis game example includes:\n-Multiplayer lobby\n-Platformer behavior\n-Screen wrap behavior\n-Sound effects\n-Resource bars\n-Forces",
     "author": "",
     "windowWidth": 1280,
     "windowHeight": 720,
@@ -574,15 +574,15 @@
       "title": "",
       "v": 0,
       "uiSettings": {
-        "grid": false,
+        "grid": true,
         "gridType": "rectangular",
         "gridWidth": 32,
         "gridHeight": 32,
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridColor": 10401023,
-        "gridAlpha": 0.8,
-        "snap": false,
+        "gridAlpha": 0.1,
+        "snap": true,
         "zoomFactor": 0.4950840073748897,
         "windowMask": false
       },
@@ -593,14 +593,14 @@
           "angle": 0,
           "customSize": true,
           "depth": 48,
-          "height": 128,
+          "height": 106,
           "keepRatio": true,
           "layer": "",
           "name": "LobbyButton",
           "persistentUuid": "c7db935c-0c96-4a36-8163-9e5f4cb2eefc",
           "width": 320,
           "x": 480,
-          "y": 266,
+          "y": 288,
           "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
@@ -718,7 +718,7 @@
           "variables": [],
           "effects": [],
           "behaviors": [],
-          "string": "Requires 2 players\n\nOpen two or more previews\nif you're testing this game by yourself",
+          "string": "Requires at least 2 players\n\nOpen multiple previews\nif you're testing this game by yourself",
           "font": "CantoraOne-Regular.ttf",
           "textAlignment": "center",
           "characterSize": 30,
@@ -741,7 +741,7 @@
             "shadowOpacity": 127,
             "smoothed": true,
             "underlined": false,
-            "text": "Requires 2 players\n\nOpen two or more previews\nif you're testing this game by yourself",
+            "text": "Requires at least 2 players\n\nOpen multiple previews\nif you're testing this game by yourself",
             "font": "CantoraOne-Regular.ttf",
             "textAlignment": "center",
             "characterSize": 30,
@@ -3358,7 +3358,7 @@
               "directions": [
                 {
                   "looping": false,
-                  "timeBetweenFrames": 0.15,
+                  "timeBetweenFrames": 0.3,
                   "sprites": [
                     {
                       "hasCustomCollisionMask": true,
@@ -4357,70 +4357,73 @@
                     "",
                     "\"67;71;100\""
                   ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "StartingNumberOfPlayers",
+                    "=",
+                    "Multiplayer::PlayersInLobbyCount()"
+                  ]
                 }
               ],
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Setting owners and colors of instances of Player, ArrowBar, and Score objects"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "Player",
-                  "conditions": [],
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SystemInfo::IsMobile"
+                      },
+                      "parameters": []
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
-                        "value": "Multiplayer::MultiplayerObjectBehavior::SetPlayerObjectOwnership"
+                        "value": "Delete"
                       },
                       "parameters": [
-                        "Player",
-                        "MultiplayerObject",
-                        "=",
-                        "Player.PlayerNumber"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ChangeColor"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Player.Color"
+                        "MobileControls",
+                        ""
                       ]
                     }
-                  ],
+                  ]
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Setting owners and colors of instances of Player, ArrowBar, and Score objects",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "NumberObjectVariable"
-                          },
-                          "parameters": [
-                            "Score",
-                            "PlayerNumber",
-                            "=",
-                            "Player.PlayerNumber"
-                          ]
-                        }
-                      ],
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "Player",
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
-                            "value": "TextObject::ChangeColor"
+                            "value": "Multiplayer::MultiplayerObjectBehavior::SetPlayerObjectOwnership"
                           },
                           "parameters": [
-                            "Score",
+                            "Player",
+                            "MultiplayerObject",
+                            "=",
+                            "Player.PlayerNumber"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeColor"
+                          },
+                          "parameters": [
+                            "Player",
                             "Player.Color"
                           ]
                         }
@@ -4436,33 +4439,81 @@
                               "parameters": [
                                 "Score",
                                 "PlayerNumber",
-                                ">",
-                                "Multiplayer::PlayersInLobbyCount()"
+                                "=",
+                                "Player.PlayerNumber"
                               ]
                             }
                           ],
                           "actions": [
                             {
                               "type": {
-                                "value": "Delete"
+                                "value": "TextObject::ChangeColor"
                               },
                               "parameters": [
                                 "Score",
-                                ""
+                                "Player.Color"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "NumberObjectVariable"
+                                  },
+                                  "parameters": [
+                                    "Score",
+                                    "PlayerNumber",
+                                    ">",
+                                    "Multiplayer::PlayersInLobbyCount()"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Delete"
+                                  },
+                                  "parameters": [
+                                    "Score",
+                                    ""
+                                  ]
+                                }
                               ]
                             }
                           ]
                         }
                       ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "ArrowBar",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Multiplayer::MultiplayerObjectBehavior::SetPlayerObjectOwnership"
+                          },
+                          "parameters": [
+                            "ArrowBar",
+                            "MultiplayerObject",
+                            "=",
+                            "ArrowBar.PlayerNumber"
+                          ]
+                        }
+                      ]
                     }
-                  ]
+                  ],
+                  "parameters": []
                 },
                 {
                   "colorB": 228,
                   "colorG": 176,
                   "colorR": 74,
                   "creationTime": 0,
-                  "name": "Update score text (with names)",
+                  "name": "Update score (with names if available)",
                   "source": "",
                   "type": "BuiltinCommonInstructions::Group",
                   "events": [
@@ -4740,63 +4791,6 @@
                     }
                   ],
                   "parameters": []
-                },
-                {
-                  "type": "BuiltinCommonInstructions::ForEach",
-                  "object": "ArrowBar",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Multiplayer::MultiplayerObjectBehavior::SetPlayerObjectOwnership"
-                      },
-                      "parameters": [
-                        "ArrowBar",
-                        "MultiplayerObject",
-                        "=",
-                        "ArrowBar.PlayerNumber"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "StartingNumberOfPlayers",
-                        "=",
-                        "Multiplayer::PlayersInLobbyCount()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "SystemInfo::IsMobile"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Delete"
-                      },
-                      "parameters": [
-                        "MobileControls",
-                        ""
-                      ]
-                    }
-                  ]
                 }
               ]
             }
@@ -4808,7 +4802,7 @@
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
-          "name": "Jump controls",
+          "name": "Controls",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -4828,294 +4822,129 @@
               "actions": [],
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "WASD Movement",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
                     {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
                           "type": {
                             "value": "KeyPressed"
                           },
                           "parameters": [
                             "",
-                            "Up"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
-                          },
-                          "parameters": [
-                            "MovementJoystick",
-                            "\"Up\"",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Gamepads::C_Axis_pushed"
-                          },
-                          "parameters": [
-                            "",
-                            "1",
-                            "\"Left\"",
-                            "\"Up\"",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Gamepads::C_Button_pressed"
-                          },
-                          "parameters": [
-                            "",
-                            "1",
-                            "\"Up\"",
-                            "\"Up\""
+                            "w"
                           ]
                         }
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PlatformBehavior::SimulateControl"
-                      },
-                      "parameters": [
-                        "Player",
-                        "PlatformerObject",
-                        "\"Jump\""
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
+                      ],
+                      "actions": [
                         {
                           "type": {
-                            "value": "PlatformBehavior::CanJump"
+                            "value": "PlatformBehavior::SimulateUpKey"
                           },
                           "parameters": [
                             "Player",
                             "PlatformerObject"
                           ]
-                        },
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
                           "type": {
-                            "value": "BuiltinCommonInstructions::Once"
+                            "value": "KeyPressed"
                           },
-                          "parameters": []
+                          "parameters": [
+                            "",
+                            "a"
+                          ]
                         }
                       ],
                       "actions": [
                         {
                           "type": {
-                            "value": "PlaySound"
+                            "value": "PlatformBehavior::SimulateLeftKey"
                           },
                           "parameters": [
-                            "",
-                            "Jump",
-                            "",
-                            "100",
-                            "RandomFloatInRange(0.8,1)"
+                            "Player",
+                            "PlatformerObject"
                           ]
                         }
                       ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Aiming and Firing Controls",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Multiplayer::MultiplayerObjectBehavior::IsObjectOwnedByCurrentPlayer"
-                  },
-                  "parameters": [
-                    "Player",
-                    "MultiplayerObject"
-                  ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                    },
                     {
-                      "type": {
-                        "inverted": true,
-                        "value": "SystemInfo::IsMobile"
-                      },
-                      "parameters": []
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "s"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateDownKey"
+                          },
+                          "parameters": [
+                            "Player",
+                            "PlatformerObject"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "d"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PlatformBehavior::SimulateRightKey"
+                          },
+                          "parameters": [
+                            "Player",
+                            "PlatformerObject"
+                          ]
+                        }
+                      ]
                     }
                   ],
-                  "actions": [],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Jump ",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Mouse"
-                    },
-                    {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
-                        {
-                          "type": {
-                            "value": "MouseButtonPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetStringObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "State",
-                            "=",
-                            "\"Aiming\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetNumberObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "AimingAngle",
-                            "=",
-                            "Player.AngleToPosition(CursorX(), CursorY())"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "MouseButtonReleased"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetStringObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "State",
-                            "=",
-                            "\"FiringArrow\""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Gamepad"
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Gamepads::C_Axis_pushed"
-                          },
-                          "parameters": [
-                            "",
-                            "1",
-                            "\"Right\"",
-                            "\"Any\"",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetStringObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "State",
-                            "=",
-                            "\"Aiming\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetNumberObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "AimingAngle",
-                            "=",
-                            "Gamepads::StickAngle(1,\"Right\")"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "StringObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "State",
-                            "=",
-                            "\"Aiming\""
-                          ]
-                        },
                         {
                           "type": {
                             "value": "BuiltinCommonInstructions::Or"
@@ -5124,12 +4953,32 @@
                           "subInstructions": [
                             {
                               "type": {
-                                "value": "Gamepads::C_Button_pressed"
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Up"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed4Way"
+                              },
+                              "parameters": [
+                                "MovementJoystick",
+                                "\"Up\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
                               },
                               "parameters": [
                                 "",
                                 "1",
-                                "\"RT\"",
+                                "\"Left\"",
+                                "\"Up\"",
                                 ""
                               ]
                             },
@@ -5140,143 +4989,404 @@
                               "parameters": [
                                 "",
                                 "1",
-                                "\"RB\"",
-                                ""
+                                "\"Up\"",
+                                "\"Up\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "w"
                               ]
                             }
                           ]
-                        },
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Once"
-                          },
-                          "parameters": []
                         }
                       ],
                       "actions": [
                         {
                           "type": {
-                            "value": "SetStringObjectVariable"
+                            "value": "PlatformBehavior::SimulateControl"
                           },
                           "parameters": [
                             "Player",
-                            "State",
-                            "=",
-                            "\"FiringArrow\""
+                            "PlatformerObject",
+                            "\"Jump\""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "PlatformBehavior::CanJump"
+                              },
+                              "parameters": [
+                                "Player",
+                                "PlatformerObject"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "PlaySound"
+                              },
+                              "parameters": [
+                                "",
+                                "Jump",
+                                "",
+                                "100",
+                                "RandomFloatInRange(0.8,1)"
+                              ]
+                            }
                           ]
                         }
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SystemInfo::IsMobile"
-                      },
-                      "parameters": []
                     }
                   ],
-                  "actions": [],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Aiming and Firing Arrows",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
                   "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Virtual joystick"
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                          },
-                          "parameters": [
-                            "AimingJoystick",
-                            "\"Up\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetStringObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "State",
-                            "=",
-                            "\"Aiming\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetNumberObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "AimingAngle",
-                            "=",
-                            "AimingJoystick.StickAngle()"
-                          ]
-                        }
-                      ]
-                    },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
                             "inverted": true,
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                          },
-                          "parameters": [
-                            "AimingJoystick",
-                            "\"Up\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "StringObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "State",
-                            "=",
-                            "\"Aiming\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Once"
+                            "value": "SystemInfo::IsMobile"
                           },
                           "parameters": []
                         }
                       ],
-                      "actions": [
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Mouse"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "MouseButtonPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "State",
+                                "=",
+                                "\"Aiming\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "AimingAngle",
+                                "=",
+                                "Player.AngleToPosition(CursorX(), CursorY())"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "MouseButtonReleased"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "State",
+                                "=",
+                                "\"FiringArrow\""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Gamepad"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Gamepads::C_Axis_pushed"
+                              },
+                              "parameters": [
+                                "",
+                                "1",
+                                "\"Right\"",
+                                "\"Any\"",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "State",
+                                "=",
+                                "\"Aiming\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "AimingAngle",
+                                "=",
+                                "Gamepads::StickAngle(1,\"Right\")"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "State",
+                                "=",
+                                "\"Aiming\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "Gamepads::C_Button_pressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "1",
+                                    "\"RT\"",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Gamepads::C_Button_pressed"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "1",
+                                    "\"RB\"",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "State",
+                                "=",
+                                "\"FiringArrow\""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
                           "type": {
-                            "value": "SetStringObjectVariable"
+                            "value": "SystemInfo::IsMobile"
                           },
-                          "parameters": [
-                            "Player",
-                            "State",
-                            "=",
-                            "\"FiringArrow\""
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "Virtual joystick"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
+                              },
+                              "parameters": [
+                                "AimingJoystick",
+                                "\"Up\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "State",
+                                "=",
+                                "\"Aiming\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "AimingAngle",
+                                "=",
+                                "AimingJoystick.StickAngle()"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
+                              },
+                              "parameters": [
+                                "AimingJoystick",
+                                "\"Up\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "StringObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "State",
+                                "=",
+                                "\"Aiming\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringObjectVariable"
+                              },
+                              "parameters": [
+                                "Player",
+                                "State",
+                                "=",
+                                "\"FiringArrow\""
+                              ]
+                            }
                           ]
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "parameters": []
                 }
               ]
             }
@@ -5302,7 +5412,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Position and value of ArrowBar"
+              "comment": "Position and quantity of ArrowBar"
             },
             {
               "type": "BuiltinCommonInstructions::ForEach",
@@ -5830,727 +5940,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Stop the arrow"
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "AnimatableCapability::AnimatableBehavior::Name"
-                  },
-                  "parameters": [
-                    "Arrow",
-                    "Animation",
-                    "=",
-                    "\"Launched\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "Arrow",
-                    "Tile",
-                    "",
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Arreter"
-                  },
-                  "parameters": [
-                    "Arrow"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                  },
-                  "parameters": [
-                    "Arrow",
-                    "Animation",
-                    "=",
-                    "\"Stopped\""
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "disabled": true,
-          "folded": true,
-          "name": "Arrows",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Position and value of ArrowBar"
-            },
-            {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "Player",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Multiplayer::MultiplayerObjectBehavior::PlayerObjectOwnership"
-                  },
-                  "parameters": [
-                    "ArrowBar",
-                    "MultiplayerObject",
-                    "=",
-                    "Player.PlayerNumber"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "MettreXY"
-                  },
-                  "parameters": [
-                    "ArrowBar",
-                    "=",
-                    "Player.X()-(ArrowBar.Width()/2)",
-                    "=",
-                    "Player.Y()-20"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TiledUnitsBar::TiledUnitsBar::SetValue"
-                  },
-                  "parameters": [
-                    "ArrowBar",
-                    "=",
-                    "Player.ArrowsRemaining",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Multiplayer::MultiplayerObjectBehavior::IsObjectOwnedByCurrentPlayer"
-                  },
-                  "parameters": [
-                    "Player",
-                    "MultiplayerObject"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "AnimatableCapability::AnimatableBehavior::Name"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Animation",
-                    "!=",
-                    "\"Death\""
-                  ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Pick up arrows"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Distance"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Arrow",
-                        "16",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "Arrow",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "AnimatableCapability::AnimatableBehavior::Name"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            "Animation",
-                            "=",
-                            "\"Stopped\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Multiplayer::MultiplayerObjectBehavior::IsObjectOwnedByCurrentPlayer"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            "MultiplayerObject"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Delete"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetNumberObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "ArrowsRemaining",
-                            "+",
-                            "1"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PlaySound"
-                          },
-                          "parameters": [
-                            "",
-                            "PickUpArrow",
-                            "",
-                            "30",
-                            "RandomFloatInRange(0.9,1.1)"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Creating an arrow"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::And"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "MouseButtonPressed"
-                              },
-                              "parameters": [
-                                "",
-                                "Left"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                              },
-                              "parameters": [
-                                "MovementJoystick",
-                                "\"Up\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "SourisSurObjet"
-                              },
-                              "parameters": [
-                                "MovementJoystick",
-                                "",
-                                "",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                          },
-                          "parameters": [
-                            "AimingJoystick",
-                            "\"Up\""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "NumberVariable"
-                      },
-                      "parameters": [
-                        "Paused",
-                        "!=",
-                        "1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "NumberObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "ArrowsRemaining",
-                            ">",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Create"
-                          },
-                          "parameters": [
-                            "",
-                            "Arrow",
-                            "Player.X()",
-                            "Player.Y()",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ChangeColor"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            "Player.Color"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Multiplayer::MultiplayerObjectBehavior::SetPlayerObjectOwnership"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            "MultiplayerObject",
-                            "=",
-                            "Player.PlayerNumber"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetNumberObjectVariable"
-                          },
-                          "parameters": [
-                            "Player",
-                            "ArrowsRemaining",
-                            "-",
-                            "1"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Rotate the arrow"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "Multiplayer::MultiplayerObjectBehavior::IsObjectOwnedByCurrentPlayer"
-                      },
-                      "parameters": [
-                        "Arrow",
-                        "MultiplayerObject"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "AnimatableCapability::AnimatableBehavior::Name"
-                      },
-                      "parameters": [
-                        "Arrow",
-                        "Animation",
-                        "=",
-                        "\"Ready\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "NumberVariable"
-                      },
-                      "parameters": [
-                        "Paused",
-                        "!=",
-                        "1"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "MettreXY"
-                      },
-                      "parameters": [
-                        "Arrow",
-                        "=",
-                        "Player.X()",
-                        "=",
-                        "Player.Y()"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "MouseButtonPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "RotateTowardAngle"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            "Player.AngleToPosition(CursorX(), CursorY())",
-                            "0",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                          },
-                          "parameters": [
-                            "AimingJoystick",
-                            "\"Up\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "RotateTowardAngle"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            "AimingJoystick.StickAngle()",
-                            "0",
-                            ""
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Fire the arrow"
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Or"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "MouseButtonReleased"
-                              },
-                              "parameters": [
-                                "",
-                                "Left"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::And"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "inverted": true,
-                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                                  },
-                                  "parameters": [
-                                    "AimingJoystick",
-                                    "\"Up\""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "BuiltinCommonInstructions::Once"
-                                  },
-                                  "parameters": []
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "AddForceAL"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            "Arrow.Angle()",
-                            "350",
-                            "1"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                          },
-                          "parameters": [
-                            "Arrow",
-                            "Animation",
-                            "=",
-                            "\"Launched\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PlaySound"
-                          },
-                          "parameters": [
-                            "",
-                            "FireArrow",
-                            "",
-                            "35",
-                            "RandomFloatInRange(0.9,1.1)"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Kill player if hit (and stick the player to the arrow)"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CollisionNP"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Arrow",
-                        "",
-                        "",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "AnimatableCapability::AnimatableBehavior::Name"
-                      },
-                      "parameters": [
-                        "Arrow",
-                        "Animation",
-                        "=",
-                        "\"Launched\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "Multiplayer::MultiplayerObjectBehavior::IsObjectOwnedByCurrentPlayer"
-                      },
-                      "parameters": [
-                        "Arrow",
-                        "MultiplayerObject"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ActivateBehavior"
-                      },
-                      "parameters": [
-                        "Player",
-                        "PlatformerObject",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "MettreXY"
-                      },
-                      "parameters": [
-                        "Player",
-                        "=",
-                        "Arrow.BoundingBoxCenterX()",
-                        "=",
-                        "Arrow.BoundingBoxCenterY()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Sticker::Sticker::Stick"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Sticker",
-                        "Arrow",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "PlaySound"
-                      },
-                      "parameters": [
-                        "",
-                        "Death",
-                        "",
-                        "75",
-                        "0.8"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Animation",
-                        "=",
-                        "\"Death\""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Stop the arrow"
+              "comment": "Stop arrows when they hit a wall"
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -7272,6 +6662,1391 @@
   ],
   "externalEvents": [],
   "eventsFunctionsExtensions": [
+    {
+      "author": "",
+      "category": "Input",
+      "extensionNamespace": "",
+      "fullName": "Behavior Remapper",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWFscGhhLXctYm94LW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOSwxN0EyLDIgMCAwLDEgNywxNVY3SDlWMTVIMTFWOEgxM1YxNUgxNVY3SDE3VjE1QTIsMiAwIDAsMSAxNSwxN0g5TTUsM0gxOUEyLDIgMCAwLDEgMjEsNVYxOUEyLDIgMCAwLDEgMTksMjFINUEyLDIgMCAwLDEgMywxOVY1QTIsMiAwIDAsMSA1LDNNNSw1VjE5SDE5VjVINVoiIC8+PC9zdmc+",
+      "name": "BehaviorRemapper",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/alpha-w-box-outline.svg",
+      "shortDescription": "Quickly remap Behavior controls to different keys. ",
+      "version": "1.0.0",
+      "description": [
+        "Make sure to disable default controls unless you want two keys to do the same action.",
+        "",
+        "Actions have two versions. `custom` allow the movement keys to be changed to what ever you would like. `presets` provide a common key-bindings that can be selected from a list.",
+        "",
+        "### Available Presets:",
+        "",
+        "##### `WASD`",
+        "-\tW: Up",
+        "-\tA: Left",
+        "-\tS: Down",
+        "-\tD: Right",
+        "-\tSpace: Jump",
+        "",
+        "##### `ZQSD`",
+        "-\tZ: Up",
+        "-\tQ: Left",
+        "-\tS: Down",
+        "-\tD: Right",
+        "-\tSpace: Jump",
+        "",
+        "##### `Numpad` (Num lock must be disabled)",
+        "-\tNumpad Up: Up",
+        "-\tNumpad Left: Left",
+        "-\tNumpad Down: Down",
+        "-\tNumpad Right: Right",
+        "-\tNumpad Return/Enter: Jump",
+        "",
+        "##### `IJKL`",
+        "-\tI: Up",
+        "-\tJ: Left",
+        "-\tK: Down",
+        "-\tL: Right",
+        "-\tReturn/Enter: Jump",
+        ""
+      ],
+      "origin": {
+        "identifier": "BehaviorRemapper",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "remapper",
+        "key",
+        "bindings",
+        "presets",
+        "platformer",
+        "platform",
+        "top-down"
+      ],
+      "authorIds": [
+        "AlZ3D1xkH0QDao7T37VZZUeYNpn1"
+      ],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Allows for the controls of a Top-Down behavior to be re-mapped via a single action.",
+          "fullName": "Remap Top-down",
+          "name": "RemapForTopdown",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyUp()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementBehavior::SimulateUpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Topdown"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyLeft()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementBehavior::SimulateLeftKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Topdown"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyRight()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementBehavior::SimulateRightKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Topdown"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyDown()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TopDownMovementBehavior::SimulateDownKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Topdown"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "BehaviorRemapper::RemapForTopdown",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Remaps Top-Down behavior controls to a custom control scheme.",
+              "fullName": "Remap Top-Down controls to a custom scheme",
+              "functionType": "Action",
+              "name": "SetCustom",
+              "sentence": "Remap controls of _PARAM0_: Up: _PARAM2_, Left: _PARAM3_, Down: _PARAM4_, Right: _PARAM5_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"up\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"left\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"right\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"down\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "BehaviorRemapper::RemapForTopdown",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Up key",
+                  "name": "up",
+                  "type": "key"
+                },
+                {
+                  "description": "Left key",
+                  "name": "left",
+                  "type": "key"
+                },
+                {
+                  "description": "Down key",
+                  "name": "down",
+                  "type": "key"
+                },
+                {
+                  "description": "Right key",
+                  "name": "right",
+                  "type": "key"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Remaps Top-Down behavior controls to a preset control scheme.",
+              "fullName": "Remap Top-Down controls to a preset",
+              "functionType": "Action",
+              "name": "SetPreset",
+              "sentence": "Remap controls of _PARAM0_ to preset _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "QWERTY bindings"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StrEqual"
+                      },
+                      "parameters": [
+                        "GetArgumentAsString(\"options\")",
+                        "=",
+                        "\"WASD\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"w\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"a\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"s\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"d\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "AZERTY bindings"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StrEqual"
+                      },
+                      "parameters": [
+                        "GetArgumentAsString(\"options\")",
+                        "=",
+                        "\"ZQSD\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"z\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"q\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"s\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"d\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Numpad bindings"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StrEqual"
+                      },
+                      "parameters": [
+                        "GetArgumentAsString(\"options\")",
+                        "=",
+                        "\"Numpad\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadUp\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadLeft\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadDown\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadRight\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "QWERTY player 2 bindings "
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StrEqual"
+                      },
+                      "parameters": [
+                        "GetArgumentAsString(\"options\")",
+                        "=",
+                        "\"IJKL\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"i\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"j\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"k\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForTopdown::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"l\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "BehaviorRemapper::RemapForTopdown",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Preset name",
+                  "name": "options",
+                  "supplementaryInformation": "[\"WASD\",\"ZQSD\",\"Numpad\",\"IJKL\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "w",
+              "type": "String",
+              "label": "Up key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Up"
+            },
+            {
+              "value": "a",
+              "type": "String",
+              "label": "Left key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Left"
+            },
+            {
+              "value": "d",
+              "type": "String",
+              "label": "Right key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Right"
+            },
+            {
+              "value": "s",
+              "type": "String",
+              "label": "Down key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Down"
+            },
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "TopDownMovementBehavior::TopDownMovementBehavior"
+              ],
+              "name": "Topdown"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        },
+        {
+          "description": "Allows for the controls of a platformer behavior to be re-mapped via a single action.",
+          "fullName": "Remap Platformer controls",
+          "name": "RemapForPlatformer",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyUp()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateUpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Platformer"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateLadderKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Platformer"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyLeft()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateLeftKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Platformer"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyRight()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateRightKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Platformer"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyDown()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateDownKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Platformer"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateReleaseLadderKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Platformer"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Object.Behavior::PropertyJump()"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlatformBehavior::SimulateJumpKey"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Platformer"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "BehaviorRemapper::RemapForPlatformer",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Remaps Platformer behavior controls to a custom control scheme.",
+              "fullName": "Remap Platformer controls to a custom scheme",
+              "functionType": "Action",
+              "name": "SetCustom",
+              "sentence": "Remap controls of _PARAM0_: Up: _PARAM2_, Left: _PARAM3_, Down: _PARAM4_, Right: _PARAM5_, Jump: _PARAM6_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"up\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"left\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"right\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"down\")"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyJump"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsString(\"jump\")"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "BehaviorRemapper::RemapForPlatformer",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Up key",
+                  "name": "up",
+                  "type": "key"
+                },
+                {
+                  "description": "Left key",
+                  "name": "left",
+                  "type": "key"
+                },
+                {
+                  "description": "Down key",
+                  "name": "down",
+                  "type": "key"
+                },
+                {
+                  "description": "Right key",
+                  "name": "right",
+                  "type": "key"
+                },
+                {
+                  "description": "Jump key",
+                  "name": "jump",
+                  "type": "key"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Remaps Platformer behavior controls to a preset control scheme.",
+              "fullName": "Remap Platformer controls to a preset",
+              "functionType": "Action",
+              "name": "SetPreset",
+              "sentence": "Remap controls of _PARAM0_ to preset _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "QWERTY bindings"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StrEqual"
+                      },
+                      "parameters": [
+                        "GetArgumentAsString(\"options\")",
+                        "=",
+                        "\"WASD\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"w\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"a\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"s\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"d\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyJump"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Space\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "AZERTY bindings"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StrEqual"
+                      },
+                      "parameters": [
+                        "GetArgumentAsString(\"options\")",
+                        "=",
+                        "\"ZQSD\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"z\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"q\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"s\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"d\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyJump"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Space\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Numpad bindings"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StrEqual"
+                      },
+                      "parameters": [
+                        "GetArgumentAsString(\"options\")",
+                        "=",
+                        "\"Numpad\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadUp\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadLeft\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadDown\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadRight\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyJump"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"NumpadReturn\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "QWERTY player 2 bindings "
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StrEqual"
+                      },
+                      "parameters": [
+                        "GetArgumentAsString(\"options\")",
+                        "=",
+                        "\"IJKL\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyUp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"i\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyLeft"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"j\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyDown"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"k\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyRight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"l\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BehaviorRemapper::RemapForPlatformer::SetPropertyJump"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "\"Return\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "BehaviorRemapper::RemapForPlatformer",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Preset name",
+                  "name": "options",
+                  "supplementaryInformation": "[\"WASD\",\"ZQSD\",\"Numpad\",\"IJKL\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "String",
+              "label": "Up key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Up"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Left key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Left"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Down key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Down"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Right key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Right"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Jump key",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Jump"
+            },
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "PlatformBehavior::PlatformerObjectBehavior"
+              ],
+              "name": "Platformer"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        }
+      ],
+      "eventsBasedObjects": []
+    },
     {
       "author": "",
       "category": "Input",
