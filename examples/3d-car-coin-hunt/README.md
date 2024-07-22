@@ -1,1 +1,1 @@
-A top-down 3D racing game with 360° controls where players chase coins that are spread in a city.
+A top-down 3D racing game with 360° controls where players are driving through a city to collect coins.
