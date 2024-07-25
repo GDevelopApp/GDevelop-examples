@@ -177,6 +177,7 @@ const sortedStarterSlugs = new Set([
   '3d-car-coin-hunt',
   'multiplayer-platformer-arrow-fight',
   'top-down-rpg',
+  'multiplayer-jump-game',
   'multiplayer-platformer-pickup',
   'spherez',
   'multiplayer-bounce-puzzle',
