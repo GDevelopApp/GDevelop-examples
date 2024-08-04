@@ -590,7 +590,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.4789341884535306,
+        "zoomFactor": 0.8700232859857403,
         "windowMask": false
       },
       "objectsGroups": [
@@ -662,8 +662,8 @@
           "name": "Player",
           "persistentUuid": "386469df-5174-48d4-bd2b-7c45a143a091",
           "width": 0,
-          "x": 431,
-          "y": 329,
+          "x": 434,
+          "y": 345,
           "z": 160,
           "zOrder": 2,
           "numberProperties": [],
@@ -1830,6 +1830,7 @@
                 "Player",
                 "LaneCharacter",
                 "Platform",
+                "Object3D",
                 "Platform",
                 ""
               ]
@@ -2278,6 +2279,7 @@
                             "Player",
                             "LaneCharacter",
                             "Platform",
+                            "Object3D",
                             "Platform",
                             ""
                           ]
@@ -2777,6 +2779,7 @@
                             "Player",
                             "LaneCharacter",
                             "Platform",
+                            "Object3D",
                             "Platform",
                             ""
                           ]
@@ -23745,6 +23748,41 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "LanePlatformer::LaneCharacter::SetPropertyLane"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Behavior::LaneOf(Object.Object3D::CenterZ())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "LanePlatformer::LaneCharacter::SetPropertyTargetedLane"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Lane"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
                     {
@@ -24034,19 +24072,10 @@
               "sentence": "Enable _PARAM2_ on the same lane as _PARAM0_",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "OtherObject",
                   "conditions": [],
                   "actions": [
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "MinZ",
-                        "=",
-                        "-LaneDepth / 2 + LaneDepth * Lane"
-                      ]
-                    },
                     {
                       "type": {
                         "value": "ActivateBehavior"
@@ -24064,24 +24093,14 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "Scene3D::Base3DBehavior::Z"
+                            "value": "LanePlatformer::LaneCharacter::IsObjectOnSameLane"
                           },
                           "parameters": [
+                            "Object",
+                            "Behavior",
                             "OtherObject",
                             "Object3D",
-                            ">=",
-                            "MinZ"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Scene3D::Base3DBehavior::Z"
-                          },
-                          "parameters": [
-                            "OtherObject",
-                            "Object3D",
-                            "<",
-                            "MinZ + LaneDepth"
+                            ""
                           ]
                         }
                       ],
@@ -24097,14 +24116,6 @@
                           ]
                         }
                       ]
-                    }
-                  ],
-                  "variables": [
-                    {
-                      "folded": true,
-                      "name": "MinZ",
-                      "type": "number",
-                      "value": 0
                     }
                   ]
                 }
@@ -24125,8 +24136,13 @@
                 {
                   "description": "Platform",
                   "name": "OtherObject",
-                  "supplementaryInformation": "Scene3D::Cube3DObject",
                   "type": "objectList"
+                },
+                {
+                  "description": "3D capability",
+                  "name": "Object3D",
+                  "supplementaryInformation": "Scene3D::Base3DBehavior",
+                  "type": "behavior"
                 },
                 {
                   "description": "Platform",
@@ -24142,68 +24158,33 @@
               "functionType": "Condition",
               "name": "IsObjectOnSameLane",
               "private": true,
-              "sentence": "_PARAM2_ on the same lane as _PARAM0_",
+              "sentence": "_PARAM0_ on the same lane as _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LanePlatformer::LaneCharacter::LaneOf"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Lane",
+                        "OtherObject.Object3D::CenterZ()",
+                        "Object3D"
+                      ]
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
-                        "value": "SetNumberVariable"
+                        "value": "SetReturnBoolean"
                       },
                       "parameters": [
-                        "MinZ",
-                        "=",
-                        "LaneDepth * (Lane - 0.5)"
+                        "True"
                       ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Scene3D::Base3DBehavior::CenterZ"
-                          },
-                          "parameters": [
-                            "OtherObject",
-                            "Object3D",
-                            ">=",
-                            "MinZ"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Scene3D::Base3DBehavior::CenterZ"
-                          },
-                          "parameters": [
-                            "OtherObject",
-                            "Object3D",
-                            "<",
-                            "MinZ + LaneDepth"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetReturnBoolean"
-                          },
-                          "parameters": [
-                            "True"
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "variables": [
-                    {
-                      "folded": true,
-                      "name": "MinZ",
-                      "type": "number",
-                      "value": 0
                     }
                   ]
                 }
@@ -24224,8 +24205,59 @@
                 {
                   "description": "Other object",
                   "name": "OtherObject",
-                  "supplementaryInformation": "Scene3D::Model3DObject",
                   "type": "objectList"
+                },
+                {
+                  "description": "3D capability",
+                  "name": "Object3D",
+                  "supplementaryInformation": "Scene3D::Base3DBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Lane of object",
+              "functionType": "ExpressionAndCondition",
+              "name": "LaneOf",
+              "private": true,
+              "sentence": "the lane of _PARAM2_ according to configuration",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "round(CenterZ / LaneDepth)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "LanePlatformer::LaneCharacter",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Center Z",
+                  "name": "CenterZ",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -24234,7 +24266,6 @@
               "description": "the lane of the object.",
               "fullName": "Lane",
               "functionType": "ExpressionAndCondition",
-              "group": "Lane platformer character",
               "name": "Lane",
               "sentence": "the lane",
               "events": [
@@ -24440,7 +24471,6 @@
               "description": "Check if has changed of lane.",
               "fullName": "Has changed of lane",
               "functionType": "Condition",
-              "group": "Lane platformer character configuration",
               "name": "HasChangedOfLane",
               "sentence": "_PARAM0_ has changed of lane",
               "events": [
@@ -24868,6 +24898,7 @@
                         "Character",
                         "LaneCharacter",
                         "Object",
+                        "Object3D",
                         ""
                       ]
                     }
