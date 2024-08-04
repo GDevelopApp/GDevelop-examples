@@ -23989,6 +23989,41 @@
                       ]
                     }
                   ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "LanePlatformer::LaneCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "This is done after the events that handles player controls :\n- to avoid a 1-frame delay"
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -24027,35 +24062,12 @@
                         "\"Move\"",
                         "TargetedLane * LaneDepth",
                         "\"linear\"",
-                        "0.3",
+                        "LaneChangeDuration",
                         ""
                       ]
                     }
                   ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Scene3D::Model3DObject",
-                  "type": "object"
                 },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "LanePlatformer::LaneCharacter",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "",
-              "functionType": "Action",
-              "name": "doStepPostEvents",
-              "sentence": "",
-              "events": [
                 {
                   "type": "BuiltinCommonInstructions::Comment",
                   "color": {
@@ -24066,41 +24078,71 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "Avoid to cut animation when players move from 2 lanes in a row."
+                  "comment": "- to avoid to cut animation when players move from 2 lanes in a row"
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
-                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                        "value": "AnimatableCapability::AnimatableBehavior::Name"
                       },
                       "parameters": [
-                        "Lane",
-                        "=",
-                        "TargetedLane"
+                        "Object",
+                        "Animation",
+                        "startsWith",
+                        "\"Run\""
                       ]
-                    },
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
                           "type": {
-                            "value": "AnimatableCapability::AnimatableBehavior::Name"
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "Lane",
+                            "=",
+                            "TargetedLane"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
                           },
                           "parameters": [
                             "Object",
                             "Animation",
                             "=",
-                            "\"RunLeft\""
+                            "\"Run\""
                           ]
-                        },
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
                           "type": {
-                            "value": "AnimatableCapability::AnimatableBehavior::Name"
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "Lane",
+                            "<",
+                            "TargetedLane"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
                           },
                           "parameters": [
                             "Object",
@@ -24110,18 +24152,33 @@
                           ]
                         }
                       ]
-                    }
-                  ],
-                  "actions": [
+                    },
                     {
-                      "type": {
-                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Animation",
-                        "=",
-                        "\"Run\""
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "Lane",
+                            ">",
+                            "TargetedLane"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Animation",
+                            "=",
+                            "\"RunLeft\""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -24378,17 +24435,6 @@
                         "-",
                         "1"
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Animation",
-                        "=",
-                        "\"RunLeft\""
-                      ]
                     }
                   ]
                 }
@@ -24449,17 +24495,6 @@
                         "Behavior",
                         "+",
                         "1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Animation",
-                        "=",
-                        "\"RunRight\""
                       ]
                     }
                   ]
@@ -24603,6 +24638,16 @@
               "group": "",
               "extraInformation": [],
               "name": "LaneMax"
+            },
+            {
+              "value": "0.3",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Lane change duration",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "LaneChangeDuration"
             }
           ],
           "sharedPropertyDescriptors": []
@@ -24613,6 +24658,58 @@
           "name": "SmoothCameraZ",
           "objectType": "Scene3D::Model3DObject",
           "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "ln((1 - speed)) = ln(1 / 2) / halfwatTime"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "LanePlatformer::SmoothCameraZ::SetPropertyTranslationZLogSpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "log(0.5) / TranslationZHalfwayDuration"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "LanePlatformer::SmoothCameraZ",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
             {
               "fullName": "",
               "functionType": "Action",
@@ -24642,18 +24739,6 @@
                     }
                   ],
                   "actions": [
-                    {
-                      "type": {
-                        "value": "SetCameraCenterX"
-                      },
-                      "parameters": [
-                        "",
-                        "=",
-                        "Object.CenterX() + OffsetX + XFromAngleAndDistance(ElevationAngle + 180, Distance)",
-                        "",
-                        ""
-                      ]
-                    },
                     {
                       "type": {
                         "value": "SetCameraCenterY"
@@ -24727,7 +24812,7 @@
                       "parameters": [
                         "",
                         "=",
-                        "lerp(Scene3D::CameraZ(), Object.Object3D::CenterZ(), 0.05 * 60 * TimeDelta())",
+                        "Object.Object3D::CenterZ() + (Scene3D::CameraZ() - Object.Object3D::CenterZ()) * exp(TimeDelta() * TranslationZLogSpeed)",
                         "",
                         ""
                       ]
@@ -24804,6 +24889,26 @@
               "group": "",
               "extraInformation": [],
               "name": "ElevationAngle"
+            },
+            {
+              "value": "0.125",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Halfway time on Z axis",
+              "description": "",
+              "group": "Catch-up speed",
+              "extraInformation": [],
+              "name": "TranslationZHalfwayDuration"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "TranslationZLogSpeed"
             }
           ],
           "sharedPropertyDescriptors": []
