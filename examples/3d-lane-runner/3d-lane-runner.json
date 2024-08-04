@@ -580,15 +580,15 @@
   ],
   "layouts": [
     {
-      "b": 223,
+      "b": 182,
       "disableInputWhenNotFocused": true,
       "mangledName": "Game",
       "name": "Game",
-      "r": 226,
+      "r": 182,
       "standardSortMethod": true,
       "stopSoundsOnStartup": false,
       "title": "",
-      "v": 226,
+      "v": 182,
       "uiSettings": {
         "grid": true,
         "gridType": "rectangular",
@@ -604,7 +604,7 @@
       },
       "objectsGroups": [
         {
-          "name": "Platforms",
+          "name": "Platform",
           "objects": [
             {
               "name": "Ground"
@@ -626,7 +626,7 @@
           ]
         },
         {
-          "name": "AllObjects",
+          "name": "LevelElement",
           "objects": [
             {
               "name": "Ground"
@@ -644,18 +644,6 @@
         }
       ],
       "variables": [
-        {
-          "folded": true,
-          "name": "Randomizer",
-          "type": "number",
-          "value": 0
-        },
-        {
-          "folded": true,
-          "name": "RisingPitch",
-          "type": "number",
-          "value": 0.8
-        },
         {
           "name": "Coins",
           "type": "number",
@@ -1302,20 +1290,7 @@
           "assetStoreId": "54b38ee3a7082557b70bfd9a5c139b4ed7327c9f1fd846c861b8d45970a2b127",
           "name": "Player",
           "type": "Scene3D::Model3DObject",
-          "variables": [
-            {
-              "folded": true,
-              "name": "Lane",
-              "type": "number",
-              "value": 1
-            },
-            {
-              "folded": true,
-              "name": "TargetedLane",
-              "type": "number",
-              "value": 1
-            }
-          ],
+          "variables": [],
           "effects": [],
           "behaviors": [
             {
@@ -1489,14 +1464,7 @@
           "assetStoreId": "",
           "name": "Ground",
           "type": "Scene3D::Cube3DObject",
-          "variables": [
-            {
-              "folded": true,
-              "name": "Lane",
-              "type": "number",
-              "value": 0
-            }
-          ],
+          "variables": [],
           "effects": [],
           "behaviors": [
             {
@@ -1539,14 +1507,7 @@
           "assetStoreId": "",
           "name": "GroundElevated",
           "type": "Scene3D::Cube3DObject",
-          "variables": [
-            {
-              "folded": true,
-              "name": "Lane",
-              "type": "number",
-              "value": 0
-            }
-          ],
+          "variables": [],
           "effects": [],
           "behaviors": [
             {
@@ -1589,16 +1550,14 @@
           "assetStoreId": "e3f504ba9b05bd7bbb1e24348772eb7d4509175e93fe55f3f1c39e4f3903967c",
           "name": "SpikeGroup",
           "type": "Scene3D::Model3DObject",
-          "variables": [
+          "variables": [],
+          "effects": [],
+          "behaviors": [
             {
-              "folded": true,
-              "name": "Lane",
-              "type": "number",
-              "value": 0
+              "name": "LaneObject",
+              "type": "LanePlatformer::LaneObject"
             }
           ],
-          "effects": [],
-          "behaviors": [],
           "content": {
             "centerLocation": "ObjectCenter",
             "depth": 99,
@@ -1618,19 +1577,16 @@
           "assetStoreId": "b8200f0619b25c76e3d392f1d0d16d7547bf1c96097bc23af81b68cf11e57677",
           "name": "Coin",
           "type": "Scene3D::Model3DObject",
-          "variables": [
-            {
-              "folded": true,
-              "name": "Lane",
-              "type": "number",
-              "value": 0
-            }
-          ],
+          "variables": [],
           "effects": [],
           "behaviors": [
             {
               "name": "Collectible",
               "type": "Collectible::Collectible"
+            },
+            {
+              "name": "LaneObject",
+              "type": "LanePlatformer::LaneObject"
             }
           ],
           "content": {
@@ -1779,7 +1735,7 @@
           "areaMinY": 0,
           "areaMinZ": 0,
           "assetStoreId": "",
-          "name": "CoinPickUp",
+          "name": "CoinExplosion",
           "type": "ParticleEmitter3D::ParticleEmitter3D",
           "variables": [],
           "effects": [],
@@ -1932,7 +1888,7 @@
             "objectName": "Coin"
           },
           {
-            "objectName": "CoinPickUp"
+            "objectName": "CoinExplosion"
           }
         ]
       },
@@ -2008,7 +1964,7 @@
               "parameters": [
                 "Player",
                 "LaneCharacter",
-                "Platforms",
+                "Platform",
                 "Platform",
                 ""
               ]
@@ -2456,7 +2412,7 @@
                           "parameters": [
                             "Player",
                             "LaneCharacter",
-                            "Platforms",
+                            "Platform",
                             "Platform",
                             ""
                           ]
@@ -2492,13 +2448,14 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "NumberObjectVariable"
+                            "value": "LanePlatformer::LaneObject::IsObjectOnSameLane"
                           },
                           "parameters": [
                             "Coin",
-                            "Lane",
-                            "=",
-                            "Player.LaneCharacter::Lane()"
+                            "LaneObject",
+                            "Player",
+                            "LaneCharacter",
+                            ""
                           ]
                         },
                         {
@@ -2551,7 +2508,7 @@
                           },
                           "parameters": [
                             "",
-                            "CoinPickUp",
+                            "CoinExplosion",
                             "Coin.CenterX()",
                             "Coin.CenterY()",
                             ""
@@ -2562,7 +2519,7 @@
                             "value": "ParticleEmitter3D::ParticleEmitter3D::SetZ"
                           },
                           "parameters": [
-                            "CoinPickUp",
+                            "CoinExplosion",
                             "=",
                             "Coin.Object3D::CenterZ()",
                             ""
@@ -2647,13 +2604,14 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "NumberObjectVariable"
+                            "value": "LanePlatformer::LaneObject::IsObjectOnSameLane"
                           },
                           "parameters": [
                             "SpikeGroup",
-                            "Lane",
-                            "=",
-                            "Player.LaneCharacter::Lane()"
+                            "LaneObject",
+                            "Player",
+                            "LaneCharacter",
+                            ""
                           ]
                         },
                         {
@@ -2953,7 +2911,7 @@
                           "parameters": [
                             "Player",
                             "LaneCharacter",
-                            "Platforms",
+                            "Platform",
                             "Platform",
                             ""
                           ]
@@ -2984,7 +2942,7 @@
                     "value": "PosX"
                   },
                   "parameters": [
-                    "AllObjects",
+                    "LevelElement",
                     "<",
                     "Player.X() - 1060"
                   ]
@@ -2996,7 +2954,7 @@
                     "value": "Delete"
                   },
                   "parameters": [
-                    "AllObjects",
+                    "LevelElement",
                     ""
                   ]
                 }
@@ -3115,6 +3073,10 @@
         {
           "name": "LaneCharacter",
           "type": "LanePlatformer::LaneCharacter"
+        },
+        {
+          "name": "LaneObject",
+          "type": "LanePlatformer::LaneObject"
         },
         {
           "name": "Object3D",
@@ -24311,6 +24273,99 @@
               "objectGroups": []
             },
             {
+              "fullName": "Is on same lane",
+              "functionType": "Condition",
+              "name": "IsObjectOnSameLane",
+              "private": true,
+              "sentence": "_PARAM2_ on the same lane as _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "MinZ",
+                        "=",
+                        "LaneDepth * (Lane - 0.5)"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::CenterZ"
+                          },
+                          "parameters": [
+                            "OtherObject",
+                            "Object3D",
+                            ">=",
+                            "MinZ"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::CenterZ"
+                          },
+                          "parameters": [
+                            "OtherObject",
+                            "Object3D",
+                            "<",
+                            "MinZ + LaneDepth"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetReturnBoolean"
+                          },
+                          "parameters": [
+                            "True"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "folded": true,
+                      "name": "MinZ",
+                      "type": "number",
+                      "value": 0
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "LanePlatformer::LaneCharacter",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Other object",
+                  "name": "OtherObject",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "the lane of the object.",
               "fullName": "Lane",
               "functionType": "ExpressionAndCondition",
@@ -24912,6 +24967,89 @@
             }
           ],
           "sharedPropertyDescriptors": []
+        },
+        {
+          "description": "",
+          "fullName": "",
+          "name": "LaneObject",
+          "objectType": "Scene3D::Model3DObject",
+          "eventsFunctions": [
+            {
+              "fullName": "Is on same lane",
+              "functionType": "Condition",
+              "name": "IsObjectOnSameLane",
+              "sentence": "_PARAM0_ on the same lane as _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "This behavior only allow to pick the objects where the one from LaneCharacter only pick the characters."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "LanePlatformer::LaneCharacter::IsObjectOnSameLane"
+                      },
+                      "parameters": [
+                        "Character",
+                        "LaneCharacter",
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "LanePlatformer::LaneObject",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Character",
+                  "name": "Character",
+                  "supplementaryInformation": "Scene3D::Model3DObject",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Lane platformer character",
+                  "name": "LaneCharacter",
+                  "supplementaryInformation": "LanePlatformer::LaneCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [],
+          "sharedPropertyDescriptors": []
         }
       ],
       "eventsBasedObjects": []
@@ -25371,7 +25509,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": true,
-        "zoomFactor": 0.4633111824513984,
+        "zoomFactor": 0.6672773998329988,
         "windowMask": false
       }
     },
