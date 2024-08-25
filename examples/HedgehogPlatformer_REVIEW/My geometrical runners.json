@@ -3296,7 +3296,7 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::OnFloor"
+                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::IsOnFloor"
                   },
                   "parameters": [
                     "Players",
@@ -3373,7 +3373,7 @@
                 {
                   "type": {
                     "inverted": true,
-                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::OnFloor"
+                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::IsOnFloor"
                   },
                   "parameters": [
                     "Players",
@@ -6206,7 +6206,7 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::OnFloor"
+                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::IsOnFloor"
                   },
                   "parameters": [
                     "Players",
@@ -6283,7 +6283,7 @@
                 {
                   "type": {
                     "inverted": true,
-                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::OnFloor"
+                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::IsOnFloor"
                   },
                   "parameters": [
                     "Players",
@@ -13611,6 +13611,12 @@
           "name": "TimeDelta",
           "type": "number",
           "value": 1
+        },
+        {
+          "folded": true,
+          "name": "SightRadius",
+          "type": "number",
+          "value": 0
         }
       ],
       "eventsFunctions": [
@@ -14595,13 +14601,12 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySightRadius"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "SightRadius",
                         "=",
-                        "max(TimeDelta * abs(Speed) + Object.Behavior::GroundSnappingDistanceMax(), TimeDelta * (abs(SpeedX) + abs(SpeedY)))"
+                        "max(TimeDelta * abs(GroundSpeed) + Object.Behavior::GroundSnappingDistanceMax(), TimeDelta * (abs(SpeedX) + abs(SpeedY)))"
                       ]
                     },
                     {
@@ -14617,11 +14622,10 @@
                     },
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySightRadius"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "SightRadius",
                         "+",
                         "Width + Height"
                       ]
@@ -14875,7 +14879,7 @@
                           },
                           "parameters": [
                             "",
-                            "FloorAngle",
+                            "GroundAngle",
                             "0",
                             "SlopeFactorAngle",
                             ""
@@ -14892,22 +14896,22 @@
                                 "value": "BuiltinCommonInstructions::CompareNumbers"
                               },
                               "parameters": [
-                                "sign(FloorAngle)",
+                                "sign(GroundAngle)",
                                 "=",
-                                "sign(Speed)"
+                                "sign(GroundSpeed)"
                               ]
                             }
                           ],
                           "actions": [
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "clamp(Speed + ((DownSlopeFactor * sin(ToRad(FloorAngle))) * TimeDelta), -MaxSpeed, MaxSpeed)"
+                                "clamp(GroundSpeed + ((DownSlopeFactor * sin(ToRad(GroundAngle))) * TimeDelta), -MaxSpeed, MaxSpeed)"
                               ]
                             }
                           ]
@@ -14920,22 +14924,22 @@
                                 "value": "BuiltinCommonInstructions::CompareNumbers"
                               },
                               "parameters": [
-                                "sign(FloorAngle)",
+                                "sign(GroundAngle)",
                                 "!=",
-                                "sign(Speed)"
+                                "sign(GroundSpeed)"
                               ]
                             }
                           ],
                           "actions": [
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "clamp(Speed + ((UpSlopeFactor * sin(ToRad(FloorAngle))) * TimeDelta), -MaxSpeed, MaxSpeed)"
+                                "clamp(GroundSpeed + ((UpSlopeFactor * sin(ToRad(GroundAngle))) * TimeDelta), -MaxSpeed, MaxSpeed)"
                               ]
                             }
                           ]
@@ -15100,7 +15104,7 @@
                             "Object",
                             "Behavior",
                             "+",
-                            "JumpSpeed * sin(ToRad(FloorAngle))"
+                            "JumpSpeed * sin(ToRad(GroundAngle))"
                           ]
                         },
                         {
@@ -15111,7 +15115,7 @@
                             "Object",
                             "Behavior",
                             "-",
-                            "JumpSpeed * cos(ToRad(FloorAngle))"
+                            "JumpSpeed * cos(ToRad(GroundAngle))"
                           ]
                         },
                         {
@@ -15158,7 +15162,7 @@
                         },
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyFloorAngle"
+                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundAngle"
                           },
                           "parameters": [
                             "Object",
@@ -15169,7 +15173,7 @@
                         },
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyHasExtraJump"
+                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyCanJump"
                           },
                           "parameters": [
                             "Object",
@@ -15306,7 +15310,7 @@
                             },
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
@@ -15319,13 +15323,13 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "max(-TopSpeed, Speed - (Acceleration * TimeDelta))"
+                                "max(-TopSpeed, GroundSpeed - (Acceleration * TimeDelta))"
                               ]
                             }
                           ]
@@ -15346,7 +15350,7 @@
                             },
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
@@ -15359,13 +15363,13 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "min(TopSpeed, Speed + (Acceleration * TimeDelta))"
+                                "min(TopSpeed, GroundSpeed + (Acceleration * TimeDelta))"
                               ]
                             }
                           ]
@@ -15415,7 +15419,7 @@
                           },
                           "parameters": [
                             "",
-                            "FloorAngle",
+                            "GroundAngle",
                             "0",
                             "SlopeFactorAngle",
                             ""
@@ -15434,13 +15438,13 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                           },
                           "parameters": [
                             "Object",
                             "Behavior",
                             "=",
-                            "Speed - ((Friction * sign(Speed)) * TimeDelta)"
+                            "GroundSpeed - ((Friction * sign(GroundSpeed)) * TimeDelta)"
                           ]
                         }
                       ],
@@ -15453,7 +15457,7 @@
                                 "value": "BuiltinCommonInstructions::CompareNumbers"
                               },
                               "parameters": [
-                                "abs(Speed)",
+                                "abs(GroundSpeed)",
                                 "<",
                                 "Friction * TimeDelta"
                               ]
@@ -15462,7 +15466,7 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
@@ -15493,13 +15497,13 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                           },
                           "parameters": [
                             "Object",
                             "Behavior",
                             "=",
-                            "clamp(Speed, -MaxSpeed, MaxSpeed)"
+                            "clamp(GroundSpeed, -MaxSpeed, MaxSpeed)"
                           ]
                         }
                       ]
@@ -15549,7 +15553,7 @@
                           "parameters": [
                             "CosA",
                             "=",
-                            "cos(ToRad(FloorAngle))"
+                            "cos(ToRad(GroundAngle))"
                           ]
                         },
                         {
@@ -15559,7 +15563,7 @@
                           "parameters": [
                             "SinA",
                             "=",
-                            "sin(ToRad(FloorAngle))"
+                            "sin(ToRad(GroundAngle))"
                           ]
                         },
                         {
@@ -15569,7 +15573,7 @@
                           "parameters": [
                             "MovementLength",
                             "=",
-                            "abs((OldSpeed + Speed) / 2 * TimeDelta)"
+                            "abs((OldSpeed + GroundSpeed) / 2 * TimeDelta)"
                           ]
                         }
                       ],
@@ -15591,7 +15595,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
@@ -15651,7 +15655,7 @@
                             },
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
@@ -15701,7 +15705,7 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
@@ -15761,7 +15765,7 @@
                             },
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
@@ -15897,7 +15901,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "Speed * cos(ToRad(FloorAngle))"
+                                "GroundSpeed * cos(ToRad(GroundAngle))"
                               ]
                             },
                             {
@@ -15908,7 +15912,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "Speed * sin(ToRad(FloorAngle))"
+                                "GroundSpeed * sin(ToRad(GroundAngle))"
                               ]
                             }
                           ]
@@ -16108,7 +16112,7 @@
                               "actions": [
                                 {
                                   "type": {
-                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyFloorAngle"
+                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundAngle"
                                   },
                                   "parameters": [
                                     "Object",
@@ -16307,7 +16311,7 @@
                                     "value": "DebuggerTools::ConsoleLog"
                                   },
                                   "parameters": [
-                                    "\"Floor distance: \" + DistanceMin + \" angle: \" + FloorAngle",
+                                    "\"Floor distance: \" + DistanceMin + \" angle: \" + GroundAngle",
                                     "\"info\"",
                                     ""
                                   ]
@@ -16419,7 +16423,7 @@
                                 },
                                 {
                                   "type": {
-                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyFloorAngle"
+                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundAngle"
                                   },
                                   "parameters": [
                                     "Object",
@@ -16515,7 +16519,7 @@
                               },
                               "parameters": [
                                 "",
-                                "FloorAngle",
+                                "GroundAngle",
                                 "0",
                                 "SlopeFactorAngle",
                                 ""
@@ -16525,13 +16529,13 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                               },
                               "parameters": [
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "clamp(Speed, -MaxSpeed, MaxSpeed)"
+                                "clamp(GroundSpeed, -MaxSpeed, MaxSpeed)"
                               ]
                             }
                           ]
@@ -16615,7 +16619,7 @@
                               },
                               "parameters": [
                                 "",
-                                "FloorAngle",
+                                "GroundAngle",
                                 "0",
                                 "SlopeFactorAngle + (UnattachMinAngle / 2)",
                                 ""
@@ -16648,7 +16652,7 @@
                                         "value": "BuiltinCommonInstructions::CompareNumbers"
                                       },
                                       "parameters": [
-                                        "abs(Speed)",
+                                        "abs(GroundSpeed)",
                                         "<=",
                                         "UnattachMinSpeed"
                                       ]
@@ -16676,7 +16680,7 @@
                                         "value": "BuiltinCommonInstructions::CompareNumbers"
                                       },
                                       "parameters": [
-                                        "abs(Speed)",
+                                        "abs(GroundSpeed)",
                                         ">",
                                         "abs(UnattachMinSpeed)"
                                       ]
@@ -16722,7 +16726,7 @@
                               },
                               "parameters": [
                                 "",
-                                "FloorAngle",
+                                "GroundAngle",
                                 "0",
                                 "UnattachMinAngle",
                                 ""
@@ -16755,7 +16759,7 @@
                                         "value": "BuiltinCommonInstructions::CompareNumbers"
                                       },
                                       "parameters": [
-                                        "abs(Speed)",
+                                        "abs(GroundSpeed)",
                                         "<=",
                                         "UnattachMinSpeed"
                                       ]
@@ -16783,7 +16787,7 @@
                                         "value": "BuiltinCommonInstructions::CompareNumbers"
                                       },
                                       "parameters": [
-                                        "abs(Speed)",
+                                        "abs(GroundSpeed)",
                                         ">",
                                         "abs(UnattachMinSpeed)"
                                       ]
@@ -16816,7 +16820,7 @@
                             },
                             {
                               "type": {
-                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyFloorAngle"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundAngle"
                               },
                               "parameters": [
                                 "Object",
@@ -17026,7 +17030,7 @@
                         },
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyHasExtraJump"
+                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyCanJump"
                           },
                           "parameters": [
                             "Object",
@@ -17037,7 +17041,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyFloorAngle"
+                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundAngle"
                           },
                           "parameters": [
                             "Object",
@@ -17054,7 +17058,7 @@
                             "Object",
                             "Behavior",
                             "+",
-                            "JumpSpeed * sin(ToRad(FloorAngle))"
+                            "JumpSpeed * sin(ToRad(GroundAngle))"
                           ]
                         },
                         {
@@ -17065,7 +17069,7 @@
                             "Object",
                             "Behavior",
                             "-",
-                            "JumpSpeed * cos(ToRad(FloorAngle))"
+                            "JumpSpeed * cos(ToRad(GroundAngle))"
                           ]
                         },
                         {
@@ -17092,7 +17096,7 @@
                         },
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyHasExtraJump"
+                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyCanJump"
                           },
                           "parameters": [
                             "Object",
@@ -17350,7 +17354,7 @@
                             "value": "BuiltinCommonInstructions::CompareNumbers"
                           },
                           "parameters": [
-                            "abs(FloorAngle)",
+                            "abs(GroundAngle)",
                             "<",
                             "SlopeFactorAngle"
                           ]
@@ -17938,7 +17942,7 @@
                                 },
                                 {
                                   "type": {
-                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyFloorAngle"
+                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundAngle"
                                   },
                                   "parameters": [
                                     "Object",
@@ -17958,7 +17962,7 @@
                                         "value": "DebuggerTools::ConsoleLog"
                                       },
                                       "parameters": [
-                                        "\"-> GROUND landing angle: \" + FloorAngle",
+                                        "\"-> GROUND landing angle: \" + GroundAngle",
                                         "\"info\"",
                                         ""
                                       ]
@@ -17986,7 +17990,7 @@
                                       },
                                       "parameters": [
                                         "",
-                                        "FloorAngle",
+                                        "GroundAngle",
                                         "0",
                                         "22.5",
                                         ""
@@ -17996,7 +18000,7 @@
                                   "actions": [
                                     {
                                       "type": {
-                                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                                       },
                                       "parameters": [
                                         "Object",
@@ -18028,7 +18032,7 @@
                                       },
                                       "parameters": [
                                         "",
-                                        "FloorAngle",
+                                        "GroundAngle",
                                         "0",
                                         "45",
                                         ""
@@ -18041,7 +18045,7 @@
                                       },
                                       "parameters": [
                                         "",
-                                        "FloorAngle",
+                                        "GroundAngle",
                                         "0",
                                         "22.5",
                                         ""
@@ -18067,7 +18071,7 @@
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                                           },
                                           "parameters": [
                                             "Object",
@@ -18095,13 +18099,13 @@
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                                           },
                                           "parameters": [
                                             "Object",
                                             "Behavior",
                                             "=",
-                                            "(SpeedY * 0.5) * sign(sin(ToRad(FloorAngle)))"
+                                            "(SpeedY * 0.5) * sign(sin(ToRad(GroundAngle)))"
                                           ]
                                         }
                                       ]
@@ -18130,7 +18134,7 @@
                                       },
                                       "parameters": [
                                         "",
-                                        "FloorAngle",
+                                        "GroundAngle",
                                         "0",
                                         "45",
                                         ""
@@ -18156,7 +18160,7 @@
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                                           },
                                           "parameters": [
                                             "Object",
@@ -18184,13 +18188,13 @@
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                                           },
                                           "parameters": [
                                             "Object",
                                             "Behavior",
                                             "=",
-                                            "(SpeedY * 1) * sign(sin(ToRad(FloorAngle)))"
+                                            "(SpeedY * 1) * sign(sin(ToRad(GroundAngle)))"
                                           ]
                                         }
                                       ]
@@ -18609,7 +18613,7 @@
                                             },
                                             {
                                               "type": {
-                                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyFloorAngle"
+                                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundAngle"
                                               },
                                               "parameters": [
                                                 "Object",
@@ -18620,13 +18624,13 @@
                                             },
                                             {
                                               "type": {
-                                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                                               },
                                               "parameters": [
                                                 "Object",
                                                 "Behavior",
                                                 "=",
-                                                "SpeedY * sign(sin(ToRad(FloorAngle)))"
+                                                "SpeedY * sign(sin(ToRad(GroundAngle)))"
                                               ]
                                             }
                                           ],
@@ -18640,7 +18644,7 @@
                                                     "value": "DebuggerTools::ConsoleLog"
                                                   },
                                                   "parameters": [
-                                                    "\"-> GROUND landing angle: \" + FloorAngle",
+                                                    "\"-> GROUND landing angle: \" + GroundAngle",
                                                     "\"info\"",
                                                     ""
                                                   ]
@@ -18748,7 +18752,7 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "Speed"
+                        "GroundSpeed"
                       ]
                     },
                     {
@@ -18898,7 +18902,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "(abs(Speed) + FloorMagnet) * TimeDelta"
+                        "(abs(GroundSpeed) + FloorMagnet) * TimeDelta"
                       ]
                     }
                   ]
@@ -19093,64 +19097,12 @@
               "fullName": "Is on floor",
               "functionType": "Condition",
               "group": "Hedgehog state",
-              "name": "OnFloor",
+              "name": "IsOnFloor",
               "sentence": "_PARAM0_ is grounded (Precise check? _PARAM2_)",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
-                    {
-                      "type": {
-                        "value": "GetArgumentAsBoolean"
-                      },
-                      "parameters": [
-                        "\"Precise\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnBoolean"
-                      },
-                      "parameters": [
-                        "True"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "GetArgumentAsBoolean"
-                      },
-                      "parameters": [
-                        "\"Precise\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyOnFloorTime"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ">",
-                        "2"
-                      ]
-                    },
                     {
                       "type": {
                         "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
@@ -19514,7 +19466,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "FloorAngle"
+                        "GroundAngle"
                       ]
                     }
                   ]
@@ -19639,7 +19591,7 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyHasExtraJump"
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyCanJump"
                       },
                       "parameters": [
                         "Object",
@@ -19689,7 +19641,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyHasExtraJump"
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyCanJump"
                       },
                       "parameters": [
                         "Object",
@@ -19730,7 +19682,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyHasExtraJump"
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyCanJump"
                       },
                       "parameters": [
                         "Object",
@@ -20654,13 +20606,13 @@
                     },
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
                         "=",
-                        "min(MaxSpeed, Speed)"
+                        "min(MaxSpeed, GroundSpeed)"
                       ]
                     }
                   ]
@@ -21704,7 +21656,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Speed"
+                        "GroundSpeed"
                       ]
                     }
                   ]
@@ -21744,7 +21696,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                       },
                       "parameters": [
                         "Object",
@@ -21755,13 +21707,13 @@
                     },
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeed"
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyGroundSpeed"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
                         "=",
-                        "min(MaxSpeed, Speed)"
+                        "min(MaxSpeed, GroundSpeed)"
                       ]
                     }
                   ]
@@ -22640,7 +22592,7 @@
                       "parameters": [
                         "CosA",
                         "=",
-                        "cos(ToRad(FloorAngle))"
+                        "cos(ToRad(GroundAngle))"
                       ]
                     },
                     {
@@ -22650,7 +22602,7 @@
                       "parameters": [
                         "SinA",
                         "=",
-                        "sin(ToRad(FloorAngle))"
+                        "sin(ToRad(GroundAngle))"
                       ]
                     },
                     {
@@ -23632,7 +23584,18 @@
               "group": "",
               "extraInformation": [],
               "hidden": true,
-              "name": "Speed"
+              "name": "GroundSpeed"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Ground angle",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "GroundAngle"
             },
             {
               "value": "0",
@@ -23677,17 +23640,6 @@
               "extraInformation": [],
               "hidden": true,
               "name": "OldSpeedY"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "unit": "DegreeAngle",
-              "label": "Floor angle",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "FloorAngle"
             },
             {
               "value": "0",
@@ -23757,7 +23709,7 @@
               "group": "",
               "extraInformation": [],
               "hidden": true,
-              "name": "HasExtraJump"
+              "name": "CanJump"
             },
             {
               "value": "",
@@ -23792,6 +23744,17 @@
             {
               "value": "0",
               "type": "Number",
+              "unit": "Second",
+              "label": "",
+              "description": "The control lock timer when slipping",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "SlipTimer"
+            },
+            {
+              "value": "0",
+              "type": "Number",
               "unit": "Pixel",
               "label": "",
               "description": "Used in the \"IsMoving\" condition",
@@ -23814,17 +23777,6 @@
             {
               "value": "0",
               "type": "Number",
-              "unit": "Second",
-              "label": "",
-              "description": "The control lock timer when slipping",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "SlipTimer"
-            },
-            {
-              "value": "0",
-              "type": "Number",
               "unit": "PixelSpeed",
               "label": "",
               "description": "",
@@ -23832,17 +23784,6 @@
               "extraInformation": [],
               "hidden": true,
               "name": "OldSpeed"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "unit": "Pixel",
-              "label": "",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "SightRadius"
             },
             {
               "value": "",
