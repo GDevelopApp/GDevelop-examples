@@ -3705,6 +3705,22 @@
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetAngle"
+              },
+              "parameters": [
+                "Player",
+                "=",
+                "Player.Hed_PlatformerCharacter::GroundAngle()"
+              ]
+            }
+          ]
         }
       ],
       "layers": [
@@ -14465,18 +14481,6 @@
               "sentence": "",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Controls and jump frames"
-                },
-                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
@@ -14534,46 +14538,6 @@
                         "=",
                         "Object.CenterY()"
                       ]
-                    }
-                  ]
-                },
-                {
-                  "folded": true,
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Physics execution"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyOriginalAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Object.Angle()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "HedgehogAngle"
-                      ]
                     },
                     {
                       "type": {
@@ -14585,34 +14549,90 @@
                         "TimeDelta() * LayerTimeScale(Object.Layer())"
                       ]
                     }
-                  ],
-                  "events": [
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::FollowCurrentPlatform"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            ""
-                          ]
-                        }
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::FollowCurrentPlatform"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Shearch platforms around the character.\nThis is done outside of the sub-steps because it's costly and the searched area doesn't need to be precise as long as the character don't move outside of it."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySightRadius"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "max(TimeDelta * abs(Speed) + Object.Behavior::GroundSnappingDistanceMax(), TimeDelta * (abs(SpeedX) + abs(SpeedY)))"
                       ]
                     },
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::UpdateClosePlatforms"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "SightRadius",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySightRadius"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "+",
+                        "Width + Height"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
                     {
                       "type": "BuiltinCommonInstructions::Comment",
                       "color": {
@@ -14623,7 +14643,7 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "Shearch platforms around the character.\nThis is done outside of the sub-steps because it's costly and the searched area doesn't need to be precise as long as the character don't move outside of it."
+                      "comment": "Use sub-steps to avoid collision issues when fps drop."
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
@@ -14631,116 +14651,86 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySightRadius"
+                            "value": "SetNumberVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "StepCount",
                             "=",
-                            "max(TimeDelta * abs(Speed) + Object.Behavior::GroundSnappingDistanceMax(), TimeDelta * (abs(SpeedX) + abs(SpeedY)))"
+                            "clamp(ceil(TimeDelta / SubstepTimeDeltaMax), 1, SubstepCountMax)"
                           ]
                         },
                         {
                           "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::UpdateClosePlatforms"
+                            "value": "SetNumberVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
-                            "SightRadius",
-                            ""
+                            "TimeDelta",
+                            "/",
+                            "StepCount"
                           ]
-                        },
+                        }
+                      ],
+                      "events": [
                         {
-                          "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySightRadius"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "+",
-                            "Width + Height"
+                          "disabled": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "StepCount",
+                                ">",
+                                "1"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "DebuggerTools::ConsoleLog"
+                              },
+                              "parameters": [
+                                "\"Split step in \" + StepCount",
+                                "\"info\"",
+                                ""
+                              ]
+                            }
                           ]
                         }
                       ]
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "StepCount",
                       "conditions": [],
-                      "actions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetBooleanVariable"
+                          },
+                          "parameters": [
+                            "WasOnFloor",
+                            "False",
+                            "1"
+                          ]
+                        }
+                      ],
                       "events": [
                         {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "Use sub-steps to avoid collision issues when fps drop."
-                        },
-                        {
                           "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
+                          "conditions": [
                             {
                               "type": {
-                                "value": "SetNumberVariable"
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
                               },
                               "parameters": [
-                                "StepCount",
-                                "=",
-                                "clamp(ceil(TimeDelta / SubstepTimeDeltaMax), 1, SubstepCountMax)"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetNumberVariable"
-                              },
-                              "parameters": [
-                                "TimeDelta",
-                                "/",
-                                "StepCount"
+                                "Object",
+                                "Behavior"
                               ]
                             }
                           ],
-                          "events": [
-                            {
-                              "disabled": true,
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "NumberVariable"
-                                  },
-                                  "parameters": [
-                                    "StepCount",
-                                    ">",
-                                    "1"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "DebuggerTools::ConsoleLog"
-                                  },
-                                  "parameters": [
-                                    "\"Split step in \" + StepCount",
-                                    "\"info\"",
-                                    ""
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "StepCount",
-                          "conditions": [],
                           "actions": [
                             {
                               "type": {
@@ -14748,168 +14738,84 @@
                               },
                               "parameters": [
                                 "WasOnFloor",
-                                "False",
+                                "True",
                                 "1"
                               ]
                             }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "WasOnFloor",
+                                "True",
+                                ""
+                              ]
+                            }
                           ],
-                          "events": [
+                          "actions": [
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "SetBooleanVariable"
-                                  },
-                                  "parameters": [
-                                    "WasOnFloor",
-                                    "True",
-                                    "1"
-                                  ]
-                                }
+                              "type": {
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::MoveOnGround"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "Platform",
+                                "PlatformBehavior",
+                                ""
                               ]
-                            },
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "BooleanVariable"
-                                  },
-                                  "parameters": [
-                                    "WasOnFloor",
-                                    "True",
-                                    ""
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::MoveOnGround"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "Platform",
-                                    "PlatformBehavior",
-                                    ""
-                                  ]
-                                }
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "WasOnFloor",
+                                "False",
+                                ""
                               ]
-                            },
+                            }
+                          ],
+                          "actions": [
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "BooleanVariable"
-                                  },
-                                  "parameters": [
-                                    "WasOnFloor",
-                                    "False",
-                                    ""
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "HedgehogPlatformer::Hed_PlatformerCharacter::MoveOnAir"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "Platform",
-                                    "PlatformBehavior",
-                                    ""
-                                  ]
-                                }
+                              "type": {
+                                "value": "HedgehogPlatformer::Hed_PlatformerCharacter::MoveOnAir"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "Platform",
+                                "PlatformBehavior",
+                                ""
                               ]
                             }
                           ]
                         }
-                      ],
-                      "variables": [
-                        {
-                          "folded": true,
-                          "name": "WasOnFloor",
-                          "type": "boolean",
-                          "value": false
-                        },
-                        {
-                          "name": "StepCount",
-                          "type": "number",
-                          "value": 1
-                        }
                       ]
-                    },
+                    }
+                  ],
+                  "variables": [
                     {
                       "folded": true,
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Object rotation setting"
+                      "name": "WasOnFloor",
+                      "type": "boolean",
+                      "value": false
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyHedgehogAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "Object.Angle()"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "=",
-                            "OriginalAngle"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "=",
-                            "FloorAngle"
-                          ]
-                        }
-                      ]
+                      "name": "StepCount",
+                      "type": "number",
+                      "value": 1
                     }
                   ]
                 }
@@ -14934,7 +14840,6 @@
               "description": "Runs the ground physics on the object",
               "fullName": "Move on the ground",
               "functionType": "Action",
-              "group": "Extension",
               "name": "MoveOnGround",
               "private": true,
               "sentence": "Move the object _PARAM0_ on the ground",
@@ -16970,7 +16875,6 @@
               "description": "Runs the airborne physics on the object",
               "fullName": "Move on air",
               "functionType": "Action",
-              "group": "Extension",
               "name": "MoveOnAir",
               "private": true,
               "sentence": "Move the object _PARAM0_ on air",
@@ -18804,7 +18708,6 @@
               "description": "Moves the object based on the speeds obtained.",
               "fullName": "Move the object",
               "functionType": "Action",
-              "group": "Extension",
               "name": "MoveObject",
               "private": true,
               "sentence": "Move _PARAM0_",
@@ -20338,6 +20241,220 @@
               "objectGroups": []
             },
             {
+              "description": "the horizontal speed of the object (this speed can only be changed on airborne).",
+              "fullName": "Horizontal speed",
+              "functionType": "ExpressionAndCondition",
+              "group": "Hedgehog state",
+              "name": "XSpeed",
+              "sentence": "the horizontal speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "SpeedX"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the ground speed of the object.",
+              "fullName": "Ground speed",
+              "functionType": "ActionWithOperator",
+              "getterName": "XSpeed",
+              "group": "Speed",
+              "name": "SetXSpeed",
+              "sentence": "the ground speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeedX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "min(MaxSpeedX, Value)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyOldSpeedX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "min(MaxSpeedX, OldSpeedX)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the vertical speed of the object (this speed can only be changed on airborne).",
+              "fullName": "Vertical speed",
+              "functionType": "ExpressionAndCondition",
+              "group": "Hedgehog state",
+              "name": "YSpeed",
+              "sentence": "the vertical speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "SpeedY"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the ground speed of the object.",
+              "fullName": "Ground speed",
+              "functionType": "ActionWithOperator",
+              "getterName": "YSpeed",
+              "group": "Speed",
+              "name": "SetYSpeed",
+              "sentence": "the ground speed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeedY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "min(MaxSpeedY, Value)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyOldSpeedY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "min(MaxSpeedY, OldSpeedY)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "Check if default controls are activated (use the simulation actions if deactivated).",
               "fullName": "Default controls",
               "functionType": "Condition",
@@ -21808,220 +21925,6 @@
               "objectGroups": []
             },
             {
-              "description": "the horizontal speed of the object (this speed can only be changed on airborne).",
-              "fullName": "Horizontal speed",
-              "functionType": "ExpressionAndCondition",
-              "group": "Speed",
-              "name": "XSpeed",
-              "sentence": "the horizontal speed",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "SpeedX"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "the ground speed of the object.",
-              "fullName": "Ground speed",
-              "functionType": "ActionWithOperator",
-              "getterName": "XSpeed",
-              "group": "Speed",
-              "name": "SetXSpeed",
-              "sentence": "the ground speed",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeedX"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "min(MaxSpeedX, Value)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyOldSpeedX"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "min(MaxSpeedX, OldSpeedX)"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "the vertical speed of the object (this speed can only be changed on airborne).",
-              "fullName": "Vertical speed",
-              "functionType": "ExpressionAndCondition",
-              "group": "Speed",
-              "name": "YSpeed",
-              "sentence": "the vertical speed",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "SpeedY"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "the ground speed of the object.",
-              "fullName": "Ground speed",
-              "functionType": "ActionWithOperator",
-              "getterName": "YSpeed",
-              "group": "Speed",
-              "name": "SetYSpeed",
-              "sentence": "the ground speed",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::PropertyIsOnFloor"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertySpeedY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "min(MaxSpeedY, Value)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyOldSpeedY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "min(MaxSpeedY, OldSpeedY)"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
               "description": "the acceleration per frame of the object.",
               "fullName": "Acceleration",
               "functionType": "ExpressionAndCondition",
@@ -22532,89 +22435,6 @@
               "objectGroups": []
             },
             {
-              "description": "the time scale (hedgehog physics) of the object.",
-              "fullName": "Time scale",
-              "functionType": "ExpressionAndCondition",
-              "group": "Advanced",
-              "name": "TimeScale",
-              "sentence": "the time scale",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "TimeScale"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "",
-              "functionType": "ActionWithOperator",
-              "getterName": "TimeScale",
-              "name": "SetTimeScale",
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyTimeScale"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Value"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "supplementaryInformation": "Sprite",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "HedgehogPlatformer::Hed_PlatformerCharacter",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
               "description": "the collision layer of the object, only interacts with hedgehog platformers of the same layer. ",
               "fullName": "Collision layer",
               "functionType": "ExpressionAndCondition",
@@ -22669,7 +22489,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::Hed_Platform::SetPropertyCollisionLayer"
+                        "value": "HedgehogPlatformer::Hed_PlatformerCharacter::SetPropertyCollisionLayer"
                       },
                       "parameters": [
                         "Object",
@@ -23889,7 +23709,7 @@
               "type": "Number",
               "unit": "PixelSpeed",
               "label": "Ground speed",
-              "description": "The current ground speed",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23900,7 +23720,7 @@
               "type": "Number",
               "unit": "PixelSpeed",
               "label": "Horizontal speed",
-              "description": "The horizontal speed",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23911,7 +23731,7 @@
               "type": "Number",
               "unit": "PixelSpeed",
               "label": "Vertical speed",
-              "description": "The vertical speed",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23921,8 +23741,8 @@
               "value": "0",
               "type": "Number",
               "unit": "PixelSpeed",
-              "label": "Old horizontal speed",
-              "description": "The horizontal speed in previous frame",
+              "label": "",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23932,8 +23752,8 @@
               "value": "0",
               "type": "Number",
               "unit": "PixelSpeed",
-              "label": "Old vertical speed",
-              "description": "The vertical speed in previous frame",
+              "label": "",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23944,7 +23764,7 @@
               "type": "Number",
               "unit": "DegreeAngle",
               "label": "Floor angle",
-              "description": "The current ground angle",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23953,8 +23773,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Right key press",
-              "description": "The current state of the right key",
+              "label": "",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23964,7 +23784,7 @@
               "value": "0",
               "type": "Number",
               "label": "Jump key press",
-              "description": "The current state of the jump key",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23974,7 +23794,7 @@
               "value": "0",
               "type": "Number",
               "label": "Left key press",
-              "description": "The current state of the left key",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -23993,8 +23813,8 @@
             {
               "value": "",
               "type": "Boolean",
-              "label": "Is pushing",
-              "description": "The horizontal validation of the object",
+              "label": "",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
@@ -24013,23 +23833,12 @@
             {
               "value": "0",
               "type": "Boolean",
-              "label": "Extra jump",
-              "description": "Extra jump validation",
+              "label": "",
+              "description": "",
               "group": "",
               "extraInformation": [],
               "hidden": true,
               "name": "HasExtraJump"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "unit": "DegreeAngle",
-              "label": "Hedgehog angle",
-              "description": "The hedgehog angle",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "HedgehogAngle"
             },
             {
               "value": "",
@@ -24064,7 +23873,7 @@
             {
               "value": "",
               "type": "Boolean",
-              "label": "Maintain ground angle",
+              "label": "",
               "description": "Maintaining angle validation",
               "group": "",
               "extraInformation": [],
@@ -24074,7 +23883,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Old x position of the platformer",
+              "unit": "Pixel",
+              "label": "",
               "description": "Used in the \"IsMoving\" condition",
               "group": "",
               "extraInformation": [],
@@ -24084,7 +23894,8 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "Old y position of the platformer",
+              "unit": "Pixel",
+              "label": "",
               "description": "Used in the \"IsMoving\" condition",
               "group": "",
               "extraInformation": [],
@@ -24094,18 +23905,8 @@
             {
               "value": "0",
               "type": "Number",
-              "unit": "DegreeAngle",
-              "label": "Original angle of the object",
-              "description": "Used for \"Rotate\" function in hedgehog movement.",
-              "group": "",
-              "extraInformation": [],
-              "hidden": true,
-              "name": "OriginalAngle"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "label": "Slip timer",
+              "unit": "Second",
+              "label": "",
               "description": "The control lock timer when slipping",
               "group": "",
               "extraInformation": [],
@@ -24148,6 +23949,7 @@
             {
               "value": "",
               "type": "Number",
+              "unit": "Pixel",
               "label": "",
               "description": "",
               "group": "",
