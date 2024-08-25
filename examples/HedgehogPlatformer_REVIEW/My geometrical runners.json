@@ -345,6 +345,15 @@
         "name": "Collision2",
         "smoothed": false,
         "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "assets/NewSprite.png",
+        "kind": "image",
+        "metadata": "{\"extension\":\".png\"}",
+        "name": "NewSprite",
+        "smoothed": false,
+        "userAdded": false
       }
     ],
     "resourceFolders": []
@@ -376,7 +385,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.21607397323875727,
+        "zoomFactor": 0.4950840073748959,
         "windowMask": false
       },
       "objectsGroups": [
@@ -962,6 +971,22 @@
           "x": -393,
           "y": -102,
           "zOrder": 33,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "AngleLockMarker",
+          "persistentUuid": "249e23c6-5e5f-4931-ab3e-73c2cd1e7b17",
+          "width": 0,
+          "x": -578,
+          "y": 366,
+          "zOrder": 34,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -2585,6 +2610,75 @@
               ]
             }
           ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "AngleLockMarker",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "HedgehogPlatform",
+              "type": "HedgehogPlatformer::HedgehogPlatform",
+              "PlatformType": "Ground angle lock marker",
+              "CollisionLayer": 0,
+              "IsAngleLockSnapping": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "NewSprite",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "metadata": "{\"pskl\":{}}",
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "NewSprite",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 16,
+                            "y": 0
+                          },
+                          {
+                            "x": 16,
+                            "y": 16
+                          },
+                          {
+                            "x": 0,
+                            "y": 16
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ],
       "objectsFolderStructure": {
@@ -2610,6 +2704,9 @@
           },
           {
             "objectName": "Background"
+          },
+          {
+            "objectName": "AngleLockMarker"
           }
         ]
       },
@@ -3823,6 +3920,10 @@
         {
           "name": "Hed_PlatformerCharacter",
           "type": "HedgehogPlatformer::HedgehogCharacter"
+        },
+        {
+          "name": "HedgehogPlatform",
+          "type": "HedgehogPlatformer::HedgehogPlatform"
         },
         {
           "name": "Opacity",
@@ -13663,6 +13764,10 @@
                 "     */",
                 "    _potentialCollidingObjects = [];",
                 "    lastRaycastResult = new RaycastResult();",
+                "    /**",
+                "     * @type {PlatformRuntimeBehavior | null}",
+                "     */",
+                "    lastOverlappingPlatform = null;",
                 "",
                 "    /**",
                 "     * @param {gdjs.RuntimeInstanceContainer} instanceContainer",
@@ -13918,6 +14023,29 @@
                 "        this.lastRaycastResult.distance = Math.sqrt(sqDistMin);",
                 "        this.lastRaycastResult.nomalizeAccordingTo(rayX, rayY);",
                 "        return true;",
+                "    }",
+                "",
+                "    /**",
+                "     * @param {gdjs.RuntimeObject} object",
+                "     * @param {string} platformType",
+                "     */",
+                "    isOverlappingPotentialCollidingObjects(object, platformType) {",
+                "        for (const platformBehavior of this._potentialCollidingObjects) {",
+                "            if (platformBehavior.behavior._getPlatformType() !== platformType) {",
+                "                continue;",
+                "            }",
+                "            const platform = platformBehavior.owner;",
+                "            if (gdjs.RuntimeObject.collisionTest(",
+                "                object,",
+                "                platform,",
+                "                false,",
+                "                true",
+                "            )) {",
+                "                this.lastOverlappingPlatform = platformBehavior;",
+                "                return true;",
+                "            }",
+                "        }",
+                "        return false;",
                 "    }",
                 "}",
                 "",
@@ -15797,18 +15925,6 @@
                               ]
                             },
                             {
-                              "type": "BuiltinCommonInstructions::Comment",
-                              "color": {
-                                "b": 109,
-                                "g": 230,
-                                "r": 255,
-                                "textB": 0,
-                                "textG": 0,
-                                "textR": 0
-                              },
-                              "comment": "// TODO check angle lock marker collision"
-                            },
-                            {
                               "type": "BuiltinCommonInstructions::Standard",
                               "conditions": [
                                 {
@@ -15833,17 +15949,116 @@
                                   ]
                                 }
                               ],
-                              "actions": [
+                              "actions": [],
+                              "events": [
                                 {
-                                  "type": {
-                                    "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "mod(AngleBetweenPositions(0, 0, NormalX, NormalY) + 90, 360)"
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::IsCollidingClosePlatforms"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Behavior",
+                                        "\"Ground angle lock marker\"",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "SetBooleanVariable"
+                                      },
+                                      "parameters": [
+                                        "IsGroundAngleLocked",
+                                        "True",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "events": [
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::IsCollidingPlatformSnapping"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Behavior",
+                                            ""
+                                          ]
+                                        }
+                                      ],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Behavior",
+                                            "=",
+                                            "90 * round(GroundAngle / 90)"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "DebuggerTools::ConsoleLog"
+                                          },
+                                          "parameters": [
+                                            "\"GoundAngle locked: \" + GroundAngle",
+                                            "\"info\"",
+                                            ""
+                                          ]
+                                        }
+                                      ]
+                                    }
                                   ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "BooleanVariable"
+                                      },
+                                      "parameters": [
+                                        "IsGroundAngleLocked",
+                                        "=",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Behavior",
+                                        "=",
+                                        "mod(AngleBetweenPositions(0, 0, NormalX, NormalY) + 90, 360)"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "variables": [
+                                {
+                                  "name": "IsGroundAngleLocked",
+                                  "type": "boolean",
+                                  "value": false
                                 }
                               ]
                             },
@@ -16855,6 +17070,16 @@
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
+                        {
+                          "type": {
+                            "value": "HedgehogPlatformer::HedgehogCharacter::IsJumping"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            ""
+                          ]
+                        },
                         {
                           "type": {
                             "value": "HedgehogPlatformer::HedgehogCharacter::PropertyKeyJumpPress"
@@ -22267,6 +22492,106 @@
               "objectGroups": []
             },
             {
+              "fullName": "Is in collision with close platforms",
+              "functionType": "Condition",
+              "name": "IsCollidingClosePlatforms",
+              "private": true,
+              "sentence": "_PARAM0_ is in collision with close platforms of type: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const { getManager } = gdjs.__hedgehogPlatformerExtension;",
+                    "",
+                    "const platformType = eventsFunctionContext.getArgument(\"PlatformType\");",
+                    "",
+                    "eventsFunctionContext.returnValue = getManager(runtimeScene).isOverlappingPotentialCollidingObjects(objects[0], platformType);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Object",
+                        "",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": []
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacter",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Platform type",
+                  "name": "PlatformType",
+                  "supplementaryInformation": "[\"Ground angle lock marker\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the last platform in collision with the object is doing ground angle snapping.",
+              "fullName": "Last colliding platform snapping",
+              "functionType": "Condition",
+              "name": "IsCollidingPlatformSnapping",
+              "private": true,
+              "sentence": "The last platform in collision with _PARAM0_ is doing ground angle snapping",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const { getManager } = gdjs.__hedgehogPlatformerExtension;\r",
+                    "\r",
+                    "const platform = getManager(runtimeScene).lastOverlappingPlatform;\r",
+                    "console.log(platform);\r",
+                    "eventsFunctionContext.returnValue = platform ? platform.behavior._getIsAngleLockSnapping() : false;"
+                  ],
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Sprite",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "fullName": "Raycast close platforms",
               "functionType": "Condition",
               "name": "RaycastClosePlatforms",
@@ -22810,20 +23135,20 @@
               "objectGroups": []
             },
             {
-              "description": "the last intersected platform obstacle mode by recast.",
-              "fullName": "Last recast obstacle mode",
+              "description": "the last intersected platform type by recast.",
+              "fullName": "Last recast platform type",
               "functionType": "ExpressionAndCondition",
-              "name": "RaycastObstacleMode",
+              "name": "RaycastPlatformType",
               "private": true,
-              "sentence": "the last intersected platform obstacle mode by recast",
+              "sentence": "the last intersected platform type by recast",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": [
                     "const { getManager } = gdjs.__hedgehogPlatformerExtension;\r",
                     "\r",
-                    "const platformBehavior = getManager(runtimeScene).lastRaycastResult.platform.behavior;\r",
-                    "eventsFunctionContext.returnValue = platformBehavior ? platformBehavior._getObstacleMode() : \"\";"
+                    "const platform = getManager(runtimeScene).lastRaycastResult.platform;\r",
+                    "eventsFunctionContext.returnValue = platform ? platform.behavior._getPlatformType() : \"\";"
                   ],
                   "parameterObjects": "",
                   "useStrict": true,
@@ -23862,6 +24187,15 @@
               "group": "",
               "extraInformation": [],
               "name": "CollisionLayer"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "Angle lock snapping",
+              "description": "Movement angle is snapped to 0°, 90°, 180° or 270°",
+              "group": "",
+              "extraInformation": [],
+              "name": "IsAngleLockSnapping"
             }
           ],
           "sharedPropertyDescriptors": []
