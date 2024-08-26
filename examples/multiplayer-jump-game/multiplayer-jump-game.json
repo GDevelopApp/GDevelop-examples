@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 208,
+    "build": 209,
     "major": 5,
     "minor": 4,
     "revision": 0
@@ -5128,7 +5128,7 @@
               "linearDamping": 0.1,
               "angularDamping": 0.1,
               "gravityScale": 1,
-              "layers": 1,
+              "layers": 0,
               "masks": 1
             },
             {
@@ -6305,7 +6305,7 @@
               "angularDamping": 0.1,
               "gravityScale": 1,
               "layers": 1,
-              "masks": 1
+              "masks": 65535
             },
             {
               "name": "ShakeObject_PositionAngleScale",
@@ -7361,7 +7361,7 @@
               "angularDamping": 0.1,
               "gravityScale": 1,
               "layers": 1,
-              "masks": 1
+              "masks": 65535
             }
           ]
         },
@@ -7396,7 +7396,7 @@
               "angularDamping": 0.1,
               "gravityScale": 1,
               "layers": 1,
-              "masks": 1
+              "masks": 65535
             }
           ]
         },
@@ -8450,16 +8450,34 @@
                     "SmoothCamera",
                     ""
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "We enable a specific layer for each player, so that they are in collision with obstacles, but not with each other"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
                 {
                   "type": {
-                    "value": "Multiplayer::MultiplayerObjectBehavior::EnableBehaviorSynchronization"
+                    "value": "Physics2::EnableLayer"
                   },
                   "parameters": [
                     "PlayerObject",
-                    "MultiplayerObject",
                     "Physics2",
-                    ""
+                    "Multiplayer::CurrentPlayerNumber() + 1",
+                    "yes"
                   ]
                 }
               ]
@@ -8589,7 +8607,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "For other players (existing or new) ensure their behaviors are not activated so they don't affect our game"
+          "comment": "For other players (existing or new) ensure camera behaviors are not activated so they don't affect our game"
         },
         {
           "type": "BuiltinCommonInstructions::ForEach",
@@ -8605,25 +8623,6 @@
           ],
           "actions": [],
           "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BehaviorActivated"
-                  },
-                  "parameters": ["PlayerObject", "Physics2"]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ActivateBehavior"
-                  },
-                  "parameters": ["PlayerObject", "Physics2", ""]
-                }
-              ]
-            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
