@@ -175,6 +175,7 @@ const checkProjectResourceFiles = async (project, projectFolderPath) => {
 const sortedStarterSlugs = new Set([
   'platformer',
   '3d-car-coin-hunt',
+  '3d-road-crosser',
   'multiplayer-platformer-arrow-fight',
   'top-down-rpg',
   'multiplayer-jump-game',
