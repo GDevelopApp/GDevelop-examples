@@ -1,1 +1,1 @@
-This shows how to create multiple markers when the player touches the screen.
+Interactive Music Player Jukebox example with animated disk & tracklist.
