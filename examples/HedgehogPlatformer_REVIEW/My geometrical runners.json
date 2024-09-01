@@ -1044,7 +1044,9 @@
               "OldY": 0,
               "OldSpeed": 0,
               "PlatformOldX": 2.0247e-320,
-              "PlatformOldY": 2.0247e-320
+              "PlatformOldY": 2.0247e-320,
+              "FloorMagnetDistanceMin": 3.75,
+              "FloorMagnetDistanceMax": 13.123
             },
             {
               "name": "SmoothCamera",
@@ -15958,50 +15960,27 @@
               "sentence": "",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "HedgehogPlatformer::HedgehogCharacter::PropertySpeedBasedMagnet"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "FloorMagnet * TimeDelta"
-                      ]
-                    }
-                  ]
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "FloorMagnetDistanceMin = 3.75 = 4 pixels / 32 pixels * 30 fps\nFloorMagnetDistanceMax = 13.125 = 14 pixels / 32 pixels * 30 fps\n\nThese properties are in character height per second because it allows to keep the value relevent no matter the resolution and the frame rate of the game.\nThis way extension users don't need to worry about it."
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "HedgehogPlatformer::HedgehogCharacter::PropertySpeedBasedMagnet"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ]
-                    }
-                  ],
+                  "conditions": [],
                   "actions": [
                     {
                       "type": {
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "(abs(GroundSpeed) + FloorMagnet) * TimeDelta"
+                        "min(abs(GroundSpeed) + FloorMagnetDistanceMin * Height, FloorMagnetDistanceMax * Height) * TimeDelta"
                       ]
                     }
                   ]
@@ -18808,7 +18787,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "FloorMagnet"
+                        "FloorMagnetDistanceMax"
                       ]
                     }
                   ]
@@ -18848,7 +18827,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyFloorMagnet"
+                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyFloorMagnetDistanceMax"
                       },
                       "parameters": [
                         "Object",
@@ -20804,25 +20783,24 @@
               "name": "SlopeFactorAngle"
             },
             {
-              "value": "14",
+              "value": "13,125",
               "type": "Number",
-              "unit": "Pixel",
-              "label": "Floor magnet",
+              "label": "Maximum floor magnet distance (in character height per seconds)",
               "description": "Object position changes by this value when it's grounded, to keep it grounded in a sudden high-speed slip.",
               "group": "Ground",
               "extraInformation": [],
               "advanced": true,
-              "name": "FloorMagnet"
+              "name": "FloorMagnetDistanceMax"
             },
             {
-              "value": "true",
-              "type": "Boolean",
-              "label": "Speed-based floor magnet",
-              "description": "Reduces or increases floor magnet depending on object's current speed",
+              "value": "3,75",
+              "type": "Number",
+              "label": "Minimum floor magnet distance (in character height per seconds)",
+              "description": "",
               "group": "Ground",
               "extraInformation": [],
               "advanced": true,
-              "name": "SpeedBasedMagnet"
+              "name": "FloorMagnetDistanceMin"
             },
             {
               "value": "90",
