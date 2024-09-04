@@ -1150,7 +1150,7 @@
           "effects": [],
           "behaviors": [],
           "content": {
-            "DeadZoneRadius": 0.2
+            "DeadZoneRadius": 0.25
           },
           "childrenContent": {
             "Border": {
@@ -1281,7 +1281,7 @@
             }
           ],
           "content": {
-            "DeadZoneRadius": 0.2
+            "DeadZoneRadius": 0.25
           },
           "childrenContent": {
             "Border": {
@@ -2612,7 +2612,7 @@
                           "parameters": [
                             "Player",
                             "PhysicsCar",
-                            "PedalJoystick.StickForceY()",
+                            "-PedalJoystick.StickForceY()",
                             ""
                           ]
                         }
@@ -29026,7 +29026,7 @@
       "name": "SpriteMultitouchJoystick",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_controller_joystick_arrows_direction.svg",
       "shortDescription": "Joysticks or buttons for touchscreens.",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "description": [
         "Multitouch joysticks can be used the same way as physical gamepads:",
         "- 4 or 8 directions",
@@ -29176,9 +29176,9 @@
                     "value": "ModVarSceneTxt"
                   },
                   "parameters": [
-                    "__MultitouchJoystick.Controllers[GetArgumentAsNumber(\"ControllerIdentifier\")].Buttons[GetArgumentAsString(\"Button\")].State",
+                    "__MultitouchJoystick.Controllers[ControllerIdentifier].Buttons[Button].State",
                     "=",
-                    "GetArgumentAsString(\"ButtonState\")"
+                    "ButtonState"
                   ]
                 }
               ]
@@ -29221,9 +29221,9 @@
                     "value": "ModVarScene"
                   },
                   "parameters": [
-                    "__MultitouchJoystick.Controllers[GetArgumentAsNumber(\"ControllerIdentifier\")].Joystick[GetArgumentAsString(\"JoystickIdentifier\")].DeadZone",
+                    "__MultitouchJoystick.Controllers[ControllerIdentifier].Joystick[JoystickIdentifier].DeadZone",
                     "=",
-                    "GetArgumentAsNumber(\"DeadZoneRadius\")"
+                    "DeadZoneRadius"
                   ]
                 }
               ]
@@ -29266,7 +29266,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__MultitouchJoystick.Controllers[GetArgumentAsNumber(\"ControllerIdentifier\")].Joystick[GetArgumentAsString(\"JoystickIdentifier\")].DeadZone)"
+                    "Variable(__MultitouchJoystick.Controllers[ControllerIdentifier].Joystick[JoystickIdentifier].DeadZone)"
                   ]
                 }
               ]
@@ -29880,9 +29880,9 @@
                   "parameters": [
                     "",
                     ">",
-                    "SpriteMultitouchJoystick::DeadZone(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\"))",
-                    "GetArgumentAsNumber(\"ControllerIdentifier\")",
-                    "GetArgumentAsString(\"JoystickIdentifier\")",
+                    "SpriteMultitouchJoystick::DeadZone(ControllerIdentifier, JoystickIdentifier)",
+                    "ControllerIdentifier",
+                    "JoystickIdentifier",
                     ""
                   ]
                 },
@@ -29892,8 +29892,8 @@
                   },
                   "parameters": [
                     "",
-                    "SpriteMultitouchJoystick::JoystickAngle(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\"))",
-                    "GetArgumentAsString(\"Direction\")",
+                    "SpriteMultitouchJoystick::JoystickAngle(ControllerIdentifier, JoystickIdentifier)",
+                    "Direction",
                     ""
                   ]
                 }
@@ -29960,7 +29960,7 @@
                   "parameters": [
                     "",
                     ">",
-                    "SpriteMultitouchJoystick::DeadZone(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\"))",
+                    "SpriteMultitouchJoystick::DeadZone(ControllerIdentifier, JoystickIdentifier)",
                     "GetArgumentAsNumber(\"ControllerIdentifier\")",
                     "GetArgumentAsString(\"JoystickIdentifier\")",
                     ""
@@ -29972,8 +29972,8 @@
                   },
                   "parameters": [
                     "",
-                    "SpriteMultitouchJoystick::JoystickAngle(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\"))",
-                    "GetArgumentAsString(\"Direction\")",
+                    "SpriteMultitouchJoystick::JoystickAngle(ControllerIdentifier, JoystickIdentifier)",
+                    "Direction",
                     ""
                   ]
                 }
@@ -30028,7 +30028,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "SpriteMultitouchJoystick::StickForce(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\"))"
+                    "SpriteMultitouchJoystick::StickForce(ControllerIdentifier, JoystickIdentifier)"
                   ]
                 }
               ]
@@ -30061,14 +30061,25 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
+              "conditions": [
+                {
+                  "type": {
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "__MultitouchJoystick.Controllers[ControllerIdentifier].Joystick[JoystickIdentifier].Force",
+                    ">",
+                    "SpriteMultitouchJoystick::DeadZone(ControllerIdentifier, JoystickIdentifier)"
+                  ]
+                }
+              ],
               "actions": [
                 {
                   "type": {
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__MultitouchJoystick.Controllers[GetArgumentAsNumber(\"ControllerIdentifier\")].Joystick[GetArgumentAsString(\"JoystickIdentifier\")].Force)"
+                    "Variable(__MultitouchJoystick.Controllers[ControllerIdentifier].Joystick[JoystickIdentifier].Force)"
                   ]
                 }
               ]
@@ -30109,9 +30120,9 @@
                     "value": "ModVarScene"
                   },
                   "parameters": [
-                    "__MultitouchJoystick.Controllers[GetArgumentAsNumber(\"ControllerIdentifier\")].Joystick[GetArgumentAsString(\"JoystickIdentifier\")].Force",
+                    "__MultitouchJoystick.Controllers[ControllerIdentifier].Joystick[JoystickIdentifier].Force",
                     "=",
-                    "GetArgumentAsNumber(\"Value\")"
+                    "Value"
                   ]
                 }
               ]
@@ -30277,7 +30288,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "SpriteMultitouchJoystick::JoystickForce(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\")) * cos(ToRad(SpriteMultitouchJoystick::JoystickAngle(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\"))))"
+                    "SpriteMultitouchJoystick::JoystickForce(ControllerIdentifier, JoystickIdentifier) * cos(ToRad(SpriteMultitouchJoystick::JoystickAngle(ControllerIdentifier, JoystickIdentifier)))"
                   ]
                 }
               ]
@@ -30317,7 +30328,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "SpriteMultitouchJoystick::JoystickForce(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\")) * sin(ToRad(SpriteMultitouchJoystick::JoystickAngle(GetArgumentAsNumber(\"ControllerIdentifier\"), GetArgumentAsString(\"JoystickIdentifier\"))))"
+                    "SpriteMultitouchJoystick::JoystickForce(ControllerIdentifier, JoystickIdentifier) * sin(ToRad(SpriteMultitouchJoystick::JoystickAngle(ControllerIdentifier, JoystickIdentifier)))"
                   ]
                 }
               ]
@@ -30689,14 +30700,26 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SpriteMultitouchJoystick::MultitouchJoystick::PropertyJoystickForce"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ">",
+                        "DeadZoneRadius"
+                      ]
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.Behavior::PropertyJoystickForce()"
+                        "JoystickForce"
                       ]
                     }
                   ]
@@ -30740,7 +30763,7 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     },
                     {
@@ -30749,9 +30772,9 @@
                       },
                       "parameters": [
                         "",
-                        "Object.Behavior::PropertyControllerIdentifier()",
-                        "Object.Behavior::PropertyJoystickIdentifier()",
-                        "Object.Behavior::PropertyJoystickForce()",
+                        "ControllerIdentifier",
+                        "JoystickIdentifier",
+                        "JoystickForce",
                         ""
                       ]
                     }
@@ -30789,7 +30812,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.Behavior::PropertyJoystickAngle()"
+                        "JoystickAngle"
                       ]
                     }
                   ]
@@ -30969,7 +30992,7 @@
                         "Object",
                         "Behavior",
                         ">",
-                        "Object.Behavior::PropertyDeadZoneRadius()"
+                        "DeadZoneRadius"
                       ]
                     },
                     {
@@ -30978,8 +31001,8 @@
                       },
                       "parameters": [
                         "",
-                        "Object.Behavior::JoystickAngle()",
-                        "GetArgumentAsString(\"Direction\")",
+                        "JoystickAngle",
+                        "Direction",
                         ""
                       ]
                     }
@@ -31035,7 +31058,7 @@
                         "Object",
                         "Behavior",
                         ">",
-                        "Object.Behavior::PropertyDeadZoneRadius()"
+                        "DeadZoneRadius"
                       ]
                     },
                     {
@@ -31044,8 +31067,8 @@
                       },
                       "parameters": [
                         "",
-                        "Object.Behavior::JoystickAngle()",
-                        "GetArgumentAsString(\"Direction\")",
+                        "JoystickAngle",
+                        "Direction",
                         ""
                       ]
                     }
@@ -31364,7 +31387,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.Behavior::PropertyDeadZoneRadius()"
+                        "DeadZoneRadius"
                       ]
                     }
                   ]
@@ -31407,7 +31430,7 @@
                         "Object",
                         "Behavior",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -33303,7 +33326,7 @@
                       "parameters": [
                         "Border",
                         "MultitouchJoystick",
-                        "GetArgumentAsString(\"Direction\")",
+                        "Direction",
                         ""
                       ]
                     }
@@ -33353,7 +33376,7 @@
                       "parameters": [
                         "Border",
                         "MultitouchJoystick",
-                        "GetArgumentAsString(\"Direction\")",
+                        "Direction",
                         ""
                       ]
                     }
@@ -33744,10 +33767,10 @@
             "folderName": "__ROOT",
             "children": [
               {
-                "objectName": "Thumb"
+                "objectName": "\u0001= gvalue"
               },
               {
-                "objectName": "Border"
+                "objectName": "ter3D::Parti"
               }
             ]
           },
