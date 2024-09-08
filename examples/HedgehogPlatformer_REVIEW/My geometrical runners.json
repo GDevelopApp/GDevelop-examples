@@ -13120,26 +13120,6 @@
                             "value": "SetNumberVariable"
                           },
                           "parameters": [
-                            "CosA",
-                            "=",
-                            "cos(ToRad(GroundAngle))"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
-                            "SinA",
-                            "=",
-                            "sin(ToRad(GroundAngle))"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
                             "MovementLength",
                             "=",
                             "abs((OldSpeed + GroundSpeed) / 2 * TimeDelta)"
@@ -13206,7 +13186,7 @@
                                 "value": "BuiltinCommonInstructions::CompareNumbers"
                               },
                               "parameters": [
-                                "abs(Object.Behavior::RaycastNormalX() * SinA - Object.Behavior::RaycastNormalY() * CosA)",
+                                "abs(Object.Behavior::RaycastNormalX() * SinGroundAngle - Object.Behavior::RaycastNormalY() * CosGroundAngle)",
                                 "<",
                                 "0.1"
                               ]
@@ -13263,9 +13243,9 @@
                               "parameters": [
                                 "Object",
                                 "+",
-                                "Object.Behavior::RaycastDistance() * CosA",
+                                "Object.Behavior::RaycastDistance() * CosGroundAngle",
                                 "+",
-                                "Object.Behavior::RaycastDistance() * SinA"
+                                "Object.Behavior::RaycastDistance() * SinGroundAngle"
                               ]
                             }
                           ]
@@ -13317,7 +13297,7 @@
                                 "value": "BuiltinCommonInstructions::CompareNumbers"
                               },
                               "parameters": [
-                                "abs(Object.Behavior::RaycastNormalX() * SinA - Object.Behavior::RaycastNormalY() * CosA)",
+                                "abs(Object.Behavior::RaycastNormalX() * SinGroundAngle - Object.Behavior::RaycastNormalY() * CosGroundAngle)",
                                 "<",
                                 "0.1"
                               ]
@@ -13374,9 +13354,9 @@
                               "parameters": [
                                 "Object",
                                 "-",
-                                "Object.Behavior::RaycastDistance() * CosA",
+                                "Object.Behavior::RaycastDistance() * CosGroundAngle",
                                 "-",
-                                "Object.Behavior::RaycastDistance() * SinA"
+                                "Object.Behavior::RaycastDistance() * SinGroundAngle"
                               ]
                             }
                           ],
@@ -13402,18 +13382,6 @@
                         }
                       ],
                       "variables": [
-                        {
-                          "folded": true,
-                          "name": "CosA",
-                          "type": "number",
-                          "value": 1
-                        },
-                        {
-                          "folded": true,
-                          "name": "SinA",
-                          "type": "number",
-                          "value": 0
-                        },
                         {
                           "name": "MovementLength",
                           "type": "number",
@@ -13472,7 +13440,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "XFromAngleAndDistance(GroundAngle, GroundSpeed)"
+                                "GroundSpeed * CosGroundAngle"
                               ]
                             },
                             {
@@ -13483,7 +13451,7 @@
                                 "Object",
                                 "Behavior",
                                 "=",
-                                "YFromAngleAndDistance(GroundAngle, GroundSpeed)"
+                                "GroundSpeed * SinGroundAngle"
                               ]
                             }
                           ]
@@ -13739,13 +13707,13 @@
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
                                           },
                                           "parameters": [
                                             "Object",
                                             "Behavior",
-                                            "=",
-                                            "90 * round(GroundAngle / 90)"
+                                            "90 * round(GroundAngle / 90)",
+                                            ""
                                           ]
                                         }
                                       ]
@@ -13799,13 +13767,13 @@
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
                                           },
                                           "parameters": [
                                             "Object",
                                             "Behavior",
-                                            "=",
-                                            "90 * round(GroundAngle / 90)"
+                                            "90 * round(GroundAngle / 90)",
+                                            ""
                                           ]
                                         }
                                       ]
@@ -13845,41 +13813,39 @@
                                   "actions": [
                                     {
                                       "type": {
-                                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
                                       },
                                       "parameters": [
                                         "Object",
                                         "Behavior",
-                                        "=",
-                                        "mod(AngleBetweenPositions(0, 0, NormalX, NormalY) + 90, 360)"
+                                        "mod(AngleBetweenPositions(0, 0, NormalX, NormalY) + 90, 360)",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::PropertyShouldRotate"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Behavior"
                                       ]
                                     }
                                   ],
-                                  "events": [
+                                  "actions": [
                                     {
-                                      "type": "BuiltinCommonInstructions::Standard",
-                                      "conditions": [
-                                        {
-                                          "type": {
-                                            "value": "HedgehogPlatformer::HedgehogCharacter::PropertyShouldRotate"
-                                          },
-                                          "parameters": [
-                                            "Object",
-                                            "Behavior"
-                                          ]
-                                        }
-                                      ],
-                                      "actions": [
-                                        {
-                                          "type": {
-                                            "value": "SetAngle"
-                                          },
-                                          "parameters": [
-                                            "Object",
-                                            "=",
-                                            "GroundAngle"
-                                          ]
-                                        }
+                                      "type": {
+                                        "value": "SetAngle"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "=",
+                                        "GroundAngle"
                                       ]
                                     }
                                   ]
@@ -15501,13 +15467,13 @@
                                 },
                                 {
                                   "type": {
-                                    "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                                    "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
                                   },
                                   "parameters": [
                                     "Object",
                                     "Behavior",
-                                    "=",
-                                    "AngleBetweenPositions(0, 0, NormalX, NormalY) + 90"
+                                    "AngleBetweenPositions(0, 0, NormalX, NormalY) + 90",
+                                    ""
                                   ]
                                 }
                               ],
@@ -15664,7 +15630,7 @@
                                             "Object",
                                             "Behavior",
                                             "=",
-                                            "(SpeedY * 0.5) * sign(sin(ToRad(GroundAngle)))"
+                                            "SpeedY * 0.5 * sign(SinGroundAngle)"
                                           ]
                                         }
                                       ]
@@ -15753,7 +15719,7 @@
                                             "Object",
                                             "Behavior",
                                             "=",
-                                            "(SpeedY * 1) * sign(sin(ToRad(GroundAngle)))"
+                                            "SpeedY * sign(SinGroundAngle)"
                                           ]
                                         }
                                       ]
@@ -16174,13 +16140,13 @@
                                             },
                                             {
                                               "type": {
-                                                "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                                                "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
                                               },
                                               "parameters": [
                                                 "Object",
                                                 "Behavior",
-                                                "=",
-                                                "Angle"
+                                                "Angle",
+                                                ""
                                               ]
                                             },
                                             {
@@ -16191,7 +16157,7 @@
                                                 "Object",
                                                 "Behavior",
                                                 "=",
-                                                "SpeedY * sign(sin(ToRad(GroundAngle)))"
+                                                "SpeedY * sign(SinGroundAngle)"
                                               ]
                                             }
                                           ],
@@ -16683,13 +16649,13 @@
                     },
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                        "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "=",
-                        "0"
+                        "0",
+                        ""
                       ]
                     },
                     {
@@ -16916,6 +16882,86 @@
                   "name": "Behavior",
                   "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacter",
                   "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "GroundAngle",
+              "functionType": "Action",
+              "getterName": "GroundAngle",
+              "name": "SetGroundAngle",
+              "private": true,
+              "sentence": "Change the GroundAngle of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacter::PropertyGroundAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "!=",
+                        "Value"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyCosGroundAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "cos(ToRad(Value))"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertySinGroundAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "sin(ToRad(Value))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacter",
+                  "type": "behavior"
+                },
+                {
+                  "description": "",
+                  "name": "Value",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -19983,29 +20029,9 @@
                         "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "CosA",
-                        "=",
-                        "cos(ToRad(GroundAngle))"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "SinA",
-                        "=",
-                        "sin(ToRad(GroundAngle))"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
                         "SourceX",
                         "=",
-                        "Object.CenterX() + LocalSourceX * CosA - LocalSourceY * SinA"
+                        "Object.CenterX() + LocalSourceX * CosGroundAngle - LocalSourceY * SinGroundAngle"
                       ]
                     },
                     {
@@ -20015,7 +20041,7 @@
                       "parameters": [
                         "SourceY",
                         "=",
-                        "Object.CenterY() + LocalSourceX * SinA + LocalSourceY * CosA"
+                        "Object.CenterY() + LocalSourceX * SinGroundAngle + LocalSourceY * CosGroundAngle"
                       ]
                     },
                     {
@@ -20025,7 +20051,7 @@
                       "parameters": [
                         "DirectionUnitX",
                         "=",
-                        "LocalDirectionUnitX * CosA - LocalDirectionUnitY * SinA"
+                        "LocalDirectionUnitX * CosGroundAngle - LocalDirectionUnitY * SinGroundAngle"
                       ]
                     },
                     {
@@ -20035,7 +20061,7 @@
                       "parameters": [
                         "DirectionUnitY",
                         "=",
-                        "LocalDirectionUnitX * SinA + LocalDirectionUnitY * CosA"
+                        "LocalDirectionUnitX * SinGroundAngle + LocalDirectionUnitY * CosGroundAngle"
                       ]
                     }
                   ],
@@ -20050,7 +20076,7 @@
                             "value": "DebuggerTools::ConsoleLog"
                           },
                           "parameters": [
-                            "\"Sensor: \" + ToString(LocalSourceX * CosA - LocalSourceY * SinA) + \" \" + ToString(LocalSourceX * SinA + LocalSourceY * CosA)",
+                            "\"Sensor: \" + ToString(LocalSourceX * CosGroundAngle - LocalSourceY * SinGroundAngle) + \" \" + ToString(LocalSourceX * SinGroundAngle + LocalSourceY * CosGroundAngle)",
                             "\"info\"",
                             ""
                           ]
@@ -20165,17 +20191,6 @@
                     {
                       "folded": true,
                       "name": "DirectionUnitY",
-                      "type": "number",
-                      "value": 0
-                    },
-                    {
-                      "name": "CosA",
-                      "type": "number",
-                      "value": 1
-                    },
-                    {
-                      "folded": true,
-                      "name": "SinA",
                       "type": "number",
                       "value": 0
                     }
@@ -21261,6 +21276,28 @@
               "extraInformation": [],
               "hidden": true,
               "name": "PlatformOldY"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "CosGroundAngle"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "SinGroundAngle"
             }
           ],
           "sharedPropertyDescriptors": []
