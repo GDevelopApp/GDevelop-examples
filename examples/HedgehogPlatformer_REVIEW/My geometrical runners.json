@@ -439,7 +439,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.19561100536769707,
+        "zoomFactor": 0.4057518905943927,
         "windowMask": false
       },
       "objectsGroups": [
@@ -499,9 +499,9 @@
           "layer": "",
           "name": "Obstacle",
           "persistentUuid": "cfd0e128-3f33-4b6c-9e86-4e15244e7bbc",
-          "width": 931,
-          "x": 89,
-          "y": 523,
+          "width": 928,
+          "x": 82,
+          "y": 521,
           "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
@@ -679,14 +679,14 @@
         {
           "angle": 0,
           "customSize": true,
-          "depth": 0.3418803418803419,
+          "depth": 1,
           "height": 60,
           "layer": "",
           "name": "Obstacle",
           "persistentUuid": "fc795c4d-8437-47b1-922c-d01affdf7304",
-          "width": 1000,
-          "x": 179,
-          "y": -2,
+          "width": 995,
+          "x": 186,
+          "y": -3,
           "zOrder": 31,
           "numberProperties": [],
           "stringProperties": [],
@@ -954,8 +954,8 @@
           "name": "Obstacle2",
           "persistentUuid": "69ae615c-8040-4d53-809b-416590d36fd9",
           "width": 500,
-          "x": 179,
-          "y": 1,
+          "x": 186,
+          "y": -3,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -13650,16 +13650,177 @@
                                       ]
                                     }
                                   ],
-                                  "actions": [
+                                  "actions": [],
+                                  "events": [
                                     {
-                                      "type": {
-                                        "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
-                                      },
-                                      "parameters": [
-                                        "Object",
-                                        "Behavior",
-                                        "mod(AngleBetweenPositions(0, 0, NormalX, NormalY) + 90, 360)",
-                                        ""
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "SetNumberVariable"
+                                          },
+                                          "parameters": [
+                                            "OldGroundAngle",
+                                            "=",
+                                            "GroundAngle"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Behavior",
+                                            "mod(AngleBetweenPositions(0, 0, NormalX, NormalY) + 90, 360)",
+                                            ""
+                                          ]
+                                        }
+                                      ],
+                                      "events": [
+                                        {
+                                          "type": "BuiltinCommonInstructions::Standard",
+                                          "conditions": [
+                                            {
+                                              "type": {
+                                                "inverted": true,
+                                                "value": "HedgehogPlatformer::IsAngleAround"
+                                              },
+                                              "parameters": [
+                                                "",
+                                                "GroundAngle",
+                                                "OldGroundAngle",
+                                                "0.1",
+                                                ""
+                                              ]
+                                            }
+                                          ],
+                                          "actions": [],
+                                          "events": [
+                                            {
+                                              "type": "BuiltinCommonInstructions::Comment",
+                                              "color": {
+                                                "b": 109,
+                                                "g": 230,
+                                                "r": 255,
+                                                "textB": 0,
+                                                "textG": 0,
+                                                "textR": 0
+                                              },
+                                              "comment": "Evaluate the ground angle a 2nd time to avoid the angle to toggle every frame between 2 values."
+                                            },
+                                            {
+                                              "type": "BuiltinCommonInstructions::Standard",
+                                              "conditions": [
+                                                {
+                                                  "type": {
+                                                    "value": "HedgehogPlatformer::HedgehogCharacter::RaycastFromCharacter"
+                                                  },
+                                                  "parameters": [
+                                                    "Object",
+                                                    "Behavior",
+                                                    "0",
+                                                    "Height / 2",
+                                                    "0",
+                                                    "1",
+                                                    "Height",
+                                                    ""
+                                                  ]
+                                                }
+                                              ],
+                                              "actions": [
+                                                {
+                                                  "type": {
+                                                    "value": "SetNumberVariable"
+                                                  },
+                                                  "parameters": [
+                                                    "NormalX",
+                                                    "=",
+                                                    "Object.Behavior::RaycastNormalX()"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": {
+                                                    "value": "SetNumberVariable"
+                                                  },
+                                                  "parameters": [
+                                                    "NormalY",
+                                                    "=",
+                                                    "Object.Behavior::RaycastNormalY()"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": {
+                                                    "value": "SetNumberVariable"
+                                                  },
+                                                  "parameters": [
+                                                    "DistanceMin",
+                                                    "=",
+                                                    "Object.Behavior::RaycastDistance()"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": {
+                                                    "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyIsCenterOnGround"
+                                                  },
+                                                  "parameters": [
+                                                    "Object",
+                                                    "Behavior",
+                                                    "yes"
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "BuiltinCommonInstructions::Standard",
+                                              "conditions": [
+                                                {
+                                                  "type": {
+                                                    "value": "NumberVariable"
+                                                  },
+                                                  "parameters": [
+                                                    "DistanceMin",
+                                                    "<",
+                                                    "Height"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": {
+                                                    "value": "HedgehogPlatformer::HedgehogCharacter::CanBeSnappedOnGround"
+                                                  },
+                                                  "parameters": [
+                                                    "Object",
+                                                    "Behavior",
+                                                    "DistanceMin",
+                                                    ""
+                                                  ]
+                                                }
+                                              ],
+                                              "actions": [
+                                                {
+                                                  "type": {
+                                                    "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
+                                                  },
+                                                  "parameters": [
+                                                    "Object",
+                                                    "Behavior",
+                                                    "mod(AngleBetweenPositions(0, 0, NormalX, NormalY) + 90, 360)",
+                                                    ""
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "variables": [
+                                        {
+                                          "folded": true,
+                                          "name": "OldGroundAngle",
+                                          "type": "number",
+                                          "value": 0
+                                        }
                                       ]
                                     }
                                   ]
@@ -13714,6 +13875,18 @@
                                   ]
                                 }
                               ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Raycast from the left and the right..."
                             },
                             {
                               "type": "BuiltinCommonInstructions::Standard",
@@ -13893,6 +14066,18 @@
                                   ]
                                 }
                               ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "...to push the character out of the floor."
                             },
                             {
                               "type": "BuiltinCommonInstructions::Standard",
