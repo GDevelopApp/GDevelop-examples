@@ -240,6 +240,19 @@ const getPreviewImageUrls = (gameFolderPath, allFiles) => {
 };
 
 /**
+ * @param {string} gameFolderPath
+ * @param {Object.<string, DreeWithMetadata>} allFiles
+ * @returns
+ */
+const getQuickCustomizationImageUrl = (gameFolderPath, allFiles) => {
+  const imagePath = normalizePathSeparators(
+    path.join(gameFolderPath, 'thumbnail-quick-customization.png')
+  );
+  const hasImage = !!allFiles[imagePath];
+  return hasImage ? getResourceUrl(imagePath) : undefined;
+};
+
+/**
  * Extract the information about the example games from the examples folder.
  * @param {libGDevelop} gd
  * @param {Record<string, gdPlatformExtension>} platformExtensionsMap
@@ -405,6 +418,10 @@ const extractExamples = async (
           usedExtensions,
           eventsBasedExtensions,
           previewImageUrls: getPreviewImageUrls(gameFolderPath, allFiles),
+          quickCustomizationImageUrl: getQuickCustomizationImageUrl(
+            gameFolderPath,
+            allFiles
+          ),
           license: fileWithMetadata.license,
           projectFileUrl: getResourceUrl(fileWithMetadata.path),
           gdevelopVersion: '', //TODO: set to the GDevelop version used to author the example?

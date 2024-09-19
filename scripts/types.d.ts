@@ -27,6 +27,7 @@ export interface Example {
   tags: string[];
   authorIds: string[];
   previewImageUrls: string[];
+  quickCustomizationImageUrl: string | undefined;
   gdevelopVersion: string;
   codeSizeLevel: string;
   difficultyLevel: string | undefined;
