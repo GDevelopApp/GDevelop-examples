@@ -704,11 +704,6 @@
           "updateIfNotVisible": false,
           "variables": [
             {
-              "name": "Number",
-              "type": "string",
-              "value": "1"
-            },
-            {
               "name": "Keys",
               "type": "structure",
               "children": [
@@ -738,23 +733,13 @@
                   "value": "Up"
                 }
               ]
-            },
-            {
-              "name": "BombCapacity",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "Range",
-              "type": "string",
-              "value": ""
             }
           ],
           "effects": [],
           "behaviors": [
             {
               "name": "Player",
-              "type": "Player::Player"
+              "type": "Player::PlayerBehavior"
             },
             {
               "name": "RemapForTopdown",
@@ -849,7 +834,7 @@
             },
             {
               "name": "PlayerModel",
-              "type": "Player::PlayerModel",
+              "type": "Player::PlayerAnimator",
               "Tween": "Tween",
               "Tween3D": "Tween3D",
               "Flash": "Flash"
@@ -1009,28 +994,14 @@
                   "value": "e"
                 }
               ]
-            },
-            {
-              "name": "BombCapacity",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "Number",
-              "type": "string",
-              "value": "2"
-            },
-            {
-              "name": "Range",
-              "type": "string",
-              "value": ""
             }
           ],
           "effects": [],
           "behaviors": [
             {
               "name": "Player",
-              "type": "Player::Player"
+              "type": "Player::PlayerBehavior",
+              "Id": 2
             },
             {
               "name": "RemapForTopdown",
@@ -1126,7 +1097,7 @@
             },
             {
               "name": "PlayerModel",
-              "type": "Player::PlayerModel",
+              "type": "Player::PlayerAnimator",
               "Tween": "Tween",
               "Tween3D": "Tween3D",
               "Flash": "Flash"
@@ -1257,11 +1228,6 @@
           "updateIfNotVisible": false,
           "variables": [
             {
-              "name": "Number",
-              "type": "string",
-              "value": "3"
-            },
-            {
               "name": "Keys",
               "type": "structure",
               "children": [
@@ -1291,23 +1257,14 @@
                   "value": "i"
                 }
               ]
-            },
-            {
-              "name": "BombCapacity",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "Range",
-              "type": "string",
-              "value": ""
             }
           ],
           "effects": [],
           "behaviors": [
             {
               "name": "Player",
-              "type": "Player::Player"
+              "type": "Player::PlayerBehavior",
+              "Id": 3
             },
             {
               "name": "RemapForTopdown",
@@ -1403,7 +1360,7 @@
             },
             {
               "name": "PlayerModel",
-              "type": "Player::PlayerModel",
+              "type": "Player::PlayerAnimator",
               "Tween": "Tween",
               "Tween3D": "Tween3D",
               "Flash": "Flash"
@@ -1534,11 +1491,6 @@
           "updateIfNotVisible": false,
           "variables": [
             {
-              "name": "Number",
-              "type": "string",
-              "value": "4"
-            },
-            {
               "name": "Keys",
               "type": "structure",
               "children": [
@@ -1568,23 +1520,14 @@
                   "value": "Numpad8"
                 }
               ]
-            },
-            {
-              "name": "BombCapacity",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "Range",
-              "type": "string",
-              "value": ""
             }
           ],
           "effects": [],
           "behaviors": [
             {
               "name": "Player",
-              "type": "Player::Player"
+              "type": "Player::PlayerBehavior",
+              "Id": 4
             },
             {
               "name": "RemapForTopdown",
@@ -1680,7 +1623,7 @@
             },
             {
               "name": "PlayerModel",
-              "type": "Player::PlayerModel",
+              "type": "Player::PlayerAnimator",
               "Tween": "Tween",
               "Tween3D": "Tween3D",
               "Flash": "Flash"
@@ -1811,7 +1754,14 @@
           "updateIfNotVisible": false,
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "BombBehavior",
+              "type": "Bomb::BombBehavior",
+              "PlayerId": 0,
+              "ExplosionRange": 2
+            }
+          ],
           "animations": [
             {
               "name": "",
@@ -2962,6 +2912,36 @@
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Player::PlayerBehavior::SetInitialBombCapacity"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Player",
+                    "=",
+                    "GlobalVariable(Bomb)",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Player::PlayerBehavior::SetInitialBombRange"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Player",
+                    "=",
+                    "GlobalVariable(Flame)",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
@@ -3050,7 +3030,7 @@
               "actions": [
                 {
                   "type": {
-                    "value": "Player::Player::PickUpBonus"
+                    "value": "Player::PlayerBehavior::PickUpBonus"
                   },
                   "parameters": [
                     "Player",
@@ -3147,7 +3127,7 @@
                               },
                               "parameters": [
                                 "",
-                                "Player.Variable(Number)",
+                                "Player.Player::Id()",
                                 "\"A\"",
                                 ""
                               ]
@@ -3173,179 +3153,182 @@
                             "textG": 0,
                             "textR": 0
                           },
-                          "comment": "canPutBomb variable is used to forget the bombs picked by the condition and be able to access the created one."
+                          "comment": "CanPutBomb variable is used to forget the bombs picked by the condition and be able to access the created one."
                         },
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetSceneVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "canPutBomb",
-                                "False"
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Player::Player::CanPutBomb"
-                              },
-                              "parameters": [
-                                "Player",
-                                "Player",
-                                "Bomb",
-                                ""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetSceneVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "canPutBomb",
-                                "True"
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "SceneVariableAsBoolean"
-                              },
-                              "parameters": [
-                                "canPutBomb",
-                                "True"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Player::Player::PutBomb"
-                              },
-                              "parameters": [
-                                "Player",
-                                "Player",
-                                "Bomb",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Create"
-                              },
-                              "parameters": [
-                                "",
-                                "BombModel",
-                                "0",
-                                "0",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetCenter"
-                              },
-                              "parameters": [
-                                "BombModel",
-                                "=",
-                                "Bomb.CenterX()",
-                                "=",
-                                "Bomb.CenterY()"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Sticker::Sticker::Stick"
-                              },
-                              "parameters": [
-                                "BombModel",
-                                "Sticker",
-                                "Bomb",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Cache"
-                              },
-                              "parameters": [
-                                "Bomb"
-                              ]
-                            }
-                          ],
+                          "actions": [],
                           "events": [
                             {
                               "type": "BuiltinCommonInstructions::Standard",
                               "conditions": [
                                 {
                                   "type": {
-                                    "value": "AjoutObjConcern"
+                                    "value": "Player::PlayerBehavior::CanPutBomb"
                                   },
                                   "parameters": [
-                                    "",
-                                    "Player"
+                                    "Player",
+                                    "Player",
+                                    "Bomb",
+                                    ""
                                   ]
                                 }
                               ],
-                              "actions": [],
-                              "events": [
+                              "actions": [
                                 {
-                                  "type": "BuiltinCommonInstructions::Comment",
-                                  "color": {
-                                    "b": 109,
-                                    "g": 230,
-                                    "r": 255,
-                                    "textB": 0,
-                                    "textG": 0,
-                                    "textR": 0
+                                  "type": {
+                                    "value": "SetBooleanVariable"
                                   },
-                                  "comment": "Other players can be on the square where the bomb is put."
+                                  "parameters": [
+                                    "CanPutBomb",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "CanPutBomb",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Player::PlayerBehavior::PutBomb"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "Player",
+                                    "Bomb",
+                                    "BombBehavior",
+                                    ""
+                                  ]
                                 },
                                 {
-                                  "type": "BuiltinCommonInstructions::ForEach",
-                                  "object": "Player",
+                                  "type": {
+                                    "value": "Create"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "BombModel",
+                                    "0",
+                                    "0",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SetCenter"
+                                  },
+                                  "parameters": [
+                                    "BombModel",
+                                    "=",
+                                    "Bomb.CenterX()",
+                                    "=",
+                                    "Bomb.CenterY()"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Sticker::Sticker::Stick"
+                                  },
+                                  "parameters": [
+                                    "BombModel",
+                                    "Sticker",
+                                    "Bomb",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Cache"
+                                  },
+                                  "parameters": [
+                                    "Bomb"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
                                   "conditions": [
                                     {
                                       "type": {
-                                        "value": "CollisionNP"
+                                        "value": "AjoutObjConcern"
                                       },
                                       "parameters": [
-                                        "Player",
-                                        "Bomb",
                                         "",
-                                        "",
-                                        ""
+                                        "Player"
                                       ]
                                     }
                                   ],
-                                  "actions": [
+                                  "actions": [],
+                                  "events": [
                                     {
-                                      "type": {
-                                        "value": "Player::Player::AllowToWalkOnBomb"
+                                      "type": "BuiltinCommonInstructions::Comment",
+                                      "color": {
+                                        "b": 109,
+                                        "g": 230,
+                                        "r": 255,
+                                        "textB": 0,
+                                        "textG": 0,
+                                        "textR": 0
                                       },
-                                      "parameters": [
-                                        "Player",
-                                        "Player",
-                                        "Bomb",
-                                        ""
+                                      "comment": "Other players can be on the square where the bomb is put."
+                                    },
+                                    {
+                                      "type": "BuiltinCommonInstructions::ForEach",
+                                      "object": "Player",
+                                      "conditions": [
+                                        {
+                                          "type": {
+                                            "value": "CollisionNP"
+                                          },
+                                          "parameters": [
+                                            "Player",
+                                            "Bomb",
+                                            "",
+                                            "",
+                                            ""
+                                          ]
+                                        }
+                                      ],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "Player::PlayerBehavior::AllowToWalkOnBomb"
+                                          },
+                                          "parameters": [
+                                            "Player",
+                                            "Player",
+                                            "Bomb",
+                                            ""
+                                          ]
+                                        }
                                       ]
                                     }
                                   ]
                                 }
                               ]
+                            }
+                          ],
+                          "variables": [
+                            {
+                              "folded": true,
+                              "name": "CanPutBomb",
+                              "type": "boolean",
+                              "value": false
                             }
                           ]
                         }
@@ -3371,7 +3354,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Player::Player::SeparateFromBomb"
+                        "value": "Player::PlayerBehavior::SeparateFromBomb"
                       },
                       "parameters": [
                         "Player",
@@ -3408,112 +3391,19 @@
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CompareObjectTimer"
-                      },
-                      "parameters": [
-                        "Bomb",
-                        "\"Detonator\"",
-                        ">=",
-                        "3"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Bomb::Explode"
-                      },
-                      "parameters": [
-                        "",
-                        "Bomb",
-                        "Explosion",
-                        "Explosion",
-                        "Obstacle",
-                        "ExplosionParticleEmitter",
-                        ""
-                      ]
-                    }
-                  ],
+                  "conditions": [],
+                  "actions": [],
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Link",
-                      "include": {
-                        "includeConfig": 0
-                      },
-                      "target": "Check explosion collision"
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "...or by chain reaction."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "hasNewBombExploded",
-                        "True"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "infiniteLoopWarning": true,
-                  "type": "BuiltinCommonInstructions::While",
-                  "whileConditions": [
-                    {
-                      "type": {
-                        "value": "SceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "hasNewBombExploded",
-                        "True"
-                      ]
-                    }
-                  ],
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "hasNewBombExploded",
-                        "False"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::ForEach",
-                      "object": "Bomb",
+                      "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "value": "CollisionNP"
+                            "value": "Bomb::BombBehavior::IsReadyToExplode"
                           },
                           "parameters": [
-                            "Explosion",
                             "Bomb",
-                            "",
-                            "",
+                            "BombBehavior",
                             ""
                           ]
                         }
@@ -3521,20 +3411,11 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "AjoutObjConcern"
+                            "value": "Bomb::BombBehavior::Explode"
                           },
                           "parameters": [
-                            "",
-                            "Explosion"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Bomb::Explode"
-                          },
-                          "parameters": [
-                            "",
                             "Bomb",
+                            "BombBehavior",
                             "Explosion",
                             "Explosion",
                             "Obstacle",
@@ -3544,11 +3425,12 @@
                         },
                         {
                           "type": {
-                            "value": "SetSceneVariableAsBoolean"
+                            "value": "SetBooleanVariable"
                           },
                           "parameters": [
-                            "hasNewBombExploded",
-                            "True"
+                            "HasNewBombExploded",
+                            "True",
+                            ""
                           ]
                         }
                       ],
@@ -3561,6 +3443,119 @@
                           "target": "Check explosion collision"
                         }
                       ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "...or by chain reaction."
+                    },
+                    {
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "HasNewBombExploded",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetBooleanVariable"
+                          },
+                          "parameters": [
+                            "HasNewBombExploded",
+                            "False",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::ForEach",
+                          "object": "Bomb",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "CollisionNP"
+                              },
+                              "parameters": [
+                                "Explosion",
+                                "Bomb",
+                                "",
+                                "",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "AjoutObjConcern"
+                              },
+                              "parameters": [
+                                "",
+                                "Explosion"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Bomb::BombBehavior::Explode"
+                              },
+                              "parameters": [
+                                "Bomb",
+                                "BombBehavior",
+                                "Explosion",
+                                "Explosion",
+                                "Obstacle",
+                                "ExplosionParticleEmitter",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetBooleanVariable"
+                              },
+                              "parameters": [
+                                "HasNewBombExploded",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Link",
+                              "include": {
+                                "includeConfig": 0
+                              },
+                              "target": "Check explosion collision"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "folded": true,
+                      "name": "HasNewBombExploded",
+                      "type": "boolean",
+                      "value": false
                     }
                   ]
                 }
@@ -3691,7 +3686,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Player::PlayerModel::PlayDeathAnimationFromExplosion"
+                            "value": "Player::PlayerAnimator::PlayDeathAnimationFromExplosion"
                           },
                           "parameters": [
                             "PlayerModel",
@@ -3796,7 +3791,7 @@
                     },
                     {
                       "type": {
-                        "value": "Player::PlayerModel::CanRespawn"
+                        "value": "Player::PlayerAnimator::CanRespawn"
                       },
                       "parameters": [
                         "PlayerModel",
@@ -3839,7 +3834,7 @@
                     },
                     {
                       "type": {
-                        "value": "Player::Player::GiveBackBonuses"
+                        "value": "Player::PlayerBehavior::GiveBackBonuses"
                       },
                       "parameters": [
                         "Player",
@@ -3869,7 +3864,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Player::PlayerModel::PlayRespawnAnimation"
+                            "value": "Player::PlayerAnimator::PlayRespawnAnimation"
                           },
                           "parameters": [
                             "PlayerModel",
@@ -4049,7 +4044,7 @@
               "actions": [
                 {
                   "type": {
-                    "value": "Player::PlayerModel::UpdatePosition"
+                    "value": "Player::PlayerAnimator::UpdatePosition"
                   },
                   "parameters": [
                     "PlayerModel",
@@ -4181,6 +4176,10 @@
           "type": "Bomb::BombAnimator"
         },
         {
+          "name": "BombBehavior",
+          "type": "Bomb::BombBehavior"
+        },
+        {
           "name": "BonusAnimator",
           "type": "Bonus::BonusAnimator"
         },
@@ -4210,11 +4209,11 @@
         },
         {
           "name": "Player",
-          "type": "Player::Player"
+          "type": "Player::PlayerBehavior"
         },
         {
           "name": "PlayerModel",
-          "type": "Player::PlayerModel",
+          "type": "Player::PlayerAnimator",
           "MovementAngle": 90
         },
         {
@@ -4241,6 +4240,10 @@
         {
           "name": "Sticker",
           "type": "Sticker::Sticker"
+        },
+        {
+          "name": "Text",
+          "type": "TextContainerCapability::TextContainerBehavior"
         },
         {
           "name": "TopDownCornerSlider",
@@ -5617,26 +5620,26 @@
           "conditions": [
             {
               "type": {
-                "value": "VarObjet"
+                "value": "Player::PlayerBehavior::Id"
               },
               "parameters": [
                 "Player",
-                "Number",
+                "Player",
                 "=",
-                "Bomb.Variable(PlayerNum)"
+                "Bomb.BombBehavior::PlayerId()",
+                ""
               ]
             }
           ],
           "actions": [
             {
               "type": {
-                "value": "ModVarObjet"
+                "value": "Player::PlayerBehavior::GetBackBomb"
               },
               "parameters": [
                 "Player",
-                "BombPut",
-                "-",
-                "1"
+                "Player",
+                ""
               ]
             }
           ]
@@ -5672,7 +5675,7 @@
                 "Score",
                 "PlayerNum",
                 "=",
-                "Player.Variable(Number)"
+                "Player.Player::Id()"
               ]
             }
           ],
@@ -5685,7 +5688,7 @@
                 "Score",
                 "Text",
                 "=",
-                "GlobalVariableString(Score[Player.VariableString(Number)])"
+                "GlobalVariableString(Score[Player.Player::Id()])"
               ]
             }
           ]
@@ -38353,294 +38356,379 @@
       "dependencies": [],
       "globalVariables": [],
       "sceneVariables": [],
-      "eventsFunctions": [
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
         {
-          "description": "Explode a bombe into 4 lines of Explosion objects.",
-          "fullName": "Explode a bombe",
-          "functionType": "Action",
-          "name": "Explode",
-          "sentence": "_PARAM1_ explode into _PARAM2_ and _PARAM5_ and is stopped by _PARAM4_",
-          "events": [
+          "description": "",
+          "fullName": "",
+          "name": "BombBehavior",
+          "objectType": "",
+          "eventsFunctions": [
             {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Creation of the central explosion square"
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "Explosion",
-                    "Bomb.X()",
-                    "Bomb.Y()",
-                    "\"\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ChangePlan"
-                  },
-                  "parameters": [
-                    "Explosion",
-                    "=",
-                    "Explosion.Y() + 12"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVarObjet"
-                  },
-                  "parameters": [
-                    "Explosion",
-                    "PlayerNum",
-                    "=",
-                    "Bomb.Variable(PlayerNum)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "ParticleEmitter",
-                    "Explosion.CenterX()",
-                    "Explosion.CenterY()",
-                    "\"\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Cache"
-                  },
-                  "parameters": [
-                    "Explosion"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Creation of the explosion squares on the 4 directions"
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Bomb::CreateExplosionArm"
-                  },
-                  "parameters": [
-                    "",
-                    "Bomb",
-                    "Explosion",
-                    "ExplosionBehavior",
-                    "Obstacle",
-                    "ParticleEmitter",
-                    "0",
-                    "1",
-                    "0",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Bomb::CreateExplosionArm"
-                  },
-                  "parameters": [
-                    "",
-                    "Bomb",
-                    "Explosion",
-                    "ExplosionBehavior",
-                    "Obstacle",
-                    "ParticleEmitter",
-                    "180",
-                    "-1",
-                    "0",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Bomb::CreateExplosionArm"
-                  },
-                  "parameters": [
-                    "",
-                    "Bomb",
-                    "Explosion",
-                    "ExplosionBehavior",
-                    "Obstacle",
-                    "ParticleEmitter",
-                    "90",
-                    "0",
-                    "1",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Bomb::CreateExplosionArm"
-                  },
-                  "parameters": [
-                    "",
-                    "Bomb",
-                    "Explosion",
-                    "ExplosionBehavior",
-                    "Obstacle",
-                    "ParticleEmitter",
-                    "-90",
-                    "0",
-                    "-1",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "Bomb",
-                    ""
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Bomb",
-              "name": "Bomb",
-              "type": "objectList"
-            },
-            {
-              "description": "Explosion",
-              "name": "Explosion",
-              "supplementaryInformation": "Sprite",
-              "type": "objectList"
-            },
-            {
-              "description": "Explosion",
-              "name": "ExplosionBehavior",
-              "supplementaryInformation": "Bomb::ExplosionBehavior",
-              "type": "behavior"
-            },
-            {
-              "description": "Obstacle",
-              "name": "Obstacle",
-              "type": "objectList"
-            },
-            {
-              "description": "Particle Emitter",
-              "name": "ParticleEmitter",
-              "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
-              "type": "objectList"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Create one line of Explosion object in a given direction.",
-          "fullName": "Create an explosion arm",
-          "functionType": "Action",
-          "name": "CreateExplosionArm",
-          "private": true,
-          "sentence": "Create an explosion arm with _PARAM2_ and _PARAM5_ from _PARAM1_ to _PARAM4_ in the direction _PARAM6_° (_PARAM7_ ; _PARAM8_)",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
+              "fullName": "Initialize a bomb",
+              "functionType": "Action",
+              "name": "Initialize",
+              "sentence": "Initialize _PARAM0_ for player: _PARAM2_ and range: _PARAM3_",
               "events": [
                 {
-                  "infiniteLoopWarning": true,
-                  "type": "BuiltinCommonInstructions::While",
-                  "whileConditions": [
-                    {
-                      "type": {
-                        "value": "NumberVariable"
-                      },
-                      "parameters": [
-                        "Iteration",
-                        "<=",
-                        "Bomb.Variable(Range)"
-                      ]
-                    }
-                  ],
+                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
                     {
                       "type": {
-                        "value": "SetSceneVariableAsBoolean"
+                        "value": "Bomb::BombBehavior::SetPropertyPlayerId"
                       },
                       "parameters": [
-                        "isExplosionAlreadyCreated",
-                        ""
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "PlayerId"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Bomb::BombBehavior::SetPropertyExplosionRange"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Range"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"Detonator\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::BombBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Player id",
+                  "name": "PlayerId",
+                  "type": "expression"
+                },
+                {
+                  "description": "Range",
+                  "name": "Range",
+                  "supplementaryInformation": "Player::PlayerBehavior",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Is ready to explode",
+              "functionType": "Condition",
+              "name": "IsReadyToExplode",
+              "sentence": "_PARAM0_ is ready to explode",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"Detonator\"",
+                        ">=",
+                        "Delay"
                       ]
                     }
                   ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::BombBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Explode a bomb into 4 lines of Explosion objects.",
+              "fullName": "Explode a bomb",
+              "functionType": "Action",
+              "name": "Explode",
+              "sentence": "_PARAM0_ explode into _PARAM2_ and _PARAM5_ and is stopped by _PARAM4_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Creation of the central explosion square"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Explosion",
+                        "Object.X()",
+                        "Object.Y()",
+                        "\"\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangePlan"
+                      },
+                      "parameters": [
+                        "Explosion",
+                        "=",
+                        "Explosion.Y() + 12"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "Explosion",
+                        "PlayerNum",
+                        "=",
+                        "PlayerId"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "ParticleEmitter",
+                        "Explosion.CenterX()",
+                        "Explosion.CenterY()",
+                        "\"\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "Explosion"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Creation of the explosion squares on the 4 directions"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Bomb::BombBehavior::CreateExplosionArm"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Explosion",
+                        "ExplosionBehavior",
+                        "Obstacle",
+                        "ParticleEmitter",
+                        "0",
+                        "1",
+                        "0",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Bomb::BombBehavior::CreateExplosionArm"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Explosion",
+                        "ExplosionBehavior",
+                        "Obstacle",
+                        "ParticleEmitter",
+                        "180",
+                        "-1",
+                        "0",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Bomb::BombBehavior::CreateExplosionArm"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Explosion",
+                        "ExplosionBehavior",
+                        "Obstacle",
+                        "ParticleEmitter",
+                        "90",
+                        "0",
+                        "1",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Bomb::BombBehavior::CreateExplosionArm"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "Explosion",
+                        "ExplosionBehavior",
+                        "Obstacle",
+                        "ParticleEmitter",
+                        "-90",
+                        "0",
+                        "-1",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::BombBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Explosion",
+                  "name": "Explosion",
+                  "supplementaryInformation": "Sprite",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Explosion",
+                  "name": "ExplosionBehavior",
+                  "supplementaryInformation": "Bomb::ExplosionBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Obstacle",
+                  "name": "Obstacle",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Particle Emitter",
+                  "name": "ParticleEmitter",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "objectList"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Create one line of Explosion object in a given direction.",
+              "fullName": "Create an explosion arm",
+              "functionType": "Action",
+              "name": "CreateExplosionArm",
+              "private": true,
+              "sentence": "Create an explosion arm with _PARAM2_ and _PARAM5_ from _PARAM0_ to _PARAM4_ in the direction _PARAM6_° (_PARAM7_ ; _PARAM8_)",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [],
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
                         {
                           "type": {
-                            "value": "Bomb::ExplosionBehavior::HasJustBeenCreated"
+                            "value": "NumberVariable"
                           },
                           "parameters": [
-                            "Explosion",
-                            "ExplosionBehavior",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PosX"
-                          },
-                          "parameters": [
-                            "Explosion",
-                            "=",
-                            "Bomb.X() + ExplosionDirectionX * 60 * Iteration"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PosY"
-                          },
-                          "parameters": [
-                            "Explosion",
-                            "=",
-                            "Bomb.Y() + ExplosionDirectionY * 60 * Iteration"
+                            "Iteration",
+                            "<=",
+                            "ExplosionRange"
                           ]
                         }
                       ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
@@ -38648,66 +38736,7 @@
                           },
                           "parameters": [
                             "isExplosionAlreadyCreated",
-                            "True"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Create"
-                          },
-                          "parameters": [
-                            "",
-                            "Explosion",
-                            "Bomb.X() + ExplosionDirectionX * 60 * Iteration",
-                            "Bomb.Y() + ExplosionDirectionY * 60 * Iteration",
-                            "\"\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "Explosion",
-                            "PlayerNum",
-                            "=",
-                            "Bomb.Variable(PlayerNum)"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "Explosion",
-                            "DirectionX",
-                            "=",
-                            "ExplosionDirectionX"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "Explosion",
-                            "DirectionY",
-                            "=",
-                            "ExplosionDirectionY"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Cache"
-                          },
-                          "parameters": [
-                            "Explosion"
+                            ""
                           ]
                         }
                       ],
@@ -38717,14 +38746,50 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "SceneVariableAsBoolean"
+                                "value": "Bomb::ExplosionBehavior::HasJustBeenCreated"
                               },
                               "parameters": [
-                                "isExplosionAlreadyCreated",
-                                "="
+                                "Explosion",
+                                "ExplosionBehavior",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PosX"
+                              },
+                              "parameters": [
+                                "Explosion",
+                                "=",
+                                "Object.X() + ExplosionDirectionX * 60 * Iteration"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PosY"
+                              },
+                              "parameters": [
+                                "Explosion",
+                                "=",
+                                "Object.Y() + ExplosionDirectionY * 60 * Iteration"
                               ]
                             }
                           ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetSceneVariableAsBoolean"
+                              },
+                              "parameters": [
+                                "isExplosionAlreadyCreated",
+                                "True"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
                           "actions": [
                             {
                               "type": {
@@ -38732,54 +38797,141 @@
                               },
                               "parameters": [
                                 "",
-                                "ParticleEmitter",
-                                "Explosion.CenterX()",
-                                "Explosion.CenterY()",
+                                "Explosion",
+                                "Object.X() + ExplosionDirectionX * 60 * Iteration",
+                                "Object.Y() + ExplosionDirectionY * 60 * Iteration",
                                 "\"\""
                               ]
                             },
                             {
                               "type": {
-                                "value": "Create"
+                                "value": "ModVarObjet"
                               },
                               "parameters": [
-                                "",
-                                "ParticleEmitter",
-                                "Explosion.CenterX() - ExplosionDirectionX * 30",
-                                "Explosion.CenterY() - ExplosionDirectionY * 30",
-                                "\"\""
+                                "Explosion",
+                                "PlayerNum",
+                                "=",
+                                "PlayerId"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Explosion",
+                                "DirectionX",
+                                "=",
+                                "ExplosionDirectionX"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ModVarObjet"
+                              },
+                              "parameters": [
+                                "Explosion",
+                                "DirectionY",
+                                "=",
+                                "ExplosionDirectionY"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Cache"
+                              },
+                              "parameters": [
+                                "Explosion"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "SceneVariableAsBoolean"
+                                  },
+                                  "parameters": [
+                                    "isExplosionAlreadyCreated",
+                                    "="
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Create"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "ParticleEmitter",
+                                    "Explosion.CenterX()",
+                                    "Explosion.CenterY()",
+                                    "\"\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "Create"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "ParticleEmitter",
+                                    "Explosion.CenterX() - ExplosionDirectionX * 30",
+                                    "Explosion.CenterY() - ExplosionDirectionY * 30",
+                                    "\"\""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "When an obstacle is reached, the loop is broken (by setting a big value in the iteration variable)."
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "CollisionNP"
+                                  },
+                                  "parameters": [
+                                    "Explosion",
+                                    "Obstacle",
+                                    "",
+                                    "",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "Iteration",
+                                    "=",
+                                    "666"
+                                  ]
+                                }
                               ]
                             }
                           ]
                         },
                         {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "When an obstacle is reached, the loop is broken (by setting a big value in the iteration variable)."
-                        },
-                        {
                           "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "CollisionNP"
-                              },
-                              "parameters": [
-                                "Explosion",
-                                "Obstacle",
-                                "",
-                                "",
-                                ""
-                              ]
-                            }
-                          ],
+                          "conditions": [],
                           "actions": [
                             {
                               "type": {
@@ -38787,92 +38939,156 @@
                               },
                               "parameters": [
                                 "Iteration",
-                                "=",
-                                "666"
+                                "+",
+                                "1"
                               ]
                             }
                           ]
                         }
                       ]
-                    },
+                    }
+                  ],
+                  "variables": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
-                            "Iteration",
-                            "+",
-                            "1"
-                          ]
-                        }
+                      "folded": true,
+                      "name": "Iteration",
+                      "type": "number",
+                      "value": 1
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::BombBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Explosion",
+                  "name": "Explosion",
+                  "supplementaryInformation": "Sprite",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Explosion",
+                  "name": "ExplosionBehavior",
+                  "supplementaryInformation": "Bomb::ExplosionBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Obstacle",
+                  "name": "Obstacle",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Praticle emitter",
+                  "name": "ParticleEmitter",
+                  "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
+                  "type": "objectList"
+                },
+                {
+                  "description": "Explosion direction angle",
+                  "name": "ExplosionDirection",
+                  "type": "expression"
+                },
+                {
+                  "description": "Explosion direction X",
+                  "name": "ExplosionDirectionX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Explosion direction Y",
+                  "name": "ExplosionDirectionY",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the player id of the object.",
+              "fullName": "Player id",
+              "functionType": "ExpressionAndCondition",
+              "group": "BombBehavior configuration",
+              "name": "PlayerId",
+              "sentence": "the player id",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "PlayerId"
                       ]
                     }
                   ]
                 }
               ],
-              "variables": [
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
                 {
-                  "folded": true,
-                  "name": "Iteration",
-                  "type": "number",
-                  "value": 1
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::BombBehavior",
+                  "type": "behavior"
                 }
-              ]
+              ],
+              "objectGroups": []
             }
           ],
-          "parameters": [
+          "propertyDescriptors": [
             {
-              "description": "Bomb",
-              "name": "Bomb",
-              "type": "objectList"
+              "value": "3",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Delay",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Delay"
             },
             {
-              "description": "Explosion",
-              "name": "Explosion",
-              "supplementaryInformation": "Sprite",
-              "type": "objectList"
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Player id",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "PlayerId"
             },
             {
-              "description": "Explosion",
-              "name": "ExplosionBehavior",
-              "supplementaryInformation": "Bomb::ExplosionBehavior",
-              "type": "behavior"
-            },
-            {
-              "description": "Obstacle",
-              "name": "Obstacle",
-              "type": "objectList"
-            },
-            {
-              "description": "Praticle emitter",
-              "name": "ParticleEmitter",
-              "supplementaryInformation": "ParticleEmitter3D::ParticleEmitter3D",
-              "type": "objectList"
-            },
-            {
-              "description": "Explosion direction angle",
-              "name": "ExplosionDirection",
-              "type": "expression"
-            },
-            {
-              "description": "Explosion direction X",
-              "name": "ExplosionDirectionX",
-              "type": "expression"
-            },
-            {
-              "description": "Explosion direction Y",
-              "name": "ExplosionDirectionY",
-              "type": "expression"
+              "value": "2",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "ExplosionRange"
             }
           ],
-          "objectGroups": []
-        }
-      ],
-      "eventsBasedBehaviors": [
+          "sharedPropertyDescriptors": []
+        },
         {
           "description": "",
           "fullName": "",
@@ -39444,8 +39660,8 @@
       "eventsBasedBehaviors": [
         {
           "description": "A player that picks up bonuses to become more powerful.",
-          "fullName": "Player",
-          "name": "Player",
+          "fullName": "Player behavior",
+          "name": "PlayerBehavior",
           "objectType": "",
           "eventsFunctions": [
             {
@@ -39460,7 +39676,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Player::Player::ResetPowers"
+                        "value": "Player::PlayerBehavior::ResetPowers"
                       },
                       "parameters": [
                         "Object",
@@ -39494,7 +39710,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::Player",
+                  "supplementaryInformation": "Player::PlayerBehavior",
                   "type": "behavior"
                 }
               ],
@@ -39525,11 +39741,11 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "Player::PlayerBehavior::SetPropertyBombCapacity"
                       },
                       "parameters": [
                         "Object",
-                        "BombCapacity",
+                        "Behavior",
                         "+",
                         "1"
                       ]
@@ -39554,11 +39770,11 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "Player::PlayerBehavior::SetPropertyBombRange"
                       },
                       "parameters": [
                         "Object",
-                        "Range",
+                        "Behavior",
                         "+",
                         "1"
                       ]
@@ -39583,10 +39799,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarScene"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "newIndex",
+                        "NewBonusIndex",
                         "=",
                         "Object.VariableChildCount(Bonus)"
                       ]
@@ -39597,7 +39813,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "Bonus[Variable(newIndex)].Number",
+                        "Bonus[NewBonusIndex].Number",
                         "=",
                         "Bonus.Variable(Type)"
                       ]
@@ -39608,7 +39824,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "Bonus[Variable(newIndex)].X",
+                        "Bonus[NewBonusIndex].X",
                         "=",
                         "Bonus.X() - 5"
                       ]
@@ -39619,7 +39835,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "Bonus[Variable(newIndex)].Y",
+                        "Bonus[NewBonusIndex].Y",
                         "=",
                         "Bonus.Y() - 5"
                       ]
@@ -39633,6 +39849,14 @@
                         ""
                       ]
                     }
+                  ],
+                  "variables": [
+                    {
+                      "folded": true,
+                      "name": "NewBonusIndex",
+                      "type": "number",
+                      "value": 0
+                    }
                   ]
                 }
               ],
@@ -39645,7 +39869,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::Player",
+                  "supplementaryInformation": "Player::PlayerBehavior",
                   "type": "behavior"
                 },
                 {
@@ -39670,7 +39894,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Player::Player::ResetPowers"
+                        "value": "Player::PlayerBehavior::ResetPowers"
                       },
                       "parameters": [
                         "Object",
@@ -39760,7 +39984,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::Player",
+                  "supplementaryInformation": "Player::PlayerBehavior",
                   "type": "behavior"
                 },
                 {
@@ -39791,24 +40015,24 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "Player::PlayerBehavior::SetPropertyBombCapacity"
                       },
                       "parameters": [
                         "Object",
-                        "Range",
-                        "=",
-                        "GlobalVariable(Flame)"
+                        "Behavior",
+                        "+",
+                        "InitialBombCapacity"
                       ]
                     },
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "Player::PlayerBehavior::SetPropertyBombRange"
                       },
                       "parameters": [
                         "Object",
-                        "BombCapacity",
-                        "=",
-                        "GlobalVariable(Bomb)"
+                        "Behavior",
+                        "+",
+                        "InitialBombRange"
                       ]
                     }
                   ]
@@ -39823,7 +40047,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::Player",
+                  "supplementaryInformation": "Player::PlayerBehavior",
                   "type": "behavior"
                 }
               ],
@@ -39869,7 +40093,7 @@
                       },
                       "parameters": [
                         "Bomb",
-                        "IsOverlaping[Object.Variable(Number)]",
+                        "IsOverlaping[Id]",
                         "True"
                       ]
                     }
@@ -39882,7 +40106,7 @@
                       "parameters": [
                         "Bomb",
                         "IsOverlaping",
-                        "Object.VariableString(Number)"
+                        "Id"
                       ]
                     }
                   ]
@@ -39909,7 +40133,7 @@
                       },
                       "parameters": [
                         "Bomb",
-                        "IsOverlaping[Object.Variable(Number)]",
+                        "IsOverlaping[Id]",
                         "True"
                       ]
                     }
@@ -39937,7 +40161,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::Player",
+                  "supplementaryInformation": "Player::PlayerBehavior",
                   "type": "behavior"
                 },
                 {
@@ -39972,13 +40196,13 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "VarObjet"
+                        "value": "Player::PlayerBehavior::PropertyUsedBomb"
                       },
                       "parameters": [
                         "Object",
-                        "BombPut",
+                        "Behavior",
                         "<",
-                        "Object.Variable(BombCapacity)"
+                        "BombCapacity"
                       ]
                     },
                     {
@@ -40021,7 +40245,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::Player",
+                  "supplementaryInformation": "Player::PlayerBehavior",
                   "type": "behavior"
                 },
                 {
@@ -40057,33 +40281,25 @@
                     },
                     {
                       "type": {
-                        "value": "ResetObjectTimer"
+                        "value": "Bomb::BombBehavior::Initialize"
                       },
                       "parameters": [
                         "Bomb",
-                        "\"Detonator\""
+                        "BombBehavior",
+                        "Id",
+                        "BombRange",
+                        ""
                       ]
                     },
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "Player::PlayerBehavior::SetPropertyUsedBomb"
                       },
                       "parameters": [
                         "Object",
-                        "BombPut",
+                        "Behavior",
                         "+",
                         "1"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "Bomb",
-                        "Range",
-                        "=",
-                        "Object.Variable(Range)"
                       ]
                     },
                     {
@@ -40107,16 +40323,55 @@
                         "=",
                         "Bomb.Y()"
                       ]
-                    },
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Bomb",
+                  "name": "Bomb",
+                  "type": "objectListOrEmptyIfJustDeclared"
+                },
+                {
+                  "description": "Bomb behavior",
+                  "name": "BombBehavior",
+                  "supplementaryInformation": "Bomb::BombBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Get back a bomb",
+              "functionType": "Action",
+              "name": "GetBackBomb",
+              "sentence": "_PARAM0_ get back a bomb",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
                     {
                       "type": {
-                        "value": "ModVarObjet"
+                        "value": "Player::PlayerBehavior::SetPropertyUsedBomb"
                       },
                       "parameters": [
-                        "Bomb",
-                        "PlayerNum",
+                        "Object",
+                        "Behavior",
                         "=",
-                        "Object.Variable(Number)"
+                        "max(0, UsedBomb - 1)"
                       ]
                     }
                   ]
@@ -40131,13 +40386,8 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::Player",
+                  "supplementaryInformation": "Player::PlayerBehavior",
                   "type": "behavior"
-                },
-                {
-                  "description": "Bomb",
-                  "name": "Bomb",
-                  "type": "objectListOrEmptyIfJustDeclared"
                 }
               ],
               "objectGroups": []
@@ -40159,7 +40409,7 @@
                       },
                       "parameters": [
                         "Bomb",
-                        "IsOverlaping[Object.Variable(Number)]",
+                        "IsOverlaping[Id]",
                         "True"
                       ]
                     }
@@ -40175,7 +40425,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::Player",
+                  "supplementaryInformation": "Player::PlayerBehavior",
                   "type": "behavior"
                 },
                 {
@@ -40185,15 +40435,281 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the player id of the object.",
+              "fullName": "Player id",
+              "functionType": "ExpressionAndCondition",
+              "group": "Player configuration",
+              "name": "Id",
+              "sentence": "the player id",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Id"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the initial bomb capacity of the object.",
+              "fullName": "Initial bomb capacity",
+              "functionType": "ExpressionAndCondition",
+              "group": "Player configuration",
+              "name": "InitialBombCapacity",
+              "sentence": "the initial bomb capacity",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "InitialBombCapacity"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "InitialBombCapacity",
+              "name": "SetInitialBombCapacity",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Player::PlayerBehavior::SetPropertyInitialBombCapacity"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the initial bomb range of the object.",
+              "fullName": "Initial bomb range",
+              "functionType": "ExpressionAndCondition",
+              "group": "Player configuration",
+              "name": "InitialBombRange",
+              "sentence": "the initial bomb range",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "InitialBombRange"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "InitialBombRange",
+              "name": "SetInitialBombRange",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Player::PlayerBehavior::SetPropertyInitialBombRange"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Player::PlayerBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
-          "propertyDescriptors": [],
+          "propertyDescriptors": [
+            {
+              "value": "1",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Player id",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Id"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Initial bomb capacity",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "InitialBombCapacity"
+            },
+            {
+              "value": "2",
+              "type": "Number",
+              "label": "Initial bomb range",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "InitialBombRange"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "BombCapacity"
+            },
+            {
+              "value": "2",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "BombRange"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "UsedBomb"
+            }
+          ],
           "sharedPropertyDescriptors": []
         },
         {
           "description": "",
           "fullName": "",
-          "name": "PlayerModel",
+          "name": "PlayerAnimator",
           "objectType": "Scene3D::Model3DObject",
           "eventsFunctions": [
             {
@@ -40240,7 +40756,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 }
               ],
@@ -40257,7 +40773,7 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "Player::PlayerModel::PropertyState"
+                        "value": "Player::PlayerAnimator::PropertyState"
                       },
                       "parameters": [
                         "Object",
@@ -40270,7 +40786,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Player::PlayerModel::SetPropertyState"
+                        "value": "Player::PlayerAnimator::SetPropertyState"
                       },
                       "parameters": [
                         "Object",
@@ -40287,7 +40803,7 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "Player::PlayerModel::IsPlayingDeathAnimation"
+                        "value": "Player::PlayerAnimator::IsPlayingDeathAnimation"
                       },
                       "parameters": [
                         "Object",
@@ -40297,7 +40813,7 @@
                     },
                     {
                       "type": {
-                        "value": "Player::PlayerModel::PropertyState"
+                        "value": "Player::PlayerAnimator::PropertyState"
                       },
                       "parameters": [
                         "Object",
@@ -40310,7 +40826,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Player::PlayerModel::SetPropertyState"
+                        "value": "Player::PlayerAnimator::SetPropertyState"
                       },
                       "parameters": [
                         "Object",
@@ -40326,7 +40842,7 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "Player::PlayerModel::PropertyState"
+                        "value": "Player::PlayerAnimator::PropertyState"
                       },
                       "parameters": [
                         "Object",
@@ -40411,7 +40927,7 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "Player::PlayerModel::PropertyState"
+                        "value": "Player::PlayerAnimator::PropertyState"
                       },
                       "parameters": [
                         "Object",
@@ -40492,7 +41008,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 }
               ],
@@ -40534,7 +41050,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 }
               ],
@@ -40553,7 +41069,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Player::PlayerModel::SetPropertyMovementAngle"
+                        "value": "Player::PlayerAnimator::SetPropertyMovementAngle"
                       },
                       "parameters": [
                         "Object",
@@ -40575,7 +41091,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 }
               ],
@@ -40632,7 +41148,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Player::PlayerModel::PlayDeathAnimation"
+                            "value": "Player::PlayerAnimator::PlayDeathAnimation"
                           },
                           "parameters": [
                             "Object",
@@ -40661,7 +41177,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Player::PlayerModel::PlayDeathAnimation"
+                            "value": "Player::PlayerAnimator::PlayDeathAnimation"
                           },
                           "parameters": [
                             "Object",
@@ -40712,7 +41228,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Player::PlayerModel::PlayDeathAnimation"
+                        "value": "Player::PlayerAnimator::PlayDeathAnimation"
                       },
                       "parameters": [
                         "Object",
@@ -40735,7 +41251,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 },
                 {
@@ -40954,7 +41470,7 @@
                     },
                     {
                       "type": {
-                        "value": "Player::PlayerModel::SetPropertyState"
+                        "value": "Player::PlayerAnimator::SetPropertyState"
                       },
                       "parameters": [
                         "Object",
@@ -40976,7 +41492,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 },
                 {
@@ -41035,7 +41551,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 }
               ],
@@ -41052,7 +41568,7 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "Player::PlayerModel::PropertyState"
+                        "value": "Player::PlayerAnimator::PropertyState"
                       },
                       "parameters": [
                         "Object",
@@ -41084,7 +41600,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 }
               ],
@@ -41152,7 +41668,7 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Player::PlayerModel::SetMovementAngle"
+                            "value": "Player::PlayerAnimator::SetMovementAngle"
                           },
                           "parameters": [
                             "Object",
@@ -41232,7 +41748,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 },
                 {
@@ -41282,7 +41798,7 @@
                     },
                     {
                       "type": {
-                        "value": "Player::PlayerModel::SetMovementAngle"
+                        "value": "Player::PlayerAnimator::SetMovementAngle"
                       },
                       "parameters": [
                         "Object",
@@ -41358,7 +41874,7 @@
                 {
                   "description": "Behavior",
                   "name": "Behavior",
-                  "supplementaryInformation": "Player::PlayerModel",
+                  "supplementaryInformation": "Player::PlayerAnimator",
                   "type": "behavior"
                 }
               ],
