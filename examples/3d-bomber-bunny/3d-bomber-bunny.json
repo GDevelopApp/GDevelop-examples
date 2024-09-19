@@ -537,9 +537,9 @@
           "stringProperties": [],
           "initialVariables": [
             {
-              "name": "PlayerNum",
-              "type": "string",
-              "value": "1"
+              "name": "PlayerId",
+              "type": "number",
+              "value": 1
             }
           ]
         },
@@ -646,9 +646,9 @@
           "stringProperties": [],
           "initialVariables": [
             {
-              "name": "PlayerNum",
-              "type": "string",
-              "value": "4"
+              "name": "PlayerId",
+              "type": "number",
+              "value": 4
             }
           ]
         },
@@ -667,9 +667,9 @@
           "stringProperties": [],
           "initialVariables": [
             {
-              "name": "PlayerNum",
-              "type": "string",
-              "value": "3"
+              "name": "PlayerId",
+              "type": "number",
+              "value": 3
             }
           ]
         },
@@ -688,9 +688,9 @@
           "stringProperties": [],
           "initialVariables": [
             {
-              "name": "PlayerNum",
-              "type": "string",
-              "value": "2"
+              "name": "PlayerId",
+              "type": "number",
+              "value": 2
             }
           ]
         }
@@ -1886,8 +1886,11 @@
           "effects": [],
           "behaviors": [
             {
-              "name": "Explosion",
-              "type": "Bomb::ExplosionBehavior"
+              "name": "ExplosionBehavior",
+              "type": "Bomb::ExplosionBehavior",
+              "PlayerId": 0,
+              "DirectionX": 0,
+              "DirectionY": 0
             }
           ],
           "animations": [
@@ -2029,9 +2032,9 @@
           "underlined": false,
           "variables": [
             {
-              "name": "PlayerNum",
-              "type": "string",
-              "value": ""
+              "name": "PlayerId",
+              "type": "number",
+              "value": 0
             }
           ],
           "effects": [],
@@ -2072,7 +2075,14 @@
           "name": "ScoreIcon1",
           "type": "Sprite",
           "updateIfNotVisible": false,
-          "variables": [],
+          "variables": [
+            {
+              "folded": true,
+              "name": "PlayerId",
+              "type": "number",
+              "value": 1
+            }
+          ],
           "effects": [],
           "behaviors": [],
           "animations": [
@@ -2113,7 +2123,14 @@
           "name": "ScoreIcon2",
           "type": "Sprite",
           "updateIfNotVisible": false,
-          "variables": [],
+          "variables": [
+            {
+              "folded": true,
+              "name": "PlayerId",
+              "type": "number",
+              "value": 2
+            }
+          ],
           "effects": [],
           "behaviors": [],
           "animations": [
@@ -2156,9 +2173,9 @@
           "updateIfNotVisible": false,
           "variables": [
             {
-              "name": "PlayerNum",
-              "type": "string",
-              "value": "3"
+              "name": "PlayerId",
+              "type": "number",
+              "value": 3
             }
           ],
           "effects": [],
@@ -2201,7 +2218,14 @@
           "name": "ScoreIcon4",
           "type": "Sprite",
           "updateIfNotVisible": false,
-          "variables": [],
+          "variables": [
+            {
+              "folded": true,
+              "name": "PlayerId",
+              "type": "number",
+              "value": 4
+            }
+          ],
           "effects": [],
           "behaviors": [],
           "animations": [
@@ -2791,9 +2815,10 @@
                   },
                   "parameters": [
                     "",
-                    "GlobalVariableString(Level)",
+                    "Level",
                     "0",
-                    "0"
+                    "0",
+                    ""
                   ]
                 },
                 {
@@ -2888,13 +2913,14 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "VarObjet"
+                    "value": "Player::PlayerBehavior::Id"
                   },
                   "parameters": [
                     "Player",
-                    "Number",
+                    "Player",
                     ">",
-                    "GlobalVariable(PlayerCount)"
+                    "PlayerCount",
+                    ""
                   ]
                 }
               ],
@@ -2945,13 +2971,13 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "VarObjet"
+                    "value": "NumberObjectVariable"
                   },
                   "parameters": [
                     "ScoreIcon",
-                    "PlayerNum",
+                    "PlayerId",
                     ">",
-                    "GlobalVariable(PlayerCount)"
+                    "PlayerCount"
                   ]
                 }
               ],
@@ -2972,13 +2998,13 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "VarObjet"
+                    "value": "NumberObjectVariable"
                   },
                   "parameters": [
                     "Score",
-                    "PlayerNum",
+                    "PlayerId",
                     ">",
-                    "GlobalVariable(PlayerCount)"
+                    "PlayerCount"
                   ]
                 }
               ],
@@ -3417,7 +3443,7 @@
                             "Bomb",
                             "BombBehavior",
                             "Explosion",
-                            "Explosion",
+                            "ExplosionBehavior",
                             "Obstacle",
                             "ExplosionParticleEmitter",
                             ""
@@ -3520,7 +3546,7 @@
                                 "Bomb",
                                 "BombBehavior",
                                 "Explosion",
-                                "Explosion",
+                                "ExplosionBehavior",
                                 "Obstacle",
                                 "ExplosionParticleEmitter",
                                 ""
@@ -3589,274 +3615,207 @@
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetSceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "scoreHasChanged",
-                    "False"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "Player",
-              "conditions": [],
               "actions": [],
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "CollisionNP"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Explosion",
-                        "",
-                        "",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "Respawn::Respawn::IsInvincible"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Respawn",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "VarObjet"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Death",
-                        "=",
-                        "1"
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetSceneVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "scoreHasChanged",
-                        "True"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetObjectVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Death",
-                        "True"
-                      ]
-                    }
-                  ],
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "Player",
+                  "conditions": [],
+                  "actions": [],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                            "value": "CollisionNP"
                           },
                           "parameters": [
+                            "Player",
+                            "Explosion",
                             "",
-                            "PlayerModel",
-                            "Player",
+                            "",
                             ""
                           ]
-                        }
-                      ],
-                      "actions": [
+                        },
                         {
                           "type": {
-                            "value": "Player::PlayerAnimator::PlayDeathAnimationFromExplosion"
+                            "inverted": true,
+                            "value": "Respawn::Respawn::IsInvincible"
                           },
                           "parameters": [
-                            "PlayerModel",
-                            "PlayerModel",
-                            "Explosion",
                             "Player",
+                            "Respawn",
                             ""
                           ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
+                        },
                         {
                           "type": {
+                            "inverted": true,
                             "value": "VarObjet"
                           },
                           "parameters": [
-                            "Explosion",
-                            "PlayerNum",
-                            "!=",
-                            "Player.Variable(Number)"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ModVarGlobal"
-                          },
-                          "parameters": [
-                            "Score[Explosion.VariableString(PlayerNum)]",
-                            "+",
-                            "1"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "VarObjet"
-                          },
-                          "parameters": [
-                            "Explosion",
-                            "PlayerNum",
+                            "Player",
+                            "Death",
                             "=",
-                            "Player.Variable(Number)"
+                            "1"
                           ]
                         }
                       ],
                       "actions": [
                         {
                           "type": {
-                            "value": "ModVarGlobal"
+                            "value": "SetBooleanVariable"
                           },
                           "parameters": [
-                            "Score[Explosion.VariableString(PlayerNum)]",
-                            "-",
-                            "1"
+                            "HasScoreChanged",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetObjectVariableAsBoolean"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Death",
+                            "True"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "LinkedObjects::PickObjectsLinkedTo"
+                              },
+                              "parameters": [
+                                "",
+                                "PlayerModel",
+                                "Player",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Player::PlayerAnimator::PlayDeathAnimationFromExplosion"
+                              },
+                              "parameters": [
+                                "PlayerModel",
+                                "PlayerModel",
+                                "Explosion",
+                                "ExplosionBehavior",
+                                "Player",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Bomb::ExplosionBehavior::PlayerId"
+                              },
+                              "parameters": [
+                                "Explosion",
+                                "ExplosionBehavior",
+                                "!=",
+                                "Player.Player::Id()",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarGlobal"
+                              },
+                              "parameters": [
+                                "Score[Explosion.ExplosionBehavior::PlayerId()]",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "Bomb::ExplosionBehavior::PlayerId"
+                              },
+                              "parameters": [
+                                "Explosion",
+                                "ExplosionBehavior",
+                                "=",
+                                "Player.Player::Id()",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ModVarGlobal"
+                              },
+                              "parameters": [
+                                "Score[Explosion.ExplosionBehavior::PlayerId()]",
+                                "-",
+                                "1"
+                              ]
+                            }
                           ]
                         }
                       ]
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Dead players come back to their initial location."
-            },
-            {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "Player",
-              "conditions": [],
-              "actions": [],
-              "events": [
+                },
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "ObjectVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Death",
-                        "True"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Player::PlayerAnimator::CanRespawn"
-                      },
-                      "parameters": [
-                        "PlayerModel",
-                        "PlayerModel",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetObjectVariableAsBoolean"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Death",
-                        "False"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Respawn::Respawn::Respawn"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Respawn",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "Player",
-                        "BombPut",
-                        "=",
-                        "0"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Player::PlayerBehavior::GiveBackBonuses"
-                      },
-                      "parameters": [
-                        "Player",
-                        "Player",
-                        "Bonus",
-                        "BonusAnimator",
-                        ""
-                      ]
-                    }
-                  ],
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Dead players come back to their initial location."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "Player",
+                  "conditions": [],
+                  "actions": [],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "value": "LinkedObjects::PickObjectsLinkedTo"
+                            "value": "ObjectVariableAsBoolean"
                           },
                           "parameters": [
-                            "",
-                            "PlayerModel",
                             "Player",
+                            "Death",
+                            "True"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Player::PlayerAnimator::CanRespawn"
+                          },
+                          "parameters": [
+                            "PlayerModel",
+                            "PlayerModel",
                             ""
                           ]
                         }
@@ -3864,41 +3823,102 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "Player::PlayerAnimator::PlayRespawnAnimation"
+                            "value": "SetObjectVariableAsBoolean"
                           },
                           "parameters": [
-                            "PlayerModel",
-                            "PlayerModel",
+                            "Player",
+                            "Death",
+                            "False"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Respawn::Respawn::Respawn"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Respawn",
                             ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Player::PlayerBehavior::GiveBackBonuses"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Player",
+                            "Bonus",
+                            "BonusAnimator",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "LinkedObjects::PickObjectsLinkedTo"
+                              },
+                              "parameters": [
+                                "",
+                                "PlayerModel",
+                                "Player",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Player::PlayerAnimator::PlayRespawnAnimation"
+                              },
+                              "parameters": [
+                                "PlayerModel",
+                                "PlayerModel",
+                                ""
+                              ]
+                            }
                           ]
                         }
                       ]
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
+                },
                 {
-                  "type": {
-                    "value": "SceneVariableAsBoolean"
-                  },
-                  "parameters": [
-                    "scoreHasChanged",
-                    "True"
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "HasScoreChanged",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Link",
+                      "include": {
+                        "includeConfig": 0
+                      },
+                      "target": "Print score"
+                    }
                   ]
                 }
               ],
-              "actions": [],
-              "events": [
+              "variables": [
                 {
-                  "type": "BuiltinCommonInstructions::Link",
-                  "include": {
-                    "includeConfig": 0
-                  },
-                  "target": "Print score"
+                  "folded": true,
+                  "name": "HasScoreChanged",
+                  "type": "boolean",
+                  "value": false
                 }
               ]
             }
@@ -4058,33 +4078,6 @@
             }
           ],
           "parameters": []
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "KeyReleased"
-              },
-              "parameters": [
-                "",
-                "Space"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "AnimatableCapability::AnimatableBehavior::SetSpeedScale"
-              },
-              "parameters": [
-                "BlueBunny",
-                "Animation",
-                "*",
-                "-1"
-              ]
-            }
-          ]
         }
       ],
       "layers": [
@@ -4188,7 +4181,7 @@
           "type": "EffectCapability::EffectBehavior"
         },
         {
-          "name": "Explosion",
+          "name": "ExplosionBehavior",
           "type": "Bomb::ExplosionBehavior"
         },
         {
@@ -5673,7 +5666,7 @@
               },
               "parameters": [
                 "Score",
-                "PlayerNum",
+                "PlayerId",
                 "=",
                 "Player.Player::Id()"
               ]
@@ -38365,6 +38358,43 @@
           "objectType": "",
           "eventsFunctions": [
             {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"Detonator\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::BombBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "fullName": "Initialize a bomb",
               "functionType": "Action",
               "name": "Initialize",
@@ -38394,15 +38424,6 @@
                         "Behavior",
                         "=",
                         "Range"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ResetObjectTimer"
-                      },
-                      "parameters": [
-                        "Object",
-                        "\"Detonator\""
                       ]
                     }
                   ]
@@ -38732,10 +38753,11 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "SetSceneVariableAsBoolean"
+                            "value": "SetBooleanVariable"
                           },
                           "parameters": [
-                            "isExplosionAlreadyCreated",
+                            "IsExplosionAlreadyCreated",
+                            "False",
                             ""
                           ]
                         }
@@ -38778,11 +38800,12 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "SetSceneVariableAsBoolean"
+                                "value": "SetBooleanVariable"
                               },
                               "parameters": [
-                                "isExplosionAlreadyCreated",
-                                "True"
+                                "IsExplosionAlreadyCreated",
+                                "True",
+                                ""
                               ]
                             }
                           ]
@@ -38805,35 +38828,15 @@
                             },
                             {
                               "type": {
-                                "value": "ModVarObjet"
+                                "value": "Bomb::ExplosionBehavior::Inizialize"
                               },
                               "parameters": [
                                 "Explosion",
-                                "PlayerNum",
-                                "=",
-                                "PlayerId"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "Explosion",
-                                "DirectionX",
-                                "=",
-                                "ExplosionDirectionX"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "ModVarObjet"
-                              },
-                              "parameters": [
-                                "Explosion",
-                                "DirectionY",
-                                "=",
-                                "ExplosionDirectionY"
+                                "ExplosionBehavior",
+                                "PlayerId",
+                                "ExplosionDirectionX",
+                                "ExplosionDirectionY",
+                                ""
                               ]
                             },
                             {
@@ -38851,11 +38854,12 @@
                               "conditions": [
                                 {
                                   "type": {
-                                    "value": "SceneVariableAsBoolean"
+                                    "value": "BooleanVariable"
                                   },
                                   "parameters": [
-                                    "isExplosionAlreadyCreated",
-                                    "="
+                                    "IsExplosionAlreadyCreated",
+                                    "=",
+                                    ""
                                   ]
                                 }
                               ],
@@ -38954,6 +38958,12 @@
                       "name": "Iteration",
                       "type": "number",
                       "value": 1
+                    },
+                    {
+                      "folded": true,
+                      "name": "IsExplosionAlreadyCreated",
+                      "type": "boolean",
+                      "value": false
                     }
                   ]
                 }
@@ -39404,6 +39414,82 @@
               "objectGroups": []
             },
             {
+              "fullName": "Inizialize an explosion part",
+              "functionType": "Action",
+              "name": "Inizialize",
+              "sentence": "Initialize _PARAM0_ for player: _PARAM2_ and direction: _PARAM3_ ;  _PARAM4_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Bomb::ExplosionBehavior::SetPropertyPlayerId"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "PlayerId"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Bomb::ExplosionBehavior::SetPropertyDirectionX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "DirectionX"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Bomb::ExplosionBehavior::SetPropertyDirectionY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "DirectionY"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::ExplosionBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Player id",
+                  "name": "PlayerId",
+                  "type": "expression"
+                },
+                {
+                  "description": "Direction X",
+                  "name": "DirectionX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Direction Y",
+                  "name": "DirectionY",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
@@ -39500,9 +39586,166 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the playerId of the object.",
+              "fullName": "PlayerId",
+              "functionType": "ExpressionAndCondition",
+              "group": "ExplosionBehavior configuration",
+              "name": "PlayerId",
+              "sentence": "the playerId",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "PlayerId"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::ExplosionBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the directionX of the object.",
+              "fullName": "DirectionX",
+              "functionType": "ExpressionAndCondition",
+              "group": "ExplosionBehavior configuration",
+              "name": "DirectionX",
+              "sentence": "the directionX",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "DirectionX"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::ExplosionBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the directionY of the object.",
+              "fullName": "DirectionY",
+              "functionType": "ExpressionAndCondition",
+              "group": "ExplosionBehavior configuration",
+              "name": "DirectionY",
+              "sentence": "the directionY",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "DirectionY"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Bomb::ExplosionBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
-          "propertyDescriptors": [],
+          "propertyDescriptors": [
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "PlayerId"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "DirectionX"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "DirectionY"
+            }
+          ],
           "sharedPropertyDescriptors": []
         }
       ],
@@ -41101,31 +41344,33 @@
               "fullName": "Play death animation from explosion",
               "functionType": "Action",
               "name": "PlayDeathAnimationFromExplosion",
-              "sentence": "Play death animation of _PARAM0_ according to _PARAM2_ and _PARAM3_",
+              "sentence": "Play death animation of _PARAM0_ according to _PARAM2_ and _PARAM4_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
-                        "value": "VarObjet"
+                        "value": "Bomb::ExplosionBehavior::DirectionX"
                       },
                       "parameters": [
                         "Explosion",
-                        "DirectionX",
+                        "ExplosionBehavior",
                         "=",
-                        "0"
+                        "0",
+                        ""
                       ]
                     },
                     {
                       "type": {
-                        "value": "VarObjet"
+                        "value": "Bomb::ExplosionBehavior::DirectionY"
                       },
                       "parameters": [
                         "Explosion",
-                        "DirectionY",
+                        "ExplosionBehavior",
                         "=",
-                        "0"
+                        "0",
+                        ""
                       ]
                     }
                   ],
@@ -41202,24 +41447,26 @@
                       "subInstructions": [
                         {
                           "type": {
-                            "value": "VarObjet"
+                            "value": "Bomb::ExplosionBehavior::DirectionX"
                           },
                           "parameters": [
                             "Explosion",
-                            "DirectionX",
+                            "ExplosionBehavior",
                             "!=",
-                            "0"
+                            "0",
+                            ""
                           ]
                         },
                         {
                           "type": {
-                            "value": "VarObjet"
+                            "value": "Bomb::ExplosionBehavior::DirectionY"
                           },
                           "parameters": [
                             "Explosion",
-                            "DirectionY",
+                            "ExplosionBehavior",
                             "!=",
-                            "0"
+                            "0",
+                            ""
                           ]
                         }
                       ]
@@ -41233,8 +41480,8 @@
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "Explosion.Variable(DirectionX)",
-                        "Explosion.Variable(DirectionY)",
+                        "Explosion.ExplosionBehavior::DirectionX()",
+                        "Explosion.ExplosionBehavior::DirectionY()",
                         ""
                       ]
                     }
@@ -41258,6 +41505,12 @@
                   "description": "Explosion",
                   "name": "Explosion",
                   "type": "objectList"
+                },
+                {
+                  "description": "Explosion behavior",
+                  "name": "ExplosionBehavior",
+                  "supplementaryInformation": "Bomb::ExplosionBehavior",
+                  "type": "behavior"
                 },
                 {
                   "description": "Player",
