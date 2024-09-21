@@ -2267,7 +2267,35 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "UnPauseTimer"
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "sound_volume",
+                        "=",
+                        "30"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Initialize timers\nplayer_shoot_timer is used when shooting projectiles\nengine timer is used when creating the engine particles"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ResetTimer"
                       },
                       "parameters": [
                         "",
@@ -2276,12 +2304,11 @@
                     },
                     {
                       "type": {
-                        "value": "SetNumberVariable"
+                        "value": "ResetTimer"
                       },
                       "parameters": [
-                        "sound_volume",
-                        "=",
-                        "30"
+                        "",
+                        "\"engine\""
                       ]
                     }
                   ]
@@ -4881,63 +4908,31 @@
                         "=",
                         "0"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "UnPauseTimer"
+                        "value": "Wait"
                       },
                       "parameters": [
-                        "",
-                        "\"player_destroyable\""
+                        "Variable(player_undestroyable_time)"
                       ]
-                    }
-                  ],
-                  "events": [
+                    },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Timer"
-                          },
-                          "parameters": [
-                            "",
-                            "Variable(player_undestroyable_time)",
-                            "\"player_destroyable\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetBooleanVariable"
-                          },
-                          "parameters": [
-                            "player_destroyable",
-                            "True",
-                            "1"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PauseTimer"
-                          },
-                          "parameters": [
-                            "",
-                            "\"player_destroyable\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ResetTimer"
-                          },
-                          "parameters": [
-                            "",
-                            "\"player_destroyable\""
-                          ]
-                        }
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "player_destroyable",
+                        "True",
+                        "1"
                       ]
                     }
                   ]
@@ -6842,82 +6837,55 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "If player life = 0, wait few seconds and go to game over screen"
+                  "comment": "If player life = 0 or number of asteroids = 0, wait few seconds and go to game over screen"
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
-                        "value": "VarScene"
+                        "value": "BuiltinCommonInstructions::Or"
                       },
-                      "parameters": [
-                        "player_life",
-                        "=",
-                        "0"
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "NbObjet"
+                          },
+                          "parameters": [
+                            "asteroids",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "player_life",
+                            "=",
+                            "0"
+                          ]
+                        }
                       ]
                     },
                     {
                       "type": {
-                        "value": "Timer"
+                        "value": "BuiltinCommonInstructions::Once"
                       },
-                      "parameters": [
-                        "",
-                        "3",
-                        "\"end_game_timer\""
-                      ]
+                      "parameters": []
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "Scene"
+                        "value": "Wait"
                       },
                       "parameters": [
-                        "",
-                        "\"game_over\"",
-                        "true"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "If the number of asteroids = 0, wait few seconds and go to game over screen"
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "NbObjet"
-                      },
-                      "parameters": [
-                        "asteroids",
-                        "=",
-                        "0"
+                        "3"
                       ]
                     },
-                    {
-                      "type": {
-                        "value": "Timer"
-                      },
-                      "parameters": [
-                        "",
-                        "3",
-                        "\"end_game_timer\""
-                      ]
-                    }
-                  ],
-                  "actions": [
                     {
                       "type": {
                         "value": "Scene"
