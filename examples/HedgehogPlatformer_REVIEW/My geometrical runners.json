@@ -1927,7 +1927,9 @@
               "PlatformFunction": false,
               "WallFunction": false,
               "CeilFunction": false,
-              "FloorFunction": false
+              "FloorFunction": false,
+              "ShouldRotateCharacter": false,
+              "ShouldRotateCharacters": false
             }
           ],
           "animations": [
@@ -13827,15 +13829,61 @@
                                       ]
                                     }
                                   ],
-                                  "actions": [
+                                  "actions": [],
+                                  "events": [
                                     {
-                                      "type": {
-                                        "value": "SetAngle"
-                                      },
-                                      "parameters": [
-                                        "Object",
-                                        "=",
-                                        "GroundAngle"
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::ShouldLastRaycastedPlatformRotateCharacters"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Behavior",
+                                            ""
+                                          ]
+                                        }
+                                      ],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "SetAngle"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "=",
+                                            "GroundAngle"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [
+                                        {
+                                          "type": {
+                                            "inverted": true,
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::ShouldLastRaycastedPlatformRotateCharacters"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Behavior",
+                                            ""
+                                          ]
+                                        }
+                                      ],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "SetAngle"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "=",
+                                            "0"
+                                          ]
+                                        }
                                       ]
                                     }
                                   ]
@@ -20572,6 +20620,45 @@
               "objectGroups": []
             },
             {
+              "description": "Check if the last recasted platform should rotate characters",
+              "fullName": "Last recasted platform should rotate characters",
+              "functionType": "Condition",
+              "name": "ShouldLastRaycastedPlatformRotateCharacters",
+              "private": true,
+              "sentence": "The last raycasted platform from _PARAM0_ should rotate characters",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const { getManager } = gdjs.__hedgehogPlatformerExtension;\r",
+                    "\r",
+                    "const platform = getManager(runtimeScene).lastRaycastResult.platform;\r",
+                    "eventsFunctionContext.returnValue = platform ?\r",
+                    "    platform.behavior._getShouldRotateCharacters() :\r",
+                    "    false;\r",
+                    ""
+                  ],
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "Mark the last raycasted platform as the current platform",
               "fullName": "Current platform",
               "functionType": "Action",
@@ -21958,6 +22045,15 @@
               "group": "Layer toggle",
               "extraInformation": [],
               "name": "IsRequiringGrounded"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Rotate characters",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "ShouldRotateCharacters"
             }
           ],
           "sharedPropertyDescriptors": []
