@@ -462,7 +462,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.25,
         "snap": true,
-        "zoomFactor": 0.20902556228336097,
+        "zoomFactor": 0.34375202416124645,
         "windowMask": false
       },
       "objectsGroups": [
@@ -503,7 +503,7 @@
           "depth": 1,
           "height": 554,
           "keepRatio": true,
-          "layer": "Toggles",
+          "layer": "Marker",
           "name": "LayerToggleMarker2",
           "persistentUuid": "8a0bfa99-06e9-4db7-9121-3b37aab74f1b",
           "width": 415,
@@ -520,7 +520,7 @@
           "depth": 1,
           "height": 288,
           "keepRatio": true,
-          "layer": "Toggles",
+          "layer": "Marker",
           "name": "GroundedLayerToggleMarker",
           "persistentUuid": "633bc167-d35e-4158-99ef-e1e45bb7c203",
           "width": 480,
@@ -1200,6 +1200,22 @@
           "x": 3560,
           "y": 385,
           "zOrder": 134,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "Marker",
+          "name": "AngleLockMarker",
+          "persistentUuid": "4b1e9928-0062-42a4-957c-8359f5a9750d",
+          "width": 0,
+          "x": 4416,
+          "y": 960,
+          "zOrder": 135,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -3273,7 +3289,6 @@
       },
       "events": [
         {
-          "disabled": true,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -3288,14 +3303,41 @@
           "actions": [
             {
               "type": {
-                "value": "DebuggerTools::EnableDebugDraw"
+                "value": "HideLayer"
               },
               "parameters": [
                 "",
+                "\"Marker\""
+              ]
+            },
+            {
+              "type": {
+                "value": "HideLayer"
+              },
+              "parameters": [
                 "",
-                "yes",
-                "no",
-                "no"
+                "\"Collision\""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "disabled": true,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DebuggerTools::EnableDebugDraw"
+                  },
+                  "parameters": [
+                    "",
+                    "",
+                    "yes",
+                    "no",
+                    "no"
+                  ]
+                }
               ]
             }
           ]
@@ -3911,7 +3953,7 @@
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
           "isLocked": false,
-          "name": "Toggles",
+          "name": "Marker",
           "renderingType": "",
           "visibility": true,
           "cameras": [],
@@ -13642,7 +13684,18 @@
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
-                          "actions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "OldGroundAngle",
+                                "=",
+                                "GroundAngle"
+                              ]
+                            }
+                          ],
                           "events": [
                             {
                               "type": "BuiltinCommonInstructions::Comment",
@@ -13764,51 +13817,15 @@
                                   "events": [
                                     {
                                       "type": "BuiltinCommonInstructions::Standard",
-                                      "conditions": [
-                                        {
-                                          "type": {
-                                            "value": "HedgehogPlatformer::HedgehogCharacter::IsCollidingHorizontalAngleLockMarker"
-                                          },
-                                          "parameters": [
-                                            "Object",
-                                            "Behavior",
-                                            ""
-                                          ]
-                                        },
-                                        {
-                                          "type": {
-                                            "value": "HedgehogPlatformer::IsAngleAround"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            "GroundAngle",
-                                            "0",
-                                            "45",
-                                            ""
-                                          ]
-                                        },
-                                        {
-                                          "type": {
-                                            "value": "HedgehogPlatformer::IsAngleAround"
-                                          },
-                                          "parameters": [
-                                            "",
-                                            "GroundAngle",
-                                            "180",
-                                            "45",
-                                            ""
-                                          ]
-                                        }
-                                      ],
+                                      "conditions": [],
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
+                                            "value": "DebuggerTools::ConsoleLog"
                                           },
                                           "parameters": [
-                                            "Object",
-                                            "Behavior",
-                                            "90 * round(GroundAngle / 90)",
+                                            "\"GoundAngle locked: \" + GroundAngle",
+                                            "\"info\"",
                                             ""
                                           ]
                                         }
@@ -13819,7 +13836,7 @@
                                       "conditions": [
                                         {
                                           "type": {
-                                            "value": "HedgehogPlatformer::HedgehogCharacter::IsCollidingVerticalAngleLockMarker"
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::IsCollidingHorizontalAngleLockMarker"
                                           },
                                           "parameters": [
                                             "Object",
@@ -13872,20 +13889,100 @@
                                             ""
                                           ]
                                         }
+                                      ],
+                                      "events": [
+                                        {
+                                          "type": "BuiltinCommonInstructions::Standard",
+                                          "conditions": [],
+                                          "actions": [
+                                            {
+                                              "type": {
+                                                "value": "DebuggerTools::ConsoleLog"
+                                              },
+                                              "parameters": [
+                                                "\"GoundAngle locked horizontally: \" + GroundAngle",
+                                                "\"info\"",
+                                                ""
+                                              ]
+                                            }
+                                          ]
+                                        }
                                       ]
                                     },
                                     {
                                       "type": "BuiltinCommonInstructions::Standard",
-                                      "conditions": [],
+                                      "conditions": [
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::IsCollidingVerticalAngleLockMarker"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Behavior",
+                                            ""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "BuiltinCommonInstructions::Not"
+                                          },
+                                          "parameters": [],
+                                          "subInstructions": [
+                                            {
+                                              "type": {
+                                                "value": "HedgehogPlatformer::IsAngleAround"
+                                              },
+                                              "parameters": [
+                                                "",
+                                                "GroundAngle",
+                                                "90",
+                                                "45",
+                                                ""
+                                              ]
+                                            },
+                                            {
+                                              "type": {
+                                                "value": "HedgehogPlatformer::IsAngleAround"
+                                              },
+                                              "parameters": [
+                                                "",
+                                                "GroundAngle",
+                                                "270",
+                                                "45",
+                                                ""
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ],
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "DebuggerTools::ConsoleLog"
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
                                           },
                                           "parameters": [
-                                            "\"GoundAngle locked: \" + GroundAngle",
-                                            "\"info\"",
+                                            "Object",
+                                            "Behavior",
+                                            "90 * round(GroundAngle / 90)",
                                             ""
+                                          ]
+                                        }
+                                      ],
+                                      "events": [
+                                        {
+                                          "type": "BuiltinCommonInstructions::Standard",
+                                          "conditions": [],
+                                          "actions": [
+                                            {
+                                              "type": {
+                                                "value": "DebuggerTools::ConsoleLog"
+                                              },
+                                              "parameters": [
+                                                "\"GoundAngle locked vertically: \" + GroundAngle",
+                                                "\"info\"",
+                                                ""
+                                              ]
+                                            }
                                           ]
                                         }
                                       ]
@@ -13912,16 +14009,6 @@
                                       "type": "BuiltinCommonInstructions::Standard",
                                       "conditions": [],
                                       "actions": [
-                                        {
-                                          "type": {
-                                            "value": "SetNumberVariable"
-                                          },
-                                          "parameters": [
-                                            "OldGroundAngle",
-                                            "=",
-                                            "GroundAngle"
-                                          ]
-                                        },
                                         {
                                           "type": {
                                             "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
@@ -14068,14 +14155,66 @@
                                               ]
                                             }
                                           ]
-                                        }
-                                      ],
-                                      "variables": [
+                                        },
                                         {
-                                          "folded": true,
-                                          "name": "OldGroundAngle",
-                                          "type": "number",
-                                          "value": 0
+                                          "disabled": true,
+                                          "type": "BuiltinCommonInstructions::Standard",
+                                          "conditions": [],
+                                          "actions": [
+                                            {
+                                              "type": {
+                                                "value": "DebuggerTools::ConsoleLog"
+                                              },
+                                              "parameters": [
+                                                "\"GoundAngle delta: \" + ToString(AngleDifference(GroundAngle, OldGroundAngle))",
+                                                "\"info\"",
+                                                ""
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "BuiltinCommonInstructions::Comment",
+                                          "color": {
+                                            "b": 109,
+                                            "g": 230,
+                                            "r": 255,
+                                            "textB": 0,
+                                            "textG": 0,
+                                            "textR": 0
+                                          },
+                                          "comment": "Avoid characters from taking sharp turn."
+                                        },
+                                        {
+                                          "type": "BuiltinCommonInstructions::Standard",
+                                          "conditions": [
+                                            {
+                                              "type": {
+                                                "inverted": true,
+                                                "value": "HedgehogPlatformer::IsAngleAround"
+                                              },
+                                              "parameters": [
+                                                "",
+                                                "GroundAngle",
+                                                "OldGroundAngle",
+                                                "50",
+                                                ""
+                                              ]
+                                            }
+                                          ],
+                                          "actions": [
+                                            {
+                                              "type": {
+                                                "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
+                                              },
+                                              "parameters": [
+                                                "Object",
+                                                "Behavior",
+                                                "OldGroundAngle",
+                                                ""
+                                              ]
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
@@ -14486,6 +14625,17 @@
                                 },
                                 {
                                   "type": {
+                                    "value": "HedgehogPlatformer::HedgehogCharacter::SetGroundAngle"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "OldGroundAngle",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
                                     "value": "HedgehogPlatformer::HedgehogCharacter::TransitionToAirborne"
                                   },
                                   "parameters": [
@@ -14537,6 +14687,12 @@
                               "name": "HasFoundFloor",
                               "type": "boolean",
                               "value": false
+                            },
+                            {
+                              "folded": true,
+                              "name": "OldGroundAngle",
+                              "type": "number",
+                              "value": 0
                             }
                           ]
                         }
@@ -20052,7 +20208,7 @@
                     "\r",
                     "const platform = getManager(runtimeScene).lastOverlappingPlatform;\r",
                     "eventsFunctionContext.returnValue = platform ?\r",
-                    "    platform.behavior._getShouldSnapAngleHorizontally() :\r",
+                    "    platform.behavior._getShouldSnapAngleVertically() :\r",
                     "    false;\r",
                     ""
                   ],
