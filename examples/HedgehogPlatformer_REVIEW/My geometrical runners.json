@@ -2554,6 +2554,17 @@
                   ]
                 }
               ]
+            },
+            {
+              "name": "Crouch",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
             }
           ]
         },
@@ -3803,7 +3814,74 @@
                     "yes",
                     ""
                   ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCrouching"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacterRolling",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Animation",
+                    "=",
+                    "\"Crouch\""
+                  ]
                 },
+                {
+                  "type": {
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacterAnimator",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsRolling"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacterRolling",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCrouching"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacterRolling",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
                 {
                   "type": {
                     "value": "ActivateBehavior"
@@ -23292,6 +23370,22 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::SetPropertyIsCrouching"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "no"
+                      ]
+                    }
+                  ]
                 }
               ],
               "parameters": [
@@ -23317,6 +23411,22 @@
               "name": "SimulateRollKey",
               "sentence": "Simulate pressing Roll key for _PARAM0_",
               "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::SetPropertyIsCrouching"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
@@ -23372,12 +23482,93 @@
               "objectGroups": []
             },
             {
-              "description": "Check if isRolling.",
-              "fullName": "IsRolling",
+              "description": "Check if the character is crouching.",
+              "fullName": "Is crouching",
+              "functionType": "Condition",
+              "name": "IsCrouching",
+              "sentence": "_PARAM0_ is crouching",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::PropertyIsCrouching"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::PropertyIsRolling"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::HedgehogCharacter::IsUsingControl"
+                      },
+                      "parameters": [
+                        "Object",
+                        "HedgehogCharacter",
+                        "\"Left\"",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::HedgehogCharacter::IsUsingControl"
+                      },
+                      "parameters": [
+                        "Object",
+                        "HedgehogCharacter",
+                        "\"Right\"",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacterRolling",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the character is rolling.",
+              "fullName": "Is rolling",
               "functionType": "Condition",
               "group": "Hedgehog rolling",
               "name": "IsRolling",
-              "sentence": "_PARAM0_ isRolling",
+              "sentence": "_PARAM0_ is rolling",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -23435,6 +23626,7 @@
               "functionType": "Action",
               "group": "Hedgehog rolling",
               "name": "SetIsRolling",
+              "private": true,
               "sentence": "Enable rolling for _PARAM0_ : _PARAM2_",
               "events": [
                 {
@@ -23822,6 +24014,16 @@
               "extraInformation": [],
               "hidden": true,
               "name": "IsRolling"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "IsCrouching"
             },
             {
               "value": "0",
