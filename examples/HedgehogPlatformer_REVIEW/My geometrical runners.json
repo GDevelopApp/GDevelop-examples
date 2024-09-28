@@ -1829,7 +1829,13 @@
                     {
                       "hasCustomCollisionMask": true,
                       "image": "assets\\Blue player_roll.png",
-                      "points": [],
+                      "points": [
+                        {
+                          "name": "Bottom",
+                          "x": 56,
+                          "y": 117
+                        }
+                      ],
                       "originPoint": {
                         "name": "origine",
                         "x": 69.5,
@@ -3363,6 +3369,51 @@
             "outlineOpacity": 64,
             "outlineSize": 1
           }
+        },
+        {
+          "additive": false,
+          "assetStoreId": "",
+          "destroyWhenNoParticles": true,
+          "emitterAngleA": 0,
+          "emitterAngleB": 10,
+          "emitterForceMax": 300,
+          "emitterForceMin": 200,
+          "flow": 200,
+          "jumpForwardInTimeOnCreation": 0,
+          "maxParticleNb": 100,
+          "name": "Dust",
+          "particleAlpha1": 255,
+          "particleAlpha2": 0,
+          "particleAlphaRandomness1": 0,
+          "particleAlphaRandomness2": 0,
+          "particleAngle1": 0,
+          "particleAngle2": 0,
+          "particleAngleRandomness1": 0,
+          "particleAngleRandomness2": 0,
+          "particleBlue1": 80,
+          "particleBlue2": 80,
+          "particleGravityX": 0,
+          "particleGravityY": -500,
+          "particleGreen1": 172,
+          "particleGreen2": 172,
+          "particleLifeTimeMax": 0.5,
+          "particleLifeTimeMin": 0.125,
+          "particleRed1": 211,
+          "particleRed2": 211,
+          "particleSize1": 12.5,
+          "particleSize2": 200,
+          "particleSizeRandomness1": 0,
+          "particleSizeRandomness2": 0,
+          "rendererParam1": 8,
+          "rendererParam2": 1,
+          "rendererType": "Point",
+          "tank": -1,
+          "textureParticleName": "",
+          "type": "ParticleSystem::ParticleEmitter",
+          "zoneRadius": 0,
+          "variables": [],
+          "effects": [],
+          "behaviors": []
         }
       ],
       "objectsFolderStructure": {
@@ -3421,6 +3472,9 @@
           },
           {
             "objectName": "CoinParticles"
+          },
+          {
+            "objectName": "Dust"
           }
         ]
       },
@@ -3549,32 +3603,6 @@
                   },
                   "parameters": [
                     "",
-                    "Up"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "HedgehogPlatformer::HedgehogCharacter::SimulateJumpKey"
-                  },
-                  "parameters": [
-                    "Player1",
-                    "HedgehogCharacter",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "KeyPressed"
-                  },
-                  "parameters": [
-                    "",
                     "Down"
                   ]
                 }
@@ -3591,6 +3619,76 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "LShift"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Down"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacter::SimulateJumpKey"
+                      },
+                      "parameters": [
+                        "Player1",
+                        "HedgehogCharacter",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Down"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::SimulateSpinDashKey"
+                      },
+                      "parameters": [
+                        "Player1",
+                        "HedgehogCharacterRolling",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ],
           "parameters": []
@@ -3600,6 +3698,7 @@
           "colorG": 87,
           "colorR": 219,
           "creationTime": 0,
+          "disabled": true,
           "name": "Player 2",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -3793,8 +3892,265 @@
               "conditions": [
                 {
                   "type": {
+                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCharging"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacterRolling",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Animation",
+                    "=",
+                    "\"Roll\""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "HedgehogPlatformer::HedgehogCharacter::SetShouldRotate"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacter",
+                    "no",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacterAnimator",
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Dust",
+                        "0",
+                        "0",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Dust",
+                        "=",
+                        "Player.HedgehogCharacter::MovementAngle()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "MettreAutour"
+                      },
+                      "parameters": [
+                        "Dust",
+                        "Player1",
+                        "52",
+                        "Player.HedgehogCharacter::MovementAngle() + 90"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ChangePlan"
+                      },
+                      "parameters": [
+                        "Dust",
+                        "=",
+                        "Player.ZOrder() - 2"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "HedgehogPlatformer::HedgehogCharacter::IsFacingForward"
+                          },
+                          "parameters": [
+                            "Player",
+                            "HedgehogCharacter",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Dust",
+                            "+",
+                            "180 - Dust.ConeSprayAngle() / 2"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "HedgehogPlatformer::HedgehogCharacter::IsFacingForward"
+                          },
+                          "parameters": [
+                            "Player",
+                            "HedgehogCharacter",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Dust",
+                            "+",
+                            "Dust.ConeSprayAngle() / 2"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacter::IsFacingForward"
+                      },
+                      "parameters": [
+                        "Player",
+                        "HedgehogCharacter",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Rotate"
+                      },
+                      "parameters": [
+                        "Player",
+                        "1200",
+                        "20 * (Players.HedgehogCharacter::Speed() / Players.HedgehogCharacter::MaxSpeed())"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::HedgehogCharacter::IsFacingForward"
+                      },
+                      "parameters": [
+                        "Player",
+                        "HedgehogCharacter",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Rotate"
+                      },
+                      "parameters": [
+                        "Player",
+                        "-1200",
+                        "20 * (Players.HedgehogCharacter::Speed() / Players.HedgehogCharacter::MaxSpeed())"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCharging"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacterRolling",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Dust",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
                     "inverted": true,
                     "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsRolling"
+                  },
+                  "parameters": [
+                    "Player",
+                    "HedgehogCharacterRolling",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCharging"
                   },
                   "parameters": [
                     "Player",
@@ -3815,81 +4171,72 @@
                     ""
                   ]
                 }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCrouching"
-                  },
-                  "parameters": [
-                    "Player",
-                    "HedgehogCharacterRolling",
-                    ""
-                  ]
-                }
               ],
-              "actions": [
+              "events": [
                 {
-                  "type": {
-                    "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Animation",
-                    "=",
-                    "\"Crouch\""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCrouching"
+                      },
+                      "parameters": [
+                        "Player",
+                        "HedgehogCharacterRolling",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Animation",
+                        "=",
+                        "\"Crouch\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ActivateBehavior"
+                      },
+                      "parameters": [
+                        "Player",
+                        "HedgehogCharacterAnimator",
+                        ""
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "ActivateBehavior"
-                  },
-                  "parameters": [
-                    "Player",
-                    "HedgehogCharacterAnimator",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsRolling"
-                  },
-                  "parameters": [
-                    "Player",
-                    "HedgehogCharacterRolling",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCrouching"
-                  },
-                  "parameters": [
-                    "Player",
-                    "HedgehogCharacterRolling",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ActivateBehavior"
-                  },
-                  "parameters": [
-                    "Player",
-                    "HedgehogCharacterAnimator",
-                    "yes"
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCrouching"
+                      },
+                      "parameters": [
+                        "Player",
+                        "HedgehogCharacterRolling",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ActivateBehavior"
+                      },
+                      "parameters": [
+                        "Player",
+                        "HedgehogCharacterAnimator",
+                        "yes"
+                      ]
+                    }
                   ]
                 }
               ]
@@ -13194,6 +13541,16 @@
                                   "actions": [
                                     {
                                       "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyIsFacingForward"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Behavior",
+                                        "no"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
                                         "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundSpeed"
                                       },
                                       "parameters": [
@@ -13280,6 +13637,16 @@
                                     }
                                   ],
                                   "actions": [
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyIsFacingForward"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Behavior",
+                                        "yes"
+                                      ]
+                                    },
                                     {
                                       "type": {
                                         "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundSpeed"
@@ -15473,6 +15840,36 @@
                             "max(-MaxSpeed, SpeedX - (Acceleration * TimeDelta))"
                           ]
                         }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "HedgehogPlatformer::HedgehogCharacter::PropertySpeedX"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "<=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyIsFacingForward"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "no"
+                              ]
+                            }
+                          ]
+                        }
                       ]
                     },
                     {
@@ -15511,6 +15908,36 @@
                             "Behavior",
                             "=",
                             "min(MaxSpeed, SpeedX + (Acceleration * TimeDelta))"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "HedgehogPlatformer::HedgehogCharacter::PropertySpeedX"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ">=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyIsFacingForward"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "yes"
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -18069,6 +18496,54 @@
                             "True"
                           ]
                         }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacter",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the character is facing forward.",
+              "fullName": "Is facing forward",
+              "functionType": "Condition",
+              "group": "Hedgehog state",
+              "name": "IsFacingForward",
+              "sentence": "_PARAM0_ is facing forward",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacter::PropertyIsFacingForward"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
                       ]
                     }
                   ]
@@ -22089,6 +22564,16 @@
               "extraInformation": [],
               "hidden": true,
               "name": "SinGroundAngle"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "IsFacingForward"
             }
           ],
           "sharedPropertyDescriptors": []
@@ -22684,13 +23169,13 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::HedgehogCharacterAnimator::PropertyDirectionKey"
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::HedgehogCharacter::IsFacingForward"
                       },
                       "parameters": [
                         "Object",
-                        "Behavior",
-                        "=",
-                        "\"Left\""
+                        "HedgehogCharacter",
+                        ""
                       ]
                     }
                   ],
@@ -22712,13 +23197,12 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::HedgehogCharacterAnimator::PropertyDirectionKey"
+                        "value": "HedgehogPlatformer::HedgehogCharacter::IsFacingForward"
                       },
                       "parameters": [
                         "Object",
-                        "Behavior",
-                        "=",
-                        "\"Right\""
+                        "HedgehogCharacter",
+                        ""
                       ]
                     }
                   ],
@@ -23274,6 +23758,114 @@
                   "conditions": [
                     {
                       "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::PropertyIsCharging"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::PropertyIsCrouching"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::SetPropertyIsCharging"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::SetIsRolling"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "HedgehogPlatformer::HedgehogCharacter::IsFacingForward"
+                          },
+                          "parameters": [
+                            "Object",
+                            "HedgehogCharacter",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "HedgehogPlatformer::HedgehogCharacter::SetSpeed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "HedgehogCharacter",
+                            "=",
+                            "SpinDashSpeed",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "HedgehogPlatformer::HedgehogCharacter::IsFacingForward"
+                          },
+                          "parameters": [
+                            "Object",
+                            "HedgehogCharacter",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "HedgehogPlatformer::HedgehogCharacter::SetSpeed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "HedgehogCharacter",
+                            "=",
+                            "-SpinDashSpeed",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
                         "value": "HedgehogPlatformer::HedgehogCharacterRolling::PropertyIsRolling"
                       },
                       "parameters": [
@@ -23407,7 +23999,7 @@
               "description": "Simulate a press of the roll key.",
               "fullName": "Simulate roll key press",
               "functionType": "Action",
-              "group": "Hedgehog rolling",
+              "group": "Hedgehog controls",
               "name": "SimulateRollKey",
               "sentence": "Simulate pressing Roll key for _PARAM0_",
               "events": [
@@ -23430,16 +24022,6 @@
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::PropertyIsRolling"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior"
-                      ]
-                    },
                     {
                       "type": {
                         "value": "BuiltinCommonInstructions::CompareNumbers"
@@ -23482,9 +24064,61 @@
               "objectGroups": []
             },
             {
+              "description": "Simulate a press of the spindash key.",
+              "fullName": "Simulate spindash key press",
+              "functionType": "Action",
+              "group": "Hedgehog controls",
+              "name": "SimulateSpinDashKey",
+              "sentence": "Simulate pressing Spindash key for _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::IsCrouching"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::SetPropertyIsCharging"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacterRolling",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "Check if the character is crouching.",
               "fullName": "Is crouching",
               "functionType": "Condition",
+              "group": "Hedgehog rolling",
               "name": "IsCrouching",
               "sentence": "_PARAM0_ is crouching",
               "events": [
@@ -23590,6 +24224,54 @@
                         "abs(Object.HedgehogCharacter::Speed())",
                         ">=",
                         "MinSpeed"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "HedgehogPlatformer::HedgehogCharacterRolling",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the character is charging a spindash.",
+              "fullName": "Is charging a spindash",
+              "functionType": "Condition",
+              "group": "Hedgehog rolling",
+              "name": "IsCharging",
+              "sentence": "_PARAM0_ is charging a spindash",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "HedgehogPlatformer::HedgehogCharacterRolling::PropertyIsCharging"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
                       ]
                     }
                   ],
@@ -24006,6 +24688,16 @@
               "name": "MinSpeed"
             },
             {
+              "value": "1440",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Spindash speed",
+              "description": "",
+              "group": "Spindash",
+              "extraInformation": [],
+              "name": "SpinDashSpeed"
+            },
+            {
               "value": "",
               "type": "Boolean",
               "label": "",
@@ -24024,6 +24716,16 @@
               "extraInformation": [],
               "hidden": true,
               "name": "IsCrouching"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "IsCharging"
             },
             {
               "value": "0",
