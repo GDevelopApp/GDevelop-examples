@@ -1381,7 +1381,9 @@
               "OldY": 0,
               "OldSpeed": 0,
               "PlatformOldX": 2.0247e-320,
-              "PlatformOldY": 2.0247e-320
+              "PlatformOldY": 2.0247e-320,
+              "AirAcceleration": 1012.5,
+              "AirDrag": 0.03125
             },
             {
               "name": "HedgehogCharacterAnimator",
@@ -14301,7 +14303,7 @@
                                         "Object",
                                         "Behavior",
                                         "=",
-                                        "max(-MaxSpeed, GroundSpeed - Acceleration * TimeDelta)"
+                                        "max(-MaxSpeed, GroundSpeed - GroundAcceleration * TimeDelta)"
                                       ]
                                     }
                                   ]
@@ -14399,7 +14401,7 @@
                                         "Object",
                                         "Behavior",
                                         "=",
-                                        "min(MaxSpeed, GroundSpeed + Acceleration * TimeDelta)"
+                                        "min(MaxSpeed, GroundSpeed + GroundAcceleration * TimeDelta)"
                                       ]
                                     }
                                   ]
@@ -14497,38 +14499,8 @@
                               "parameters": [
                                 "Object",
                                 "Behavior",
-                                "=",
-                                "GroundSpeed - Friction * sign(GroundSpeed) * TimeDelta"
-                              ]
-                            }
-                          ],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "BuiltinCommonInstructions::CompareNumbers"
-                                  },
-                                  "parameters": [
-                                    "abs(GroundSpeed)",
-                                    "<",
-                                    "Friction * TimeDelta"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundSpeed"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Behavior",
-                                    "=",
-                                    "0"
-                                  ]
-                                }
+                                "-",
+                                "min(abs(GroundSpeed), Friction * TimeDelta) * sign(GroundSpeed)"
                               ]
                             }
                           ]
@@ -16611,7 +16583,7 @@
                             "Object",
                             "Behavior",
                             "=",
-                            "max(-MaxSpeed, SpeedX - (Acceleration * TimeDelta))"
+                            "max(-MaxSpeed, SpeedX - (AirAcceleration * TimeDelta))"
                           ]
                         }
                       ],
@@ -16681,7 +16653,7 @@
                             "Object",
                             "Behavior",
                             "=",
-                            "min(MaxSpeed, SpeedX + (Acceleration * TimeDelta))"
+                            "min(MaxSpeed, SpeedX + (AirAcceleration * TimeDelta))"
                           ]
                         }
                       ],
@@ -16726,15 +16698,14 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "\"Where is air drag?\"\nNo input check (air friction)"
+                      "comment": "Air drag"
                     },
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "inverted": true,
-                            "value": "HedgehogPlatformer::HedgehogCharacter::PropertyIsLeftKeyPressed"
+                            "value": "HedgehogPlatformer::HedgehogCharacter::PropertySpeedY"
                           },
                           "parameters": [
                             "Object",
@@ -16745,33 +16716,13 @@
                         },
                         {
                           "type": {
-                            "inverted": true,
-                            "value": "HedgehogPlatformer::HedgehogCharacter::PropertyIsRightKeyPressed"
+                            "value": "HedgehogPlatformer::HedgehogCharacter::PropertySpeedY"
                           },
                           "parameters": [
                             "Object",
                             "Behavior",
-                            "<=",
-                            "0"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::CompareNumbers"
-                          },
-                          "parameters": [
-                            "abs(GroundAngle)",
-                            "<",
-                            "StandMaxAngle"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "HedgehogPlatformer::HedgehogCharacter::PropertyAirFriction"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior"
+                            ">",
+                            "AirDragMinSpeedY"
                           ]
                         }
                       ],
@@ -16783,38 +16734,8 @@
                           "parameters": [
                             "Object",
                             "Behavior",
-                            "=",
-                            "SpeedX - ((Friction * sign(SpeedX)) * TimeDelta)"
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::CompareNumbers"
-                              },
-                              "parameters": [
-                                "abs(SpeedX)",
-                                "<",
-                                "Friction * TimeDelta"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertySpeedX"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                "=",
-                                "0"
-                              ]
-                            }
+                            "-",
+                            "SpeedX * min(1, AirDrag * 60 * TimeDelta)"
                           ]
                         }
                       ]
@@ -20975,7 +20896,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Acceleration"
+                        "GroundAcceleration"
                       ]
                     }
                   ]
@@ -21014,7 +20935,7 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyAcceleration"
+                        "value": "HedgehogPlatformer::HedgehogCharacter::SetPropertyGroundAcceleration"
                       },
                       "parameters": [
                         "Object",
@@ -23021,15 +22942,6 @@
               "name": "Gravity"
             },
             {
-              "value": "",
-              "type": "Boolean",
-              "label": "Allow air friction",
-              "description": "",
-              "group": "Airborne",
-              "extraInformation": [],
-              "name": "AirFriction"
-            },
-            {
               "value": "0",
               "type": "Number",
               "label": "Ceil bounce factor",
@@ -23049,6 +22961,26 @@
               "name": "MaxFallingSpeed"
             },
             {
+              "value": "0,03125",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Air drag",
+              "description": "The air drag reduce the speed on X axis.",
+              "group": "Airborne",
+              "extraInformation": [],
+              "name": "AirDrag"
+            },
+            {
+              "value": "-720",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Air drag min speed Y",
+              "description": "",
+              "group": "Airborne",
+              "extraInformation": [],
+              "name": "AirDragMinSpeedY"
+            },
+            {
               "value": "720",
               "type": "Number",
               "unit": "PixelSpeed",
@@ -23062,11 +22994,21 @@
               "value": "506.25",
               "type": "Number",
               "unit": "PixelAcceleration",
-              "label": "Acceleration",
+              "label": "Ground acceleration",
               "description": "",
-              "group": "Speed",
+              "group": "Ground",
               "extraInformation": [],
-              "name": "Acceleration"
+              "name": "GroundAcceleration"
+            },
+            {
+              "value": "1 012,5",
+              "type": "Number",
+              "unit": "PixelAcceleration",
+              "label": "Air acceleration",
+              "description": "",
+              "group": "Airborne",
+              "extraInformation": [],
+              "name": "AirAcceleration"
             },
             {
               "value": "5400",
@@ -23074,7 +23016,7 @@
               "unit": "PixelAcceleration",
               "label": "Deceleration",
               "description": "When changing of direction on the ground.",
-              "group": "Speed",
+              "group": "Ground",
               "extraInformation": [],
               "name": "Deceleration"
             },
@@ -23084,7 +23026,7 @@
               "unit": "PixelAcceleration",
               "label": "Friction",
               "description": "When there is no input.",
-              "group": "Speed",
+              "group": "Ground",
               "extraInformation": [],
               "name": "Friction"
             },
