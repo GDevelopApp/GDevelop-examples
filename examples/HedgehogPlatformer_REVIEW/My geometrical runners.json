@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 213,
+    "build": 214,
     "major": 5,
     "minor": 4,
     "revision": 0
@@ -476,7 +476,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.25,
         "snap": true,
-        "zoomFactor": 0.4481978045410588,
+        "zoomFactor": 0.3325387091250945,
         "windowMask": false
       },
       "objectsGroups": [
@@ -3371,6 +3371,8 @@
           "particleAngleRandomness2": 0,
           "particleBlue1": 101,
           "particleBlue2": 101,
+          "particleColor1": "235;209;101",
+          "particleColor2": "235;209;101",
           "particleGravityX": 0,
           "particleGravityY": 0,
           "particleGreen1": 209,
@@ -3480,6 +3482,8 @@
           "particleAngleRandomness2": 0,
           "particleBlue1": 80,
           "particleBlue2": 80,
+          "particleColor1": "211;172;80",
+          "particleColor2": "211;172;80",
           "particleGravityX": 0,
           "particleGravityY": -500,
           "particleGreen1": 172,
@@ -26070,9 +26074,51 @@
               "sentence": "_PARAM0_ push _PARAM2_",
               "events": [
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Project the character speed on the spring tangente (-unitY, unitX) to get the lateral speed.\nOnly keep this lateral speed and \"replace\" the speed in the spring direction with the push speed value.\n\nFor instance, for vertical springs, this allows to keep the speed on X while setting the speed on Y no matter what was the character Y speed before.\nThe formula is a generalization to this for any spring angle."
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
                   "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "unitX",
+                        "=",
+                        "cos(ToRad(Object.Angle()))"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "unitY",
+                        "=",
+                        "sin(ToRad(Object.Angle()))"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "LateralSpeed",
+                        "=",
+                        "- Character.HedgehogCharacter::SpeedX() * unitY + Character.HedgehogCharacter::SpeedY() * unitX"
+                      ]
+                    },
                     {
                       "type": {
                         "value": "HedgehogPlatformer::HedgehogCharacter::SetSpeedX"
@@ -26080,8 +26126,8 @@
                       "parameters": [
                         "Character",
                         "HedgehogCharacter",
-                        "+",
-                        "XFromAngleAndDistance(Object.Behavior::Angle(), PushSpeed)",
+                        "=",
+                        "-LateralSpeed * unitY + PushSpeed * unitX",
                         ""
                       ]
                     },
@@ -26092,10 +26138,28 @@
                       "parameters": [
                         "Character",
                         "HedgehogCharacter",
-                        "+",
-                        "YFromAngleAndDistance(Object.Behavior::Angle(), PushSpeed)",
+                        "=",
+                        "LateralSpeed * unitX + PushSpeed * unitY",
                         ""
                       ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "name": "unitX",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "name": "unitY",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "folded": true,
+                      "name": "LateralSpeed",
+                      "type": "number",
+                      "value": 0
                     }
                   ]
                 }
