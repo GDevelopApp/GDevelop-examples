@@ -13,10 +13,10 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "pixelsRounding": true,
+    "pixelsRounding": false,
     "projectUuid": "d9fe5327-62ab-4346-94b0-eb70c4d3315e",
-    "scaleMode": "nearest",
-    "sizeOnStartupMode": "",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
     "templateSlug": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
@@ -476,7 +476,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.25,
         "snap": true,
-        "zoomFactor": 0.28172599320797154,
+        "zoomFactor": 0.20220707303602986,
         "windowMask": false
       },
       "objectsGroups": [
@@ -1419,7 +1419,9 @@
               "BalanceOnLedgeAnimationName": "BalanceOnLedge",
               "JumpRotationSpeed": 360,
               "DirectionKey": "",
-              "PushAnimationName": "Push"
+              "PushAnimationName": "",
+              "BrakeAnimationName": "",
+              "WalkAnimationName": "Run"
             },
             {
               "name": "HedgehogCharacterRolling",
@@ -3169,7 +3171,18 @@
           "width": 1024,
           "variables": [],
           "effects": [],
-          "behaviors": []
+          "behaviors": [
+            {
+              "bottomEdgeAnchor": 0,
+              "leftEdgeAnchor": 1,
+              "name": "Anchor",
+              "relativeToOriginalWindowSize": true,
+              "rightEdgeAnchor": 2,
+              "topEdgeAnchor": 0,
+              "type": "AnchorBehavior::AnchorBehavior",
+              "useLegacyBottomAndRightAnchors": false
+            }
+          ]
         },
         {
           "adaptCollisionMaskAutomatically": false,
@@ -4967,6 +4980,34 @@
           ]
         },
         {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Avoid the chamera to lag 1 frame behind the object."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SmoothCamera::SmoothCamera::MoveCameraCloser"
+              },
+              "parameters": [
+                "Player1",
+                "SmoothCamera",
+                ""
+              ]
+            }
+          ]
+        },
+        {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -5229,6 +5270,10 @@
         }
       ],
       "behaviorsSharedData": [
+        {
+          "name": "Anchor",
+          "type": "AnchorBehavior::AnchorBehavior"
+        },
         {
           "name": "Animation",
           "type": "AnimatableCapability::AnimatableBehavior"
@@ -19937,7 +19982,7 @@
               "objectGroups": []
             },
             {
-              "description": "the current speed of the object.",
+              "description": "the current speed of the object. The speed can be negative when the object is on the ground.",
               "fullName": "Speed",
               "functionType": "ExpressionAndCondition",
               "group": "Hedgehog state",
@@ -24564,28 +24609,361 @@
                               ]
                             }
                           ],
-                          "actions": [
+                          "actions": [],
+                          "events": [
                             {
-                              "type": {
-                                "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Animation",
-                                "=",
-                                "RunAnimationName"
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "HedgehogPlatformer::HedgehogCharacterAnimator::PropertyBrakeAnimationName"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "!=",
+                                    "\"\""
+                                  ]
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::IsUsingControl"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "HedgehogCharacter",
+                                        "\"Left\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::Speed"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "HedgehogCharacter",
+                                        ">=",
+                                        "BrakeMinSpeed",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Animation",
+                                        "=",
+                                        "BrakeAnimationName"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::IsUsingControl"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "HedgehogCharacter",
+                                        "\"Right\"",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacter::Speed"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "HedgehogCharacter",
+                                        "<=",
+                                        "-BrakeMinSpeed",
+                                        ""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Animation",
+                                        "=",
+                                        "BrakeAnimationName"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "AnimatableCapability::AnimatableBehavior::Name"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Animation",
+                                        "=",
+                                        "BrakeAnimationName"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [],
+                                  "events": [
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::IsUsingControl"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "HedgehogCharacter",
+                                            "\"Left\"",
+                                            ""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::Speed"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "HedgehogCharacter",
+                                            "<",
+                                            "0",
+                                            ""
+                                          ]
+                                        }
+                                      ],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Animation",
+                                            "=",
+                                            "IdleAnimationName"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::IsUsingControl"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "HedgehogCharacter",
+                                            "\"Right\"",
+                                            ""
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacter::Speed"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "HedgehogCharacter",
+                                            ">",
+                                            "0",
+                                            ""
+                                          ]
+                                        }
+                                      ],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Animation",
+                                            "=",
+                                            "IdleAnimationName"
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
                               ]
                             },
                             {
-                              "type": {
-                                "value": "AnimatableCapability::AnimatableBehavior::SetSpeedScale"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Animation",
-                                "=",
-                                "Object.HedgehogCharacter::Speed() / Object.HedgehogCharacter::MaxSpeed()"
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "AnimatableCapability::AnimatableBehavior::Name"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Animation",
+                                        "!=",
+                                        "BrakeAnimationName"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "HedgehogPlatformer::HedgehogCharacterAnimator::PropertyBrakeAnimationName"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Behavior",
+                                        "=",
+                                        "\"\""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "AnimatableCapability::AnimatableBehavior::SetSpeedScale"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Animation",
+                                    "=",
+                                    "Object.HedgehogCharacter::Speed() / Object.HedgehogCharacter::MaxSpeed()"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::Or"
+                                      },
+                                      "parameters": [],
+                                      "subInstructions": [
+                                        {
+                                          "type": {
+                                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                                          },
+                                          "parameters": [
+                                            "Object.HedgehogCharacter::Speed()",
+                                            "<",
+                                            "RunMinSpeed"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacterAnimator::PropertyRunAnimationName"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Behavior",
+                                            "=",
+                                            "\"\""
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Animation",
+                                        "=",
+                                        "WalkAnimationName"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::Or"
+                                      },
+                                      "parameters": [],
+                                      "subInstructions": [
+                                        {
+                                          "type": {
+                                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                                          },
+                                          "parameters": [
+                                            "Object.HedgehogCharacter::Speed()",
+                                            ">=",
+                                            "RunMinSpeed"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "HedgehogPlatformer::HedgehogCharacterAnimator::PropertyWalkAnimationName"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "Behavior",
+                                            "=",
+                                            "\"\""
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "Animation",
+                                        "=",
+                                        "RunAnimationName"
+                                      ]
+                                    }
+                                  ]
+                                }
                               ]
+                            }
+                          ],
+                          "variables": [
+                            {
+                              "folded": true,
+                              "name": "IsBreaking",
+                              "type": "boolean",
+                              "value": false
                             }
                           ]
                         },
@@ -24827,16 +25205,25 @@
               "type": "String",
               "label": "Idle",
               "description": "",
-              "group": "Animations",
+              "group": "",
               "extraInformation": [],
               "name": "IdleAnimationName"
+            },
+            {
+              "value": "Walk",
+              "type": "String",
+              "label": "Walk",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "WalkAnimationName"
             },
             {
               "value": "Run",
               "type": "String",
               "label": "Run",
               "description": "",
-              "group": "Animations",
+              "group": "",
               "extraInformation": [],
               "name": "RunAnimationName"
             },
@@ -24845,7 +25232,7 @@
               "type": "String",
               "label": "Jump",
               "description": "",
-              "group": "Animations",
+              "group": "",
               "extraInformation": [],
               "name": "JumpAnimationName"
             },
@@ -24854,7 +25241,7 @@
               "type": "String",
               "label": "Fall",
               "description": "",
-              "group": "Animations",
+              "group": "",
               "extraInformation": [],
               "name": "FallAnimationName"
             },
@@ -24863,7 +25250,7 @@
               "type": "String",
               "label": "Balance on ledge",
               "description": "",
-              "group": "Animations",
+              "group": "",
               "extraInformation": [],
               "name": "BalanceOnLedgeAnimationName"
             },
@@ -24878,6 +25265,44 @@
               "name": "JumpRotationSpeed"
             },
             {
+              "value": "Push",
+              "type": "String",
+              "label": "Push",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "PushAnimationName"
+            },
+            {
+              "value": "Brake",
+              "type": "String",
+              "label": "Brake",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "BrakeAnimationName"
+            },
+            {
+              "value": "720",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Brake animation min speed",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "BrakeMinSpeed"
+            },
+            {
+              "value": "1080",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Run animation min speed",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "RunMinSpeed"
+            },
+            {
               "value": "",
               "type": "String",
               "label": "",
@@ -24886,15 +25311,6 @@
               "extraInformation": [],
               "hidden": true,
               "name": "DirectionKey"
-            },
-            {
-              "value": "Push",
-              "type": "String",
-              "label": "Push",
-              "description": "",
-              "group": "",
-              "extraInformation": [],
-              "name": "PushAnimationName"
             }
           ],
           "sharedPropertyDescriptors": []
