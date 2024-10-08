@@ -173,10 +173,10 @@ const checkProjectResourceFiles = async (project, projectFolderPath) => {
 };
 
 const sortedStarterSlugs = new Set([
-  'platformer',
-  '3d-car-coin-hunt',
+  'platformer', // 2D example first.
+  '3d-car-coin-hunt', // 3D example second.
+  'multiplayer-platformer-arrow-fight', // Multiplayer example third.
   '3d-road-crosser',
-  'multiplayer-platformer-arrow-fight',
   'top-down-rpg',
   'multiplayer-jump-game',
   'multiplayer-platformer-pickup',
