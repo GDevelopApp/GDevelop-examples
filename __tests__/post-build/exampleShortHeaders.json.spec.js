@@ -149,7 +149,7 @@ describe('exampleShortHeaders.json post build checks', () => {
           'Shake object',
           'Flash object',
         ]),
-        codeSizeLevel: 'medium',
+        codeSizeLevel: 'small',
         difficultyLevel: 'simple',
         gdevelopVersion: '',
       })
