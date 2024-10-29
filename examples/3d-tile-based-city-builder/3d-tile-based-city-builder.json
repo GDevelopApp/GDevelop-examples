@@ -1,7 +1,7 @@
 {
   "firstLayout": "GameScene",
   "gdVersion": {
-    "build": 216,
+    "build": 217,
     "major": 5,
     "minor": 4,
     "revision": 0
@@ -2052,7 +2052,7 @@
       "name": "MousePointerLock",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
       "shortDescription": "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
-      "version": "0.1.4",
+      "version": "0.1.7",
       "description": [
         "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
         "",
@@ -2061,7 +2061,7 @@
         "",
         "Game players don't have to worry about leaving the gameplay area or accidentally clicking on another application that moves the mouse focus away from the game.",
         "",
-        "Locking the pointer locks `MouseX()` and `MouseY()` expressions.",
+        "Locking the pointer locks `CursorX()` and `CursorY()` expressions.",
         "Use `MovementX()` and `MovementY()` instead.",
         ""
       ],
@@ -2095,11 +2095,19 @@
                 "",
                 "gdjs._MousePointerLockExtension = {};",
                 "gdjs._MousePointerLockExtension.movement = { x: 0, y: 0 };",
+                "gdjs._MousePointerLockExtension.retried = false;",
                 "",
-                "canvas.addEventListener(\"mousemove\", (e) => {",
+                "canvas.addEventListener(\"pointermove\", (e) => {",
                 "    gdjs._MousePointerLockExtension.movement.x += e.movementX || 0;",
                 "    gdjs._MousePointerLockExtension.movement.y += e.movementY || 0;",
-                "}, false);"
+                "}, false);",
+                "",
+                "document.addEventListener(\"pointerlockerror\", (e) => {",
+                "    if (!gdjs._MousePointerLockExtension.retried) {",
+                "        canvas.requestPointerLock();",
+                "        gdjs._MousePointerLockExtension.retried = true;",
+                "    } ",
+                "});"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -2179,11 +2187,14 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\r",
-                "canvas.requestPointerLock({ unadjustedMovement: true });"
+                "if (canvas.requestPointerLock && !document.pointerLockElement) {\r",
+                "    canvas.requestPointerLock({ unadjustedMovement: true });\r",
+                "    gdjs._MousePointerLockExtension.retried = false;\r",
+                "}"
               ],
               "parameterObjects": "",
               "useStrict": true,
-              "eventsSheetExpanded": false
+              "eventsSheetExpanded": true
             }
           ],
           "parameters": [],
@@ -2198,7 +2209,11 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "document.exitPointerLock();",
+              "inlineCode": [
+                "if (document.exitPointerLock) {\r",
+                "    document.exitPointerLock();\r",
+                "}"
+              ],
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
