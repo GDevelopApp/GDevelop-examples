@@ -1,13 +1,15 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 99,
-    "major": 4,
-    "minor": 0,
+    "build": 217,
+    "major": 5,
+    "minor": 4,
     "revision": 0
   },
   "properties": {
     "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
@@ -83,6 +85,9 @@
     "resourceFolders": []
   },
   "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
   "objectsGroups": [],
   "variables": [],
   "layouts": [
@@ -160,9 +165,9 @@
       ],
       "objects": [
         {
+          "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
           "name": "Wheel",
-          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -206,7 +211,6 @@
           "italic": false,
           "name": "Console",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -220,6 +224,27 @@
             "b": 0,
             "g": 0,
             "r": 0
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "MovementX : 0\nMovementY : 0\n---\nMouseX : 0\nMouseY : 0",
+            "font": "",
+            "textAlignment": "",
+            "verticalTextAlignment": "top",
+            "characterSize": 20,
+            "color": "0;0;0"
           }
         },
         {
@@ -228,7 +253,6 @@
           "italic": false,
           "name": "Help",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -242,9 +266,44 @@
             "b": 0,
             "g": 0,
             "r": 0
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Click the steering wheel to lock the mouse pointer.\nPress the ESC key to release the mouse pointer.",
+            "font": "",
+            "textAlignment": "",
+            "verticalTextAlignment": "top",
+            "characterSize": 20,
+            "color": "0;0;0"
           }
         }
       ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Wheel"
+          },
+          {
+            "objectName": "Console"
+          },
+          {
+            "objectName": "Help"
+          }
+        ]
+      },
       "events": [
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -365,9 +424,15 @@
           "ambientLightColorB": 0,
           "ambientLightColorG": 0,
           "ambientLightColorR": 0,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "perspective",
           "followBaseLayerCamera": false,
           "isLightingLayer": false,
+          "isLocked": false,
           "name": "",
+          "renderingType": "",
           "visibility": true,
           "cameras": [
             {
@@ -399,16 +464,16 @@
       "name": "MousePointerLock",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
       "shortDescription": "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "description": [
         "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
         "",
-        "For example, a user can rotate or continue to manipulate an object by moving the mouse endlessly ([open the project online](https://editor.gdevelop.io/?project=https://raw.githubusercontent.com/PANDAKO-GitHub/MousePointerLockExtension/main/game.json).",
+        "For example, a user can rotate or continue to manipulate an object by moving the mouse endlessly ([open the project online](https://editor.gdevelop.io/?project=example://mouse-pointer-lock)).",
         "Without the pointer lock, the rotation or operation will stop the moment the pointer reaches the edge of the browser or screen.",
         "",
         "Game players don't have to worry about leaving the gameplay area or accidentally clicking on another application that moves the mouse focus away from the game.",
         "",
-        "Locking the pointer locks `MouseX()` and `MouseY()` expressions.",
+        "Locking the pointer locks `CursorX()` and `CursorY()` expressions.",
         "Use `MovementX()` and `MovementY()` instead.",
         ""
       ],
@@ -419,12 +484,15 @@
       "tags": [
         "mouse",
         "lock",
+        "cursor",
         "pointer"
       ],
       "authorIds": [
         "Zu55H5hcb9YmZTltIVOTAFDJQyB2"
       ],
       "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
       "eventsFunctions": [
         {
           "fullName": "",
@@ -439,11 +507,19 @@
                 "",
                 "gdjs._MousePointerLockExtension = {};",
                 "gdjs._MousePointerLockExtension.movement = { x: 0, y: 0 };",
+                "gdjs._MousePointerLockExtension.retried = false;",
                 "",
-                "canvas.addEventListener(\"mousemove\", (e) => {",
-                "    gdjs._MousePointerLockExtension.movement.x = e.movementX || 0;",
-                "    gdjs._MousePointerLockExtension.movement.y = e.movementY || 0;",
-                "}, false);"
+                "canvas.addEventListener(\"pointermove\", (e) => {",
+                "    gdjs._MousePointerLockExtension.movement.x += e.movementX || 0;",
+                "    gdjs._MousePointerLockExtension.movement.y += e.movementY || 0;",
+                "}, false);",
+                "",
+                "document.addEventListener(\"pointerlockerror\", (e) => {",
+                "    if (!gdjs._MousePointerLockExtension.retried) {",
+                "        canvas.requestPointerLock();",
+                "        gdjs._MousePointerLockExtension.retried = true;",
+                "    } ",
+                "});"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -523,11 +599,14 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\r",
-                "canvas.requestPointerLock();"
+                "if (canvas.requestPointerLock && !document.pointerLockElement) {\r",
+                "    canvas.requestPointerLock({ unadjustedMovement: true });\r",
+                "    gdjs._MousePointerLockExtension.retried = false;\r",
+                "}"
               ],
               "parameterObjects": "",
               "useStrict": true,
-              "eventsSheetExpanded": false
+              "eventsSheetExpanded": true
             }
           ],
           "parameters": [],
@@ -542,7 +621,11 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "document.exitPointerLock();",
+              "inlineCode": [
+                "if (document.exitPointerLock) {\r",
+                "    document.exitPointerLock();\r",
+                "}"
+              ],
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
