@@ -373,10 +373,9 @@ const extractExamples = async (
           );
           return null;
         }
-        const readmeFileContent = readmeFileWithMetadata.parsedContent.replace(
-          /\r\n/g,
-          '\n'
-        );
+        const readmeFileContent = readmeFileWithMetadata.parsedContent
+          .replace(/\r\n/g, '\n')
+          .trim();
         const exampleName = formatExampleName(slug);
 
         const shortDescription = readmeFileContent.split('\n\n')[0];
