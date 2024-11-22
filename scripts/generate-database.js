@@ -559,6 +559,7 @@ const generateSortedShortHeaders = (allExamples) => {
     name: example.name,
     slug: example.slug,
     shortDescription: example.shortDescription,
+    description: example.description,
     license: example.license,
     previewImageUrls: example.previewImageUrls,
     quickCustomizationImageUrl: example.quickCustomizationImageUrl,
