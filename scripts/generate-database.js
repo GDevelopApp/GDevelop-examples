@@ -213,6 +213,12 @@ const sortedStarterSlugs = new Set([
   'geometry-monster',
 ]);
 
+const sortedStartingPointSlugs = new Set([
+  'starting-platformer',
+  'starting-top-down',
+  'starting-physics',
+]);
+
 /**
  * Computes a list of static tags to add to the example based on its slug.
  * @param {string} exampleSlug
@@ -221,6 +227,9 @@ const sortedStarterSlugs = new Set([
 const getStaticTags = (exampleSlug) => {
   const staticTags = [];
   if (sortedStarterSlugs.has(exampleSlug)) staticTags.push('Starter');
+
+  if (sortedStartingPointSlugs.has(exampleSlug))
+    staticTags.push('Starting point');
 
   return staticTags;
 };
@@ -496,17 +505,20 @@ const updateExampleFiles = async (gd, allExampleFiles) => {
 
 /**
  * Generate the "short headers" for the examples, with starters
- * listed first and in the order specified by `sortedStarterSlugs`.
+ * listed first and in the order specified by `sortedStarterSlugs` or `sortedStartingPointSlugs`.
  * @param {Example[]} allExamples
  * @return {ExampleShortHeader[]}
  */
 const generateSortedShortHeaders = (allExamples) => {
   const starters = [];
+  const startingPoints = [];
   const examplesWithGameTag = [];
   const examplesWithNeitherStarterNorGameTags = [];
   for (const example of allExamples) {
     if (sortedStarterSlugs.has(example.slug)) {
       starters.push(example);
+    } else if (sortedStartingPointSlugs.has(example.slug)) {
+      startingPoints.push(example);
     } else if (example.tags.includes('game')) {
       examplesWithGameTag.push(example);
     } else {
@@ -521,6 +533,16 @@ const generateSortedShortHeaders = (allExamples) => {
     );
   });
 
+  const sortedStartingPointSlugsArray = [...sortedStartingPointSlugs];
+  const sortedStartingPoints = [...startingPoints].sort(
+    (example1, example2) => {
+      return (
+        sortedStartingPointSlugsArray.indexOf(example1.slug) -
+        sortedStartingPointSlugsArray.indexOf(example2.slug)
+      );
+    }
+  );
+
   examplesWithNeitherStarterNorGameTags.sort(
     examplePreviewImageSortingFunction
   );
@@ -528,6 +550,7 @@ const generateSortedShortHeaders = (allExamples) => {
   return [
     ...sortedStarters,
     ...examplesWithGameTag,
+    ...sortedStartingPoints,
     ...examplesWithNeitherStarterNorGameTags,
   ].map((example) => ({
     id: example.id,
