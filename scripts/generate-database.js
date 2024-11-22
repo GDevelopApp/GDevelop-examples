@@ -369,11 +369,10 @@ const extractExamples = async (
           '\n'
         );
         const exampleName = formatExampleName(slug);
-        const shortDescription = readmeFileContent.split('\n\n')[0];
-        const description = readmeFileContent
-          .split('\n\n')
-          .slice(1)
-          .join('\n\n');
+
+        // Descriptions are short enough to be completely in the short description, avoiding to split them.
+        const shortDescription = readmeFileContent;
+        const description = '';
 
         const tags = [
           ...fileWithMetadata.tags,
