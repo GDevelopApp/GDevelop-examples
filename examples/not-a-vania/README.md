@@ -1,6 +1,6 @@
 This project is meant as a game example or template for a more advanced platformer. This is in the style of older castlevania entries, such as Castlevania 1 or 3.
 
-There are numerous advanced GDevelop concepts in this project, such as finite state machines (FSMs), tweens, bitmap fonts and bitmap text objects, tilemaps, external event sheets, declaring variables via events, and object variables. 
+There are numerous advanced GDevelop concepts in this project, such as finite state machines (FSMs), tweens, bitmap fonts and bitmap text objects, tilemaps, external event sheets, declaring variables via events, and object variables.
 
 Before working with this project, it is STRONGLY recommended that you review the following:
 
