@@ -2062,6 +2062,17 @@
               "slopeMaxAngle": 44
             },
             {
+              "name": "PhysicsCharacter3DAnimator",
+              "type": "PhysicsCharacter3DAnimator::PhysicsCharacter3DAnimator",
+              "PhysicsCharacter3D": "PhysicsCharacter3D",
+              "Animation": "Animation",
+              "IdleAnimationName": "Idle",
+              "RunAnimationName": "Run",
+              "JumpAnimationName": "Jump",
+              "FallAnimationName": "Fall",
+              "OldAngle": 0
+            },
+            {
               "name": "Platformer3DGamepadMapper",
               "type": "Gamepads::Platformer3DGamepadMapper",
               "PhysicsCharacter3D": "PhysicsCharacter3D",
@@ -3693,9 +3704,22 @@
               ]
             }
           ],
-          "actions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetWindowSize"
+              },
+              "parameters": [
+                "",
+                "320",
+                "180",
+                "no"
+              ]
+            }
+          ],
           "events": [
             {
+              "disabled": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -3723,7 +3747,6 @@
               ]
             },
             {
-              "disabled": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
@@ -3872,6 +3895,16 @@
                     "0",
                     "1000",
                     ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Character",
+                    "+",
+                    "90"
                   ]
                 },
                 {
@@ -4512,7 +4545,7 @@
                             "Character",
                             "ThirdPersonCamera",
                             "+",
-                            "0.1 * MousePointerLock::MovementX()",
+                            "120 * MousePointerLock::MovementX() / SceneWindowWidth()",
                             ""
                           ]
                         },
@@ -4524,69 +4557,68 @@
                             "Character",
                             "ThirdPersonCamera",
                             "+",
-                            "0.1 * MousePointerLock::MovementY()",
+                            "120 * MousePointerLock::MovementY() / SceneWindowHeight()",
                             ""
                           ]
                         }
-                      ],
-                      "events": [
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
                             {
                               "type": {
-                                "value": "BuiltinCommonInstructions::Or"
-                              },
-                              "parameters": [],
-                              "subInstructions": [
-                                {
-                                  "type": {
-                                    "value": "Physics3D::PhysicsCharacter3D::CurrentForwardSpeed"
-                                  },
-                                  "parameters": [
-                                    "Character",
-                                    "PhysicsCharacter3D",
-                                    "!=",
-                                    "0"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Physics3D::PhysicsCharacter3D::CurrentSidewaysSpeed"
-                                  },
-                                  "parameters": [
-                                    "Character",
-                                    "PhysicsCharacter3D",
-                                    "!=",
-                                    "0"
-                                  ]
-                                }
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetAngle"
+                                "value": "Physics3D::PhysicsCharacter3D::CurrentForwardSpeed"
                               },
                               "parameters": [
                                 "Character",
-                                "+",
-                                "Character.ThirdPersonCamera::RotationAngleOffset()"
+                                "PhysicsCharacter3D",
+                                "!=",
+                                "0"
                               ]
                             },
                             {
                               "type": {
-                                "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationAngleOffset"
+                                "value": "Physics3D::PhysicsCharacter3D::CurrentSidewaysSpeed"
                               },
                               "parameters": [
                                 "Character",
-                                "ThirdPersonCamera",
-                                "=",
-                                "0",
-                                ""
+                                "PhysicsCharacter3D",
+                                "!=",
+                                "0"
                               ]
                             }
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::PhysicsCharacter3D::SetForwardAngle"
+                          },
+                          "parameters": [
+                            "Character",
+                            "PhysicsCharacter3D",
+                            "+",
+                            "Character.ThirdPersonCamera::RotationAngleOffset()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationAngleOffset"
+                          },
+                          "parameters": [
+                            "Character",
+                            "ThirdPersonCamera",
+                            "=",
+                            "0",
+                            ""
                           ]
                         }
                       ]
@@ -4897,23 +4929,6 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "AnimatableCapability::AnimatableBehavior::SetSpeedScale"
-                      },
-                      "parameters": [
-                        "Character",
-                        "Animation",
-                        "=",
-                        "1"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
@@ -4923,69 +4938,49 @@
                         "Character",
                         "PhysicsCharacter3D"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                        "value": "Tween3D::Tween3D::TweenStretchZ"
                       },
                       "parameters": [
                         "Character",
-                        "Animation",
-                        "=",
-                        "\"Jump\""
+                        "Tween3D",
+                        "\"Stretch\"",
+                        "1.5",
+                        "0.15",
+                        "\"easeOutCubic\"",
+                        ""
                       ]
-                    }
-                  ],
-                  "events": [
+                    },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Once"
-                          },
-                          "parameters": []
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Tween3D::Tween3D::TweenStretchZ"
-                          },
-                          "parameters": [
-                            "Character",
-                            "Tween3D",
-                            "\"Stretch\"",
-                            "1.5",
-                            "0.15",
-                            "\"easeOutCubic\"",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Wait"
-                          },
-                          "parameters": [
-                            "0.15"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Tween3D::Tween3D::TweenStretchZ"
-                          },
-                          "parameters": [
-                            "Character",
-                            "Tween3D",
-                            "\"Stretch\"",
-                            "1",
-                            "0.2",
-                            "\"easeInOutCubic\"",
-                            ""
-                          ]
-                        }
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "0.15"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween3D::Tween3D::TweenStretchZ"
+                      },
+                      "parameters": [
+                        "Character",
+                        "Tween3D",
+                        "\"Stretch\"",
+                        "1",
+                        "0.2",
+                        "\"easeInOutCubic\"",
+                        ""
                       ]
                     }
                   ]
@@ -5002,126 +4997,49 @@
                         "Character",
                         "PhysicsCharacter3D"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
                     }
                   ],
-                  "actions": [],
-                  "events": [
+                  "actions": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Once"
-                          },
-                          "parameters": []
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Tween3D::Tween3D::TweenStretchZ"
-                          },
-                          "parameters": [
-                            "Character",
-                            "Tween3D",
-                            "\"Stretch\"",
-                            "0.67",
-                            "0.125",
-                            "\"easeOutCubic\"",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Wait"
-                          },
-                          "parameters": [
-                            "0.125"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Tween3D::Tween3D::TweenStretchZ"
-                          },
-                          "parameters": [
-                            "Character",
-                            "Tween3D",
-                            "\"Stretch\"",
-                            "1",
-                            "0.25",
-                            "\"easeInOutCubic\"",
-                            ""
-                          ]
-                        }
+                      "type": {
+                        "value": "Tween3D::Tween3D::TweenStretchZ"
+                      },
+                      "parameters": [
+                        "Character",
+                        "Tween3D",
+                        "\"Stretch\"",
+                        "0.67",
+                        "0.125",
+                        "\"easeOutCubic\"",
+                        ""
                       ]
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Physics3D::PhysicsCharacter3D::CurrentForwardSpeed"
-                          },
-                          "parameters": [
-                            "Character",
-                            "PhysicsCharacter3D",
-                            "=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                          },
-                          "parameters": [
-                            "Character",
-                            "Animation",
-                            "=",
-                            "\"Idle\""
-                          ]
-                        }
+                      "type": {
+                        "value": "Wait"
+                      },
+                      "parameters": [
+                        "0.125"
                       ]
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Physics3D::PhysicsCharacter3D::CurrentForwardSpeed"
-                          },
-                          "parameters": [
-                            "Character",
-                            "PhysicsCharacter3D",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                          },
-                          "parameters": [
-                            "Character",
-                            "Animation",
-                            "=",
-                            "\"Run\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "AnimatableCapability::AnimatableBehavior::SetSpeedScale"
-                          },
-                          "parameters": [
-                            "Character",
-                            "Animation",
-                            "=",
-                            "Character.PhysicsCharacter3D::CurrentForwardSpeed() / Character.PhysicsCharacter3D::ForwardSpeedMax()"
-                          ]
-                        }
+                      "type": {
+                        "value": "Tween3D::Tween3D::TweenStretchZ"
+                      },
+                      "parameters": [
+                        "Character",
+                        "Tween3D",
+                        "\"Stretch\"",
+                        "1",
+                        "0.25",
+                        "\"easeInOutCubic\"",
+                        ""
                       ]
                     }
                   ]
@@ -5233,23 +5151,6 @@
                         "Object3D",
                         "=",
                         "Character.Z()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "disabled": true,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetAngle"
-                      },
-                      "parameters": [
-                        "Character",
-                        "=",
-                        "Character.Angle() + AngleDifference(Character.Angle(), Character.Angle()) * 0.25 * 60 * TimeDelta()"
                       ]
                     }
                   ]
@@ -5404,6 +5305,7 @@
           ]
         },
         {
+          "disabled": true,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [],
           "actions": [
@@ -5595,6 +5497,10 @@
         {
           "name": "PhysicsCharacter3D",
           "type": "Physics3D::PhysicsCharacter3D"
+        },
+        {
+          "name": "PhysicsCharacter3DAnimator",
+          "type": "PhysicsCharacter3DAnimator::PhysicsCharacter3DAnimator"
         },
         {
           "name": "Platformer3DGamepadMapper",
@@ -7359,6 +7265,23 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AnimatableCapability::AnimatableBehavior::SetSpeedScale"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Animation",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
@@ -7409,14 +7332,29 @@
                         "FallAnimationName"
                       ]
                     }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCharacter3D::IsOnFloor"
+                      },
+                      "parameters": [
+                        "Object",
+                        "PhysicsCharacter3D"
+                      ]
+                    }
                   ],
+                  "actions": [],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "value": "Physics3D::PhysicsCharacter3D::IsOnFloor"
+                            "value": "Physics3D::PhysicsCharacter3D::IsMovingEvenALittle"
                           },
                           "parameters": [
                             "Object",
@@ -7424,64 +7362,153 @@
                           ]
                         }
                       ],
-                      "actions": [],
-                      "events": [
+                      "actions": [
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "Physics3D::PhysicsCharacter3D::IsMovingEvenALittle"
-                              },
-                              "parameters": [
-                                "Object",
-                                "PhysicsCharacter3D"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Animation",
-                                "=",
-                                "RunAnimationName"
-                              ]
-                            }
+                          "type": {
+                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Animation",
+                            "=",
+                            "RunAnimationName"
                           ]
                         },
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "Physics3D::PhysicsCharacter3D::IsMovingEvenALittle"
-                              },
-                              "parameters": [
-                                "Object",
-                                "PhysicsCharacter3D"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "AnimatableCapability::AnimatableBehavior::SetName"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Animation",
-                                "=",
-                                "IdleAnimationName"
-                              ]
-                            }
+                          "type": {
+                            "value": "AnimatableCapability::AnimatableBehavior::SetSpeedScale"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Animation",
+                            "=",
+                            "Object.PhysicsCharacter3D::CurrentForwardSpeed() / Object.PhysicsCharacter3D::ForwardSpeedMax()"
                           ]
                         }
                       ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "Physics3D::PhysicsCharacter3D::IsMovingEvenALittle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PhysicsCharacter3D"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Animation",
+                            "=",
+                            "IdleAnimationName"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "AngleDelta",
+                        "=",
+                        "AngleDifference(Object.Angle(), Object.PhysicsCharacter3D::ForwardAngle())"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "AngleDelta",
+                            "<",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "AngleDelta",
+                            "=",
+                            "min(0, AngleDelta + RotationSpeed * TimeDelta())"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "AngleDelta",
+                            ">",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "AngleDelta",
+                            "=",
+                            "max(0, AngleDelta - RotationSpeed * TimeDelta())"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Object.PhysicsCharacter3D::ForwardAngle() + AngleDelta"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "name": "AngleDelta",
+                      "type": "number",
+                      "value": 0
                     }
                   ]
                 }
@@ -7562,15 +7589,25 @@
               "name": "FallAnimationName"
             },
             {
-              "value": "",
-              "type": "Behavior",
-              "label": "Platformer character",
+              "value": "0",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "",
               "description": "",
               "group": "",
-              "extraInformation": [
-                "PlatformBehavior::PlatformerObjectBehavior"
-              ],
-              "name": "PlatformerBehavior"
+              "extraInformation": [],
+              "hidden": true,
+              "name": "OldAngle"
+            },
+            {
+              "value": "180",
+              "type": "Number",
+              "unit": "AngularSpeed",
+              "label": "Rotation speed",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "RotationSpeed"
             }
           ],
           "sharedPropertyDescriptors": []
@@ -37194,10 +37231,11 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "SetAngle"
+                            "value": "Physics3D::PhysicsCharacter3D::SetForwardAngle"
                           },
                           "parameters": [
                             "Object",
+                            "PhysicsCharacter3D",
                             "=",
                             "Gamepads::StickAngle(GamepadIdentifier, JoystickIdentifier) + CameraAngle(Object.Layer())"
                           ]
@@ -41439,10 +41477,11 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "SetAngle"
+                        "value": "Physics3D::PhysicsCharacter3D::SetForwardAngle"
                       },
                       "parameters": [
                         "Object",
+                        "PhysicsCharacter3D",
                         "=",
                         "SpriteMultitouchJoystick::StickAngle(ControllerIdentifier, JoystickIdentifier) + CameraAngle(Object.Layer())"
                       ]
