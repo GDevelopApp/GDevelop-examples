@@ -1307,7 +1307,6 @@
           "width": 250,
           "x": 0,
           "y": 1375,
-          "z": 200,
           "zOrder": 31,
           "numberProperties": [],
           "stringProperties": [],
@@ -3228,7 +3227,9 @@
               "RotationOffset": 0,
               "CenterX": 0,
               "CenterY": 0,
-              "MovementAngle": 0
+              "MovementAngle": 0,
+              "Object3D": "Object3D",
+              "Plane": "Z"
             }
           ],
           "content": {},
@@ -3379,6 +3380,23 @@
               "gravityScale": 1,
               "layers": 17,
               "masks": 17
+            },
+            {
+              "name": "PhysicsEllipseMovement3D",
+              "type": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
+              "Object3D": "Object3D",
+              "Physics3D": "Physics3D",
+              "Width": 400,
+              "Height": 400,
+              "Plane": "X",
+              "LoopDuration": 6,
+              "InitialTurningLeft": true,
+              "InitialDirectionAngle": 180,
+              "ShouldRotate": false,
+              "RotationOffset": 0,
+              "CenterV": 0,
+              "CenterH": 0,
+              "MovementAngle": 0
             }
           ],
           "content": {},
@@ -5451,46 +5469,6 @@
                 "Physics3D",
                 "=",
                 "-1000"
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "TODO PhysicsEllipseMovement3D is not done."
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
-              },
-              "parameters": [
-                "MovingPlatform2",
-                "Physics3D",
-                "=",
-                "200 * sin(ToRad(TimeFromStart() * 45))"
-              ]
-            },
-            {
-              "type": {
-                "value": "Physics3D::Physics3DBehavior::SetLinearVelocityZ"
-              },
-              "parameters": [
-                "MovingPlatform2",
-                "Physics3D",
-                "=",
-                "200 * cos(ToRad(TimeFromStart() * 45))"
               ]
             }
           ]
@@ -25409,27 +25387,126 @@
                       "parameters": []
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterX"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Object.X() - Object.Behavior::DeltaX()"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyPlane"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Z\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterV"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.X() - Object.Behavior::DeltaH()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterH"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.Y() - Object.Behavior::DeltaV()"
+                          ]
+                        }
                       ]
                     },
                     {
-                      "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Object.Y() - Object.Behavior::DeltaY()"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyPlane"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"Y\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterV"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.Y() - Object.Behavior::DeltaH()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterH"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.Object3D::Z() - Object.Behavior::DeltaV()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyPlane"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "\"X\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterV"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.X() - Object.Behavior::DeltaH()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterH"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.Object3D::Z() - Object.Behavior::DeltaV()"
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -25439,26 +25516,131 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyRadiusX"
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyPlane"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "!=",
-                        "0"
+                        "=",
+                        "\"Z\""
                       ]
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyWidth"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "-sin(ToRad(MovementAngle)) * Width / 2"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyHeight"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetLinearVelocityY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "cos(ToRad(MovementAngle)) * Height / 2"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyShouldRotate"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetAngularVelocityZ"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "360 / LoopDuration"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
                       },
-                      "parameters": [
-                        "Object",
-                        "Physics3D",
-                        "=",
-                        "-sin(ToRad(MovementAngle)) * RadiusX"
+                      "comment": "Ensure the object doesn't drift away."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "MettreXY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "clamp(Object.X(), CenterV - Width / 2, CenterV + Width / 2)",
+                            "=",
+                            "clamp(Object.Y(), CenterH - Height / 2, CenterH + Height / 2)"
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -25468,26 +25650,140 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyRadiusY"
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyPlane"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "!=",
-                        "0"
+                        "=",
+                        "\"Y\""
                       ]
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityY"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyWidth"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetLinearVelocityY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "-sin(ToRad(MovementAngle)) * Width / 2"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyHeight"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetLinearVelocityZ"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "cos(ToRad(MovementAngle)) * Height / 2"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyShouldRotate"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetAngularVelocityX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "360 / LoopDuration"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
                       },
-                      "parameters": [
-                        "Object",
-                        "Physics3D",
-                        "=",
-                        "cos(ToRad(MovementAngle)) * RadiusY"
+                      "comment": "Ensure the object doesn't drift away."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "MettreY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "clamp(Object.Y(), CenterV - Width / 2, CenterV + Width / 2)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Object3D",
+                            "=",
+                            "clamp(Object.Object3D::Z(), CenterH - Height / 2, CenterH + Height / 2)"
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -25497,54 +25793,140 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyShouldRotate"
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyPlane"
                       },
                       "parameters": [
                         "Object",
-                        "Behavior"
+                        "Behavior",
+                        "=",
+                        "\"X\""
                       ]
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetAngularVelocityZ"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Physics3D",
-                        "=",
-                        "360 / LoopDuration"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyWidth"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "-sin(ToRad(MovementAngle)) * Width / 2"
+                          ]
+                        }
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Ensure the object doesn't drift away."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
+                    },
                     {
-                      "type": {
-                        "value": "MettreXY"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyHeight"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetLinearVelocityZ"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "cos(ToRad(MovementAngle)) * Height / 2"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyShouldRotate"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetAngularVelocityX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Physics3D",
+                            "=",
+                            "360 / LoopDuration"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
                       },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "clamp(Object.X(), CenterX - RadiusX, CenterX + RadiusX)",
-                        "=",
-                        "clamp(Object.Y(), CenterY - RadiusY, CenterY + RadiusY)"
+                      "comment": "Ensure the object doesn't drift away."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "MettreX"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "clamp(Object.X(), CenterV - Width / 2, CenterV + Width / 2)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Object3D",
+                            "=",
+                            "clamp(Object.Object3D::Z(), CenterH - Height / 2, CenterH + Height / 2)"
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -25617,58 +25999,34 @@
               "objectGroups": []
             },
             {
-              "description": "Change the turning direction (left or right).",
-              "fullName": "Turn the other way",
-              "functionType": "Action",
-              "name": "ToggleTurningLeft",
-              "sentence": "_PARAM0_ turn the other way",
+              "description": "Check if the object is turning left.",
+              "fullName": "Is turning left",
+              "functionType": "Condition",
+              "name": "IsTurningLeft",
+              "sentence": "_PARAM0_ is turning left",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyLoopDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "<",
+                        "0"
+                      ]
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterX"
+                        "value": "SetReturnBoolean"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "2 * Object.X() - Object.Behavior::CenterX()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "2 * Object.Y() - Object.Behavior::CenterY()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyMovementAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "+",
-                        "180"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyLoopDuration"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "*",
-                        "-1"
+                        "True"
                       ]
                     }
                   ]
@@ -25798,34 +26156,58 @@
               "objectGroups": []
             },
             {
-              "description": "Check if the object is turning left.",
-              "fullName": "Is turning left",
-              "functionType": "Condition",
-              "name": "IsTurningLeft",
-              "sentence": "_PARAM0_ is turning left",
+              "description": "Change the turning direction (left or right).",
+              "fullName": "Turn the other way",
+              "functionType": "Action",
+              "name": "ToggleTurningLeft",
+              "sentence": "_PARAM0_ turn the other way",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                  "conditions": [],
+                  "actions": [
                     {
                       "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::PropertyLoopDuration"
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterV"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "<",
-                        "0"
+                        "=",
+                        "2 * Object.X() - Object.Behavior::CenterV()"
                       ]
-                    }
-                  ],
-                  "actions": [
+                    },
                     {
                       "type": {
-                        "value": "SetReturnBoolean"
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyCenterH"
                       },
                       "parameters": [
-                        "True"
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "2 * Object.Y() - Object.Behavior::CenterH()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyMovementAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "+",
+                        "180"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyLoopDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "*",
+                        "-1"
                       ]
                     }
                   ]
@@ -25851,7 +26233,7 @@
               "fullName": "Movement angle",
               "functionType": "Expression",
               "name": "MovementAngle",
-              "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+              "sentence": "",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -25887,12 +26269,301 @@
               "objectGroups": []
             },
             {
-              "description": "Return the loop duration (in seconds).",
-              "fullName": "Loop duration",
+              "description": "Change the movement angle. The object is teleported according to the angle.",
+              "fullName": "Teleport at an angle",
+              "functionType": "Action",
+              "name": "SetMovementAngle",
+              "sentence": "Teleport _PARAM0_ on the ellipse at _PARAM2_°",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyMovementAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Movement angle",
+                  "name": "Value",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the movement center position on X axis.",
+              "fullName": "Movement center X",
               "functionType": "Expression",
               "group": "Configuration",
-              "name": "LoopDuration",
+              "name": "CenterV",
               "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CenterV"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the movement center position on Y axis.",
+              "fullName": "Movement center Y",
+              "functionType": "Expression",
+              "group": "Configuration",
+              "name": "CenterH",
+              "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CenterH"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the ellipse width of the object.",
+              "fullName": "Ellipse width",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D ellipse movement ellipse configuration",
+              "name": "Width",
+              "sentence": "the ellipse width",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Width"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Width",
+              "name": "SetWidth",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyWidth"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the ellipse height of the object.",
+              "fullName": "Ellipse height",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D ellipse movement ellipse configuration",
+              "name": "Height",
+              "sentence": "the ellipse height",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Height"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "Height",
+              "name": "SetHeight",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyHeight"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the loop duration (in seconds).",
+              "fullName": "Loop duration",
+              "functionType": "ExpressionAndCondition",
+              "group": "Configuration",
+              "name": "LoopDuration",
+              "sentence": "the loop duration",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -25928,265 +26599,10 @@
               "objectGroups": []
             },
             {
-              "description": "Return the ellipse radius on X axis.",
-              "fullName": "Radius X",
-              "functionType": "Expression",
-              "group": "Configuration",
-              "name": "RadiusX",
-              "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "RadiusX"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Return the ellipse radius on X axis.",
-              "fullName": "Radius Y",
-              "functionType": "Expression",
-              "group": "Configuration",
-              "name": "RadiusY",
-              "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "RadiusY"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Return the movement center position on X axis.",
-              "fullName": "Movement center X",
-              "functionType": "Expression",
-              "group": "Configuration",
-              "name": "CenterX",
-              "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "CenterX"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Return the movement center position on Y axis.",
-              "fullName": "Movement center Y",
-              "functionType": "Expression",
-              "group": "Configuration",
-              "name": "CenterY",
-              "sentence": "Set initial Y of _PARAM0_ to _PARAM2_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "CenterY"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Change the radius on X axis of the movement.",
-              "fullName": "Radius X",
-              "functionType": "Action",
-              "group": "Elliptical movement configuration",
-              "name": "SetRadiusX",
-              "sentence": "Change the radius on X axis of the movement of _PARAM0_ to _PARAM2_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyRadiusX"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Value"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Radius X",
-                  "name": "Value",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Change the radius on Y axis of the movement.",
-              "fullName": "Radius Y",
-              "functionType": "Action",
-              "group": "Elliptical movement configuration",
-              "name": "SetRadiusY",
-              "sentence": "Change the radius on Y axis of the movement of _PARAM0_ to _PARAM2_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyRadiusY"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Value"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Radius Y",
-                  "name": "Value",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
               "description": "Change the loop duration.",
               "fullName": "Loop duration",
-              "functionType": "Action",
+              "functionType": "ActionWithOperator",
+              "getterName": "LoopDuration",
               "group": "Elliptical movement configuration",
               "name": "SetLoopDuration",
               "sentence": "Change the loop duration of _PARAM0_ to _PARAM2_",
@@ -26270,54 +26686,9 @@
               "objectGroups": []
             },
             {
-              "description": "Change the movement angle. The object is teleported according to the angle.",
-              "fullName": "Teleport at an angle",
-              "functionType": "Action",
-              "name": "SetMovementAngle",
-              "sentence": "Teleport _PARAM0_ on the ellipse at _PARAM2_°",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D::SetPropertyMovementAngle"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        "=",
-                        "Value"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsEllipseMovement3D::PhysicsEllipseMovement3D",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Movement angle",
-                  "name": "Value",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
               "fullName": "Delta X",
               "functionType": "Expression",
-              "name": "DeltaX",
+              "name": "DeltaH",
               "private": true,
               "sentence": "",
               "events": [
@@ -26330,7 +26701,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "cos(ToRad(MovementAngle)) * RadiusX"
+                        "cos(ToRad(MovementAngle)) * Width / 2"
                       ]
                     }
                   ]
@@ -26357,7 +26728,7 @@
             {
               "fullName": "Delta Y",
               "functionType": "Expression",
-              "name": "DeltaY",
+              "name": "DeltaV",
               "private": true,
               "sentence": "",
               "events": [
@@ -26370,7 +26741,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "sin(ToRad(MovementAngle)) * RadiusY"
+                        "sin(ToRad(MovementAngle)) * Height / 2"
                       ]
                     }
                   ]
@@ -26477,6 +26848,17 @@
             {
               "value": "",
               "type": "Behavior",
+              "label": "3D capability",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Scene3D::Base3DBehavior"
+              ],
+              "name": "Object3D"
+            },
+            {
+              "value": "",
+              "type": "Behavior",
               "label": "3D physics engine",
               "description": "",
               "group": "",
@@ -26489,21 +26871,34 @@
               "value": "100",
               "type": "Number",
               "unit": "Pixel",
-              "label": "Radius of the movement on X axis",
+              "label": "Ellipse width",
               "description": "",
               "group": "Ellipse",
               "extraInformation": [],
-              "name": "RadiusX"
+              "name": "Width"
             },
             {
               "value": "0",
               "type": "Number",
               "unit": "Pixel",
-              "label": "Radius of the movement on Y axis",
+              "label": "Ellipse height",
               "description": "",
               "group": "Ellipse",
               "extraInformation": [],
-              "name": "RadiusY"
+              "name": "Height"
+            },
+            {
+              "value": "Z",
+              "type": "Choice",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Z",
+                "Y",
+                "X"
+              ],
+              "name": "Plane"
             },
             {
               "value": "6",
@@ -26561,7 +26956,7 @@
               "group": "",
               "extraInformation": [],
               "hidden": true,
-              "name": "CenterX"
+              "name": "CenterV"
             },
             {
               "value": "0",
@@ -26571,7 +26966,7 @@
               "group": "",
               "extraInformation": [],
               "hidden": true,
-              "name": "CenterY"
+              "name": "CenterH"
             },
             {
               "value": "0",
