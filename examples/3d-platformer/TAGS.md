@@ -1,1 +1,1 @@
-game, simple
+game, advanced
