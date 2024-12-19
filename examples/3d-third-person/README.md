@@ -1,1 +1,0 @@
-A 3D first person movement example featuring 3D first person movement on the X and Y planes, the pointer lock extension, and mobile controls
