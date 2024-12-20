@@ -427,7 +427,11 @@ const extractExamples = async (
           ),
           license: fileWithMetadata.license,
           projectFileUrl: getResourceUrl(fileWithMetadata.path),
-          gdevelopVersion: '', //TODO: set to the GDevelop version used to author the example?
+          gdevelopVersion: usedExtensions
+            .map((exampleUsedExtension) => exampleUsedExtension.name)
+            .includes('Physics3D')
+            ? '5.5.200'
+            : '', //TODO: set to the GDevelop version used to author the example?
         };
 
         return example;
