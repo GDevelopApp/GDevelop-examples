@@ -1,9 +1,9 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 219,
+    "build": 220,
     "major": 5,
-    "minor": 4,
+    "minor": 5,
     "revision": 0
   },
   "properties": {
@@ -2325,7 +2325,7 @@
       "version": "1.0.0",
       "description": "3D platformer and 3D shooter keyboard controls.",
       "origin": {
-        "identifier": "BehaviorRemapper",
+        "identifier": "PhysicsCharacter3DKeyMapper",
         "name": "gdevelop-extension-store"
       },
       "tags": [
@@ -3248,7 +3248,7 @@
       "name": "MousePointerLock",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
       "shortDescription": "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "description": [
         "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
         "",
@@ -4227,7 +4227,7 @@
       "name": "Gamepads",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gamepad-variant-outline.svg",
       "shortDescription": "Add support for gamepads (or other controllers) to your game, giving access to information such as button presses, axis positions, trigger pressure, etc...",
-      "version": "0.6.2",
+      "version": "0.6.3",
       "description": [
         "Add support for gamepads (or other controllers).",
         "",
@@ -10167,7 +10167,7 @@
       "name": "SpriteMultitouchJoystick",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_controller_joystick_arrows_direction.svg",
       "shortDescription": "Joysticks or buttons for touchscreens.",
-      "version": "1.4.0",
+      "version": "1.5.0",
       "description": [
         "Multitouch joysticks can be used the same way as physical gamepads:",
         "- 4 or 8 directions",
@@ -20030,7 +20030,7 @@
       "name": "ParticleEmitter3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/f2e5a34bf465f781866677762d385d6c8e9e8d203383f2df9a3b7e0fad6a2cb5_fire.svg",
       "shortDescription": "Display a large number of particles to create visual effects.",
-      "version": "2.0.2",
+      "version": "2.0.5",
       "description": [
         "Particle emitters can be used to display:",
         "- Fire",
@@ -20314,6 +20314,9 @@
                 " * https://github.com/Alchemist0823/three.quarks#readme",
                 " * Copyright 2024 Alchemist0823 <the.forrest.sun@gmail.com>, MIT",
                 " */",
+                "",
+                "// The migration to addUpdateRange was backported without updating the library",
+                "// because GDevelop still uses Three.js 0.160.0.",
                 "",
                 "class ParticleEmitter extends THREE.Object3D {",
                 "    constructor(system) {",
@@ -24933,27 +24936,34 @@
                 "        });",
                 "        this.geometry.instanceCount = index;",
                 "        if (index > 0) {",
-                "            this.offsetBuffer.updateRange.count = index * 3;",
+                "            this.offsetBuffer.clearUpdateRanges();",
+                "            this.offsetBuffer.addUpdateRange(0, index * 3);",
                 "            this.offsetBuffer.needsUpdate = true;",
-                "            this.sizeBuffer.updateRange.count = index;",
+                "            this.sizeBuffer.clearUpdateRanges();",
+                "            this.sizeBuffer.addUpdateRange(0, index);",
                 "            this.sizeBuffer.needsUpdate = true;",
-                "            this.colorBuffer.updateRange.count = index * 4;",
+                "            this.colorBuffer.clearUpdateRanges();",
+                "            this.colorBuffer.addUpdateRange(0, index * 4);",
                 "            this.colorBuffer.needsUpdate = true;",
-                "            this.uvTileBuffer.updateRange.count = index;",
+                "            this.uvTileBuffer.clearUpdateRanges();",
+                "            this.uvTileBuffer.addUpdateRange(0, index);",
                 "            this.uvTileBuffer.needsUpdate = true;",
                 "            if (this.settings.renderMode === RenderMode.StretchedBillBoard && this.velocityBuffer) {",
-                "                this.velocityBuffer.updateRange.count = index * 4;",
+                "                this.velocityBuffer.clearUpdateRanges();",
+                "                this.velocityBuffer.addUpdateRange(0, index * 4);",
                 "                this.velocityBuffer.needsUpdate = true;",
                 "            }",
                 "            if (this.settings.renderMode === RenderMode.Mesh) {",
-                "                this.rotationBuffer.updateRange.count = index * 4;",
+                "                this.rotationBuffer.clearUpdateRanges();",
+                "                this.rotationBuffer.addUpdateRange(0, index * 4);",
                 "                this.rotationBuffer.needsUpdate = true;",
                 "            }",
                 "            else if (this.settings.renderMode === RenderMode.StretchedBillBoard ||",
                 "                this.settings.renderMode === RenderMode.HorizontalBillBoard ||",
                 "                this.settings.renderMode === RenderMode.VerticalBillBoard ||",
                 "                this.settings.renderMode === RenderMode.BillBoard) {",
-                "                this.rotationBuffer.updateRange.count = index;",
+                "                this.rotationBuffer.clearUpdateRanges();",
+                "                this.rotationBuffer.addUpdateRange(0, index);",
                 "                this.rotationBuffer.needsUpdate = true;",
                 "            }",
                 "        }",
@@ -25296,21 +25306,29 @@
                 "                }",
                 "            }",
                 "        });",
-                "        this.positionBuffer.updateRange.count = index * 3;",
+                "        this.positionBuffer.clearUpdateRanges();",
+                "        this.positionBuffer.addUpdateRange(0, index * 3);",
                 "        this.positionBuffer.needsUpdate = true;",
-                "        this.previousBuffer.updateRange.count = index * 3;",
+                "        this.previousBuffer.clearUpdateRanges();",
+                "        this.previousBuffer.addUpdateRange(0, index * 3);",
                 "        this.previousBuffer.needsUpdate = true;",
-                "        this.nextBuffer.updateRange.count = index * 3;",
+                "        this.nextBuffer.clearUpdateRanges();",
+                "        this.nextBuffer.addUpdateRange(0, index * 3);",
                 "        this.nextBuffer.needsUpdate = true;",
-                "        this.sideBuffer.updateRange.count = index;",
+                "        this.sideBuffer.clearUpdateRanges();",
+                "        this.sideBuffer.addUpdateRange(0, index);",
                 "        this.sideBuffer.needsUpdate = true;",
-                "        this.widthBuffer.updateRange.count = index;",
+                "        this.widthBuffer.clearUpdateRanges();",
+                "        this.widthBuffer.addUpdateRange(0, index);",
                 "        this.widthBuffer.needsUpdate = true;",
-                "        this.uvBuffer.updateRange.count = index * 2;",
+                "        this.uvBuffer.clearUpdateRanges();",
+                "        this.uvBuffer.addUpdateRange(0, index * 2);",
                 "        this.uvBuffer.needsUpdate = true;",
-                "        this.colorBuffer.updateRange.count = index * 4;",
+                "        this.colorBuffer.clearUpdateRanges();",
+                "        this.colorBuffer.addUpdateRange(0, index * 4);",
                 "        this.colorBuffer.needsUpdate = true;",
-                "        this.indexBuffer.updateRange.count = triangles * 3;",
+                "        this.indexBuffer.clearUpdateRanges();",
+                "        this.indexBuffer.addUpdateRange(0, triangles * 3);",
                 "        this.indexBuffer.needsUpdate = true;",
                 "        this.geometry.setDrawRange(0, triangles * 3);",
                 "    }",
@@ -27668,7 +27686,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -27740,7 +27758,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -27823,7 +27841,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -27904,7 +27922,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsString(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -27986,7 +28004,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsString(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28068,7 +28086,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28150,7 +28168,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28232,7 +28250,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28315,7 +28333,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28397,7 +28415,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28480,7 +28498,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28563,7 +28581,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28645,7 +28663,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28727,7 +28745,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28810,7 +28828,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -28893,7 +28911,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -29106,7 +29124,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -29191,7 +29209,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsString(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -29275,7 +29293,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsString(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
@@ -29358,7 +29376,7 @@
                       "parameters": [
                         "Object",
                         "=",
-                        "GetArgumentAsNumber(\"Value\")"
+                        "Value"
                       ]
                     }
                   ]
