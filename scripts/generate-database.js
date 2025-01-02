@@ -439,7 +439,7 @@ const extractExamples = async (
           gdevelopVersion: usedExtensions
             .map((exampleUsedExtension) => exampleUsedExtension.name)
             .includes('Physics3D')
-            ? '5.5.200'
+            ? '>=5.5.220'
             : '', //TODO: set to the GDevelop version used to author the example?
         };
 
