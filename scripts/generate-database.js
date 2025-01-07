@@ -178,6 +178,7 @@ const sortedStarterSlugs = new Set([
   '3d-road-crosser',
   'multiplayer-platformer-arrow-fight',
   'top-down-rpg',
+  '3d-platformer',
   'multiplayer-jump-game',
   'multiplayer-platformer-pickup',
   'spherez',
