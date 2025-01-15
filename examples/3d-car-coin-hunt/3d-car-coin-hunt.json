@@ -1659,18 +1659,7 @@
           "type": "SpriteMultitouchJoystick::SpriteMultitouchJoystick",
           "variables": [],
           "effects": [],
-          "behaviors": [
-            {
-              "name": "Anchor",
-              "type": "AnchorBehavior::AnchorBehavior",
-              "bottomEdgeAnchor": 0,
-              "leftEdgeAnchor": 0,
-              "relativeToOriginalWindowSize": true,
-              "rightEdgeAnchor": 2,
-              "topEdgeAnchor": 0,
-              "useLegacyBottomAndRightAnchors": false
-            }
-          ],
+          "behaviors": [],
           "content": {
             "DeadZoneRadius": 0.33
           },
@@ -2985,91 +2974,55 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "HasAnyTouchOrMouseStarted"
+                            "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
                           },
                           "parameters": [
+                            "",
+                            "SteeringJoystick",
+                            "\"Left\"",
                             ""
                           ]
                         }
                       ],
-                      "actions": [],
-                      "events": [
+                      "actions": [
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::IsValidJoystickPosition"
-                              },
-                              "parameters": [
-                                "",
-                                "SteeringJoystick",
-                                "CursorX(\"UI\")"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::IsOnLeftSide"
-                              },
-                              "parameters": [
-                                "",
-                                "SteeringJoystick",
-                                "CursorX(\"UI\")",
-                                ""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
-                              },
-                              "parameters": [
-                                "SteeringJoystick",
-                                "CursorX(\"UI\")",
-                                "CursorY(\"UI\")",
-                                ""
-                              ]
-                            }
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
+                          },
+                          "parameters": [
+                            "SteeringJoystick",
+                            "CursorX(\"UI\")",
+                            "CursorY(\"UI\")",
+                            ""
                           ]
-                        },
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
                         {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::IsValidJoystickPosition"
-                              },
-                              "parameters": [
-                                "",
-                                "PedalJoystick",
-                                "CursorX(\"UI\")"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "SpriteMultitouchJoystick::IsOnLeftSide"
-                              },
-                              "parameters": [
-                                "",
-                                "PedalJoystick",
-                                "CursorX(\"UI\")"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
-                              },
-                              "parameters": [
-                                "PedalJoystick",
-                                "CursorX(\"UI\")",
-                                "CursorY(\"UI\")",
-                                ""
-                              ]
-                            }
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
+                          },
+                          "parameters": [
+                            "",
+                            "PedalJoystick",
+                            "\"Right\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
+                          },
+                          "parameters": [
+                            "PedalJoystick",
+                            "CursorX(\"UI\")",
+                            "CursorY(\"UI\")",
+                            ""
                           ]
                         }
                       ]
@@ -3817,10 +3770,6 @@
         {
           "name": "AdvancedWheelGrip",
           "type": "AdvancedWheelGrip::AdvancedWheelGrip"
-        },
-        {
-          "name": "Anchor",
-          "type": "AnchorBehavior::AnchorBehavior"
         },
         {
           "name": "Animation",
@@ -34318,11 +34267,11 @@
           "objectGroups": []
         },
         {
-          "description": "Check if the joystick can be used at a given position without touching the screen edges.",
-          "fullName": "Can be used at cursor position",
+          "description": "Check if a new touch has started on the right or left side of the screen.",
+          "fullName": "New touch on a screen side",
           "functionType": "Condition",
-          "name": "IsValidJoystickPosition",
-          "sentence": "_PARAM1_ can be used with center at the cursor position",
+          "name": "HasTouchStartedOnScreenSide",
+          "sentence": "A new touch has started on the _PARAM2_ side of the screen on _PARAM1_'s layer",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -34334,67 +34283,84 @@
                   "parameters": [
                     ""
                   ]
-                },
-                {
-                  "type": {
-                    "value": "TouchX"
-                  },
-                  "parameters": [
-                    "",
-                    "StartedTouchOrMouseId(0)",
-                    ">",
-                    "CameraBorderLeft(Object.Layer()) + 0.6 * Object.Width()",
-                    "Object.Layer()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TouchX"
-                  },
-                  "parameters": [
-                    "",
-                    "StartedTouchOrMouseId(0)",
-                    "<",
-                    "CameraBorderRight(Object.Layer()) - 0.6 * Object.Width()",
-                    "Object.Layer()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TouchY"
-                  },
-                  "parameters": [
-                    "",
-                    "StartedTouchOrMouseId(0)",
-                    ">",
-                    "CameraBorderTop(Object.Layer()) + 0.6 * Object.Width()",
-                    "Object.Layer()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TouchY"
-                  },
-                  "parameters": [
-                    "",
-                    "StartedTouchOrMouseId(0)",
-                    "<",
-                    "CameraBorderBottom(Object.Layer()) - 0.6 * Object.Width()",
-                    "Object.Layer()",
-                    ""
-                  ]
                 }
               ],
-              "actions": [
+              "actions": [],
+              "events": [
                 {
-                  "type": {
-                    "value": "SetReturnBoolean"
-                  },
-                  "parameters": [
-                    "True"
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareArgumentAsString"
+                      },
+                      "parameters": [
+                        "\"Side\"",
+                        "=",
+                        "\"Left\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TouchX"
+                      },
+                      "parameters": [
+                        "",
+                        "StartedTouchOrMouseId(0)",
+                        "<",
+                        "CameraCenterX(Object.Layer())",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareArgumentAsString"
+                      },
+                      "parameters": [
+                        "\"Side\"",
+                        "=",
+                        "\"Right\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TouchX"
+                      },
+                      "parameters": [
+                        "",
+                        "StartedTouchOrMouseId(0)",
+                        ">=",
+                        "CameraCenterX(Object.Layer())",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
                   ]
                 }
               ]
@@ -34406,60 +34372,12 @@
               "name": "Object",
               "supplementaryInformation": "SpriteMultitouchJoystick::SpriteMultitouchJoystick",
               "type": "objectList"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Check if the cursor is on the left side of the screen.",
-          "fullName": "Cursor is on screen left side",
-          "functionType": "Condition",
-          "name": "IsOnLeftSide",
-          "sentence": "The cursor is at the left side of the screen for _PARAM1_",
-          "events": [
+            },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "HasAnyTouchOrMouseStarted"
-                  },
-                  "parameters": [
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TouchX"
-                  },
-                  "parameters": [
-                    "",
-                    "StartedTouchOrMouseId(0)",
-                    "<",
-                    "CameraCenterX(Object.Layer())",
-                    "Object.Layer()",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetReturnBoolean"
-                  },
-                  "parameters": [
-                    "True"
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "description": "Multitouch joystick",
-              "name": "Object",
-              "supplementaryInformation": "SpriteMultitouchJoystick::SpriteMultitouchJoystick",
-              "type": "objectList"
+              "description": "Screen side",
+              "name": "Side",
+              "supplementaryInformation": "[\"Left\",\"Right\"]",
+              "type": "stringWithSelector"
             }
           ],
           "objectGroups": []
