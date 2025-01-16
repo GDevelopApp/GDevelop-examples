@@ -2083,28 +2083,12 @@
                   "subInstructions": [
                     {
                       "type": {
-                        "value": "BuiltinCommonInstructions::And"
+                        "value": "DoubleClick::HasSimpleClicked"
                       },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "MouseButtonFromTextReleased"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Left\""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "MousePointerLock::isPointerLocked"
-                          },
-                          "parameters": [
-                            "",
-                            ""
-                          ]
-                        }
+                      "parameters": [
+                        "",
+                        "\"Left\"",
+                        ""
                       ]
                     },
                     {
@@ -3431,6 +3415,11 @@
           "name": "OldY",
           "type": "number",
           "value": 0
+        },
+        {
+          "name": "TouchSpeedFactor",
+          "type": "number",
+          "value": 4
         }
       ],
       "eventsFunctions": [
@@ -3452,8 +3441,10 @@
                 "};",
                 "",
                 "canvas.addEventListener(\"pointermove\", (e) => {",
-                "    gdjs._MousePointerLockExtension.movementX += e.movementX || 0;",
-                "    gdjs._MousePointerLockExtension.movementY += e.movementY || 0;",
+                "    if (!!document.pointerLockElement) {",
+                "        gdjs._MousePointerLockExtension.movementX += e.movementX || 0;",
+                "        gdjs._MousePointerLockExtension.movementY += e.movementY || 0;",
+                "    }",
                 "}, false);",
                 "",
                 "document.addEventListener(\"pointerlockerror\", (e) => {",
@@ -3478,7 +3469,84 @@
           "functionType": "Action",
           "name": "onScenePreEvents",
           "sentence": "",
+          "events": [],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onScenePostEvents",
+          "sentence": "",
           "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "gdjs._MousePointerLockExtension.movementX = 0;\r",
+                "gdjs._MousePointerLockExtension.movementY = 0;"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "MousePointerLock::isEmulatingPointerLock"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MousePointerLock::SetMovementX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "(MousePointerLock::TouchX(TouchId) - OldX) * TouchSpeedFactor",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "MousePointerLock::SetMovementY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "(MousePointerLock::TouchY(TouchId) - OldY) * TouchSpeedFactor",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldX",
+                    "=",
+                    "MousePointerLock::TouchX(TouchId)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldY",
+                    "=",
+                    "MousePointerLock::TouchY(TouchId)"
+                  ]
+                }
+              ]
+            },
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -3504,84 +3572,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "MousePointerLock::isEmulatingPointerLock"
-                  },
-                  "parameters": [
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "MousePointerLock::SetMovementX"
-                  },
-                  "parameters": [
-                    "",
-                    "=",
-                    "MousePointerLock::TouchX(TouchId) - OldX",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "MousePointerLock::SetMovementY"
-                  },
-                  "parameters": [
-                    "",
-                    "=",
-                    "MousePointerLock::TouchY(TouchId) - OldY",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetNumberVariable"
-                  },
-                  "parameters": [
-                    "OldX",
-                    "=",
-                    "MousePointerLock::TouchX(TouchId)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetNumberVariable"
-                  },
-                  "parameters": [
-                    "OldY",
-                    "=",
-                    "MousePointerLock::TouchY(TouchId)"
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": [],
-          "objectGroups": []
-        },
-        {
-          "fullName": "",
-          "functionType": "Action",
-          "name": "onScenePostEvents",
-          "sentence": "",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": [
-                "gdjs._MousePointerLockExtension.movementX = 0;\r",
-                "gdjs._MousePointerLockExtension.movementY = 0;"
-              ],
-              "parameterObjects": "",
-              "useStrict": true,
-              "eventsSheetExpanded": false
             }
           ],
           "parameters": [],
@@ -4050,6 +4040,61 @@
               "type": "expression"
             }
           ],
+          "objectGroups": []
+        },
+        {
+          "description": "the speed factor for touch movement",
+          "fullName": "Speed factor for touch movement",
+          "functionType": "ExpressionAndCondition",
+          "name": "TouchSpeedFactor",
+          "sentence": "the speed factor for touch movement",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "TouchSpeedFactor"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "TouchSpeedFactor",
+          "name": "SetTouchSpeedFactor",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "TouchSpeedFactor",
+                    "=",
+                    "Value"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [],
           "objectGroups": []
         }
       ],
@@ -31587,6 +31632,287 @@
             "type": "expression"
           },
           "parameters": [],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": []
+    },
+    {
+      "author": "Silver-Streak",
+      "category": "Input",
+      "extensionNamespace": "",
+      "fullName": "Double-click",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTYiIHkxPSIzIiB4Mj0iMTYiIHkyPSI2Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMTYiIHkxPSIxMCIgeDI9IjE2IiB5Mj0iMTMiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNiwxMEwxNiwxMGMtMS4xLDAtMi0wLjktMi0ydjBjMC0xLjEsMC45LTIsMi0yaDBjMS4xLDAsMiwwLjksMiwydjBDMTgsOS4xLDE3LjEsMTAsMTYsMTB6Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNywxNC4xYzIuMy0wLjcsNS41LTEuMSw5LTEuMWMzLjUsMCw2LjcsMC40LDksMS4xIi8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTYsMjlMMTYsMjljLTUsMC05LTQtOS05di01LjlWOWMwLTMuMywyLjctNiw2LTZoNmMzLjMsMCw2LDIuNyw2LDZ2MTFDMjUsMjUsMjEsMjksMTYsMjl6Ii8+DQo8L3N2Zz4NCg==",
+      "name": "DoubleClick",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_mouse_wireless_pc.svg",
+      "shortDescription": "Check for a double-click with a mouse, or a double-tap on a touchscreen.",
+      "version": "2.0.0",
+      "description": [
+        "Check for a double-click with a mouse, or a double-tap on a touchscreen.",
+        "",
+        "Please note: Touch devices do not have alternatives for middle/right clicks. Taps on a touch device will get counted for _any_ use of these conditions, so you should either design your controls accordingly, or build out separate events if the device has a touch screen.",
+        "",
+        "Breaking changes from 2.0.0:",
+        "- Mouse button value now needs quotes",
+        "- The double-click sensitivity now relies on the device settings"
+      ],
+      "origin": {
+        "identifier": "DoubleClick",
+        "name": "gdevelop-extension-store"
+      },
+      "tags": [
+        "mouse",
+        "cursor",
+        "pointer",
+        "click",
+        "tap"
+      ],
+      "authorIds": [
+        "8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3"
+      ],
+      "dependencies": [],
+      "globalVariables": [
+        {
+          "name": "MaxDelay",
+          "type": "number",
+          "value": 0.5
+        }
+      ],
+      "sceneVariables": [],
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onFirstSceneLoaded",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "",
+                "const extension = {",
+                "    // Multiple clicks",
+                "    button: -1,",
+                "    count: 0,",
+                "",
+                "    // Simple click",
+                "    lastButton: -1,",
+                "    lastPointerId: 0,",
+                "    lastTime: 0,",
+                "    hasMoved: false,",
+                "    simpleClickButton: -1,",
+                "};",
+                "gdjs._DoubleClickExtension = extension;",
+                "",
+                "window.addEventListener(",
+                "    'click',",
+                "    event => {",
+                "        if (event.detail > 1) {",
+                "            extension.button = convertHtmlMouseButtonToInputManagerMouseButton(event.button);",
+                "            extension.count = event.detail;",
+                "        }",
+                "    }",
+                ");",
+                "",
+                "// The 'click' event doesn't do any constraint on the 1st click.",
+                "// It doesn't allow to differenciate a dragging from a click.",
+                "// So, we check it manually.",
+                "",
+                "window.addEventListener(",
+                "    'pointerdown',",
+                "    event => {",
+                "        extension.lastButton = event.button;",
+                "        extension.lastPointerId = event.pointerId;",
+                "        extension.lastTime = Date.now();",
+                "        extension.hasMoved = false;",
+                "    }",
+                ");",
+                "",
+                "window.addEventListener(",
+                "    'pointermove',",
+                "    event => {",
+                "        if (event.pointerId === extension.lastPointerId) {",
+                "            extension.hasMoved = true;",
+                "        }",
+                "    }",
+                ");",
+                "",
+                "window.addEventListener(",
+                "    'pointerup',",
+                "    (event) => {",
+                "        if (extension.button < 0 &&",
+                "            event.button === extension.lastButton &&",
+                "            event.pointerId === extension.lastPointerId &&",
+                "            (!extension.hasMoved || Date.now() - extension.lastTime < 500)) {",
+                "            extension.simpleClickButton = convertHtmlMouseButtonToInputManagerMouseButton(event.button);",
+                "            extension.lastButton = -1;",
+                "        }",
+                "    }",
+                ");",
+                "",
+                "// Converts HTML mouse button to InputManager mouse button.",
+                "// This function is used to align HTML button values with GDevelop 3 C++ SFML Mouse button enum values,",
+                "// notably the middle and right buttons.",
+                "function convertHtmlMouseButtonToInputManagerMouseButton(button) {",
+                "    switch (button) {",
+                "        case 1: // Middle button",
+                "            return gdjs.InputManager.MOUSE_MIDDLE_BUTTON;",
+                "        case 2: // Right button",
+                "            return gdjs.InputManager.MOUSE_RIGHT_BUTTON;",
+                "    }",
+                "    return button;",
+                "}",
+                "",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onScenePostEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "gdjs._DoubleClickExtension.button = -1;\r",
+                "gdjs._DoubleClickExtension.simpleClickButton = -1;"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the specified mouse button is clicked twice in a short amount of time.",
+          "fullName": "Double-clicked (or double-tapped)",
+          "functionType": "Condition",
+          "name": "HasDoubleClicked",
+          "sentence": "_PARAM1_ mouse button is double-clicked",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "DoubleClick::HasClicked"
+                  },
+                  "parameters": [
+                    "",
+                    "MouseButton",
+                    "2",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Mouse button to track",
+              "longDescription": "As touch devices do not have middle/right tap equivalents, you will need to account for this within your events if you're not using the left mouse button and building for touch devices.",
+              "name": "MouseButton",
+              "type": "mouseButton"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the specified mouse button is clicked.",
+          "fullName": "Clicked (or tapped)",
+          "functionType": "Condition",
+          "name": "HasSimpleClicked",
+          "sentence": "_PARAM1_ mouse button is clicked",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const buttonName = eventsFunctionContext.getArgument(\"MouseButton\");",
+                "const clickCount = eventsFunctionContext.getArgument(\"ClickCount\");",
+                "",
+                "const { simpleClickButton } = gdjs._DoubleClickExtension;",
+                "",
+                "if (gdjs.evtTools.input.mouseButtonsNameToCode[buttonName] === simpleClickButton) {",
+                "    return eventsFunctionContext.returnValue = true;",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Mouse button to track",
+              "longDescription": "As touch devices do not have middle/right tap equivalents, you will need to account for this within your events if you're not using the left mouse button and building for touch devices.",
+              "name": "MouseButton",
+              "type": "mouseButton"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the specified mouse button is clicked.",
+          "fullName": "Clicked (or tapped)",
+          "functionType": "Condition",
+          "name": "HasClicked",
+          "private": true,
+          "sentence": "_PARAM1_ mouse button is clicked _PARAM2_ times",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "",
+                "const buttonName = eventsFunctionContext.getArgument(\"MouseButton\");",
+                "const clickCount = eventsFunctionContext.getArgument(\"ClickCount\");",
+                "",
+                "const { button, count } = gdjs._DoubleClickExtension;",
+                "",
+                "if (gdjs.evtTools.input.mouseButtonsNameToCode[buttonName] === button &&",
+                "  (clickCount === 0 || clickCount === count)) {",
+                "    return eventsFunctionContext.returnValue = true;",
+                "}"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Mouse button to track",
+              "longDescription": "As touch devices do not have middle/right tap equivalents, you will need to account for this within your events if you're not using the left mouse button and building for touch devices.",
+              "name": "MouseButton",
+              "type": "mouseButton"
+            },
+            {
+              "description": "Click count (or 0 for any click count)",
+              "name": "ClickCount",
+              "type": "expression"
+            }
+          ],
           "objectGroups": []
         }
       ],
