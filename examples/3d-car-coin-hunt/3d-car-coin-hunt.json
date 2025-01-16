@@ -33748,36 +33748,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "SpriteMultitouchJoystick::JoystickForce"
-                  },
-                  "parameters": [
-                    "",
-                    ">",
-                    "0",
-                    "ControllerIdentifier",
-                    "JoystickIdentifier",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "DebuggerTools::ConsoleLog"
-                  },
-                  "parameters": [
-                    "ToString(SpriteMultitouchJoystick::JoystickAngle(ControllerIdentifier, JoystickIdentifier))",
-                    "\"info\"",
-                    ""
-                  ]
-                }
-              ]
             }
           ],
           "parameters": [
@@ -33944,56 +33914,6 @@
                   },
                   "parameters": [
                     "max(0, Controllers[ControllerIdentifier].Joystick[JoystickIdentifier].Force - SpriteMultitouchJoystick::DeadZone(ControllerIdentifier, JoystickIdentifier)) / (1 - SpriteMultitouchJoystick::DeadZone(ControllerIdentifier, JoystickIdentifier))"
-                  ]
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "DebuggerTools::ConsoleLog"
-                  },
-                  "parameters": [
-                    "ToString(Controllers[ControllerIdentifier].Joystick[JoystickIdentifier].Force)",
-                    "\"info\"",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "disabled": true,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "DebuggerTools::ConsoleLog"
-                  },
-                  "parameters": [
-                    "ToString(ControllerIdentifier) + \" \" + JoystickIdentifier",
-                    "\"info\"",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "DebuggerTools::ConsoleLog"
-                  },
-                  "parameters": [
-                    "ToString(ControllerIdentifier) + \" \" + JoystickIdentifier + \" : \" + ToString(Controllers[ControllerIdentifier].Joystick[JoystickIdentifier].Force)",
-                    "\"info\"",
-                    ""
                   ]
                 }
               ]
@@ -34270,6 +34190,7 @@
           "description": "Check if a new touch has started on the right or left side of the screen.",
           "fullName": "New touch on a screen side",
           "functionType": "Condition",
+          "group": "Multitouch Joystick",
           "name": "HasTouchStartedOnScreenSide",
           "sentence": "A new touch has started on the _PARAM2_ side of the screen on _PARAM1_'s layer",
           "events": [
@@ -35703,12 +35624,31 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "CollisionPoint"
+                                "value": "BuiltinCommonInstructions::Or"
                               },
-                              "parameters": [
-                                "Object",
-                                "TouchX(StartedTouchOrMouseId(TouchIndex), Object.Layer(), 0)",
-                                "TouchY(StartedTouchOrMouseId(TouchIndex), Object.Layer(), 0)"
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "CollisionPoint"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "TouchX(StartedTouchOrMouseId(TouchIndex), Object.Layer())",
+                                    "TouchY(StartedTouchOrMouseId(TouchIndex), Object.Layer())"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SpriteMultitouchJoystick::MultitouchButton::PropertyRadius"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    ">",
+                                    "DistanceBetweenPositions(Object.CenterX(), Object.CenterY(), TouchX(StartedTouchOrMouseId(TouchIndex), Object.Layer()), TouchY(StartedTouchOrMouseId(TouchIndex), Object.Layer()))"
+                                  ]
+                                }
                               ]
                             }
                           ],
@@ -36024,6 +35964,16 @@
               "extraInformation": [],
               "hidden": true,
               "name": "IsReleased"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Triggering circle radius",
+              "description": "This circle adds up to the object collision mask.",
+              "group": "",
+              "extraInformation": [],
+              "name": "Radius"
             }
           ],
           "sharedPropertyDescriptors": []
