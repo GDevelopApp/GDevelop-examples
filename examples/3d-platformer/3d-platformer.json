@@ -387,13 +387,7 @@
     "folderName": "__ROOT"
   },
   "objectsGroups": [],
-  "variables": [
-    {
-      "name": "Variable",
-      "type": "number",
-      "value": 0
-    }
-  ],
+  "variables": [],
   "layouts": [
     {
       "b": 250,
@@ -488,6 +482,11 @@
           "name": "ControlKind",
           "type": "string",
           "value": "Keyboard"
+        },
+        {
+          "name": "IsCameraLocked",
+          "type": "boolean",
+          "value": false
         }
       ],
       "instances": [
@@ -3756,17 +3755,36 @@
                     "=",
                     "\"Touch\""
                   ]
-                },
+                }
+              ],
+              "events": [
                 {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "2",
-                    ""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsCameraLocked",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                      },
+                      "parameters": [
+                        "Character",
+                        "ThirdPersonCamera",
+                        "=",
+                        "2",
+                        ""
+                      ]
+                    }
                   ]
                 }
               ]
@@ -3811,6 +3829,37 @@
                     ""
                   ]
                 }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsCameraLocked",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                      },
+                      "parameters": [
+                        "Character",
+                        "ThirdPersonCamera",
+                        "=",
+                        "2",
+                        ""
+                      ]
+                    }
+                  ]
+                }
               ]
             },
             {
@@ -3848,6 +3897,37 @@
                     ""
                   ]
                 }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsCameraLocked",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                      },
+                      "parameters": [
+                        "Character",
+                        "ThirdPersonCamera",
+                        "=",
+                        "2",
+                        ""
+                      ]
+                    }
+                  ]
+                }
               ]
             },
             {
@@ -3855,13 +3935,48 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "Physics3D::PhysicsCharacter3D::CurrentForwardSpeed"
+                    "value": "BuiltinCommonInstructions::Not"
                   },
-                  "parameters": [
-                    "Character",
-                    "PhysicsCharacter3D",
-                    "=",
-                    "0"
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "AnyKeyPressed"
+                          },
+                          "parameters": [
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Gamepads::StickForce"
+                          },
+                          "parameters": [
+                            "",
+                            ">",
+                            "0",
+                            "1",
+                            "\"Left\"",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
+                          },
+                          "parameters": [
+                            "WalkJoystick",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               ],
@@ -3920,6 +4035,29 @@
                         "ThirdPersonCamera",
                         "=",
                         "0.5",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "IsCameraLocked",
+                        "False",
                         ""
                       ]
                     }
@@ -4047,6 +4185,15 @@
                     "",
                     ""
                   ]
+                },
+                {
+                  "type": {
+                    "value": "MousePointerLock::IsMoving"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
                 }
               ],
               "actions": [
@@ -4058,7 +4205,7 @@
                     "Character",
                     "ThirdPersonCamera",
                     "+",
-                    "120 * MousePointerLock::MovementX() / SceneWindowWidth()",
+                    "180 * MousePointerLock::MovementX() / SceneWindowWidth()",
                     ""
                   ]
                 },
@@ -4070,38 +4217,18 @@
                     "Character",
                     "ThirdPersonCamera",
                     "+",
-                    "120 * MousePointerLock::MovementY() / SceneWindowHeight()",
+                    "90 * MousePointerLock::MovementY() / SceneWindowHeight()",
                     ""
                   ]
-                }
-              ],
-              "events": [
+                },
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "MousePointerLock::IsMoving"
-                      },
-                      "parameters": [
-                        "",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                      },
-                      "parameters": [
-                        "Character",
-                        "ThirdPersonCamera",
-                        "=",
-                        "1000000",
-                        ""
-                      ]
-                    }
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsCameraLocked",
+                    "True",
+                    ""
                   ]
                 }
               ]
@@ -4142,7 +4269,7 @@
                     "Character",
                     "ThirdPersonCamera",
                     "+",
-                    "90 * Gamepads::StickForceX(1, \"Right\") * TimeDelta()",
+                    "180 * Gamepads::StickForceX(1, \"Right\") * TimeDelta()",
                     ""
                   ]
                 },
@@ -4154,10 +4281,37 @@
                     "Character",
                     "ThirdPersonCamera",
                     "+",
-                    "180 * Gamepads::StickForceY(1, \"Right\") * TimeDelta()",
+                    "90 * Gamepads::StickForceY(1, \"Right\") * TimeDelta()",
                     ""
                   ]
                 },
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "IsCameraLocked",
+                    "True",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "IsCameraLocked",
+                    "True",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
                 {
                   "type": {
                     "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
@@ -19944,7 +20098,7 @@
       "name": "MousePointerLock",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
       "shortDescription": "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
-      "version": "0.1.8",
+      "version": "0.2.0",
       "description": [
         "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
         "",
@@ -19972,7 +20126,23 @@
       ],
       "dependencies": [],
       "globalVariables": [],
-      "sceneVariables": [],
+      "sceneVariables": [
+        {
+          "name": "TouchId",
+          "type": "number",
+          "value": -1
+        },
+        {
+          "name": "OldX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "OldY",
+          "type": "number",
+          "value": 0
+        }
+      ],
       "eventsFunctions": [
         {
           "fullName": "",
@@ -19997,16 +20167,111 @@
                 "}, false);",
                 "",
                 "document.addEventListener(\"pointerlockerror\", (e) => {",
-                "    if (!gdjs._MousePointerLockExtension.retried) {",
+                "    if (gdjs._MousePointerLockExtension.retried) {",
+                "        ",
+                "    } else {",
                 "        canvas.requestPointerLock();",
                 "        gdjs._MousePointerLockExtension.retried = true;",
                 "    }",
-                "    console.log(e);",
                 "});"
               ],
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onScenePreEvents",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "HasTouchEnded"
+                  },
+                  "parameters": [
+                    "",
+                    "TouchId"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    "=",
+                    "-1"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "MousePointerLock::isEmulatingPointerLock"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MousePointerLock::SetMovementX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "MousePointerLock::TouchX(TouchId) - OldX",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "MousePointerLock::SetMovementY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "MousePointerLock::TouchY(TouchId) - OldY",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldX",
+                    "=",
+                    "MousePointerLock::TouchX(TouchId)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldY",
+                    "=",
+                    "MousePointerLock::TouchY(TouchId)"
+                  ]
+                }
+              ]
             }
           ],
           "parameters": [],
@@ -20040,6 +20305,61 @@
           "sentence": "Request Pointer Lock",
           "events": [
             {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "HasAnyTouchOrMouseStarted"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    "=",
+                    "-1"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    "=",
+                    "StartedTouchOrMouseId(0)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldX",
+                    "=",
+                    "MousePointerLock::TouchX(TouchId)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "OldY",
+                    "=",
+                    "MousePointerLock::TouchY(TouchId)"
+                  ]
+                }
+              ]
+            },
+            {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\r",
@@ -20050,7 +20370,7 @@
               ],
               "parameterObjects": "",
               "useStrict": true,
-              "eventsSheetExpanded": true
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [],
@@ -20063,6 +20383,22 @@
           "name": "ExitPointerLock",
           "sentence": "Exit pointer lock",
           "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    "=",
+                    "-1"
+                  ]
+                }
+              ]
+            },
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
@@ -20086,11 +20422,129 @@
           "sentence": "The mouse pointer is locked",
           "events": [
             {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    ">=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    "<",
+                    "0"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "MousePointerLock::isPointerActuallyLocked"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the mouse pointer is actually locked.",
+          "fullName": "Pointer is actually locked",
+          "functionType": "Condition",
+          "name": "isPointerActuallyLocked",
+          "private": true,
+          "sentence": "The mouse pointer actually is locked",
+          "events": [
+            {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = document.pointerLockElement ? true : false;",
+              "inlineCode": "eventsFunctionContext.returnValue = !!document.pointerLockElement;",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the mouse pointer lock is emulated.",
+          "fullName": "Pointer lock is emulated",
+          "functionType": "Condition",
+          "name": "isEmulatingPointerLock",
+          "private": true,
+          "sentence": "The mouse pointer is lock is emulated",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "MousePointerLock::isPointerActuallyLocked"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    ">=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
             }
           ],
           "parameters": [],
@@ -20175,6 +20629,30 @@
           "objectGroups": []
         },
         {
+          "description": "the movement of the locked pointer on the X axis.",
+          "fullName": "Pointer X movement",
+          "functionType": "ActionWithOperator",
+          "getterName": "MovementX",
+          "name": "SetMovementX",
+          "private": true,
+          "sentence": "the movement of the locked pointer on the X axis",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const value = eventsFunctionContext.getArgument(\"Value\");\r",
+                "gdjs._MousePointerLockExtension.movementX = value;\r",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
           "description": "the movement of the pointer on the Y axis.",
           "fullName": "Pointer Y movement",
           "functionType": "ExpressionAndCondition",
@@ -20194,6 +20672,94 @@
             "type": "expression"
           },
           "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "the movement of the locked pointer on the X axis.",
+          "fullName": "Pointer X movement",
+          "functionType": "ActionWithOperator",
+          "getterName": "MovementY",
+          "name": "SetMovementY",
+          "private": true,
+          "sentence": "the movement of the locked pointer on the X axis",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const value = eventsFunctionContext.getArgument(\"Value\");\r",
+                "gdjs._MousePointerLockExtension.movementY = value;\r",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the X position of a specific touch",
+          "fullName": "Touch X position",
+          "functionType": "Expression",
+          "name": "TouchX",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const touchId = eventsFunctionContext.getArgument(\"NewTouchId\");",
+                "eventsFunctionContext.returnValue = runtimeScene.getGame().getInputManager().getTouchX(touchId);",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Touch identifier",
+              "name": "NewTouchId",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the Y position of a specific touch",
+          "fullName": "Touch Y position",
+          "functionType": "Expression",
+          "name": "TouchY",
+          "private": true,
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const touchId = eventsFunctionContext.getArgument(\"NewTouchId\");",
+                "eventsFunctionContext.returnValue = runtimeScene.getGame().getInputManager().getTouchY(touchId);",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Touch identifier",
+              "name": "NewTouchId",
+              "type": "expression"
+            }
+          ],
           "objectGroups": []
         }
       ],
