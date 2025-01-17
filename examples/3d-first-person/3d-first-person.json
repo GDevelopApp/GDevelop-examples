@@ -3360,7 +3360,8 @@
         "pointer"
       ],
       "authorIds": [
-        "Zu55H5hcb9YmZTltIVOTAFDJQyB2"
+        "Zu55H5hcb9YmZTltIVOTAFDJQyB2",
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
       ],
       "dependencies": [],
       "globalVariables": [],
@@ -3396,29 +3397,64 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "const canvas = runtimeScene.getGame().getRenderer().getCanvas();",
                 "",
-                "gdjs._MousePointerLockExtension = {",
-                "    movementX: 0,",
-                "    movementY: 0,",
-                "    retried: false,",
+                "class PointerLockHandler {",
+                "    movementX = 0;",
+                "    movementY = 0;",
+                "    retried = false;",
+                "    /**",
+                "     * @type {gdjs.RuntimeGame}",
+                "     */",
+                "    game;",
+                "",
+                "    /**",
+                "     * @param {gdjs.RuntimeGame} game",
+                "     */",
+                "    constructor(game) {",
+                "        this.game = game;",
+                "        const canvas = game.getRenderer().getCanvas();",
+                "",
+                "        canvas.addEventListener(\"pointermove\", event => {",
+                "            if (!!document.pointerLockElement) {",
+                "                this.movementX += event.movementX || 0;",
+                "                this.movementY += event.movementY || 0;",
+                "            }",
+                "        }, false);",
+                "",
+                "        document.addEventListener(\"pointerlockerror\", event => {",
+                "            if (!this.retried) {",
+                "                canvas.requestPointerLock();",
+                "                this.retried = true;",
+                "            }",
+                "        });",
+                "    }",
+                "",
+                "    requestPointerLock() {",
+                "        const canvas = this.game.getRenderer().getCanvas();",
+                "        if (canvas.requestPointerLock && !document.pointerLockElement) {",
+                "            this.retried = false;",
+                "            canvas.requestPointerLock({ unadjustedMovement: true });",
+                "        }",
+                "    }",
+                "",
+                "    exitPointerLock() {",
+                "        if (document.exitPointerLock) {",
+                "            document.exitPointerLock();",
+                "        }",
+                "    }",
+                "",
+                "    isPointerLocked() {",
+                "        return !!document.pointerLockElement;",
+                "    }",
+                "",
+                "    resetMovement() {",
+                "        this.movementX = 0;",
+                "        this.movementY = 0;",
+                "    }",
                 "};",
                 "",
-                "canvas.addEventListener(\"pointermove\", (e) => {",
-                "    if (!!document.pointerLockElement) {",
-                "        gdjs._MousePointerLockExtension.movementX += e.movementX || 0;",
-                "        gdjs._MousePointerLockExtension.movementY += e.movementY || 0;",
-                "    }",
-                "}, false);",
-                "",
-                "document.addEventListener(\"pointerlockerror\", (e) => {",
-                "    if (gdjs._MousePointerLockExtension.retried) {",
-                "        ",
-                "    } else {",
-                "        canvas.requestPointerLock();",
-                "        gdjs._MousePointerLockExtension.retried = true;",
-                "    }",
-                "});"
+                "gdjs._MousePointerLockExtension = { handler: new PointerLockHandler(runtimeScene.getGame()) };",
+                ""
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -3431,23 +3467,16 @@
         {
           "fullName": "",
           "functionType": "Action",
-          "name": "onScenePreEvents",
-          "sentence": "",
-          "events": [],
-          "parameters": [],
-          "objectGroups": []
-        },
-        {
-          "fullName": "",
-          "functionType": "Action",
           "name": "onScenePostEvents",
           "sentence": "",
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "gdjs._MousePointerLockExtension.movementX = 0;\r",
-                "gdjs._MousePointerLockExtension.movementY = 0;"
+                "const { handler } = gdjs._MousePointerLockExtension;\r",
+                "\r",
+                "handler.resetMovement();\r",
+                ""
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -3606,11 +3635,10 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "const canvas = runtimeScene.getGame().getRenderer().getCanvas();\r",
-                "if (canvas.requestPointerLock && !document.pointerLockElement) {\r",
-                "    gdjs._MousePointerLockExtension.retried = false;\r",
-                "    canvas.requestPointerLock({ unadjustedMovement: true });\r",
-                "}"
+                "const { handler } = gdjs._MousePointerLockExtension;\r",
+                "\r",
+                "handler.requestPointerLock();\r",
+                ""
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -3646,9 +3674,11 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "if (document.exitPointerLock) {\r",
-                "    document.exitPointerLock();\r",
-                "}"
+                "\r",
+                "const { handler } = gdjs._MousePointerLockExtension;\r",
+                "\r",
+                "handler.exitPointerLock();\r",
+                ""
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -3738,7 +3768,13 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = !!document.pointerLockElement;",
+              "inlineCode": [
+                "\r",
+                "const { handler } = gdjs._MousePointerLockExtension;\r",
+                "\r",
+                "eventsFunctionContext.returnValue = handler.isPointerLocked();\r",
+                ""
+              ],
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -3860,7 +3896,11 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = gdjs._MousePointerLockExtension.movementX || 0;",
+              "inlineCode": [
+                "\r",
+                "eventsFunctionContext.returnValue = gdjs._MousePointerLockExtension.handler.movementX || 0;\r",
+                ""
+              ],
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -3884,8 +3924,9 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
+                "\r",
                 "const value = eventsFunctionContext.getArgument(\"Value\");\r",
-                "gdjs._MousePointerLockExtension.movementX = value;\r",
+                "gdjs._MousePointerLockExtension.handler.movementX = value;\r",
                 ""
               ],
               "parameterObjects": "",
@@ -3906,7 +3947,11 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = gdjs._MousePointerLockExtension.movementY || 0;",
+              "inlineCode": [
+                "\r",
+                "eventsFunctionContext.returnValue = gdjs._MousePointerLockExtension.handler.movementY || 0;\r",
+                ""
+              ],
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -3930,8 +3975,9 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
+                "\r",
                 "const value = eventsFunctionContext.getArgument(\"Value\");\r",
-                "gdjs._MousePointerLockExtension.movementY = value;\r",
+                "gdjs._MousePointerLockExtension.handler.movementY = value;\r",
                 ""
               ],
               "parameterObjects": "",
@@ -3953,6 +3999,7 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
+                "",
                 "const touchId = eventsFunctionContext.getArgument(\"NewTouchId\");",
                 "eventsFunctionContext.returnValue = runtimeScene.getGame().getInputManager().getTouchX(touchId);",
                 ""
@@ -3985,6 +4032,7 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
+                "",
                 "const touchId = eventsFunctionContext.getArgument(\"NewTouchId\");",
                 "eventsFunctionContext.returnValue = runtimeScene.getGame().getInputManager().getTouchY(touchId);",
                 ""
@@ -4007,7 +4055,7 @@
           "objectGroups": []
         },
         {
-          "description": "the speed factor for touch movement",
+          "description": "the speed factor for touch movement.",
           "fullName": "Speed factor for touch movement",
           "functionType": "ExpressionAndCondition",
           "name": "TouchSpeedFactor",
@@ -31656,65 +31704,82 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "const extension = {",
+                "",
+                "class ClickCounter {",
                 "    // Multiple clicks",
-                "    button: -1,",
-                "    count: 0,",
+                "    multipleClickButton = -1;",
+                "    count = 0;",
                 "",
                 "    // Simple click",
-                "    lastButton: -1,",
-                "    lastPointerId: 0,",
-                "    lastTime: 0,",
-                "    hasMoved: false,",
-                "    simpleClickButton: -1,",
-                "};",
-                "gdjs._DoubleClickExtension = extension;",
+                "    lastButton = -1;",
+                "    lastPointerId = 0;",
+                "    lastTime = 0;",
+                "    hasMoved = false;",
+                "    simpleClickButton = -1;",
                 "",
-                "window.addEventListener(",
-                "    'click',",
-                "    event => {",
-                "        if (event.detail > 1) {",
-                "            extension.button = convertHtmlMouseButtonToInputManagerMouseButton(event.button);",
-                "            extension.count = event.detail;",
+                "    constructor() {",
+                "        window.addEventListener(",
+                "            'click',",
+                "            event => {",
+                "                if (event.detail > 1) {",
+                "                    this.multipleClickButton = convertHtmlMouseButtonToInputManagerMouseButton(event.button);",
+                "                    this.count = event.detail;",
+                "                }",
+                "            }",
+                "        );",
+                "",
+                "        // The 'click' event doesn't do any constraint on the 1st click.",
+                "        // It doesn't allow to differenciate a dragging from a click.",
+                "        // So, we check it manually.",
+                "",
+                "        window.addEventListener(",
+                "            'pointerdown',",
+                "            event => {",
+                "                this.lastButton = event.button;",
+                "                this.lastPointerId = event.pointerId;",
+                "                this.lastTime = Date.now();",
+                "                this.hasMoved = false;",
+                "            }",
+                "        );",
+                "",
+                "        window.addEventListener(",
+                "            'pointermove',",
+                "            event => {",
+                "                if (event.pointerId === this.lastPointerId) {",
+                "                    this.hasMoved = true;",
+                "                }",
+                "            }",
+                "        );",
+                "",
+                "        window.addEventListener(",
+                "            'pointerup',",
+                "            (event) => {",
+                "                if (event.button === this.lastButton &&",
+                "                    event.pointerId === this.lastPointerId &&",
+                "                    (!this.hasMoved || Date.now() - this.lastTime < 500)) {",
+                "                    this.simpleClickButton = convertHtmlMouseButtonToInputManagerMouseButton(event.button);",
+                "                    this.lastButton = -1;",
+                "                }",
+                "            }",
+                "        );",
+                "",
+                "    }",
+                "",
+                "    reset() {",
+                "        this.multipleClickButton = -1;",
+                "        this.simpleClickButton = -1;",
+                "    }",
+                "",
+                "    hasClicked(buttonName, count) {",
+                "        const button = gdjs.evtTools.input.mouseButtonsNameToCode[buttonName];",
+                "        if (count === 1) {",
+                "            return button === this.simpleClickButton;",
+                "        }",
+                "        else {",
+                "            return button === this.multipleClickButton && clickCount === this.count",
                 "        }",
                 "    }",
-                ");",
-                "",
-                "// The 'click' event doesn't do any constraint on the 1st click.",
-                "// It doesn't allow to differenciate a dragging from a click.",
-                "// So, we check it manually.",
-                "",
-                "window.addEventListener(",
-                "    'pointerdown',",
-                "    event => {",
-                "        extension.lastButton = event.button;",
-                "        extension.lastPointerId = event.pointerId;",
-                "        extension.lastTime = Date.now();",
-                "        extension.hasMoved = false;",
-                "    }",
-                ");",
-                "",
-                "window.addEventListener(",
-                "    'pointermove',",
-                "    event => {",
-                "        if (event.pointerId === extension.lastPointerId) {",
-                "            extension.hasMoved = true;",
-                "        }",
-                "    }",
-                ");",
-                "",
-                "window.addEventListener(",
-                "    'pointerup',",
-                "    (event) => {",
-                "        if (extension.button < 0 &&",
-                "            event.button === extension.lastButton &&",
-                "            event.pointerId === extension.lastPointerId &&",
-                "            (!extension.hasMoved || Date.now() - extension.lastTime < 500)) {",
-                "            extension.simpleClickButton = convertHtmlMouseButtonToInputManagerMouseButton(event.button);",
-                "            extension.lastButton = -1;",
-                "        }",
-                "    }",
-                ");",
+                "}",
                 "",
                 "// Converts HTML mouse button to InputManager mouse button.",
                 "// This function is used to align HTML button values with GDevelop 3 C++ SFML Mouse button enum values,",
@@ -31729,6 +31794,7 @@
                 "    return button;",
                 "}",
                 "",
+                "gdjs._DoubleClickExtension = { clickCounter: new ClickCounter() };",
                 ""
               ],
               "parameterObjects": "",
@@ -31748,8 +31814,10 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "gdjs._DoubleClickExtension.button = -1;\r",
-                "gdjs._DoubleClickExtension.simpleClickButton = -1;"
+                "const { clickCounter } = gdjs._DoubleClickExtension;\r",
+                "\r",
+                "clickCounter.reset();\r",
+                ""
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -31811,20 +31879,30 @@
           "sentence": "_PARAM1_ mouse button is clicked",
           "events": [
             {
-              "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": [
-                "const buttonName = eventsFunctionContext.getArgument(\"MouseButton\");",
-                "const clickCount = eventsFunctionContext.getArgument(\"ClickCount\");",
-                "",
-                "const { simpleClickButton } = gdjs._DoubleClickExtension;",
-                "",
-                "if (gdjs.evtTools.input.mouseButtonsNameToCode[buttonName] === simpleClickButton) {",
-                "    return eventsFunctionContext.returnValue = true;",
-                "}"
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "DoubleClick::HasClicked"
+                  },
+                  "parameters": [
+                    "",
+                    "MouseButton",
+                    "1",
+                    ""
+                  ]
+                }
               ],
-              "parameterObjects": "",
-              "useStrict": true,
-              "eventsSheetExpanded": true
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
             }
           ],
           "parameters": [
@@ -31848,15 +31926,13 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
+                "",
+                "const { clickCounter } = gdjs._DoubleClickExtension;",
+                "",
                 "const buttonName = eventsFunctionContext.getArgument(\"MouseButton\");",
                 "const clickCount = eventsFunctionContext.getArgument(\"ClickCount\");",
                 "",
-                "const { button, count } = gdjs._DoubleClickExtension;",
-                "",
-                "if (gdjs.evtTools.input.mouseButtonsNameToCode[buttonName] === button &&",
-                "  (clickCount === 0 || clickCount === count)) {",
-                "    return eventsFunctionContext.returnValue = true;",
-                "}"
+                "eventsFunctionContext.returnValue = clickCounter.hasClicked(buttonName, clickCount);"
               ],
               "parameterObjects": "",
               "useStrict": true,
@@ -31871,7 +31947,7 @@
               "type": "mouseButton"
             },
             {
-              "description": "Click count (or 0 for any click count)",
+              "description": "Click count",
               "name": "ClickCount",
               "type": "expression"
             }
