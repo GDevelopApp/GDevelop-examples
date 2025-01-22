@@ -219,7 +219,7 @@ const sortedStartingPointSlugs = new Set([
   'starting-top-down',
   'starting-physics',
   'starting-3d-platformer',
-  'starting-3d-fps',
+  'starting-FPS',
 ]);
 
 /**
