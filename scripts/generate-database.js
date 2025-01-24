@@ -320,29 +320,29 @@ const extractExamples = async (
             ? 'big'
             : 'huge';
         /** @type {ExampleUsedExtension[]} */
-        const usedExtensions = gd.UsedExtensionsFinder.scanProject(project)
-          .getUsedExtensions()
-          .toNewVectorString()
-          .toJSArray()
-          .map(
-            /** @param {string} name */
-            (name) => {
-              const platformExtension = platformExtensionsMap[name];
-              if (!platformExtension) {
-                return { name, fullName: '', helpPath: '', iconUrl: '' };
-              }
+        const usedExtensions =
+          gd.ExampleExtensionUsagesFinder.getUsedExtensions(project)
+            .toNewVectorString()
+            .toJSArray()
+            .map(
+              /** @param {string} name */
+              (name) => {
+                const platformExtension = platformExtensionsMap[name];
+                if (!platformExtension) {
+                  return { name, fullName: '', helpPath: '', iconUrl: '' };
+                }
 
-              /** @type {ExampleUsedExtension} */
-              const usedExtension = {
-                name,
-                fullName: platformExtension.getFullName(),
-                helpPath: platformExtension.getHelpPath(),
-                iconUrl: platformExtension.getIconUrl(),
-                category: platformExtension.getCategory(),
-              };
-              return usedExtension;
-            }
-          );
+                /** @type {ExampleUsedExtension} */
+                const usedExtension = {
+                  name,
+                  fullName: platformExtension.getFullName(),
+                  helpPath: platformExtension.getHelpPath(),
+                  iconUrl: platformExtension.getIconUrl(),
+                  category: platformExtension.getCategory(),
+                };
+                return usedExtension;
+              }
+            );
         /** @type {ExampleEventsBasedExtension[]} */
         const eventsBasedExtensions = [];
         for (let i = 0; i < project.getEventsFunctionsExtensionsCount(); ++i) {
