@@ -214,13 +214,80 @@ const sortedStarterSlugs = new Set([
   'geometry-monster',
 ]);
 
-const sortedStartingPointSlugs = new Set([
-  'starting-platformer',
-  'starting-top-down',
-  'starting-physics',
-  'starting-3D-platformer',
-  'starting-first-person',
-]);
+const sortedStartingPointConfigs = [
+  {
+    slug: 'starting-platformer',
+    pixelArtSlug: 'pixel-art-starting-platformer',
+    title: 'Platformer',
+  },
+  {
+    slug: 'starting-top-down',
+    pixelArtSlug: 'pixel-art-starting-top-down',
+    title: 'Top-down',
+  },
+  {
+    slug: 'starting-physics',
+    pixelArtSlug: 'pixel-art-starting-physics',
+    title: 'Physics',
+  },
+  { slug: 'starting-3D-platformer', title: '3D Platformer' },
+  { slug: 'starting-first-person', title: 'First Person' },
+];
+const sortedStartingPointSlugs = new Set(
+  sortedStartingPointConfigs.map(({ slug }) => slug)
+);
+const sortedStartingPointPixelArtSlugs = new Set(
+  sortedStartingPointConfigs
+    .filter(({ pixelArtSlug }) => !!pixelArtSlug)
+    .map(({ pixelArtSlug }) => pixelArtSlug)
+);
+
+/**
+ *
+ * @param {ExampleShortHeader} exampleShortHeader
+ * @returns {ExampleShortHeader}
+ */
+const adaptAndAddLinkedExampleShortHeaders = (exampleShortHeader) => {
+  if (!sortedStartingPointSlugs.has(exampleShortHeader.slug)) {
+    return exampleShortHeader;
+  }
+
+  if (sortedStartingPointPixelArtSlugs.has(exampleShortHeader.slug)) {
+    const config = sortedStartingPointConfigs.find(
+      (config) => config.pixelArtSlug === exampleShortHeader.slug
+    );
+    if (!config) return exampleShortHeader;
+    return {
+      ...exampleShortHeader,
+      name: `${config.title} (Pixel Art)`,
+      linkedExampleShortHeaders: [
+        {
+          slug: config.slug,
+          relation: 'non-pixel-art-version',
+        },
+      ],
+    };
+  }
+
+  const config = sortedStartingPointConfigs.find(
+    (config) => config.slug === exampleShortHeader.slug
+  );
+  if (!config) return exampleShortHeader;
+
+  return {
+    ...exampleShortHeader,
+    // Update title for a friendly one.
+    name: config.title,
+    linkedExampleShortHeaders: config.pixelArtSlug
+      ? [
+          {
+            slug: config.pixelArtSlug,
+            relation: 'pixel-art-version',
+          },
+        ]
+      : [],
+  };
+};
 
 /**
  * Computes a list of static tags to add to the example based on its slug.
@@ -560,21 +627,23 @@ const generateSortedShortHeaders = (allExamples) => {
     ...examplesWithGameTag,
     ...sortedStartingPoints,
     ...examplesWithNeitherStarterNorGameTags,
-  ].map((example) => ({
-    id: example.id,
-    name: example.name,
-    slug: example.slug,
-    shortDescription: example.shortDescription,
-    description: example.description,
-    license: example.license,
-    previewImageUrls: example.previewImageUrls,
-    quickCustomizationImageUrl: example.quickCustomizationImageUrl,
-    authorIds: example.authorIds,
-    tags: example.tags,
-    difficultyLevel: example.difficultyLevel,
-    gdevelopVersion: example.gdevelopVersion,
-    codeSizeLevel: example.codeSizeLevel,
-  }));
+  ]
+    .map((example) => ({
+      id: example.id,
+      name: example.name,
+      slug: example.slug,
+      shortDescription: example.shortDescription,
+      description: example.description,
+      license: example.license,
+      previewImageUrls: example.previewImageUrls,
+      quickCustomizationImageUrl: example.quickCustomizationImageUrl,
+      authorIds: example.authorIds,
+      tags: example.tags,
+      difficultyLevel: example.difficultyLevel,
+      gdevelopVersion: example.gdevelopVersion,
+      codeSizeLevel: example.codeSizeLevel,
+    }))
+    .map(adaptAndAddLinkedExampleShortHeaders);
 };
 
 /**
