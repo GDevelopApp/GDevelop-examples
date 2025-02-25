@@ -217,17 +217,17 @@ const sortedStarterSlugs = new Set([
 const sortedStartingPointConfigs = [
   {
     slug: 'starting-platformer',
-    pixelArtSlug: 'pixel-art-starting-platformer',
+    pixelArtSlug: 'starting-platformer-pixel',
     title: 'Platformer',
   },
   {
     slug: 'starting-top-down',
-    pixelArtSlug: 'pixel-art-starting-top-down',
+    pixelArtSlug: 'starting-top-down-pixel',
     title: 'Top-down',
   },
   {
     slug: 'starting-physics',
-    pixelArtSlug: 'pixel-art-starting-physics',
+    pixelArtSlug: 'starting-physics-pixel',
     title: 'Physics',
   },
   { slug: 'starting-3D-platformer', title: '3D Platformer' },
@@ -248,10 +248,6 @@ const sortedStartingPointPixelArtSlugs = new Set(
  * @returns {ExampleShortHeader}
  */
 const adaptAndAddLinkedExampleShortHeaders = (exampleShortHeader) => {
-  if (!sortedStartingPointSlugs.has(exampleShortHeader.slug)) {
-    return exampleShortHeader;
-  }
-
   if (sortedStartingPointPixelArtSlugs.has(exampleShortHeader.slug)) {
     const config = sortedStartingPointConfigs.find(
       (config) => config.pixelArtSlug === exampleShortHeader.slug
@@ -269,24 +265,28 @@ const adaptAndAddLinkedExampleShortHeaders = (exampleShortHeader) => {
     };
   }
 
-  const config = sortedStartingPointConfigs.find(
-    (config) => config.slug === exampleShortHeader.slug
-  );
-  if (!config) return exampleShortHeader;
+  if (sortedStartingPointSlugs.has(exampleShortHeader.slug)) {
+    const config = sortedStartingPointConfigs.find(
+      (config) => config.slug === exampleShortHeader.slug
+    );
+    if (!config) return exampleShortHeader;
 
-  return {
-    ...exampleShortHeader,
-    // Update title for a friendly one.
-    name: config.title,
-    linkedExampleShortHeaders: config.pixelArtSlug
-      ? [
-          {
-            slug: config.pixelArtSlug,
-            relation: 'pixel-art-version',
-          },
-        ]
-      : [],
-  };
+    return {
+      ...exampleShortHeader,
+      // Update title for a friendly one.
+      name: config.title,
+      linkedExampleShortHeaders: config.pixelArtSlug
+        ? [
+            {
+              slug: config.pixelArtSlug,
+              relation: 'pixel-art-version',
+            },
+          ]
+        : [],
+    };
+  }
+
+  return exampleShortHeader;
 };
 
 /**
