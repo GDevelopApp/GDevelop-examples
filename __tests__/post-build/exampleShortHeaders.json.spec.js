@@ -21,7 +21,7 @@ describe('exampleShortHeaders.json post build checks', () => {
     expect(exampleShortHeaders.length).toBeGreaterThan(120);
 
     const platformer = exampleShortHeaders.find(
-      ({ name }) => name === 'Platformer'
+      ({ slug }) => slug === 'platformer'
     );
     if (!platformer)
       throw new Error('Platformer not found in the example short headers');
@@ -29,11 +29,31 @@ describe('exampleShortHeaders.json post build checks', () => {
     expect(platformer).toMatchSnapshot();
 
     const tappyPlane = exampleShortHeaders.find(
-      ({ name }) => name === 'Tappy plane'
+      ({ slug }) => slug === 'tappy-plane'
     );
     if (!tappyPlane)
       throw new Error('Tappy Plane not found in the example short headers');
 
     expect(tappyPlane).toMatchSnapshot();
+
+    const startingPointPlatformer = exampleShortHeaders.find(
+      ({ slug }) => slug === 'starting-platformer'
+    );
+    if (!startingPointPlatformer)
+      throw new Error(
+        'Starting Point Platformer not found in the example short headers'
+      );
+
+    expect(startingPointPlatformer).toMatchSnapshot();
+
+    const startingPointPixelPlatformer = exampleShortHeaders.find(
+      ({ slug }) => slug === 'starting-platformer-pixel'
+    );
+    if (!startingPointPixelPlatformer)
+      throw new Error(
+        'Starting Point Pixel Platformer not found in the example short headers'
+      );
+
+    expect(startingPointPixelPlatformer).toMatchSnapshot();
   });
 });

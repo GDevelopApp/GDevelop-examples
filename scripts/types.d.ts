@@ -55,6 +55,7 @@ export interface ExampleShortHeader {
   gdevelopVersion: string;
   codeSizeLevel: string;
   difficultyLevel: string | undefined;
+  linkedExampleShortHeaders?: { slug: string; relation: string }[];
 }
 
 export type gdProject = any;
