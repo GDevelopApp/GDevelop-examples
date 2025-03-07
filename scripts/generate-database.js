@@ -231,7 +231,7 @@ const sortedStartingPointConfigs = [
     title: 'Physics',
   },
   { slug: 'starting-3D-platformer', title: '3D Platformer' },
-  { slug: 'starting-first-person', title: 'First Person' },
+  { slug: 'starting-first-person', title: '3D First Person' },
 ];
 const sortedStartingPointSlugs = new Set(
   sortedStartingPointConfigs.map(({ slug }) => slug)
