@@ -3,15 +3,37 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.2
 
+commands:
+  restore_node_modules:
+    steps:
+      - run:
+          name: Generate cache key
+          command: ./.circleci/checksum-package-lock-json.sh package-lock-json-checksums
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock-json-checksums" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+  cache_node_modules:
+    steps:
+      - save_cache:
+          paths:
+            - ~/.npm
+            - node_modules
+            - GDevelop/newIDE/app/node_modules
+          key: v1-dependencies-{{ checksum "package-lock-json-checksums" }}
+
 jobs:
   install:
     docker:
       - image: cimg/node:20.13.1
     steps:
       - checkout
-      - run: npm install
       - run: git clone git@github.com:4ian/GDevelop.git --depth 1
+      - restore_node_modules
+      - run: npm install
       - run: cd GDevelop/newIDE/app && npm install
+      - cache_node_modules
       - persist_to_workspace:
           root: .
           paths:
