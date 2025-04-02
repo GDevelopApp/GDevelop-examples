@@ -1759,7 +1759,7 @@
               "restitution": 0.5,
               "linearDamping": 0.1,
               "angularDamping": 0.1,
-              "gravityScale": 1,
+              "gravityScale": 4,
               "layers": 17,
               "masks": 17,
               "shapeOffsetX": 0,
@@ -2180,7 +2180,35 @@
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Physics3D",
+              "type": "Physics3D::Physics3DBehavior",
+              "object3D": "Object3D",
+              "bodyType": "Static",
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Cylinder",
+              "shapeOrientation": "Z",
+              "shapeDimensionA": 15,
+              "shapeDimensionB": 100,
+              "shapeDimensionC": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "shapeOffsetZ": 50,
+              "massCenterOffsetX": 0,
+              "massCenterOffsetY": 0,
+              "massCenterOffsetZ": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 17,
+              "masks": 17
+            }
+          ],
           "content": {
             "centerLocation": "ModelOrigin",
             "crossfadeDuration": 0,
@@ -3360,7 +3388,6 @@
           "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
-              "disabled": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
@@ -3405,7 +3432,7 @@
                     "",
                     "0",
                     "=",
-                    "min((Player.Physics2::LinearVelocity() / 300), 1)"
+                    "min((Player.Physics3D::LinearVelocityLength() / 300), 1)"
                   ]
                 },
                 {
@@ -3416,7 +3443,40 @@
                     "",
                     "0",
                     "=",
-                    "min((Player.Physics2::LinearVelocity()) * 10, 25)"
+                    "min(Player.Physics3D::LinearVelocityLength() * 10, 25)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ParticleEmitter3D::ParticleEmitter3D::SetFlow"
+                  },
+                  "parameters": [
+                    "Dust",
+                    "=",
+                    "20 + 0.01 * Player.Physics3D::LinearVelocityLength()",
+                    "-90"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartSpeedMin"
+                  },
+                  "parameters": [
+                    "Dust",
+                    "=",
+                    "30 + 0.1 * Player.Physics3D::LinearVelocityLength()",
+                    "-90"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartSpeedMax"
+                  },
+                  "parameters": [
+                    "Dust",
+                    "=",
+                    "50 + 0.3 * Player.Physics3D::LinearVelocityLength()",
+                    "-90"
                   ]
                 }
               ]
