@@ -1131,7 +1131,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.6244537826599987,
+        "zoomFactor": 0.6455105703311483,
         "windowMask": false
       },
       "objectsGroups": [
@@ -1770,6 +1770,41 @@
           ],
           "effects": [],
           "behaviors": [
+            {
+              "name": "AirControl3D",
+              "type": "AirControl3D::AirControl3D",
+              "Physics3D": "Physics3D",
+              "RotationSpeedMax": 180,
+              "RotationAcceleration": 720,
+              "RotationDeceleration": 720,
+              "TranslationSpeedMax": 400,
+              "TranslationAcceleration": 1600,
+              "TranslationDeceleration": 1600,
+              "CurrentRotationSpeed": 0,
+              "PreviousRotationSpeed": 0,
+              "CurrentForwardSpeed": 0,
+              "CurrentSidewaysSpeed": 0,
+              "PreviousForwardSpeed": 0,
+              "PreviousSidewaysSpeed": 0,
+              "HasPressedTurnLeft": false,
+              "HasPressedTurnRight": false,
+              "HasPressedTurnLeftLast": false,
+              "HadPressedTurnLeft": false,
+              "HadPressedTurnRight": false,
+              "HasPressedMoveForward": false,
+              "HasPressedMoveBackward": false,
+              "HadPressedMoveForward": false,
+              "HadPressedMoveBackward": false,
+              "HasPressedMoveBackwardLast": false,
+              "HasPressedMoveLeft": false,
+              "HasPressedMoveRight": false,
+              "HadPressedMoveLeft": false,
+              "HadPressedMoveRight": false,
+              "HasPressedMoveLeftLast": false,
+              "TargetedForwardSpeed": 0,
+              "TargetedSidewaysSpeed": 0,
+              "TargetedRotationSpeed": 0
+            },
             {
               "name": "Physics3D",
               "type": "Physics3D::Physics3DBehavior",
@@ -2609,13 +2644,13 @@
           "effects": [],
           "behaviors": [
             {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
               "bottomEdgeAnchor": 0,
               "leftEdgeAnchor": 1,
-              "name": "Anchor",
               "relativeToOriginalWindowSize": true,
               "rightEdgeAnchor": 2,
               "topEdgeAnchor": 0,
-              "type": "AnchorBehavior::AnchorBehavior",
               "useLegacyBottomAndRightAnchors": false
             }
           ],
@@ -4215,6 +4250,181 @@
               ]
             }
           ]
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Air control",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Physics3D::PhysicsCar3D::IsOnFloor"
+                  },
+                  "parameters": [
+                    "Player",
+                    "PhysicsCar3D"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Player",
+                    "AirControl3D",
+                    "no"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "Physics3D::PhysicsCar3D::IsOnFloor"
+                  },
+                  "parameters": [
+                    "Player",
+                    "PhysicsCar3D"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Player",
+                    "AirControl3D",
+                    "yes"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Down\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Gamepads::C_Button_pressed"
+                      },
+                      "parameters": [
+                        "",
+                        "1",
+                        "\"LT\"",
+                        "\"Up\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed8Way"
+                      },
+                      "parameters": [
+                        "PedalJoystick",
+                        "\"Down\"",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "AirControl3D::AirControl3D::SimulateMoveBackwardKey"
+                  },
+                  "parameters": [
+                    "Player",
+                    "AirControl3D",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "KeyFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Up\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Gamepads::C_Button_pressed"
+                      },
+                      "parameters": [
+                        "",
+                        "1",
+                        "\"RT\"",
+                        "\"Up\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed8Way"
+                      },
+                      "parameters": [
+                        "PedalJoystick",
+                        "\"Up\"",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "AirControl3D::AirControl3D::SimulateMoveForwardKey"
+                  },
+                  "parameters": [
+                    "Player",
+                    "AirControl3D",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
         }
       ],
       "layers": [
@@ -4402,6 +4612,12 @@
         }
       ],
       "behaviorsSharedData": [
+        {
+          "name": "AirControl3D",
+          "type": "AirControl3D::AirControl3D",
+          "Cos": 0,
+          "Sin": 0
+        },
         {
           "name": "Anchor",
           "type": "AnchorBehavior::AnchorBehavior"
@@ -44558,6 +44774,381 @@
           ]
         }
       ]
+    },
+    {
+      "author": "",
+      "category": "",
+      "extensionNamespace": "",
+      "fullName": "",
+      "gdevelopVersion": "",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "AirControl3D",
+      "previewIconUrl": "",
+      "shortDescription": "",
+      "version": "",
+      "description": "",
+      "tags": [],
+      "authorIds": [],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Turn and move objects forward.",
+          "fullName": "3D air control",
+          "name": "AirControl3D",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "HasPressedMoveBackward",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "HasPressedMoveForward",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "HasPressedMoveBackward",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "CurrentForce",
+                                "=",
+                                "-Force"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "HasPressedMoveForward",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "CurrentForce",
+                                "=",
+                                "Force"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Physics3D::Physics3DBehavior::ApplyForceAtCenter"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Physics3D",
+                                "XFromAngleAndDistance(Object.Angle(), CurrentForce)",
+                                "YFromAngleAndDistance(Object.Angle(), CurrentForce)",
+                                "0"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "variables": [
+                        {
+                          "name": "CurrentForce",
+                          "type": "number",
+                          "value": 0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "AirControl3D::AirControl3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Simulate a press of the move backward key.",
+              "fullName": "Simulate move backward key press",
+              "functionType": "Action",
+              "group": "Top-down walk state",
+              "name": "SimulateMoveBackwardKey",
+              "sentence": "Simulate pressing move backward key for _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "HadPressedMoveBackward",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "HasPressedMoveBackwardLast",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "HasPressedMoveBackward",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "AirControl3D::AirControl3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Simulate a press of the move forward key.",
+              "fullName": "Simulate move forward key press",
+              "functionType": "Action",
+              "group": "Top-down walk state",
+              "name": "SimulateMoveForwardKey",
+              "sentence": "Simulate pressing move forward key for _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "HadPressedMoveForward",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "HasPressedMoveBackwardLast",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "HasPressedMoveForward",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "AirControl3D::AirControl3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "3D physics engine",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "Physics3D::Physics3DBehavior"
+              ],
+              "name": "Physics3D"
+            },
+            {
+              "value": "4000",
+              "type": "Number",
+              "unit": "Newton",
+              "label": "Force",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Force"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "HasPressedMoveForward"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "HasPressedMoveBackward"
+            }
+          ],
+          "sharedPropertyDescriptors": [
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "Cos"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
+              "name": "Sin"
+            }
+          ]
+        }
+      ],
+      "eventsBasedObjects": []
     }
   ],
   "externalLayouts": [
