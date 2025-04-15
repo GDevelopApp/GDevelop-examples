@@ -1015,6 +1015,52 @@
             }
           ],
           "parameters": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Multiplayer::OpenGameLobbies"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Multiplayer::HasLobbyGameJustStarted"
+              },
+              "parameters": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Scene"
+              },
+              "parameters": [
+                "",
+                "\"Game\"",
+                ""
+              ]
+            }
+          ]
         }
       ],
       "layers": [
@@ -1804,6 +1850,12 @@
               "TargetedForwardSpeed": 0,
               "TargetedSidewaysSpeed": 0,
               "TargetedRotationSpeed": 0
+            },
+            {
+              "name": "MultiplayerObject",
+              "type": "Multiplayer::MultiplayerObjectBehavior",
+              "playerNumber": 0,
+              "actionOnPlayerDisconnect": "DestroyObject"
             },
             {
               "name": "Physics3D",
@@ -2842,6 +2894,24 @@
                 ""
               ]
             }
+          ],
+          "events": [
+            {
+              "disabled": true,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Multiplayer::SetObjectsSynchronizationRate"
+                  },
+                  "parameters": [
+                    "=",
+                    "5"
+                  ]
+                }
+              ]
+            }
           ]
         },
         {
@@ -2944,473 +3014,352 @@
           ]
         },
         {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "When the game is playing",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Multiplayer::MultiplayerObjectBehavior::TakeObjectOwnership"
+              },
+              "parameters": [
+                "Player",
+                "MultiplayerObject"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "Multiplayer::MultiplayerObjectBehavior::IsObjectOwnedByCurrentPlayer"
+              },
+              "parameters": [
+                "Player",
+                "MultiplayerObject"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ActivateBehavior"
+              },
+              "parameters": [
+                "Player",
+                "ThirdPersonCamera",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "Multiplayer::MultiplayerObjectBehavior::IsObjectOwnedByCurrentPlayer"
+              },
+              "parameters": [
+                "Player",
+                "MultiplayerObject"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ActivateBehavior"
+              },
+              "parameters": [
+                "Player",
+                "ThirdPersonCamera",
+                "yes"
+              ]
+            }
+          ],
           "events": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "StringVariable"
-                  },
-                  "parameters": [
-                    "GameState",
-                    "=",
-                    "\"Playing\""
-                  ]
-                }
-              ],
-              "actions": [],
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "When the game is playing",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
               "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Start timer only when the SedanPlayer starts moving."
-                },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
-                        "value": "Physics3D::Physics3DBehavior::LinearVelocityLength"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Player",
-                        "Physics3D",
-                        ">",
-                        "0"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "CompareTimer"
-                      },
-                      "parameters": [
-                        "",
-                        "\"Time\"",
-                        ">",
-                        "0"
+                        "GameState",
+                        "=",
+                        "\"Playing\""
                       ]
                     }
                   ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ResetTimer"
-                      },
-                      "parameters": [
-                        "",
-                        "\"Time\""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Display the timer."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "TextContainerCapability::TextContainerBehavior::SetValue"
-                      },
-                      "parameters": [
-                        "TimeText",
-                        "Text",
-                        "=",
-                        "\"Time: \" + TimeFormatter::SecondsToHHMMSS000(TimerElapsedTime(\"Time\"))"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Player controls",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
+                  "actions": [],
                   "events": [
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Start timer only when the SedanPlayer starts moving."
+                    },
+                    {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "value": "KeyFromTextPressed"
+                            "value": "Physics3D::Physics3DBehavior::LinearVelocityLength"
+                          },
+                          "parameters": [
+                            "Player",
+                            "Physics3D",
+                            ">",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "CompareTimer"
                           },
                           "parameters": [
                             "",
-                            "\"Down\""
+                            "\"Time\"",
+                            ">",
+                            "0"
                           ]
                         }
                       ],
                       "actions": [
                         {
                           "type": {
-                            "value": "Physics3D::PhysicsCar3D::SimulateBackwardKey"
-                          },
-                          "parameters": [
-                            "Player",
-                            "PhysicsCar3D"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "KeyFromTextPressed"
+                            "value": "ResetTimer"
                           },
                           "parameters": [
                             "",
-                            "\"Up\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics3D::PhysicsCar3D::SimulateForwardKey"
-                          },
-                          "parameters": [
-                            "Player",
-                            "PhysicsCar3D"
+                            "\"Time\""
                           ]
                         }
                       ]
                     },
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Display the timer."
+                    },
+                    {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "KeyFromTextPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Left\""
-                          ]
-                        }
-                      ],
+                      "conditions": [],
                       "actions": [
                         {
                           "type": {
-                            "value": "Physics3D::PhysicsCar3D::SimulateLeftKey"
+                            "value": "TextContainerCapability::TextContainerBehavior::SetValue"
                           },
                           "parameters": [
-                            "Player",
-                            "PhysicsCar3D"
+                            "TimeText",
+                            "Text",
+                            "=",
+                            "\"Time: \" + TimeFormatter::SecondsToHHMMSS000(TimerElapsedTime(\"Time\"))"
                           ]
                         }
                       ]
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "KeyFromTextPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Right\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics3D::PhysicsCar3D::SimulateRightKey"
-                          },
-                          "parameters": [
-                            "Player",
-                            "PhysicsCar3D"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "KeyFromTextPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Space\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics3D::PhysicsCar3D::SimulateHandBreakKey"
-                          },
-                          "parameters": [
-                            "Player",
-                            "PhysicsCar3D"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::Or"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "Gamepads::C_Button_pressed"
-                              },
-                              "parameters": [
-                                "",
-                                "1",
-                                "\"LT\"",
-                                "\"Up\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "Gamepads::C_Button_pressed"
-                              },
-                              "parameters": [
-                                "",
-                                "1",
-                                "\"RT\"",
-                                "\"Up\""
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics3D::PhysicsCar3D::SimulateAcceleratorStick"
-                          },
-                          "parameters": [
-                            "Player",
-                            "PhysicsCar3D",
-                            "Gamepads::TriggerPressure(1, \"RT\") - Gamepads::TriggerPressure(1, \"LT\")"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "Gamepads::C_Axis_pushed"
-                          },
-                          "parameters": [
-                            "",
-                            "1",
-                            "\"Left\"",
-                            "\"Any\"",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "Physics3D::PhysicsCar3D::SimulateSteeringStick"
-                          },
-                          "parameters": [
-                            "Player",
-                            "PhysicsCar3D",
-                            "Gamepads::TriggerPressure(1, \"RT\") - Gamepads::TriggerPressure(1, \"LT\")"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "SystemInfo::HasTouchScreen"
-                          },
-                          "parameters": [
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [],
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Player controls",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
                             {
                               "type": {
-                                "value": "DepartScene"
+                                "value": "KeyFromTextPressed"
                               },
                               "parameters": [
-                                ""
+                                "",
+                                "\"Down\""
                               ]
                             }
                           ],
                           "actions": [
                             {
                               "type": {
-                                "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
+                                "value": "Physics3D::PhysicsCar3D::SimulateBackwardKey"
+                              },
+                              "parameters": [
+                                "Player",
+                                "PhysicsCar3D"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "KeyFromTextPressed"
                               },
                               "parameters": [
                                 "",
-                                "\"Touch controls\"",
-                                "0",
-                                "0",
-                                "0"
+                                "\"Up\""
                               ]
                             }
                           ],
-                          "events": [
+                          "actions": [
                             {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
+                              "type": {
+                                "value": "Physics3D::PhysicsCar3D::SimulateForwardKey"
+                              },
+                              "parameters": [
+                                "Player",
+                                "PhysicsCar3D"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "KeyFromTextPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "\"Left\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Physics3D::PhysicsCar3D::SimulateLeftKey"
+                              },
+                              "parameters": [
+                                "Player",
+                                "PhysicsCar3D"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "KeyFromTextPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "\"Right\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Physics3D::PhysicsCar3D::SimulateRightKey"
+                              },
+                              "parameters": [
+                                "Player",
+                                "PhysicsCar3D"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "KeyFromTextPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "\"Space\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Physics3D::PhysicsCar3D::SimulateHandBreakKey"
+                              },
+                              "parameters": [
+                                "Player",
+                                "PhysicsCar3D"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
                                 {
                                   "type": {
-                                    "value": "Cache"
+                                    "value": "Gamepads::C_Button_pressed"
                                   },
                                   "parameters": [
-                                    "SteeringJoystick"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "Cache"
-                                  },
-                                  "parameters": [
-                                    "PedalJoystick"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::ActivateControl"
-                                  },
-                                  "parameters": [
-                                    "SteeringJoystick",
                                     "",
-                                    ""
+                                    "1",
+                                    "\"LT\"",
+                                    "\"Up\""
                                   ]
                                 },
                                 {
                                   "type": {
-                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::ActivateControl"
+                                    "value": "Gamepads::C_Button_pressed"
                                   },
                                   "parameters": [
-                                    "PedalJoystick",
                                     "",
-                                    ""
+                                    "1",
+                                    "\"RT\"",
+                                    "\"Up\""
                                   ]
                                 }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
-                              },
-                              "parameters": [
-                                "",
-                                "SteeringJoystick",
-                                "\"Left\"",
-                                ""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
-                              },
-                              "parameters": [
-                                "SteeringJoystick",
-                                "CursorX(\"UI\")",
-                                "CursorY(\"UI\")",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
-                              },
-                              "parameters": [
-                                "",
-                                "PedalJoystick",
-                                "\"Right\"",
-                                ""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
-                              },
-                              "parameters": [
-                                "PedalJoystick",
-                                "CursorX(\"UI\")",
-                                "CursorY(\"UI\")",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                              },
-                              "parameters": [
-                                "PedalJoystick",
-                                ""
                               ]
                             }
                           ],
@@ -3422,7 +3371,7 @@
                               "parameters": [
                                 "Player",
                                 "PhysicsCar3D",
-                                "-PedalJoystick.StickForceY()"
+                                "Gamepads::TriggerPressure(1, \"RT\") - Gamepads::TriggerPressure(1, \"LT\")"
                               ]
                             }
                           ]
@@ -3432,10 +3381,13 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
+                                "value": "Gamepads::C_Axis_pushed"
                               },
                               "parameters": [
-                                "SteeringJoystick",
+                                "",
+                                "1",
+                                "\"Left\"",
+                                "\"Any\"",
                                 ""
                               ]
                             }
@@ -3448,55 +3400,7 @@
                               "parameters": [
                                 "Player",
                                 "PhysicsCar3D",
-                                "SteeringJoystick.StickForceX()"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "disabled": true,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "CollisionNP"
-                              },
-                              "parameters": [
-                                "Player",
-                                "Road",
-                                "",
-                                "",
-                                ""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetBooleanVariable"
-                              },
-                              "parameters": [
-                                "IsOnTheRoad",
-                                "True",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "AdvancedWheelGrip::AdvancedWheelGrip::SetSurface"
-                              },
-                              "parameters": [
-                                "Player",
-                                "AdvancedWheelGrip",
-                                "\"Asphalt\"",
-                                ""
+                                "Gamepads::TriggerPressure(1, \"RT\") - Gamepads::TriggerPressure(1, \"LT\")"
                               ]
                             }
                           ]
@@ -3506,342 +3410,415 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "BooleanVariable"
+                                "value": "SystemInfo::HasTouchScreen"
                               },
                               "parameters": [
-                                "IsOnTheRoad",
-                                "False",
                                 ""
                               ]
                             }
                           ],
-                          "actions": [
+                          "actions": [],
+                          "events": [
                             {
-                              "type": {
-                                "value": "AdvancedWheelGrip::AdvancedWheelGrip::SetSurface"
-                              },
-                              "parameters": [
-                                "Player",
-                                "AdvancedWheelGrip",
-                                "\"Grass\"",
-                                ""
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "DepartScene"
+                                  },
+                                  "parameters": [
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "\"Touch controls\"",
+                                    "0",
+                                    "0",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "Cache"
+                                      },
+                                      "parameters": [
+                                        "SteeringJoystick"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "Cache"
+                                      },
+                                      "parameters": [
+                                        "PedalJoystick"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::ActivateControl"
+                                      },
+                                      "parameters": [
+                                        "SteeringJoystick",
+                                        "",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::ActivateControl"
+                                      },
+                                      "parameters": [
+                                        "PedalJoystick",
+                                        "",
+                                        ""
+                                      ]
+                                    }
+                                  ]
+                                }
                               ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "SteeringJoystick",
+                                    "\"Left\"",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
+                                  },
+                                  "parameters": [
+                                    "SteeringJoystick",
+                                    "CursorX(\"UI\")",
+                                    "CursorY(\"UI\")",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "PedalJoystick",
+                                    "\"Right\"",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
+                                  },
+                                  "parameters": [
+                                    "PedalJoystick",
+                                    "CursorX(\"UI\")",
+                                    "CursorY(\"UI\")",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
+                                  },
+                                  "parameters": [
+                                    "PedalJoystick",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Physics3D::PhysicsCar3D::SimulateAcceleratorStick"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "PhysicsCar3D",
+                                    "-PedalJoystick.StickForceY()"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
+                                  },
+                                  "parameters": [
+                                    "SteeringJoystick",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "Physics3D::PhysicsCar3D::SimulateSteeringStick"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "PhysicsCar3D",
+                                    "SteeringJoystick.StickForceX()"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "disabled": true,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "CollisionNP"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "Road",
+                                    "",
+                                    "",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetBooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "IsOnTheRoad",
+                                    "True",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "AdvancedWheelGrip::AdvancedWheelGrip::SetSurface"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "AdvancedWheelGrip",
+                                    "\"Asphalt\"",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "IsOnTheRoad",
+                                    "False",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "AdvancedWheelGrip::AdvancedWheelGrip::SetSurface"
+                                  },
+                                  "parameters": [
+                                    "Player",
+                                    "AdvancedWheelGrip",
+                                    "\"Grass\"",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "variables": [
+                            {
+                              "folded": true,
+                              "name": "IsOnTheRoad",
+                              "type": "boolean",
+                              "value": false
                             }
                           ]
                         }
                       ],
-                      "variables": [
-                        {
-                          "folded": true,
-                          "name": "IsOnTheRoad",
-                          "type": "boolean",
-                          "value": false
-                        }
-                      ]
+                      "parameters": []
                     }
-                  ],
-                  "parameters": []
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Particles and car rev volume",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetAngle"
-                  },
-                  "parameters": [
-                    "Dust",
-                    "=",
-                    "Player.Angle() + 180"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "MettreAutour"
-                  },
-                  "parameters": [
-                    "Dust",
-                    "Player",
-                    "10",
-                    "Player.Angle() - 180"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "MettreXY"
-                  },
-                  "parameters": [
-                    "Dust",
-                    "=",
-                    "Dust.X() + RandomFloatInRange(-6, 6)",
-                    "=",
-                    "Dust.Y() + RandomFloatInRange(-6, 6)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::SetZ"
-                  },
-                  "parameters": [
-                    "Dust",
-                    "Object3D",
-                    "=",
-                    "Player.Object3D::Z() + 10"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModPitchSoundChannel"
-                  },
-                  "parameters": [
-                    "",
-                    "0",
-                    "=",
-                    "min((Player.Physics3D::LinearVelocityLength() / 300), 1)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ModVolumeSoundCanal"
-                  },
-                  "parameters": [
-                    "",
-                    "0",
-                    "=",
-                    "min(Player.Physics3D::LinearVelocityLength() * 10, 25)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ParticleEmitter3D::ParticleEmitter3D::SetFlow"
-                  },
-                  "parameters": [
-                    "Dust",
-                    "=",
-                    "20 + 0.01 * Player.Physics3D::LinearVelocityLength()",
-                    "-90"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartSpeedMin"
-                  },
-                  "parameters": [
-                    "Dust",
-                    "=",
-                    "30 + 0.1 * Player.Physics3D::LinearVelocityLength()",
-                    "-90"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartSpeedMax"
-                  },
-                  "parameters": [
-                    "Dust",
-                    "=",
-                    "50 + 0.3 * Player.Physics3D::LinearVelocityLength()",
-                    "-90"
                   ]
                 }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Coins",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Coins indicator"
+              ],
+              "parameters": []
             },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "PickNearest"
-                  },
-                  "parameters": [
-                    "Coin",
-                    "Player.CenterX()",
-                    "Player.CenterY()",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "RotateTowardAngle"
-                  },
-                  "parameters": [
-                    "Arrow",
-                    "AngleBetweenPositions(Player.CenterX(), Player.CenterY(), Coin.CenterX(), Coin.CenterY())",
-                    "30",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "MettreAutour"
-                  },
-                  "parameters": [
-                    "Arrow",
-                    "Player",
-                    "60",
-                    "Arrow.Angle()"
-                  ]
-                }
-              ],
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Particles and car rev volume",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "IsOnScreen::InOnScreen::IsOnScreen"
-                      },
-                      "parameters": [
-                        "Coin",
-                        "InOnScreen",
-                        "0",
-                        ""
-                      ]
-                    }
-                  ],
+                  "conditions": [],
                   "actions": [
                     {
                       "type": {
-                        "value": "Cache"
+                        "value": "SetAngle"
                       },
                       "parameters": [
-                        "Arrow"
+                        "Dust",
+                        "=",
+                        "Player.Angle() + 180"
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                    },
                     {
                       "type": {
-                        "inverted": true,
-                        "value": "IsOnScreen::InOnScreen::IsOnScreen"
+                        "value": "MettreAutour"
                       },
                       "parameters": [
-                        "Coin",
-                        "InOnScreen",
+                        "Dust",
+                        "Player",
                         "10",
-                        ""
+                        "Player.Angle() - 180"
                       ]
-                    }
-                  ],
-                  "actions": [
+                    },
                     {
                       "type": {
-                        "value": "Montre"
+                        "value": "MettreXY"
                       },
                       "parameters": [
-                        "Arrow",
-                        ""
+                        "Dust",
+                        "=",
+                        "Dust.X() + RandomFloatInRange(-6, 6)",
+                        "=",
+                        "Dust.Y() + RandomFloatInRange(-6, 6)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Dust",
+                        "Object3D",
+                        "=",
+                        "Player.Object3D::Z() + 10"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModPitchSoundChannel"
+                      },
+                      "parameters": [
+                        "",
+                        "0",
+                        "=",
+                        "min((Player.Physics3D::LinearVelocityLength() / 300), 1)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ModVolumeSoundCanal"
+                      },
+                      "parameters": [
+                        "",
+                        "0",
+                        "=",
+                        "min(Player.Physics3D::LinearVelocityLength() * 10, 25)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetFlow"
+                      },
+                      "parameters": [
+                        "Dust",
+                        "=",
+                        "20 + 0.01 * Player.Physics3D::LinearVelocityLength()",
+                        "-90"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartSpeedMin"
+                      },
+                      "parameters": [
+                        "Dust",
+                        "=",
+                        "30 + 0.1 * Player.Physics3D::LinearVelocityLength()",
+                        "-90"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetStartSpeedMax"
+                      },
+                      "parameters": [
+                        "Dust",
+                        "=",
+                        "50 + 0.3 * Player.Physics3D::LinearVelocityLength()",
+                        "-90"
                       ]
                     }
                   ]
                 }
-              ]
+              ],
+              "parameters": []
             },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "CollisionNP"
-                  },
-                  "parameters": [
-                    "Coin",
-                    "Player",
-                    "",
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "CoinPickUp",
-                    "Coin.CenterX()",
-                    "Coin.CenterY()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::SetCenterZ"
-                  },
-                  "parameters": [
-                    "CoinPickUp",
-                    "Object3D",
-                    "=",
-                    "Coin.Object3D::CenterZ()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Delete"
-                  },
-                  "parameters": [
-                    "Coin",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
-                  },
-                  "parameters": [
-                    "RemainingText",
-                    "Text",
-                    "=",
-                    "\"Remaining: \" + ToString(SceneInstancesCount(Coin))"
-                  ]
-                }
-              ],
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Coins",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Comment",
@@ -3853,75 +3830,70 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "Collect all coins"
+                  "comment": "Coins indicator"
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
-                        "value": "SceneInstancesCount"
+                        "value": "PickNearest"
                       },
                       "parameters": [
-                        "",
                         "Coin",
-                        "=",
-                        "0"
+                        "Player.CenterX()",
+                        "Player.CenterY()",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "SetStringVariable"
+                        "value": "RotateTowardAngle"
                       },
                       "parameters": [
-                        "GameState",
-                        "=",
-                        "\"GameOver\""
+                        "Arrow",
+                        "AngleBetweenPositions(Player.CenterX(), Player.CenterY(), Coin.CenterX(), Coin.CenterY())",
+                        "30",
+                        ""
                       ]
                     },
                     {
                       "type": {
-                        "value": "ChangeTimeScale"
+                        "value": "MettreAutour"
                       },
                       "parameters": [
-                        "",
-                        "0.5"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "Score",
-                        "=",
-                        "TimerElapsedTime(\"Time\")"
+                        "Arrow",
+                        "Player",
+                        "60",
+                        "Arrow.Angle()"
                       ]
                     }
                   ],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "IsOnScreen::InOnScreen::IsOnScreen"
+                          },
+                          "parameters": [
+                            "Coin",
+                            "InOnScreen",
+                            "0",
+                            ""
+                          ]
+                        }
+                      ],
                       "actions": [
                         {
                           "type": {
-                            "value": "Wait"
+                            "value": "Cache"
                           },
                           "parameters": [
-                            "1.5"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Scene"
-                          },
-                          "parameters": [
-                            "",
-                            "\"Leaderboard\"",
-                            ""
+                            "Arrow"
                           ]
                         }
                       ]
@@ -3931,121 +3903,473 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "BuiltinCommonInstructions::Or"
+                            "inverted": true,
+                            "value": "IsOnScreen::InOnScreen::IsOnScreen"
                           },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "CompareTimer"
-                              },
-                              "parameters": [
-                                "",
-                                "\"Time\"",
-                                "<",
-                                "HighScore"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "NumberVariable"
-                              },
-                              "parameters": [
-                                "HighScore",
-                                "=",
-                                "0"
-                              ]
-                            }
+                          "parameters": [
+                            "Coin",
+                            "InOnScreen",
+                            "10",
+                            ""
                           ]
                         }
                       ],
                       "actions": [
                         {
                           "type": {
+                            "value": "Montre"
+                          },
+                          "parameters": [
+                            "Arrow",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "Coin",
+                        "Player",
+                        "",
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "CoinPickUp",
+                        "Coin.CenterX()",
+                        "Coin.CenterY()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetCenterZ"
+                      },
+                      "parameters": [
+                        "CoinPickUp",
+                        "Object3D",
+                        "=",
+                        "Coin.Object3D::CenterZ()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "Coin",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                      },
+                      "parameters": [
+                        "RemainingText",
+                        "Text",
+                        "=",
+                        "\"Remaining: \" + ToString(SceneInstancesCount(Coin))"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Collect all coins"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SceneInstancesCount"
+                          },
+                          "parameters": [
+                            "",
+                            "Coin",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "GameState",
+                            "=",
+                            "\"GameOver\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ChangeTimeScale"
+                          },
+                          "parameters": [
+                            "",
+                            "0.5"
+                          ]
+                        },
+                        {
+                          "type": {
                             "value": "SetNumberVariable"
                           },
                           "parameters": [
-                            "HighScore",
+                            "Score",
                             "=",
-                            "Score"
+                            "TimerElapsedTime(\"Time\")"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "Wait"
+                              },
+                              "parameters": [
+                                "1.5"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "Scene"
+                              },
+                              "parameters": [
+                                "",
+                                "\"Leaderboard\"",
+                                ""
+                              ]
+                            }
                           ]
                         },
                         {
-                          "type": {
-                            "value": "EcrireFichierExp"
-                          },
-                          "parameters": [
-                            "\"HighScore\"",
-                            "\"HighScore\"",
-                            "HighScore"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "TextObject::ChangeColor"
-                          },
-                          "parameters": [
-                            "BestTimeText",
-                            "\"248;231;28\""
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "CompareTimer"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "\"Time\"",
+                                    "<",
+                                    "HighScore"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "NumberVariable"
+                                  },
+                                  "parameters": [
+                                    "HighScore",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "HighScore",
+                                "=",
+                                "Score"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "EcrireFichierExp"
+                              },
+                              "parameters": [
+                                "\"HighScore\"",
+                                "\"HighScore\"",
+                                "HighScore"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "TextObject::ChangeColor"
+                              },
+                              "parameters": [
+                                "BestTimeText",
+                                "\"248;231;28\""
+                              ]
+                            }
                           ]
                         }
                       ]
                     }
                   ]
                 }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Collision sound effects",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
+              ],
+              "parameters": []
+            },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Collision sound effects",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
                 {
-                  "type": {
-                    "value": "Physics3D::Collision"
-                  },
-                  "parameters": [
-                    "Player",
-                    "Physics3D",
-                    "Obstacle",
-                    "Physics3D",
-                    ""
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::Collision"
+                      },
+                      "parameters": [
+                        "Player",
+                        "Physics3D",
+                        "Obstacle",
+                        "Physics3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PlaySound"
+                      },
+                      "parameters": [
+                        "",
+                        "Collision",
+                        "",
+                        "50",
+                        "RandomFloatInRange(0.8,1)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "name": "Air control",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Physics3D::PhysicsCar3D::IsOnFloor"
+                      },
+                      "parameters": [
+                        "Player",
+                        "PhysicsCar3D"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ActivateBehavior"
+                      },
+                      "parameters": [
+                        "Player",
+                        "AirControl3D",
+                        "no"
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Physics3D::PhysicsCar3D::IsOnFloor"
+                      },
+                      "parameters": [
+                        "Player",
+                        "PhysicsCar3D"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ActivateBehavior"
+                      },
+                      "parameters": [
+                        "Player",
+                        "AirControl3D",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
                 {
-                  "type": {
-                    "value": "PlaySound"
-                  },
-                  "parameters": [
-                    "",
-                    "Collision",
-                    "",
-                    "50",
-                    "RandomFloatInRange(0.8,1)"
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "KeyFromTextPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "\"Down\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "1",
+                            "\"LT\"",
+                            "\"Up\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed8Way"
+                          },
+                          "parameters": [
+                            "PedalJoystick",
+                            "\"Down\"",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AirControl3D::AirControl3D::SimulateMoveBackwardKey"
+                      },
+                      "parameters": [
+                        "Player",
+                        "AirControl3D",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "KeyFromTextPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "\"Up\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Button_pressed"
+                          },
+                          "parameters": [
+                            "",
+                            "1",
+                            "\"RT\"",
+                            "\"Up\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed8Way"
+                          },
+                          "parameters": [
+                            "PedalJoystick",
+                            "\"Up\"",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "AirControl3D::AirControl3D::SimulateMoveForwardKey"
+                      },
+                      "parameters": [
+                        "Player",
+                        "AirControl3D",
+                        ""
+                      ]
+                    }
                   ]
                 }
-              ]
+              ],
+              "parameters": []
             }
-          ],
-          "parameters": []
+          ]
         },
         {
           "disabled": true,
@@ -4262,181 +4586,6 @@
               ]
             }
           ]
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Air control",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Physics3D::PhysicsCar3D::IsOnFloor"
-                  },
-                  "parameters": [
-                    "Player",
-                    "PhysicsCar3D"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ActivateBehavior"
-                  },
-                  "parameters": [
-                    "Player",
-                    "AirControl3D",
-                    "no"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "Physics3D::PhysicsCar3D::IsOnFloor"
-                  },
-                  "parameters": [
-                    "Player",
-                    "PhysicsCar3D"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ActivateBehavior"
-                  },
-                  "parameters": [
-                    "Player",
-                    "AirControl3D",
-                    "yes"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Or"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "KeyFromTextPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "\"Down\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Gamepads::C_Button_pressed"
-                      },
-                      "parameters": [
-                        "",
-                        "1",
-                        "\"LT\"",
-                        "\"Up\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed8Way"
-                      },
-                      "parameters": [
-                        "PedalJoystick",
-                        "\"Down\"",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "AirControl3D::AirControl3D::SimulateMoveBackwardKey"
-                  },
-                  "parameters": [
-                    "Player",
-                    "AirControl3D",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Or"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "KeyFromTextPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "\"Up\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Gamepads::C_Button_pressed"
-                      },
-                      "parameters": [
-                        "",
-                        "1",
-                        "\"RT\"",
-                        "\"Up\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsDirectionPushed8Way"
-                      },
-                      "parameters": [
-                        "PedalJoystick",
-                        "\"Up\"",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "AirControl3D::AirControl3D::SimulateMoveForwardKey"
-                  },
-                  "parameters": [
-                    "Player",
-                    "AirControl3D",
-                    ""
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
         }
       ],
       "layers": [
@@ -4653,6 +4802,10 @@
         {
           "name": "InOnScreen",
           "type": "IsOnScreen::InOnScreen"
+        },
+        {
+          "name": "MultiplayerObject",
+          "type": "Multiplayer::MultiplayerObjectBehavior"
         },
         {
           "name": "Object3D",
