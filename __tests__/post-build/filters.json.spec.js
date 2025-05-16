@@ -17,7 +17,7 @@ describe('filters.json post build checks', () => {
     // Check tags contain the extensions.
     expect(filters.defaultTags).toContain('Top-down movement');
     expect(filters.defaultTags).toContain('Draggable Behavior');
-    expect(filters.defaultTags).toContain('Physics Engine 2.0');
+    expect(filters.defaultTags).toContain('2D Physics Engine');
 
     // Check tags don't contain extensions for which there are no examples.
     expect(filters.defaultTags).not.toContain('Physics Engine (deprecated)');
