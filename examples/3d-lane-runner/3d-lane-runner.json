@@ -1,7 +1,7 @@
 {
   "firstLayout": "Menu",
   "gdVersion": {
-    "build": 224,
+    "build": 231,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -715,6 +715,7 @@
           "assetStoreId": "055eaaaceaa6fa09820aff95e0291764fbd98d84a9c2fb8cb3c4e059010a477b",
           "name": "Start",
           "type": "PanelSpriteButton::PanelSpriteButton",
+          "variant": "",
           "variables": [],
           "effects": [],
           "behaviors": [
@@ -1951,6 +1952,7 @@
           "assetStoreId": "",
           "name": "CoinExplosion",
           "type": "ParticleEmitter3D::ParticleEmitter3D",
+          "variant": "",
           "variables": [],
           "effects": [],
           "behaviors": [],
@@ -3459,6 +3461,7 @@
           "assetStoreId": "",
           "name": "LeaderboardDialog",
           "type": "LeaderboardDialog::LeaderboardDialog",
+          "variant": "",
           "variables": [],
           "effects": [],
           "behaviors": [
@@ -3876,17 +3879,18 @@
       "category": "Movement",
       "extensionNamespace": "",
       "fullName": "Stick objects to others",
+      "gdevelopVersion": ">=5.5.222",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXN0aWNrZXItb3V0bGluZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik01LjUgMkMzLjYgMiAyIDMuNiAyIDUuNVYxOC41QzIgMjAuNCAzLjYgMjIgNS41IDIySDE2TDIyIDE2VjUuNUMyMiAzLjYgMjAuNCAyIDE4LjUgMkg1LjVNNS44IDRIMTguM0MxOS4zIDQgMjAuMSA0LjggMjAuMSA1LjhWMTVIMTguNkMxNi43IDE1IDE1LjEgMTYuNiAxNS4xIDE4LjVWMjBINS44QzQuOCAyMCA0IDE5LjIgNCAxOC4yVjUuOEM0IDQuOCA0LjggNCA1LjggNCIgLz48L3N2Zz4=",
       "name": "Sticker",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sticker-outline.svg",
       "shortDescription": "Make objects follow the position and rotation of the object they are stuck to.",
-      "version": "0.5.1",
+      "version": "0.5.3",
       "description": [
         "This extension can be useful to:",
-        "* Stick accessories to moving objects",
-        "* Animate a skeleton",
-        "* Delete an object with another one",
+        "- Stick accessories to moving objects",
+        "- Animate a skeleton",
+        "- Delete an object with another one",
         "",
         "An example allows to check it out ([open the project online](https://editor.gdevelop.io/?project=example://stick-objects))."
       ],
@@ -4021,8 +4025,10 @@
                 "            const deltaX = object.getCenterXInScene() - this.basisOldCenterXInScene;",
                 "            const deltaY = object.getCenterYInScene() - this.basisOldCenterYInScene;",
                 "            const angle = this.basisOldAngle * Math.PI / 180;",
-                "            this.relativeRotatedX = (deltaX * Math.cos(angle) + deltaY * Math.sin(angle)) / this.basisOldWidth;",
-                "            this.relativeRotatedY = (-deltaX * Math.sin(angle) + deltaY * Math.cos(angle)) / this.basisOldHeight;",
+                "            const cosA = Math.cos(angle);",
+                "            const sinA = Math.sin(angle);",
+                "            this.relativeRotatedX = (deltaX * cosA + deltaY * sinA) / this.basisOldWidth;",
+                "            this.relativeRotatedY = (-deltaX * sinA + deltaY * cosA) / this.basisOldHeight;",
                 "",
                 "            // Save initial values to avoid calculus and rounding errors",
                 "            this.basisOriginalWidth = this.basisObject.getWidth();",
@@ -4068,78 +4074,104 @@
                 "        }",
                 "        this.followingDoneThisFrame = true;",
                 "        const basisObject = this.basisObject;",
-                "        if (basisObject) {",
-                "            // If the behavior on the basis object has a different name,",
-                "            // the objects will still follow their basis objects",
-                "            // but frame delays could happen.",
-                "            const behaviorName = this.behavior.getName();",
-                "            if (basisObject.hasBehavior(behaviorName)) {",
-                "                const basisBehavior = basisObject.getBehavior(behaviorName);",
-                "                if (basisBehavior.type === this.behavior.type) {",
-                "                    // Follow parents 1st to avoid frame delays",
-                "                    basisBehavior._sticker.followBasisObject();",
-                "                }",
+                "        if (!basisObject) {",
+                "            return;",
+                "        }",
+                "        // If the behavior on the basis object has a different name,",
+                "        // the objects will still follow their basis objects",
+                "        // but frame delays could happen.",
+                "        const behaviorName = this.behavior.getName();",
+                "        if (basisObject.hasBehavior(behaviorName)) {",
+                "            const basisBehavior = basisObject.getBehavior(behaviorName);",
+                "            if (basisBehavior.type === this.behavior.type) {",
+                "                // Follow parents 1st to avoid frame delays",
+                "                basisBehavior._sticker.followBasisObject();",
                 "            }",
+                "        }",
+                "        if (this.behavior._getOnlyFollowPosition()) {",
+                "            this.followPosition();",
+                "        } else {",
+                "            this.followTransformation();",
+                "        }",
+                "        this.updateOldCoordinates();",
+                "    }",
                 "",
-                "            const object = this.behavior.owner;",
+                "    followPosition() {",
+                "        const object = this.behavior.owner;",
+                "        const basisObject = this.basisObject;",
+                "        if (!basisObject) {",
+                "            return;",
+                "        }",
+                "        if (object.getX() !== this.ownerOldX",
+                "            || object.getY() !== this.ownerOldY) {",
+                "            this.updateRelativeCoordinates();",
+                "        }",
+                "        if (this.basisOldX !== basisObject.getX()",
+                "            || this.basisOldY !== basisObject.getY()) {",
+                "            object.setPosition(",
+                "                basisObject.getX() + this.relativeX,",
+                "                basisObject.getY() + this.relativeY);",
+                "        }",
+                "    }",
                 "",
-                "            if (this.behavior._getOnlyFollowPosition()) {",
-                "                if (object.getX() !== this.ownerOldX",
-                "                    || object.getY() !== this.ownerOldY) {",
-                "                    this.updateRelativeCoordinates();",
-                "                }",
-                "",
-                "                if (this.basisOldX !== basisObject.getX() ||",
-                "                    this.basisOldY !== basisObject.getY()) {",
-                "                    object.setPosition(",
-                "                        basisObject.getX() + this.relativeX,",
-                "                        basisObject.getY() + this.relativeY);",
-                "                }",
-                "            } else {",
-                "                if (object.getX() !== this.ownerOldX",
-                "                    || object.getY() !== this.ownerOldY",
-                "                    || object.getAngle() !== this.ownerOldAngle",
-                "                    || object.getWidth() !== this.ownerOldWidth",
-                "                    || object.getHeight() !== this.ownerOldHeight) {",
-                "                    this.updateRelativeCoordinates();",
-                "                }",
-                "",
-                "                // Follow basisObject",
-                "                if (basisObject.getAngle() === this.basisOriginalAngle && this.basisOriginalAngle === 0) {",
-                "                    if (basisObject.getWidth() === this.basisOriginalWidth ||",
-                "                        basisObject.getHeight() === this.basisOriginalHeight) {",
-                "                        if (this.basisOldX !== basisObject.getX() ||",
-                "                            this.basisOldY !== basisObject.getY()) {",
-                "                            object.setPosition(",
-                "                                basisObject.getX() + this.relativeX,",
-                "                                basisObject.getY() + this.relativeY);",
-                "                        }",
-                "                    } else {",
-                "                        object.setCenterPositionInScene(",
-                "                            basisObject.getCenterXInScene() + this.relativeRotatedX * basisObject.getWidth(),",
-                "                            basisObject.getCenterYInScene() + this.relativeRotatedY * basisObject.getHeight());",
+                "    followTransformation() {",
+                "        const object = this.behavior.owner;",
+                "        const basisObject = this.basisObject;",
+                "        if (!basisObject) {",
+                "            return;",
+                "        }",
+                "        if (object.getX() !== this.ownerOldX",
+                "            || object.getY() !== this.ownerOldY",
+                "            || object.getAngle() !== this.ownerOldAngle",
+                "            || object.getWidth() !== this.ownerOldWidth",
+                "            || object.getHeight() !== this.ownerOldHeight) {",
+                "            this.updateRelativeCoordinates();",
+                "        }",
+                "        if (this.basisOldAngle !== this.basisObject.getAngle()",
+                "            || this.basisOldWidth !== this.basisObject.getWidth()",
+                "            || this.basisOldHeight !== this.basisObject.getHeight()",
+                "            || this.basisOldCenterXInScene !== this.basisObject.getCenterXInScene()",
+                "            || this.basisOldCenterYInScene !== this.basisObject.getCenterYInScene()) {",
+                "            // Unproportional dimensions changes won't work as expected",
+                "            // if the object angle is not null but nothing more can be done",
+                "            // because there is no full affine transformation on objects.",
+                "            if (basisObject.getWidth() !== this.basisOriginalWidth) {",
+                "                object.setWidth(this.relativeWidth * basisObject.getWidth());",
+                "            }",
+                "            if (basisObject.getHeight() !== this.basisOriginalHeight) {",
+                "                object.setHeight(this.relativeHeight * basisObject.getHeight());",
+                "            }",
+                "            // Follow basisObject",
+                "            if (basisObject.getAngle() === this.basisOriginalAngle",
+                "                && this.basisOriginalAngle === 0) {",
+                "                if (basisObject.getWidth() === this.basisOriginalWidth",
+                "                    || basisObject.getHeight() === this.basisOriginalHeight) {",
+                "                    if (this.basisOldX !== basisObject.getX() ||",
+                "                        this.basisOldY !== basisObject.getY()) {",
+                "                        object.setPosition(",
+                "                            basisObject.getX() + this.relativeX,",
+                "                            basisObject.getY() + this.relativeY);",
                 "                    }",
                 "                } else {",
-                "                    object.setAngle(basisObject.getAngle() + this.relativeAngle);",
+                "                    object.setCenterPositionInScene(",
+                "                        basisObject.getCenterXInScene() + this.relativeRotatedX * basisObject.getWidth(),",
+                "                        basisObject.getCenterYInScene() + this.relativeRotatedY * basisObject.getHeight());",
+                "                }",
+                "            } else {",
+                "                object.setAngle(basisObject.getAngle() + this.relativeAngle);",
                 "",
-                "                    const deltaX = this.relativeRotatedX * basisObject.getWidth();",
-                "                    const deltaY = this.relativeRotatedY * basisObject.getHeight();",
-                "                    const angle = -basisObject.getAngle() * Math.PI / 180;",
-                "                    object.setX(basisObject.getCenterXInScene() + object.getX() - object.getCenterXInScene() + deltaX * Math.cos(angle) + deltaY * Math.sin(angle));",
-                "                    object.setY(basisObject.getCenterYInScene() + object.getY() - object.getCenterYInScene() - deltaX * Math.sin(angle) + deltaY * Math.cos(angle));",
-                "                }",
-                "                // Unproportional dimensions changes won't work as expected",
-                "                // if the object angle is not null but nothing more can be done",
-                "                // because there is no full affine transformation on objects.",
-                "                if (basisObject.getWidth() !== this.basisOriginalWidth) {",
-                "                    object.setWidth(this.relativeWidth * basisObject.getWidth());",
-                "                }",
-                "                if (basisObject.getHeight() !== this.basisOriginalHeight) {",
-                "                    object.setHeight(this.relativeHeight * basisObject.getHeight());",
-                "                }",
+                "                const deltaX = this.relativeRotatedX * basisObject.getWidth();",
+                "                const deltaY = this.relativeRotatedY * basisObject.getHeight();",
+                "                const angle = -basisObject.getAngle() * Math.PI / 180;",
+                "                const cosA = Math.cos(angle);",
+                "                const sinA = Math.sin(angle);",
+                "                object.setX(",
+                "                    basisObject.getCenterXInScene() + object.getX() - object.getCenterXInScene()",
+                "                    + deltaX * cosA + deltaY * sinA);",
+                "                object.setY(",
+                "                    basisObject.getCenterYInScene() + object.getY() - object.getCenterYInScene()",
+                "                    - deltaX * sinA + deltaY * cosA);",
                 "            }",
-                "",
-                "            this.updateOldCoordinates();",
                 "        }",
                 "    }",
                 "}",
@@ -4214,6 +4246,7 @@
           "fullName": "Sticker",
           "name": "Sticker",
           "objectType": "",
+          "quickCustomizationVisibility": "hidden",
           "eventsFunctions": [
             {
               "fullName": "",
@@ -4494,12 +4527,13 @@
       "category": "Visual effect",
       "extensionNamespace": "",
       "fullName": "3D particle emitter",
+      "gdevelopVersion": ">=5.5.222",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWZpcmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcuNjYgMTEuMkMxNy40MyAxMC45IDE3LjE1IDEwLjY0IDE2Ljg5IDEwLjM4QzE2LjIyIDkuNzggMTUuNDYgOS4zNSAxNC44MiA4LjcyQzEzLjMzIDcuMjYgMTMgNC44NSAxMy45NSAzQzEzIDMuMjMgMTIuMTcgMy43NSAxMS40NiA0LjMyQzguODcgNi40IDcuODUgMTAuMDcgOS4wNyAxMy4yMkM5LjExIDEzLjMyIDkuMTUgMTMuNDIgOS4xNSAxMy41NUM5LjE1IDEzLjc3IDkgMTMuOTcgOC44IDE0LjA1QzguNTcgMTQuMTUgOC4zMyAxNC4wOSA4LjE0IDEzLjkzQzguMDggMTMuODggOC4wNCAxMy44MyA4IDEzLjc2QzYuODcgMTIuMzMgNi42OSAxMC4yOCA3LjQ1IDguNjRDNS43OCAxMCA0Ljg3IDEyLjMgNSAxNC40N0M1LjA2IDE0Ljk3IDUuMTIgMTUuNDcgNS4yOSAxNS45N0M1LjQzIDE2LjU3IDUuNyAxNy4xNyA2IDE3LjdDNy4wOCAxOS40MyA4Ljk1IDIwLjY3IDEwLjk2IDIwLjkyQzEzLjEgMjEuMTkgMTUuMzkgMjAuOCAxNy4wMyAxOS4zMkMxOC44NiAxNy42NiAxOS41IDE1IDE4LjU2IDEyLjcyTDE4LjQzIDEyLjQ2QzE4LjIyIDEyIDE3LjY2IDExLjIgMTcuNjYgMTEuMk0xNC41IDE3LjVDMTQuMjIgMTcuNzQgMTMuNzYgMTggMTMuNCAxOC4xQzEyLjI4IDE4LjUgMTEuMTYgMTcuOTQgMTAuNSAxNy4yOEMxMS42OSAxNyAxMi40IDE2LjEyIDEyLjYxIDE1LjIzQzEyLjc4IDE0LjQzIDEyLjQ2IDEzLjc3IDEyLjMzIDEzQzEyLjIxIDEyLjI2IDEyLjIzIDExLjYzIDEyLjUgMTAuOTRDMTIuNjkgMTEuMzIgMTIuODkgMTEuNyAxMy4xMyAxMkMxMy45IDEzIDE1LjExIDEzLjQ0IDE1LjM3IDE0LjhDMTUuNDEgMTQuOTQgMTUuNDMgMTUuMDggMTUuNDMgMTUuMjNDMTUuNDYgMTYuMDUgMTUuMSAxNi45NSAxNC41IDE3LjVIMTQuNVoiIC8+PC9zdmc+",
       "name": "ParticleEmitter3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/f2e5a34bf465f781866677762d385d6c8e9e8d203383f2df9a3b7e0fad6a2cb5_fire.svg",
       "shortDescription": "Display a large number of particles to create visual effects.",
-      "version": "2.0.3",
+      "version": "2.1.1",
       "description": [
         "Particle emitters can be used to display:",
         "- Fire",
@@ -4561,14 +4595,16 @@
                 "        const threeObject3D = this.get3DRendererObject();",
                 "",
                 "        threeObject3D.rotation.set(",
-                "            gdjs.toRad(this._object.getRotationX()),",
+                "            // TODO The rotation on X goes the wrong way.",
+                "            // Increment the major and remove this sign.",
+                "            - gdjs.toRad(this._object.getRotationX()),",
                 "            gdjs.toRad(this._object.getRotationY()),",
-                "            -gdjs.toRad(this._object.angle)",
+                "            gdjs.toRad(this._object.angle)",
                 "        );",
                 "",
                 "        threeObject3D.position.set(",
                 "            this._object.getX(),",
-                "            -this._object.getY(),",
+                "            this._object.getY(),",
                 "            this._object.getZ()",
                 "        );",
                 "",
@@ -4783,6 +4819,9 @@
                 " * https://github.com/Alchemist0823/three.quarks#readme",
                 " * Copyright 2024 Alchemist0823 <the.forrest.sun@gmail.com>, MIT",
                 " */",
+                "",
+                "// The migration to addUpdateRange was backported without updating the library",
+                "// because GDevelop still uses Three.js 0.160.0.",
                 "",
                 "class ParticleEmitter extends THREE.Object3D {",
                 "    constructor(system) {",
@@ -9402,27 +9441,34 @@
                 "        });",
                 "        this.geometry.instanceCount = index;",
                 "        if (index > 0) {",
-                "            this.offsetBuffer.updateRange.count = index * 3;",
+                "            this.offsetBuffer.clearUpdateRanges();",
+                "            this.offsetBuffer.addUpdateRange(0, index * 3);",
                 "            this.offsetBuffer.needsUpdate = true;",
-                "            this.sizeBuffer.updateRange.count = index;",
+                "            this.sizeBuffer.clearUpdateRanges();",
+                "            this.sizeBuffer.addUpdateRange(0, index);",
                 "            this.sizeBuffer.needsUpdate = true;",
-                "            this.colorBuffer.updateRange.count = index * 4;",
+                "            this.colorBuffer.clearUpdateRanges();",
+                "            this.colorBuffer.addUpdateRange(0, index * 4);",
                 "            this.colorBuffer.needsUpdate = true;",
-                "            this.uvTileBuffer.updateRange.count = index;",
+                "            this.uvTileBuffer.clearUpdateRanges();",
+                "            this.uvTileBuffer.addUpdateRange(0, index);",
                 "            this.uvTileBuffer.needsUpdate = true;",
                 "            if (this.settings.renderMode === RenderMode.StretchedBillBoard && this.velocityBuffer) {",
-                "                this.velocityBuffer.updateRange.count = index * 4;",
+                "                this.velocityBuffer.clearUpdateRanges();",
+                "                this.velocityBuffer.addUpdateRange(0, index * 4);",
                 "                this.velocityBuffer.needsUpdate = true;",
                 "            }",
                 "            if (this.settings.renderMode === RenderMode.Mesh) {",
-                "                this.rotationBuffer.updateRange.count = index * 4;",
+                "                this.rotationBuffer.clearUpdateRanges();",
+                "                this.rotationBuffer.addUpdateRange(0, index * 4);",
                 "                this.rotationBuffer.needsUpdate = true;",
                 "            }",
                 "            else if (this.settings.renderMode === RenderMode.StretchedBillBoard ||",
                 "                this.settings.renderMode === RenderMode.HorizontalBillBoard ||",
                 "                this.settings.renderMode === RenderMode.VerticalBillBoard ||",
                 "                this.settings.renderMode === RenderMode.BillBoard) {",
-                "                this.rotationBuffer.updateRange.count = index;",
+                "                this.rotationBuffer.clearUpdateRanges();",
+                "                this.rotationBuffer.addUpdateRange(0, index);",
                 "                this.rotationBuffer.needsUpdate = true;",
                 "            }",
                 "        }",
@@ -9765,21 +9811,29 @@
                 "                }",
                 "            }",
                 "        });",
-                "        this.positionBuffer.updateRange.count = index * 3;",
+                "        this.positionBuffer.clearUpdateRanges();",
+                "        this.positionBuffer.addUpdateRange(0, index * 3);",
                 "        this.positionBuffer.needsUpdate = true;",
-                "        this.previousBuffer.updateRange.count = index * 3;",
+                "        this.previousBuffer.clearUpdateRanges();",
+                "        this.previousBuffer.addUpdateRange(0, index * 3);",
                 "        this.previousBuffer.needsUpdate = true;",
-                "        this.nextBuffer.updateRange.count = index * 3;",
+                "        this.nextBuffer.clearUpdateRanges();",
+                "        this.nextBuffer.addUpdateRange(0, index * 3);",
                 "        this.nextBuffer.needsUpdate = true;",
-                "        this.sideBuffer.updateRange.count = index;",
+                "        this.sideBuffer.clearUpdateRanges();",
+                "        this.sideBuffer.addUpdateRange(0, index);",
                 "        this.sideBuffer.needsUpdate = true;",
-                "        this.widthBuffer.updateRange.count = index;",
+                "        this.widthBuffer.clearUpdateRanges();",
+                "        this.widthBuffer.addUpdateRange(0, index);",
                 "        this.widthBuffer.needsUpdate = true;",
-                "        this.uvBuffer.updateRange.count = index * 2;",
+                "        this.uvBuffer.clearUpdateRanges();",
+                "        this.uvBuffer.addUpdateRange(0, index * 2);",
                 "        this.uvBuffer.needsUpdate = true;",
-                "        this.colorBuffer.updateRange.count = index * 4;",
+                "        this.colorBuffer.clearUpdateRanges();",
+                "        this.colorBuffer.addUpdateRange(0, index * 4);",
                 "        this.colorBuffer.needsUpdate = true;",
-                "        this.indexBuffer.updateRange.count = triangles * 3;",
+                "        this.indexBuffer.clearUpdateRanges();",
+                "        this.indexBuffer.addUpdateRange(0, triangles * 3);",
                 "        this.indexBuffer.needsUpdate = true;",
                 "        this.geometry.setDrawRange(0, triangles * 3);",
                 "    }",
@@ -11255,6 +11309,71 @@
           "is3D": true,
           "isUsingLegacyInstancesRenderer": true,
           "name": "ParticleEmitter3D",
+          "objects": [
+            {
+              "adaptCollisionMaskAutomatically": true,
+              "assetStoreId": "",
+              "name": "Particle",
+              "type": "Sprite",
+              "updateIfNotVisible": false,
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "animations": [
+                {
+                  "name": "Image",
+                  "useMultipleDirections": false,
+                  "directions": [
+                    {
+                      "looping": false,
+                      "timeBetweenFrames": 0.08,
+                      "sprites": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Particle"
+              }
+            ]
+          },
+          "objectsGroups": [],
+          "layers": [
+            {
+              "ambientLightColorB": 200,
+              "ambientLightColorG": 200,
+              "ambientLightColorR": 200,
+              "camera3DFarPlaneDistance": 10000,
+              "camera3DFieldOfView": 45,
+              "camera3DNearPlaneDistance": 3,
+              "cameraType": "",
+              "followBaseLayerCamera": false,
+              "isLightingLayer": false,
+              "isLocked": false,
+              "name": "",
+              "renderingType": "",
+              "visibility": true,
+              "cameras": [
+                {
+                  "defaultSize": true,
+                  "defaultViewport": true,
+                  "height": 0,
+                  "viewportBottom": 1,
+                  "viewportLeft": 0,
+                  "viewportRight": 1,
+                  "viewportTop": 0,
+                  "width": 0
+                }
+              ],
+              "effects": []
+            }
+          ],
+          "instances": [],
           "eventsFunctions": [
             {
               "fullName": "",
@@ -11383,7 +11502,7 @@
                     "",
                     "// This is a hack that may break in future releases.",
                     "// Replace the group that would hold children objects by the emmiter.",
-                    "const layer = gameScene.getLayer(object.getLayer());",
+                    "const layer = object.getInstanceContainer().getLayer(object.getLayer());",
                     "const group = object.getRenderer()._threeGroup;",
                     "layer.getRenderer().remove3DRendererObject(group);",
                     "particleSystem.emitter.position.copy(group.position);",
@@ -11473,7 +11592,7 @@
                     "    for (const layerName of layerNames) {",
                     "        const layer = gameScene.getLayer(layerName);",
                     "        if (layer.__particleEmmiter3DExtension) {",
-                    "            layer.__particleEmmiter3DExtension.batchSystem.update(object.getElapsedTime() / 1000);",
+                    "            layer.__particleEmmiter3DExtension.batchSystem.update(layer.getElapsedTime() / 1000);",
                     "        }",
                     "    }",
                     "}"
@@ -11754,10 +11873,12 @@
                         {
                           "type": {
                             "inverted": true,
-                            "value": "ParticleEmitter3D::ParticleEmitter3D::PropertyAreParticlesRelative"
+                            "value": "BooleanVariable"
                           },
                           "parameters": [
-                            "Object"
+                            "AreParticlesRelative",
+                            "True",
+                            ""
                           ]
                         }
                       ],
@@ -11779,10 +11900,12 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "ParticleEmitter3D::ParticleEmitter3D::PropertyAreParticlesRelative"
+                            "value": "BooleanVariable"
                           },
                           "parameters": [
-                            "Object"
+                            "AreParticlesRelative",
+                            "True",
+                            ""
                           ]
                         }
                       ],
@@ -11917,7 +12040,7 @@
                         "    for (const layerName of layerNames) {",
                         "        const layer = gameScene.getLayer(layerName);",
                         "        if (layer.__particleEmmiter3DExtension) {",
-                        "            layer.__particleEmmiter3DExtension.batchSystem.update(object.getElapsedTime() / 1000);",
+                        "            layer.__particleEmmiter3DExtension.batchSystem.update(layer.getElapsedTime() / 1000);",
                         "        }",
                         "    }",
                         "}"
@@ -11957,10 +12080,16 @@
                     "    // Here runtimeScene is the gdjs.CustomRuntimeObjectInstanceContainer inside the custom object.",
                     "    const gameScene = object.getRuntimeScene();",
                     "",
-                    "    const layer = gameScene.getLayer(object.getLayer());",
+                    "    let rootObject = object;",
+                    "    while (rootObject.getInstanceContainer().getOwner) {",
+                    "        rootObject = rootObject.getInstanceContainer().getOwner();",
+                    "    }",
+                    "",
+                    "    const layer = gameScene.getLayer(rootObject.getLayer());",
                     "    layer.__particleEmmiter3DExtension = layer.__particleEmmiter3DExtension || {};",
                     "    if (!layer.__particleEmmiter3DExtension.batchSystem) {",
                     "        const batchSystem = new gdjs.__particleEmmiter3DExtension.BatchedRenderer();",
+                    "        batchSystem.scale.y *= -1;",
                     "        const threeScene = layer.getRenderer().getThreeScene();",
                     "        if (threeScene) {",
                     "            threeScene.add(batchSystem);",
@@ -12004,7 +12133,7 @@
                   ],
                   "parameterObjects": "Object",
                   "useStrict": true,
-                  "eventsSheetExpanded": false
+                  "eventsSheetExpanded": true
                 }
               ],
               "parameters": [
@@ -12132,10 +12261,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyZ"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "Z",
                         "=",
                         "Value"
                       ]
@@ -12204,10 +12333,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyRotationX"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "RotationX",
                         "=",
                         "Value"
                       ]
@@ -12287,10 +12416,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyRotationY"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "RotationY",
                         "=",
                         "Value"
                       ]
@@ -12368,10 +12497,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartColor"
+                        "value": "SetStringVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "StartColor",
                         "=",
                         "Value"
                       ]
@@ -12450,10 +12579,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyEndColor"
+                        "value": "SetStringVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "EndColor",
                         "=",
                         "Value"
                       ]
@@ -12532,10 +12661,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartOpacity"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "StartOpacity",
                         "=",
                         "Value"
                       ]
@@ -12614,10 +12743,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyEndOpacity"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "EndOpacity",
                         "=",
                         "Value"
                       ]
@@ -12696,10 +12825,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyFlow"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "Flow",
                         "=",
                         "Value"
                       ]
@@ -12779,10 +12908,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSizeMin"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "StartSizeMin",
                         "=",
                         "Value"
                       ]
@@ -12861,10 +12990,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSizeMax"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "StartSizeMax",
                         "=",
                         "Value"
                       ]
@@ -12944,10 +13073,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyEndScale"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "EndScale",
                         "=",
                         "Value"
                       ]
@@ -13027,10 +13156,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSpeedMin"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "StartSpeedMin",
                         "=",
                         "Value"
                       ]
@@ -13109,10 +13238,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyStartSpeedMax"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "StartSpeedMax",
                         "=",
                         "Value"
                       ]
@@ -13191,10 +13320,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyLifespanMin"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "LifespanMin",
                         "=",
                         "Value"
                       ]
@@ -13274,10 +13403,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyLifespanMax"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "LifespanMax",
                         "=",
                         "Value"
                       ]
@@ -13357,10 +13486,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyDuration"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "Duration",
                         "=",
                         "Value"
                       ]
@@ -13404,10 +13533,12 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::PropertyAreParticlesRelative"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object"
+                        "AreParticlesRelative",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -13447,21 +13578,24 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"Value\""
+                        "Value",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyAreParticlesRelative"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "no"
+                        "AreParticlesRelative",
+                        "False",
+                        ""
                       ]
                     }
                   ]
@@ -13471,21 +13605,24 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"Value\""
+                        "Value",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyAreParticlesRelative"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "yes"
+                        "AreParticlesRelative",
+                        "True",
+                        ""
                       ]
                     }
                   ]
@@ -13570,10 +13707,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertySpayConeAngle"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "SpayConeAngle",
                         "=",
                         "Value"
                       ]
@@ -13655,10 +13792,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyBlending"
+                        "value": "SetStringVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "Blending",
                         "=",
                         "Value"
                       ]
@@ -13739,10 +13876,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyGravityTop"
+                        "value": "SetStringVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "GravityTop",
                         "=",
                         "Value"
                       ]
@@ -13822,10 +13959,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyGravity"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
+                        "Gravity",
                         "=",
                         "Value"
                       ]
@@ -13869,10 +14006,12 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::PropertyShouldAutodestruct"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object"
+                        "ShouldAutodestruct",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -13912,21 +14051,24 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"Value\""
+                        "Value",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyShouldAutodestruct"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "no"
+                        "ShouldAutodestruct",
+                        "False",
+                        ""
                       ]
                     }
                   ]
@@ -13936,21 +14078,24 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"Value\""
+                        "Value",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ParticleEmitter3D::ParticleEmitter3D::SetPropertyShouldAutodestruct"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "yes"
+                        "ShouldAutodestruct",
+                        "True",
+                        ""
                       ]
                     }
                   ]
@@ -14211,71 +14356,7 @@
               "name": "RotationY"
             }
           ],
-          "objects": [
-            {
-              "adaptCollisionMaskAutomatically": true,
-              "assetStoreId": "",
-              "name": "Particle",
-              "type": "Sprite",
-              "updateIfNotVisible": false,
-              "variables": [],
-              "effects": [],
-              "behaviors": [],
-              "animations": [
-                {
-                  "name": "Image",
-                  "useMultipleDirections": false,
-                  "directions": [
-                    {
-                      "looping": false,
-                      "timeBetweenFrames": 0.08,
-                      "sprites": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "objectsFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "objectName": "Particle"
-              }
-            ]
-          },
-          "objectsGroups": [],
-          "layers": [
-            {
-              "ambientLightColorB": 200,
-              "ambientLightColorG": 200,
-              "ambientLightColorR": 200,
-              "camera3DFarPlaneDistance": 10000,
-              "camera3DFieldOfView": 45,
-              "camera3DNearPlaneDistance": 3,
-              "cameraType": "",
-              "followBaseLayerCamera": false,
-              "isLightingLayer": false,
-              "isLocked": false,
-              "name": "",
-              "renderingType": "",
-              "visibility": true,
-              "cameras": [
-                {
-                  "defaultSize": true,
-                  "defaultViewport": true,
-                  "height": 0,
-                  "viewportBottom": 1,
-                  "viewportLeft": 0,
-                  "viewportRight": 1,
-                  "viewportTop": 0,
-                  "width": 0
-                }
-              ],
-              "effects": []
-            }
-          ],
-          "instances": []
+          "variants": []
         }
       ]
     },
@@ -14284,17 +14365,18 @@
       "category": "Movement",
       "extensionNamespace": "",
       "fullName": "Screen wrap",
+      "gdevelopVersion": ">=5.5.222",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLW1vbml0b3Itc2NyZWVuc2hvdCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik05LDZINVYxMEg3VjhIOU0xOSwxMEgxN1YxMkgxNVYxNEgxOU0yMSwxNkgzVjRIMjFNMjEsMkgzQzEuODksMiAxLDIuODkgMSw0VjE2QTIsMiAwIDAsMCAzLDE4SDEwVjIwSDhWMjJIMTZWMjBIMTRWMThIMjFBMiwyIDAgMCwwIDIzLDE2VjRDMjMsMi44OSAyMi4xLDIgMjEsMiIgLz48L3N2Zz4=",
       "name": "ScreenWrap",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/monitor-screenshot.svg",
       "shortDescription": "Teleport object when it moves off the screen and immediately appear on the opposite side while maintaining speed and trajectory.",
-      "version": "0.2.5",
+      "version": "0.3.2",
       "description": [
         "The teleport happens when the center point of the object crosses a border (this can be adjusted with an offset).",
-        "By default, the borders of the wrapping area match the screen size, but they can alo be changed.",
+        "By default, the borders of the wrapping area match the screen size, but they can also be changed.",
         "",
-        "The Asteroid-like example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://space-asteroid))."
+        "The Asteroid-like example uses this extension ([open the project online](https://editor.gdevelop.io/?project=example://space-asteroids))."
       ],
       "origin": {
         "identifier": "ScreenWrap",
@@ -14321,6 +14403,7 @@
           "fullName": "Screen Wrap",
           "name": "ScreenWrap",
           "objectType": "",
+          "quickCustomizationVisibility": "hidden",
           "eventsFunctions": [
             {
               "fullName": "",
@@ -14342,11 +14425,10 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "ScreenWrap::ScreenWrap::PropertyBorderBottom"
+                            "value": "NumberVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "BorderBottom",
                             "=",
                             "0"
                           ]
@@ -14371,11 +14453,10 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "ScreenWrap::ScreenWrap::PropertyBorderRight"
+                            "value": "NumberVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "BorderRight",
                             "=",
                             "0"
                           ]
@@ -14445,11 +14526,12 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "ScreenWrap::ScreenWrap::PropertyHorizontalWrapping"
+                            "value": "BooleanVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior"
+                            "HorizontalWrapping",
+                            "True",
+                            ""
                           ]
                         }
                       ],
@@ -14516,11 +14598,12 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "ScreenWrap::ScreenWrap::PropertyVerticalWrapping"
+                            "value": "BooleanVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior"
+                            "VerticalWrapping",
+                            "True",
+                            ""
                           ]
                         }
                       ],
@@ -14614,11 +14697,12 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "ScreenWrap::ScreenWrap::PropertyHorizontalWrapping"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "HorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -14638,11 +14722,12 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::PropertyHorizontalWrapping"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "HorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -14686,11 +14771,12 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "ScreenWrap::ScreenWrap::PropertyVerticalWrapping"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "VerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -14710,11 +14796,12 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::PropertyVerticalWrapping"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "VerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -14758,22 +14845,24 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"EnableHorizontalWrapping\""
+                        "EnableHorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyHorizontalWrapping"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "no"
+                        "HorizontalWrapping",
+                        "False",
+                        ""
                       ]
                     }
                   ]
@@ -14783,22 +14872,24 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"EnableHorizontalWrapping\""
+                        "EnableHorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyHorizontalWrapping"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
+                        "HorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ]
@@ -14837,22 +14928,24 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"EnableVerticalWrapping\""
+                        "EnableVerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyVerticalWrapping"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "no"
+                        "VerticalWrapping",
+                        "False",
+                        ""
                       ]
                     }
                   ]
@@ -14862,22 +14955,24 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"EnableVerticalWrapping\""
+                        "EnableVerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyVerticalWrapping"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
+                        "VerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ]
@@ -15116,11 +15211,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyBorderTop"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "BorderTop",
                         "=",
                         "Value"
                       ]
@@ -15161,11 +15255,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyBorderLeft"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "BorderLeft",
                         "=",
                         "Value"
                       ]
@@ -15206,11 +15299,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyBorderBottom"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "BorderBottom",
                         "=",
                         "Value"
                       ]
@@ -15251,11 +15343,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyBorderRight"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "BorderRight",
                         "=",
                         "Value"
                       ]
@@ -15296,11 +15387,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrap::SetPropertyTriggerOffset"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "TriggerOffset",
                         "=",
                         "Value"
                       ]
@@ -15406,6 +15496,7 @@
           "fullName": "Screen Wrap (physics objects)",
           "name": "ScreenWrapPhysics",
           "objectType": "",
+          "quickCustomizationVisibility": "hidden",
           "eventsFunctions": [
             {
               "fullName": "",
@@ -15427,11 +15518,10 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "ScreenWrap::ScreenWrapPhysics::PropertyBorderBottom"
+                            "value": "NumberVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "BorderBottom",
                             "=",
                             "0"
                           ]
@@ -15456,11 +15546,10 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "ScreenWrap::ScreenWrapPhysics::PropertyBorderRight"
+                            "value": "NumberVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "BorderRight",
                             "=",
                             "0"
                           ]
@@ -15793,11 +15882,12 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "ScreenWrap::ScreenWrapPhysics::PropertyHorizontalWrapping"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "HorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -15817,11 +15907,12 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::PropertyHorizontalWrapping"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "HorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -15865,11 +15956,12 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "ScreenWrap::ScreenWrapPhysics::PropertyVerticalWrapping"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "VerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -15889,11 +15981,12 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::PropertyVerticalWrapping"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "VerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -15937,22 +16030,24 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"EnableHorizontalWrapping\""
+                        "EnableHorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyHorizontalWrapping"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "no"
+                        "HorizontalWrapping",
+                        "False",
+                        ""
                       ]
                     }
                   ]
@@ -15962,22 +16057,24 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"EnableHorizontalWrapping\""
+                        "EnableHorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyHorizontalWrapping"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
+                        "HorizontalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ]
@@ -16016,22 +16113,24 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"EnableVerticalWrapping\""
+                        "EnableVerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyVerticalWrapping"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "no"
+                        "VerticalWrapping",
+                        "False",
+                        ""
                       ]
                     }
                   ]
@@ -16041,22 +16140,24 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"EnableVerticalWrapping\""
+                        "EnableVerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyVerticalWrapping"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
-                        "yes"
+                        "VerticalWrapping",
+                        "True",
+                        ""
                       ]
                     }
                   ]
@@ -16295,11 +16396,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyBorderTop"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "BorderTop",
                         "=",
                         "Value"
                       ]
@@ -16340,11 +16440,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyBorderLeft"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "BorderLeft",
                         "=",
                         "Value"
                       ]
@@ -16385,11 +16484,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyBorderBottom"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "BorderBottom",
                         "=",
                         "Value"
                       ]
@@ -16430,11 +16528,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyBorderRight"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "BorderRight",
                         "=",
                         "Value"
                       ]
@@ -16475,11 +16572,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyTriggerOffset"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "TriggerOffset",
                         "=",
                         "Value"
                       ]
@@ -16520,33 +16616,30 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyAngularVelocity"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "AngularVelocity",
                         "=",
                         "Object.RequiredPhysicsBehavior::AngularVelocity()"
                       ]
                     },
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyLinearVelocityX"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "LinearVelocityX",
                         "=",
                         "Object.RequiredPhysicsBehavior::LinearVelocityX()"
                       ]
                     },
                     {
                       "type": {
-                        "value": "ScreenWrap::ScreenWrapPhysics::SetPropertyLinearVelocityY"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "LinearVelocityY",
                         "=",
                         "Object.RequiredPhysicsBehavior::LinearVelocityY()"
                       ]
@@ -16753,12 +16846,13 @@
       "category": "User interface",
       "extensionNamespace": "",
       "fullName": "Panel sprite button",
+      "gdevelopVersion": ">=5.5.222",
       "helpPath": "/objects/button",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI5LDIzSDNjLTEuMSwwLTItMC45LTItMlYxMWMwLTEuMSwwLjktMiwyLTJoMjZjMS4xLDAsMiwwLjksMiwydjEwQzMxLDIyLjEsMzAuMSwyMywyOSwyM3oiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMywxOUwxMywxOWMtMS4xLDAtMi0wLjktMi0ydi0yYzAtMS4xLDAuOS0yLDItMmgwYzEuMSwwLDIsMC45LDIsMnYyQzE1LDE4LjEsMTQuMSwxOSwxMywxOXoiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxOCIgeTE9IjEzIiB4Mj0iMTgiIHkyPSIxOSIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjIxIiB5MT0iMTMiIHgyPSIxOCIgeTI9IjE3Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjEiIHkxPSIxOSIgeDI9IjE5IiB5Mj0iMTYiLz4NCjwvc3ZnPg0K",
       "name": "PanelSpriteButton",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Interface Elements/Interface Elements_interface_ui_button_ok_cta_clock_tap.svg",
       "shortDescription": "A button that can be customized.",
-      "version": "1.4.5",
+      "version": "1.5.0",
       "description": [
         "The button can be customized with a background for each state and a label. It handles user interactions and a simple condition can be used to check if it is clicked.",
         "",
@@ -16819,11 +16913,10 @@
                       "conditions": [
                         {
                           "type": {
-                            "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                            "value": "StringVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "State",
                             "=",
                             "\"Validated\""
                           ]
@@ -16832,11 +16925,10 @@
                       "actions": [
                         {
                           "type": {
-                            "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                            "value": "SetStringVariable"
                           },
                           "parameters": [
-                            "Object",
-                            "Behavior",
+                            "State",
                             "=",
                             "\"Idle\""
                           ]
@@ -16870,12 +16962,12 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyMouseIsInside"
+                                "value": "SetBooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
-                                "no"
+                                "MouseIsInside",
+                                "False",
+                                ""
                               ]
                             }
                           ]
@@ -16885,11 +16977,12 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyShouldCheckHovering"
+                                "value": "BooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior"
+                                "ShouldCheckHovering",
+                                "True",
+                                ""
                               ]
                             },
                             {
@@ -16906,12 +16999,12 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyMouseIsInside"
+                                "value": "SetBooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
-                                "yes"
+                                "MouseIsInside",
+                                "True",
+                                ""
                               ]
                             }
                           ]
@@ -16934,12 +17027,12 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyTouchIsInside"
+                                "value": "SetBooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
-                                "no"
+                                "TouchIsInside",
+                                "False",
+                                ""
                               ]
                             }
                           ]
@@ -16949,11 +17042,10 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyTouchId"
+                                "value": "NumberVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "TouchId",
                                 "!=",
                                 "0"
                               ]
@@ -16972,12 +17064,12 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyTouchIsInside"
+                                "value": "SetBooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
-                                "yes"
+                                "TouchIsInside",
+                                "True",
+                                ""
                               ]
                             }
                           ]
@@ -17009,11 +17101,10 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyIndex"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "Index",
                                 "=",
                                 "0"
                               ]
@@ -17043,23 +17134,22 @@
                                   "actions": [
                                     {
                                       "type": {
-                                        "value": "PanelSpriteButton::ButtonFSM::SetPropertyTouchId"
+                                        "value": "SetNumberVariable"
                                       },
                                       "parameters": [
-                                        "Object",
-                                        "Behavior",
+                                        "TouchId",
                                         "=",
                                         "StartedTouchOrMouseId(Index)"
                                       ]
                                     },
                                     {
                                       "type": {
-                                        "value": "PanelSpriteButton::ButtonFSM::SetPropertyTouchIsInside"
+                                        "value": "SetBooleanVariable"
                                       },
                                       "parameters": [
-                                        "Object",
-                                        "Behavior",
-                                        "yes"
+                                        "TouchIsInside",
+                                        "True",
+                                        ""
                                       ]
                                     }
                                   ],
@@ -17101,11 +17191,10 @@
                                       "actions": [
                                         {
                                           "type": {
-                                            "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                                            "value": "SetStringVariable"
                                           },
                                           "parameters": [
-                                            "Object",
-                                            "Behavior",
+                                            "State",
                                             "=",
                                             "\"PressedInside\""
                                           ]
@@ -17120,11 +17209,10 @@
                                   "actions": [
                                     {
                                       "type": {
-                                        "value": "PanelSpriteButton::ButtonFSM::SetPropertyIndex"
+                                        "value": "SetNumberVariable"
                                       },
                                       "parameters": [
-                                        "Object",
-                                        "Behavior",
+                                        "Index",
                                         "+",
                                         "1"
                                       ]
@@ -17153,20 +17241,20 @@
                             {
                               "type": {
                                 "inverted": true,
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyMouseIsInside"
+                                "value": "BooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior"
+                                "MouseIsInside",
+                                "True",
+                                ""
                               ]
                             },
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                                "value": "StringVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "State",
                                 "=",
                                 "\"Hovered\""
                               ]
@@ -17175,11 +17263,10 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                                "value": "SetStringVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "State",
                                 "=",
                                 "\"Idle\""
                               ]
@@ -17191,20 +17278,20 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyMouseIsInside"
+                                "value": "BooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior"
+                                "MouseIsInside",
+                                "True",
+                                ""
                               ]
                             },
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                                "value": "StringVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "State",
                                 "=",
                                 "\"Idle\""
                               ]
@@ -17213,11 +17300,10 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                                "value": "SetStringVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "State",
                                 "=",
                                 "\"Hovered\""
                               ]
@@ -17230,20 +17316,20 @@
                             {
                               "type": {
                                 "inverted": true,
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyTouchIsInside"
+                                "value": "BooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior"
+                                "TouchIsInside",
+                                "True",
+                                ""
                               ]
                             },
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                                "value": "StringVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "State",
                                 "=",
                                 "\"PressedInside\""
                               ]
@@ -17252,11 +17338,10 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                                "value": "SetStringVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "State",
                                 "=",
                                 "\"PressedOutside\""
                               ]
@@ -17268,20 +17353,20 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyTouchIsInside"
+                                "value": "BooleanVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior"
+                                "TouchIsInside",
+                                "True",
+                                ""
                               ]
                             },
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                                "value": "StringVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "State",
                                 "=",
                                 "\"PressedOutside\""
                               ]
@@ -17290,11 +17375,10 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                                "value": "SetStringVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "State",
                                 "=",
                                 "\"PressedInside\""
                               ]
@@ -17329,11 +17413,10 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::ButtonFSM::SetPropertyTouchId"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "TouchId",
                                 "=",
                                 "0"
                               ]
@@ -17345,11 +17428,10 @@
                               "conditions": [
                                 {
                                   "type": {
-                                    "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                                    "value": "StringVariable"
                                   },
                                   "parameters": [
-                                    "Object",
-                                    "Behavior",
+                                    "State",
                                     "=",
                                     "\"PressedInside\""
                                   ]
@@ -17358,11 +17440,10 @@
                               "actions": [
                                 {
                                   "type": {
-                                    "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                                    "value": "SetStringVariable"
                                   },
                                   "parameters": [
-                                    "Object",
-                                    "Behavior",
+                                    "State",
                                     "=",
                                     "\"Validated\""
                                   ]
@@ -17375,11 +17456,10 @@
                                 {
                                   "type": {
                                     "inverted": true,
-                                    "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                                    "value": "StringVariable"
                                   },
                                   "parameters": [
-                                    "Object",
-                                    "Behavior",
+                                    "State",
                                     "=",
                                     "\"PressedInside\""
                                   ]
@@ -17387,11 +17467,10 @@
                                 {
                                   "type": {
                                     "inverted": true,
-                                    "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                                    "value": "StringVariable"
                                   },
                                   "parameters": [
-                                    "Object",
-                                    "Behavior",
+                                    "State",
                                     "=",
                                     "\"Validated\""
                                   ]
@@ -17400,11 +17479,10 @@
                               "actions": [
                                 {
                                   "type": {
-                                    "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                                    "value": "SetStringVariable"
                                   },
                                   "parameters": [
-                                    "Object",
-                                    "Behavior",
+                                    "State",
                                     "=",
                                     "\"Idle\""
                                   ]
@@ -17487,22 +17565,20 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::SetPropertyState"
+                        "value": "SetStringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "State",
                         "=",
                         "\"Idle\""
                       ]
                     },
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::SetPropertyTouchId"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "TouchId",
                         "=",
                         "0"
                       ]
@@ -17537,11 +17613,10 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "State",
                         "=",
                         "\"Idle\""
                       ]
@@ -17586,11 +17661,10 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "State",
                         "=",
                         "\"Validated\""
                       ]
@@ -17635,11 +17709,10 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "State",
                         "=",
                         "\"Hovered\""
                       ]
@@ -17684,11 +17757,10 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "State",
                         "=",
                         "\"Hovered\""
                       ]
@@ -17710,11 +17782,10 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "State",
                         "=",
                         "\"PressedOutside\""
                       ]
@@ -17759,11 +17830,10 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "State",
                         "=",
                         "\"PressedInside\""
                       ]
@@ -17808,11 +17878,10 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "PanelSpriteButton::ButtonFSM::PropertyState"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "State",
                         "=",
                         "\"PressedOutside\""
                       ]
@@ -17970,6 +18039,165 @@
           "fullName": "Button (panel sprite)",
           "isUsingLegacyInstancesRenderer": true,
           "name": "PanelSpriteButton",
+          "objects": [
+            {
+              "assetStoreId": "",
+              "bold": false,
+              "italic": false,
+              "name": "Label",
+              "smoothed": true,
+              "type": "TextObject::Text",
+              "underlined": false,
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "string": "Text",
+              "font": "",
+              "textAlignment": "",
+              "characterSize": 20,
+              "color": {
+                "b": 0,
+                "g": 0,
+                "r": 0
+              },
+              "content": {
+                "bold": false,
+                "isOutlineEnabled": false,
+                "isShadowEnabled": false,
+                "italic": false,
+                "outlineColor": "255;255;255",
+                "outlineThickness": 2,
+                "shadowAngle": 90,
+                "shadowBlurRadius": 2,
+                "shadowColor": "0;0;0",
+                "shadowDistance": 4,
+                "shadowOpacity": 127,
+                "smoothed": true,
+                "underlined": false,
+                "text": "Text",
+                "font": "",
+                "textAlignment": "",
+                "verticalTextAlignment": "top",
+                "characterSize": 20,
+                "color": "0;0;0"
+              }
+            },
+            {
+              "assetStoreId": "",
+              "bottomMargin": 0,
+              "height": 32,
+              "leftMargin": 0,
+              "name": "Idle",
+              "rightMargin": 0,
+              "texture": "",
+              "tiled": false,
+              "topMargin": 0,
+              "type": "PanelSpriteObject::PanelSprite",
+              "width": 32,
+              "variables": [
+                {
+                  "folded": true,
+                  "name": "State",
+                  "type": "string",
+                  "value": "Idle"
+                }
+              ],
+              "effects": [],
+              "behaviors": [
+                {
+                  "name": "ButtonFSM",
+                  "type": "PanelSpriteButton::ButtonFSM",
+                  "ShouldCheckHovering": true
+                }
+              ]
+            },
+            {
+              "assetStoreId": "",
+              "bottomMargin": 0,
+              "height": 32,
+              "leftMargin": 0,
+              "name": "Hovered",
+              "rightMargin": 0,
+              "texture": "",
+              "tiled": false,
+              "topMargin": 0,
+              "type": "PanelSpriteObject::PanelSprite",
+              "width": 32,
+              "variables": [],
+              "effects": [],
+              "behaviors": [
+                {
+                  "name": "Tween",
+                  "type": "Tween::TweenBehavior"
+                }
+              ]
+            },
+            {
+              "assetStoreId": "",
+              "bottomMargin": 0,
+              "height": 32,
+              "leftMargin": 0,
+              "name": "Pressed",
+              "rightMargin": 0,
+              "texture": "",
+              "tiled": false,
+              "topMargin": 0,
+              "type": "PanelSpriteObject::PanelSprite",
+              "width": 32,
+              "variables": [],
+              "effects": [],
+              "behaviors": []
+            }
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Label"
+              },
+              {
+                "objectName": "Idle"
+              },
+              {
+                "objectName": "Hovered"
+              },
+              {
+                "objectName": "Pressed"
+              }
+            ]
+          },
+          "objectsGroups": [],
+          "layers": [
+            {
+              "ambientLightColorB": 200,
+              "ambientLightColorG": 200,
+              "ambientLightColorR": 200,
+              "camera3DFarPlaneDistance": 10000,
+              "camera3DFieldOfView": 45,
+              "camera3DNearPlaneDistance": 3,
+              "cameraType": "",
+              "followBaseLayerCamera": false,
+              "isLightingLayer": false,
+              "isLocked": false,
+              "name": "",
+              "renderingType": "",
+              "visibility": true,
+              "cameras": [
+                {
+                  "defaultSize": true,
+                  "defaultViewport": true,
+                  "height": 0,
+                  "viewportBottom": 1,
+                  "viewportLeft": 0,
+                  "viewportRight": 1,
+                  "viewportTop": 0,
+                  "width": 0
+                }
+              ],
+              "effects": []
+            }
+          ],
+          "instances": [],
           "eventsFunctions": [
             {
               "fullName": "",
@@ -18262,10 +18490,10 @@
                             },
                             {
                               "type": {
-                                "value": "PanelSpriteButton::PanelSpriteButton::PropertyHoveredFadeOutDuration"
+                                "value": "NumberVariable"
                               },
                               "parameters": [
-                                "Object",
+                                "HoveredFadeOutDuration",
                                 ">",
                                 "0"
                               ]
@@ -18293,10 +18521,10 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "PanelSpriteButton::PanelSpriteButton::PropertyHoveredFadeOutDuration"
+                                "value": "NumberVariable"
                               },
                               "parameters": [
-                                "Object",
+                                "HoveredFadeOutDuration",
                                 "=",
                                 "0"
                               ]
@@ -18597,66 +18825,83 @@
                           ]
                         }
                       ],
-                      "actions": [
+                      "actions": [],
+                      "events": [
                         {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "Idle",
-                            "Width",
-                            "=",
-                            "Object.Width()"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ModVarObjet"
-                          },
-                          "parameters": [
-                            "Idle",
-                            "Height",
-                            "=",
-                            "Object.Height()"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PanelSpriteButton::Scale"
-                          },
-                          "parameters": [
-                            "Object",
-                            "=",
-                            "1"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PanelSpriteObject::Width"
-                          },
-                          "parameters": [
-                            "Background",
-                            "=",
-                            "Idle.Variable(Width)"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PanelSpriteObject::Height"
-                          },
-                          "parameters": [
-                            "Background",
-                            "=",
-                            "Idle.Variable(Height)"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "PanelSpriteButton::PanelSpriteButton::CenterLabel"
-                          },
-                          "parameters": [
-                            "Object",
-                            ""
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Width",
+                                "=",
+                                "Object.Width()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Height",
+                                "=",
+                                "Object.Height()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PanelSpriteButton::Scale"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "1"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PanelSpriteObject::Width"
+                              },
+                              "parameters": [
+                                "Background",
+                                "=",
+                                "Width"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PanelSpriteObject::Height"
+                              },
+                              "parameters": [
+                                "Background",
+                                "=",
+                                "Height"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PanelSpriteButton::PanelSpriteButton::CenterLabel"
+                              },
+                              "parameters": [
+                                "Object",
+                                ""
+                              ]
+                            }
+                          ],
+                          "variables": [
+                            {
+                              "name": "Width",
+                              "type": "number",
+                              "value": 0
+                            },
+                            {
+                              "name": "Height",
+                              "type": "number",
+                              "value": 0
+                            }
                           ]
                         }
                       ]
@@ -19152,10 +19397,12 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"ShouldActivate\""
+                        "ShouldActivate",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -19178,10 +19425,12 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "GetArgumentAsBoolean"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "\"ShouldActivate\""
+                        "ShouldActivate",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -19321,165 +19570,7 @@
               "name": "HoveredFadeOutDuration"
             }
           ],
-          "objects": [
-            {
-              "assetStoreId": "",
-              "bold": false,
-              "italic": false,
-              "name": "Label",
-              "smoothed": true,
-              "type": "TextObject::Text",
-              "underlined": false,
-              "variables": [],
-              "effects": [],
-              "behaviors": [],
-              "string": "Text",
-              "font": "",
-              "textAlignment": "",
-              "characterSize": 20,
-              "color": {
-                "b": 0,
-                "g": 0,
-                "r": 0
-              },
-              "content": {
-                "bold": false,
-                "isOutlineEnabled": false,
-                "isShadowEnabled": false,
-                "italic": false,
-                "outlineColor": "255;255;255",
-                "outlineThickness": 2,
-                "shadowAngle": 90,
-                "shadowBlurRadius": 2,
-                "shadowColor": "0;0;0",
-                "shadowDistance": 4,
-                "shadowOpacity": 127,
-                "smoothed": true,
-                "underlined": false,
-                "text": "Text",
-                "font": "",
-                "textAlignment": "",
-                "verticalTextAlignment": "top",
-                "characterSize": 20,
-                "color": "0;0;0"
-              }
-            },
-            {
-              "assetStoreId": "",
-              "bottomMargin": 0,
-              "height": 32,
-              "leftMargin": 0,
-              "name": "Idle",
-              "rightMargin": 0,
-              "texture": "",
-              "tiled": false,
-              "topMargin": 0,
-              "type": "PanelSpriteObject::PanelSprite",
-              "width": 32,
-              "variables": [
-                {
-                  "folded": true,
-                  "name": "State",
-                  "type": "string",
-                  "value": "Idle"
-                }
-              ],
-              "effects": [],
-              "behaviors": [
-                {
-                  "name": "ButtonFSM",
-                  "type": "PanelSpriteButton::ButtonFSM",
-                  "ShouldCheckHovering": true
-                }
-              ]
-            },
-            {
-              "assetStoreId": "",
-              "bottomMargin": 0,
-              "height": 32,
-              "leftMargin": 0,
-              "name": "Hovered",
-              "rightMargin": 0,
-              "texture": "",
-              "tiled": false,
-              "topMargin": 0,
-              "type": "PanelSpriteObject::PanelSprite",
-              "width": 32,
-              "variables": [],
-              "effects": [],
-              "behaviors": [
-                {
-                  "name": "Tween",
-                  "type": "Tween::TweenBehavior"
-                }
-              ]
-            },
-            {
-              "assetStoreId": "",
-              "bottomMargin": 0,
-              "height": 32,
-              "leftMargin": 0,
-              "name": "Pressed",
-              "rightMargin": 0,
-              "texture": "",
-              "tiled": false,
-              "topMargin": 0,
-              "type": "PanelSpriteObject::PanelSprite",
-              "width": 32,
-              "variables": [],
-              "effects": [],
-              "behaviors": []
-            }
-          ],
-          "objectsFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "objectName": "Label"
-              },
-              {
-                "objectName": "Idle"
-              },
-              {
-                "objectName": "Hovered"
-              },
-              {
-                "objectName": "Pressed"
-              }
-            ]
-          },
-          "objectsGroups": [],
-          "layers": [
-            {
-              "ambientLightColorB": 200,
-              "ambientLightColorG": 200,
-              "ambientLightColorR": 200,
-              "camera3DFarPlaneDistance": 10000,
-              "camera3DFieldOfView": 45,
-              "camera3DNearPlaneDistance": 3,
-              "cameraType": "",
-              "followBaseLayerCamera": false,
-              "isLightingLayer": false,
-              "isLocked": false,
-              "name": "",
-              "renderingType": "",
-              "visibility": true,
-              "cameras": [
-                {
-                  "defaultSize": true,
-                  "defaultViewport": true,
-                  "height": 0,
-                  "viewportBottom": 1,
-                  "viewportLeft": 0,
-                  "viewportRight": 1,
-                  "viewportTop": 0,
-                  "width": 0
-                }
-              ],
-              "effects": []
-            }
-          ],
-          "instances": []
+          "variants": []
         }
       ]
     },
@@ -19488,12 +19579,13 @@
       "category": "Input",
       "extensionNamespace": "",
       "fullName": "Swipe Gesture",
+      "gdevelopVersion": ">=5.5.222",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdlc3R1cmUtc3dpcGUtcmlnaHQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTAsOUExLDEgMCAwLDEgMTEsOEExLDEgMCAwLDEgMTIsOVYxMy40N0wxMy4yMSwxMy42TDE4LjE1LDE1Ljc5QzE4LjY4LDE2LjAzIDE5LDE2LjU2IDE5LDE3LjE0VjIxLjVDMTguOTcsMjIuMzIgMTguMzIsMjIuOTcgMTcuNSwyM0gxMUMxMC42MiwyMyAxMC4yNiwyMi44NSAxMCwyMi41N0w1LjEsMTguMzdMNS44NCwxNy42QzYuMDMsMTcuMzkgNi4zLDE3LjI4IDYuNTgsMTcuMjhINi44TDEwLDE5VjlNMTIsNEw5LDFWM0gzVjVIOVY3TDEyLDRaIiAvPjwvc3ZnPg==",
       "name": "SwipeGesture",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gesture-swipe-right.svg",
       "shortDescription": "Detect swipe gestures based on their distance and duration.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "description": [
         "Use the \"Enable swipe detection\" action at the beginning of your scene.",
         "",
@@ -19533,7 +19625,80 @@
       ],
       "dependencies": [],
       "globalVariables": [],
-      "sceneVariables": [],
+      "sceneVariables": [
+        {
+          "folded": true,
+          "name": "SwipeJustEnded",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "folded": true,
+          "name": "EndPointX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "EndPointY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "SwipeInProgress",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "folded": true,
+          "name": "StartPointX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "StartPointY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "Distance",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "DistanceX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "DistanceY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "Angle",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": true,
+          "name": "Enabled",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "folded": true,
+          "name": "Layer",
+          "type": "string",
+          "value": ""
+        }
+      ],
       "eventsFunctions": [
         {
           "fullName": "",
@@ -19559,11 +19724,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "SetSceneVariableAsBoolean"
+                    "value": "SetBooleanVariable"
                   },
                   "parameters": [
-                    "__SwipeGesture.SwipeJustEnded",
-                    "False"
+                    "SwipeJustEnded",
+                    "False",
+                    ""
                   ]
                 }
               ]
@@ -19616,22 +19782,22 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.EndPointX",
+                                "EndPointX",
                                 "=",
-                                "MouseX(VariableString(__SwipeGesture.Layer),0)"
+                                "MouseX(Layer)"
                               ]
                             },
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.EndPointY",
+                                "EndPointY",
                                 "=",
-                                "MouseY(VariableString(__SwipeGesture.Layer),0)"
+                                "MouseY(Layer)"
                               ]
                             }
                           ]
@@ -19663,19 +19829,20 @@
                             },
                             {
                               "type": {
-                                "value": "SetSceneVariableAsBoolean"
+                                "value": "SetBooleanVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.SwipeInProgress",
-                                "False"
+                                "SwipeInProgress",
+                                "False",
+                                ""
                               ]
                             },
                             {
                               "type": {
-                                "value": "SetSceneVariableAsBoolean"
+                                "value": "SetBooleanVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.SwipeJustEnded",
+                                "SwipeJustEnded",
                                 "True"
                               ]
                             }
@@ -19743,20 +19910,20 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.EndPointX",
+                                "EndPointX",
                                 "=",
                                 "0"
                               ]
                             },
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.EndPointY",
+                                "EndPointY",
                                 "=",
                                 "0"
                               ]
@@ -19781,22 +19948,22 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.StartPointX",
+                                "StartPointX",
                                 "=",
-                                "MouseX(VariableString(__SwipeGesture.Layer),0)"
+                                "MouseX(Layer)"
                               ]
                             },
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.StartPointY",
+                                "StartPointY",
                                 "=",
-                                "MouseY(VariableString(__SwipeGesture.Layer),0)"
+                                "MouseY(Layer)"
                               ]
                             }
                           ]
@@ -19837,10 +20004,10 @@
                             },
                             {
                               "type": {
-                                "value": "SetSceneVariableAsBoolean"
+                                "value": "SetBooleanVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.SwipeInProgress",
+                                "SwipeInProgress",
                                 "True"
                               ]
                             }
@@ -19893,44 +20060,32 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.Distance",
+                                "Distance",
                                 "=",
-                                "DistanceBetweenPositions(Variable(__SwipeGesture.StartPointX), Variable(__SwipeGesture.StartPointY), MouseX(VariableString(__SwipeGesture.Layer),0), MouseY(VariableString(__SwipeGesture.Layer),0))"
+                                "DistanceBetweenPositions(StartPointX, StartPointY, MouseX(Layer), MouseY(Layer))"
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
+                            },
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.DistanceX",
+                                "DistanceX",
                                 "=",
-                                "abs(Variable(__SwipeGesture.StartPointX) - MouseX(VariableString(__SwipeGesture.Layer),0))"
+                                "abs(StartPointX - MouseX(Layer))"
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
+                            },
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.DistanceY",
+                                "DistanceY",
                                 "=",
-                                "abs(Variable(__SwipeGesture.StartPointY) - MouseY(VariableString(__SwipeGesture.Layer),0))"
+                                "abs(StartPointY - MouseY(Layer))"
                               ]
                             }
                           ]
@@ -19953,12 +20108,12 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "ModVarScene"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "__SwipeGesture.Angle",
+                                "Angle",
                                 "=",
-                                "AngleBetweenPositions(Variable(__SwipeGesture.StartPointX), Variable(__SwipeGesture.StartPointY), MouseX(VariableString(__SwipeGesture.Layer),0), MouseY(VariableString(__SwipeGesture.Layer),0))"
+                                "AngleBetweenPositions(StartPointX, StartPointY, MouseX(Layer), MouseY(Layer))"
                               ]
                             }
                           ]
@@ -19988,29 +20143,32 @@
                 {
                   "type": {
                     "inverted": true,
-                    "value": "GetArgumentAsBoolean"
+                    "value": "BooleanVariable"
                   },
                   "parameters": [
-                    "\"Value\""
+                    "Value",
+                    "True",
+                    ""
                   ]
                 }
               ],
               "actions": [
                 {
                   "type": {
-                    "value": "SetSceneVariableAsBoolean"
+                    "value": "SetBooleanVariable"
                   },
                   "parameters": [
-                    "__SwipeGesture.Enabled",
-                    "False"
+                    "Enabled",
+                    "False",
+                    ""
                   ]
                 },
                 {
                   "type": {
-                    "value": "SetSceneVariableAsBoolean"
+                    "value": "SetBooleanVariable"
                   },
                   "parameters": [
-                    "__SwipeGesture.SwipeInProgress",
+                    "SwipeInProgress",
                     "False"
                   ]
                 },
@@ -20030,20 +20188,22 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "GetArgumentAsBoolean"
+                    "value": "BooleanVariable"
                   },
                   "parameters": [
-                    "\"Value\""
+                    "Value",
+                    "True",
+                    ""
                   ]
                 }
               ],
               "actions": [
                 {
                   "type": {
-                    "value": "SetSceneVariableAsBoolean"
+                    "value": "SetBooleanVariable"
                   },
                   "parameters": [
-                    "__SwipeGesture.Enabled",
+                    "Enabled",
                     "True"
                   ]
                 }
@@ -20112,7 +20272,7 @@
                         "ShapePainterObject",
                         "0",
                         "0",
-                        "VariableString(__SwipeGesture.Layer)"
+                        "Layer"
                       ]
                     }
                   ]
@@ -20129,13 +20289,7 @@
                         "ShapePainterObject",
                         ""
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
+                    },
                     {
                       "type": {
                         "value": "PrimitiveDrawing::UseRelativeCoordinates"
@@ -20172,25 +20326,18 @@
                       ]
                     }
                   ],
-                  "actions": [],
-                  "events": [
+                  "actions": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "PrimitiveDrawing::LineV2"
-                          },
-                          "parameters": [
-                            "ShapePainterObject",
-                            "Variable(__SwipeGesture.StartPointX)",
-                            "Variable(__SwipeGesture.StartPointY)",
-                            "MouseX(VariableString(__SwipeGesture.Layer),0)",
-                            "MouseY(VariableString(__SwipeGesture.Layer),0)",
-                            "ShapePainterObject.OutlineSize()"
-                          ]
-                        }
+                      "type": {
+                        "value": "PrimitiveDrawing::LineV2"
+                      },
+                      "parameters": [
+                        "ShapePainterObject",
+                        "StartPointX",
+                        "StartPointY",
+                        "MouseX(Layer)",
+                        "MouseY(Layer)",
+                        "ShapePainterObject.OutlineSize()"
                       ]
                     }
                   ]
@@ -20223,12 +20370,12 @@
               "actions": [
                 {
                   "type": {
-                    "value": "ModVarSceneTxt"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "__SwipeGesture.Layer",
+                    "Layer",
                     "=",
-                    "GetArgumentAsString(\"Value\")"
+                    "Value"
                   ]
                 }
               ]
@@ -20237,7 +20384,7 @@
           "parameters": [
             {
               "description": "Layer",
-              "name": "Layer",
+              "name": "Value",
               "type": "layer"
             }
           ],
@@ -20259,7 +20406,7 @@
                     "value": "SetReturnString"
                   },
                   "parameters": [
-                    "VariableString(__SwipeGesture.Layer)"
+                    "Layer"
                   ]
                 }
               ]
@@ -20287,7 +20434,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__SwipeGesture.Angle)"
+                    "Angle"
                   ]
                 }
               ]
@@ -20315,7 +20462,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__SwipeGesture.Distance)"
+                    "Distance"
                   ]
                 }
               ]
@@ -20343,7 +20490,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__SwipeGesture.DistanceX)"
+                    "DistanceX"
                   ]
                 }
               ]
@@ -20371,7 +20518,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__SwipeGesture.DistanceY)"
+                    "DistanceY"
                   ]
                 }
               ]
@@ -20399,7 +20546,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__SwipeGesture.StartPointX)"
+                    "StartPointX"
                   ]
                 }
               ]
@@ -20427,7 +20574,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__SwipeGesture.StartPointY)"
+                    "StartPointY"
                   ]
                 }
               ]
@@ -20455,7 +20602,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__SwipeGesture.EndPointX)"
+                    "EndPointX"
                   ]
                 }
               ]
@@ -20483,7 +20630,7 @@
                     "value": "SetReturnNumber"
                   },
                   "parameters": [
-                    "Variable(__SwipeGesture.EndPointY)"
+                    "EndPointY"
                   ]
                 }
               ]
@@ -20535,10 +20682,10 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "SceneVariableAsBoolean"
+                    "value": "BooleanVariable"
                   },
                   "parameters": [
-                    "__SwipeGesture.SwipeInProgress",
+                    "SwipeInProgress",
                     "True"
                   ]
                 }
@@ -20570,10 +20717,10 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "SceneVariableAsBoolean"
+                    "value": "BooleanVariable"
                   },
                   "parameters": [
-                    "__SwipeGesture.Enabled",
+                    "Enabled",
                     "True"
                   ]
                 }
@@ -20605,10 +20752,10 @@
               "conditions": [
                 {
                   "type": {
-                    "value": "SceneVariableAsBoolean"
+                    "value": "BooleanVariable"
                   },
                   "parameters": [
-                    "__SwipeGesture.SwipeJustEnded",
+                    "SwipeJustEnded",
                     "True"
                   ]
                 }
@@ -20678,7 +20825,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"Up\""
                               ]
@@ -20694,7 +20841,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "-135"
                                   ]
@@ -20704,7 +20851,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "-45"
                                   ]
@@ -20743,7 +20890,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"Down\""
                               ]
@@ -20759,7 +20906,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "45"
                                   ]
@@ -20769,7 +20916,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "135"
                                   ]
@@ -20808,7 +20955,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"Left\""
                               ]
@@ -20836,7 +20983,7 @@
                                             "value": "BuiltinCommonInstructions::CompareNumbers"
                                           },
                                           "parameters": [
-                                            "SwipeGesture::Angle()",
+                                            "Angle",
                                             ">=",
                                             "-180"
                                           ]
@@ -20846,7 +20993,7 @@
                                             "value": "BuiltinCommonInstructions::CompareNumbers"
                                           },
                                           "parameters": [
-                                            "SwipeGesture::Angle()",
+                                            "Angle",
                                             "<",
                                             "-135"
                                           ]
@@ -20864,7 +21011,7 @@
                                             "value": "BuiltinCommonInstructions::CompareNumbers"
                                           },
                                           "parameters": [
-                                            "SwipeGesture::Angle()",
+                                            "Angle",
                                             ">=",
                                             "135"
                                           ]
@@ -20874,7 +21021,7 @@
                                             "value": "BuiltinCommonInstructions::CompareNumbers"
                                           },
                                           "parameters": [
-                                            "SwipeGesture::Angle()",
+                                            "Angle",
                                             "<",
                                             "180"
                                           ]
@@ -20917,7 +21064,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"Right\""
                               ]
@@ -20933,7 +21080,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "-45"
                                   ]
@@ -20943,7 +21090,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "45"
                                   ]
@@ -21031,7 +21178,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"Up\""
                               ]
@@ -21047,7 +21194,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "-112.5"
                                   ]
@@ -21057,7 +21204,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "-67.5"
                                   ]
@@ -21096,7 +21243,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"Down\""
                               ]
@@ -21112,7 +21259,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "67.5"
                                   ]
@@ -21122,7 +21269,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "112.5"
                                   ]
@@ -21161,7 +21308,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"Left\""
                               ]
@@ -21189,7 +21336,7 @@
                                             "value": "BuiltinCommonInstructions::CompareNumbers"
                                           },
                                           "parameters": [
-                                            "SwipeGesture::Angle()",
+                                            "Angle",
                                             ">=",
                                             "-180"
                                           ]
@@ -21199,7 +21346,7 @@
                                             "value": "BuiltinCommonInstructions::CompareNumbers"
                                           },
                                           "parameters": [
-                                            "SwipeGesture::Angle()",
+                                            "Angle",
                                             "<",
                                             "-157.5"
                                           ]
@@ -21217,7 +21364,7 @@
                                             "value": "BuiltinCommonInstructions::CompareNumbers"
                                           },
                                           "parameters": [
-                                            "SwipeGesture::Angle()",
+                                            "Angle",
                                             ">=",
                                             "157.5"
                                           ]
@@ -21227,7 +21374,7 @@
                                             "value": "BuiltinCommonInstructions::CompareNumbers"
                                           },
                                           "parameters": [
-                                            "SwipeGesture::Angle()",
+                                            "Angle",
                                             "<",
                                             "180"
                                           ]
@@ -21270,7 +21417,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"Right\""
                               ]
@@ -21286,7 +21433,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "-22.5"
                                   ]
@@ -21296,7 +21443,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "22.5"
                                   ]
@@ -21335,7 +21482,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"UpRight\""
                               ]
@@ -21351,7 +21498,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "-67.5"
                                   ]
@@ -21361,7 +21508,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "-22.5"
                                   ]
@@ -21400,7 +21547,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"UpLeft\""
                               ]
@@ -21416,7 +21563,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "-157.5"
                                   ]
@@ -21426,7 +21573,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "-112.5"
                                   ]
@@ -21465,7 +21612,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"DownLeft\""
                               ]
@@ -21481,7 +21628,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "112.5"
                                   ]
@@ -21491,7 +21638,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "157.5"
                                   ]
@@ -21530,7 +21677,7 @@
                                 "value": "BuiltinCommonInstructions::CompareStrings"
                               },
                               "parameters": [
-                                "GetArgumentAsString(\"Direction\")",
+                                "Direction",
                                 "=",
                                 "\"DownRight\""
                               ]
@@ -21546,7 +21693,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     ">=",
                                     "22.5"
                                   ]
@@ -21556,7 +21703,7 @@
                                     "value": "BuiltinCommonInstructions::CompareNumbers"
                                   },
                                   "parameters": [
-                                    "SwipeGesture::Angle()",
+                                    "Angle",
                                     "<",
                                     "67.5"
                                   ]
@@ -21603,6 +21750,7 @@
       "category": "",
       "extensionNamespace": "",
       "fullName": "",
+      "gdevelopVersion": "",
       "helpPath": "",
       "iconUrl": "",
       "name": "LanePlatformer",
@@ -22939,6 +23087,7 @@
       "category": "",
       "extensionNamespace": "",
       "fullName": "",
+      "gdevelopVersion": "",
       "helpPath": "",
       "iconUrl": "",
       "name": "Collectible",
@@ -23161,6 +23310,7 @@
       "category": "User interface",
       "extensionNamespace": "",
       "fullName": "",
+      "gdevelopVersion": "",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXRyb3BoeSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xOCAyQzE3LjEgMiAxNiAzIDE2IDRIOEM4IDMgNi45IDIgNiAySDJWMTFDMiAxMiAzIDEzIDQgMTNINi4yQzYuNiAxNSA3LjkgMTYuNyAxMSAxN1YxOS4wOEM4IDE5LjU0IDggMjIgOCAyMkgxNkMxNiAyMiAxNiAxOS41NCAxMyAxOS4wOFYxN0MxNi4xIDE2LjcgMTcuNCAxNSAxNy44IDEzSDIwQzIxIDEzIDIyIDEyIDIyIDExVjJIMThNNiAxMUg0VjRINlYxMU0yMCAxMUgxOFY0SDIwVjExWiIgLz48L3N2Zz4=",
       "name": "LeaderboardDialog",
@@ -23189,6 +23339,434 @@
           "isInnerAreaFollowingParentSize": true,
           "isUsingLegacyInstancesRenderer": false,
           "name": "LeaderboardDialog",
+          "objects": [
+            {
+              "assetStoreId": "",
+              "bold": false,
+              "italic": false,
+              "name": "ScoreLabel",
+              "smoothed": true,
+              "type": "TextObject::Text",
+              "underlined": false,
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "string": "Score",
+              "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
+              "textAlignment": "",
+              "characterSize": 60,
+              "color": {
+                "b": 79,
+                "g": 72,
+                "r": 72
+              },
+              "content": {
+                "bold": false,
+                "isOutlineEnabled": false,
+                "isShadowEnabled": false,
+                "italic": false,
+                "outlineColor": "255;255;255",
+                "outlineThickness": 2,
+                "shadowAngle": 90,
+                "shadowBlurRadius": 2,
+                "shadowColor": "0;0;0",
+                "shadowDistance": 4,
+                "shadowOpacity": 127,
+                "smoothed": true,
+                "underlined": false,
+                "text": "Score",
+                "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
+                "textAlignment": "",
+                "verticalTextAlignment": "top",
+                "characterSize": 60,
+                "color": "72;72;79"
+              }
+            },
+            {
+              "assetStoreId": "",
+              "name": "PlayerNameInput",
+              "type": "TextInput::TextInputObject",
+              "variables": [],
+              "effects": [],
+              "behaviors": [
+                {
+                  "name": "Anchor",
+                  "type": "AnchorBehavior::AnchorBehavior",
+                  "bottomEdgeAnchor": 0,
+                  "leftEdgeAnchor": 1,
+                  "relativeToOriginalWindowSize": true,
+                  "rightEdgeAnchor": 2,
+                  "topEdgeAnchor": 0,
+                  "useLegacyBottomAndRightAnchors": false
+                }
+              ],
+              "content": {
+                "initialValue": "",
+                "placeholder": "PlayerName",
+                "fontResourceName": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
+                "fontSize": 40,
+                "inputType": "text",
+                "textColor": "72;72;79",
+                "fillColor": "231;232;243",
+                "fillOpacity": 255,
+                "borderColor": "255;255;255",
+                "borderOpacity": 255,
+                "borderWidth": 6,
+                "readOnly": false,
+                "disabled": false
+              }
+            },
+            {
+              "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
+              "name": "SubmitButton",
+              "type": "PanelSpriteButton::PanelSpriteButton",
+              "variant": "",
+              "variables": [],
+              "effects": [],
+              "behaviors": [
+                {
+                  "name": "Anchor",
+                  "type": "AnchorBehavior::AnchorBehavior",
+                  "bottomEdgeAnchor": 0,
+                  "leftEdgeAnchor": 0,
+                  "relativeToOriginalWindowSize": true,
+                  "rightEdgeAnchor": 2,
+                  "topEdgeAnchor": 0,
+                  "useLegacyBottomAndRightAnchors": false
+                }
+              ],
+              "content": {
+                "LeftPadding": 16,
+                "RightPadding": 16,
+                "PressedLabelOffsetY": 10,
+                "BottomPadding": 32,
+                "TopPadding": 16,
+                "HoveredFadeOutDuration": 0.25
+              },
+              "childrenContent": {
+                "Hovered": {
+                  "bottomMargin": 32,
+                  "height": 106,
+                  "leftMargin": 16,
+                  "rightMargin": 16,
+                  "texture": "Yellow Button_Hovered.png",
+                  "tiled": true,
+                  "topMargin": 16,
+                  "width": 256
+                },
+                "Idle": {
+                  "bottomMargin": 32,
+                  "height": 106,
+                  "leftMargin": 16,
+                  "rightMargin": 16,
+                  "texture": "Yellow Button_Idle.png",
+                  "tiled": true,
+                  "topMargin": 16,
+                  "width": 256
+                },
+                "Label": {
+                  "bold": false,
+                  "italic": false,
+                  "smoothed": true,
+                  "underlined": false,
+                  "string": "Send",
+                  "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
+                  "textAlignment": "center",
+                  "characterSize": 60,
+                  "color": {
+                    "b": 42,
+                    "g": 87,
+                    "r": 139
+                  },
+                  "content": {
+                    "bold": false,
+                    "isOutlineEnabled": false,
+                    "isShadowEnabled": false,
+                    "italic": false,
+                    "outlineColor": "255;255;255",
+                    "outlineThickness": 2,
+                    "shadowAngle": 90,
+                    "shadowBlurRadius": 2,
+                    "shadowColor": "0;0;0",
+                    "shadowDistance": 4,
+                    "shadowOpacity": 127,
+                    "smoothed": true,
+                    "underlined": false,
+                    "text": "Send",
+                    "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
+                    "textAlignment": "center",
+                    "verticalTextAlignment": "top",
+                    "characterSize": 60,
+                    "color": "139;87;42"
+                  }
+                },
+                "Pressed": {
+                  "bottomMargin": 16,
+                  "height": 106,
+                  "leftMargin": 16,
+                  "rightMargin": 16,
+                  "texture": "Yellow Button_Pressed.png",
+                  "tiled": true,
+                  "topMargin": 32,
+                  "width": 256
+                }
+              }
+            },
+            {
+              "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
+              "name": "RestartButton",
+              "type": "PanelSpriteButton::PanelSpriteButton",
+              "variant": "",
+              "variables": [],
+              "effects": [],
+              "behaviors": [
+                {
+                  "name": "Anchor",
+                  "type": "AnchorBehavior::AnchorBehavior",
+                  "bottomEdgeAnchor": 2,
+                  "leftEdgeAnchor": 4,
+                  "relativeToOriginalWindowSize": true,
+                  "rightEdgeAnchor": 4,
+                  "topEdgeAnchor": 0,
+                  "useLegacyBottomAndRightAnchors": false
+                }
+              ],
+              "content": {
+                "LeftPadding": 16,
+                "RightPadding": 16,
+                "PressedLabelOffsetY": 10,
+                "BottomPadding": 32,
+                "TopPadding": 16,
+                "HoveredFadeOutDuration": 0.25
+              },
+              "childrenContent": {
+                "Hovered": {
+                  "bottomMargin": 32,
+                  "height": 106,
+                  "leftMargin": 16,
+                  "rightMargin": 16,
+                  "texture": "Yellow Button_Hovered.png",
+                  "tiled": true,
+                  "topMargin": 16,
+                  "width": 256
+                },
+                "Idle": {
+                  "bottomMargin": 32,
+                  "height": 106,
+                  "leftMargin": 16,
+                  "rightMargin": 16,
+                  "texture": "Yellow Button_Idle.png",
+                  "tiled": true,
+                  "topMargin": 16,
+                  "width": 256
+                },
+                "Label": {
+                  "bold": false,
+                  "italic": false,
+                  "smoothed": true,
+                  "underlined": false,
+                  "string": "Restart",
+                  "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
+                  "textAlignment": "center",
+                  "characterSize": 60,
+                  "color": {
+                    "b": 42,
+                    "g": 87,
+                    "r": 139
+                  },
+                  "content": {
+                    "bold": false,
+                    "isOutlineEnabled": false,
+                    "isShadowEnabled": false,
+                    "italic": false,
+                    "outlineColor": "255;255;255",
+                    "outlineThickness": 2,
+                    "shadowAngle": 90,
+                    "shadowBlurRadius": 2,
+                    "shadowColor": "0;0;0",
+                    "shadowDistance": 4,
+                    "shadowOpacity": 127,
+                    "smoothed": true,
+                    "underlined": false,
+                    "text": "Restart",
+                    "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
+                    "textAlignment": "center",
+                    "verticalTextAlignment": "top",
+                    "characterSize": 60,
+                    "color": "139;87;42"
+                  }
+                },
+                "Pressed": {
+                  "bottomMargin": 16,
+                  "height": 106,
+                  "leftMargin": 16,
+                  "rightMargin": 16,
+                  "texture": "Yellow Button_Pressed.png",
+                  "tiled": true,
+                  "topMargin": 32,
+                  "width": 256
+                }
+              }
+            },
+            {
+              "assetStoreId": "",
+              "bottomMargin": 32,
+              "height": 128,
+              "leftMargin": 16,
+              "name": "Panel",
+              "rightMargin": 16,
+              "texture": "assets\\Grey Button_Idle.png",
+              "tiled": false,
+              "topMargin": 16,
+              "type": "PanelSpriteObject::PanelSprite",
+              "width": 128,
+              "variables": [],
+              "effects": [],
+              "behaviors": [
+                {
+                  "name": "Anchor",
+                  "type": "AnchorBehavior::AnchorBehavior",
+                  "bottomEdgeAnchor": 2,
+                  "leftEdgeAnchor": 1,
+                  "relativeToOriginalWindowSize": true,
+                  "rightEdgeAnchor": 2,
+                  "topEdgeAnchor": 1,
+                  "useLegacyBottomAndRightAnchors": false
+                }
+              ]
+            }
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "ScoreLabel"
+              },
+              {
+                "objectName": "PlayerNameInput"
+              },
+              {
+                "objectName": "SubmitButton"
+              },
+              {
+                "objectName": "RestartButton"
+              },
+              {
+                "objectName": "Panel"
+              }
+            ]
+          },
+          "objectsGroups": [],
+          "layers": [
+            {
+              "ambientLightColorB": 200,
+              "ambientLightColorG": 200,
+              "ambientLightColorR": 200,
+              "camera3DFarPlaneDistance": 10000,
+              "camera3DFieldOfView": 45,
+              "camera3DNearPlaneDistance": 3,
+              "cameraType": "",
+              "followBaseLayerCamera": false,
+              "isLightingLayer": false,
+              "isLocked": false,
+              "name": "",
+              "renderingType": "",
+              "visibility": true,
+              "cameras": [
+                {
+                  "defaultSize": true,
+                  "defaultViewport": true,
+                  "height": 0,
+                  "viewportBottom": 1,
+                  "viewportLeft": 0,
+                  "viewportRight": 1,
+                  "viewportTop": 0,
+                  "width": 0
+                }
+              ],
+              "effects": []
+            }
+          ],
+          "instances": [
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 67,
+              "layer": "",
+              "name": "ScoreLabel",
+              "persistentUuid": "e0571581-5b6f-4e0b-928a-92dd21b3851d",
+              "width": 384,
+              "x": 36,
+              "y": 41,
+              "zOrder": 18,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": true,
+              "depth": 1,
+              "height": 96,
+              "layer": "",
+              "name": "PlayerNameInput",
+              "persistentUuid": "1b66c419-4bc7-406f-91e7-7deeb515ff67",
+              "width": 360,
+              "x": 40,
+              "y": 160,
+              "zOrder": 19,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "RestartButton",
+              "persistentUuid": "d9bfca46-e22c-42c9-a581-b88dbe1f5967",
+              "width": 0,
+              "x": 224,
+              "y": 320,
+              "zOrder": 35,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": true,
+              "depth": 48,
+              "height": 106,
+              "layer": "",
+              "name": "SubmitButton",
+              "persistentUuid": "3ad1036e-666f-4a8c-9b85-6d882e192ee8",
+              "width": 216,
+              "x": 432,
+              "y": 150,
+              "zOrder": 37,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": true,
+              "depth": 0,
+              "height": 480,
+              "layer": "",
+              "name": "Panel",
+              "persistentUuid": "273f403b-d896-4fa8-81bd-ef1d5d6bd006",
+              "width": 688,
+              "x": 0,
+              "y": 0,
+              "zOrder": 1,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            }
+          ],
           "eventsFunctions": [
             {
               "fullName": "",
@@ -23885,432 +24463,7 @@
               "name": "LeaderboardId"
             }
           ],
-          "objects": [
-            {
-              "assetStoreId": "",
-              "bold": false,
-              "italic": false,
-              "name": "ScoreLabel",
-              "smoothed": true,
-              "type": "TextObject::Text",
-              "underlined": false,
-              "variables": [],
-              "effects": [],
-              "behaviors": [],
-              "string": "Score",
-              "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
-              "textAlignment": "",
-              "characterSize": 60,
-              "color": {
-                "b": 79,
-                "g": 72,
-                "r": 72
-              },
-              "content": {
-                "bold": false,
-                "isOutlineEnabled": false,
-                "isShadowEnabled": false,
-                "italic": false,
-                "outlineColor": "255;255;255",
-                "outlineThickness": 2,
-                "shadowAngle": 90,
-                "shadowBlurRadius": 2,
-                "shadowColor": "0;0;0",
-                "shadowDistance": 4,
-                "shadowOpacity": 127,
-                "smoothed": true,
-                "underlined": false,
-                "text": "Score",
-                "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
-                "textAlignment": "",
-                "verticalTextAlignment": "top",
-                "characterSize": 60,
-                "color": "72;72;79"
-              }
-            },
-            {
-              "assetStoreId": "",
-              "name": "PlayerNameInput",
-              "type": "TextInput::TextInputObject",
-              "variables": [],
-              "effects": [],
-              "behaviors": [
-                {
-                  "name": "Anchor",
-                  "type": "AnchorBehavior::AnchorBehavior",
-                  "bottomEdgeAnchor": 0,
-                  "leftEdgeAnchor": 1,
-                  "relativeToOriginalWindowSize": true,
-                  "rightEdgeAnchor": 2,
-                  "topEdgeAnchor": 0,
-                  "useLegacyBottomAndRightAnchors": false
-                }
-              ],
-              "content": {
-                "initialValue": "",
-                "placeholder": "PlayerName",
-                "fontResourceName": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
-                "fontSize": 40,
-                "inputType": "text",
-                "textColor": "72;72;79",
-                "fillColor": "231;232;243",
-                "fillOpacity": 255,
-                "borderColor": "255;255;255",
-                "borderOpacity": 255,
-                "borderWidth": 6,
-                "readOnly": false,
-                "disabled": false
-              }
-            },
-            {
-              "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
-              "name": "SubmitButton",
-              "type": "PanelSpriteButton::PanelSpriteButton",
-              "variables": [],
-              "effects": [],
-              "behaviors": [
-                {
-                  "name": "Anchor",
-                  "type": "AnchorBehavior::AnchorBehavior",
-                  "bottomEdgeAnchor": 0,
-                  "leftEdgeAnchor": 0,
-                  "relativeToOriginalWindowSize": true,
-                  "rightEdgeAnchor": 2,
-                  "topEdgeAnchor": 0,
-                  "useLegacyBottomAndRightAnchors": false
-                }
-              ],
-              "content": {
-                "LeftPadding": 16,
-                "RightPadding": 16,
-                "PressedLabelOffsetY": 10,
-                "BottomPadding": 32,
-                "TopPadding": 16,
-                "HoveredFadeOutDuration": 0.25
-              },
-              "childrenContent": {
-                "Hovered": {
-                  "bottomMargin": 32,
-                  "height": 106,
-                  "leftMargin": 16,
-                  "rightMargin": 16,
-                  "texture": "Yellow Button_Hovered.png",
-                  "tiled": true,
-                  "topMargin": 16,
-                  "width": 256
-                },
-                "Idle": {
-                  "bottomMargin": 32,
-                  "height": 106,
-                  "leftMargin": 16,
-                  "rightMargin": 16,
-                  "texture": "Yellow Button_Idle.png",
-                  "tiled": true,
-                  "topMargin": 16,
-                  "width": 256
-                },
-                "Label": {
-                  "bold": false,
-                  "italic": false,
-                  "smoothed": true,
-                  "underlined": false,
-                  "string": "Send",
-                  "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
-                  "textAlignment": "center",
-                  "characterSize": 60,
-                  "color": {
-                    "b": 42,
-                    "g": 87,
-                    "r": 139
-                  },
-                  "content": {
-                    "bold": false,
-                    "isOutlineEnabled": false,
-                    "isShadowEnabled": false,
-                    "italic": false,
-                    "outlineColor": "255;255;255",
-                    "outlineThickness": 2,
-                    "shadowAngle": 90,
-                    "shadowBlurRadius": 2,
-                    "shadowColor": "0;0;0",
-                    "shadowDistance": 4,
-                    "shadowOpacity": 127,
-                    "smoothed": true,
-                    "underlined": false,
-                    "text": "Send",
-                    "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
-                    "textAlignment": "center",
-                    "verticalTextAlignment": "top",
-                    "characterSize": 60,
-                    "color": "139;87;42"
-                  }
-                },
-                "Pressed": {
-                  "bottomMargin": 16,
-                  "height": 106,
-                  "leftMargin": 16,
-                  "rightMargin": 16,
-                  "texture": "Yellow Button_Pressed.png",
-                  "tiled": true,
-                  "topMargin": 32,
-                  "width": 256
-                }
-              }
-            },
-            {
-              "assetStoreId": "bfab3a269992cf43081e2cb8053c28aaef11f2f9e0d0cbdc00207ea271f69c2c",
-              "name": "RestartButton",
-              "type": "PanelSpriteButton::PanelSpriteButton",
-              "variables": [],
-              "effects": [],
-              "behaviors": [
-                {
-                  "name": "Anchor",
-                  "type": "AnchorBehavior::AnchorBehavior",
-                  "bottomEdgeAnchor": 2,
-                  "leftEdgeAnchor": 4,
-                  "relativeToOriginalWindowSize": true,
-                  "rightEdgeAnchor": 4,
-                  "topEdgeAnchor": 0,
-                  "useLegacyBottomAndRightAnchors": false
-                }
-              ],
-              "content": {
-                "LeftPadding": 16,
-                "RightPadding": 16,
-                "PressedLabelOffsetY": 10,
-                "BottomPadding": 32,
-                "TopPadding": 16,
-                "HoveredFadeOutDuration": 0.25
-              },
-              "childrenContent": {
-                "Hovered": {
-                  "bottomMargin": 32,
-                  "height": 106,
-                  "leftMargin": 16,
-                  "rightMargin": 16,
-                  "texture": "Yellow Button_Hovered.png",
-                  "tiled": true,
-                  "topMargin": 16,
-                  "width": 256
-                },
-                "Idle": {
-                  "bottomMargin": 32,
-                  "height": 106,
-                  "leftMargin": 16,
-                  "rightMargin": 16,
-                  "texture": "Yellow Button_Idle.png",
-                  "tiled": true,
-                  "topMargin": 16,
-                  "width": 256
-                },
-                "Label": {
-                  "bold": false,
-                  "italic": false,
-                  "smoothed": true,
-                  "underlined": false,
-                  "string": "Restart",
-                  "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
-                  "textAlignment": "center",
-                  "characterSize": 60,
-                  "color": {
-                    "b": 42,
-                    "g": 87,
-                    "r": 139
-                  },
-                  "content": {
-                    "bold": false,
-                    "isOutlineEnabled": false,
-                    "isShadowEnabled": false,
-                    "italic": false,
-                    "outlineColor": "255;255;255",
-                    "outlineThickness": 2,
-                    "shadowAngle": 90,
-                    "shadowBlurRadius": 2,
-                    "shadowColor": "0;0;0",
-                    "shadowDistance": 4,
-                    "shadowOpacity": 127,
-                    "smoothed": true,
-                    "underlined": false,
-                    "text": "Restart",
-                    "font": "3bd40ac788d44626fd640ec67ef04ab0364816b5e8c831f2077bff8805cfe689_Roboto-Bold.ttf",
-                    "textAlignment": "center",
-                    "verticalTextAlignment": "top",
-                    "characterSize": 60,
-                    "color": "139;87;42"
-                  }
-                },
-                "Pressed": {
-                  "bottomMargin": 16,
-                  "height": 106,
-                  "leftMargin": 16,
-                  "rightMargin": 16,
-                  "texture": "Yellow Button_Pressed.png",
-                  "tiled": true,
-                  "topMargin": 32,
-                  "width": 256
-                }
-              }
-            },
-            {
-              "assetStoreId": "",
-              "bottomMargin": 32,
-              "height": 128,
-              "leftMargin": 16,
-              "name": "Panel",
-              "rightMargin": 16,
-              "texture": "assets\\Grey Button_Idle.png",
-              "tiled": false,
-              "topMargin": 16,
-              "type": "PanelSpriteObject::PanelSprite",
-              "width": 128,
-              "variables": [],
-              "effects": [],
-              "behaviors": [
-                {
-                  "name": "Anchor",
-                  "type": "AnchorBehavior::AnchorBehavior",
-                  "bottomEdgeAnchor": 2,
-                  "leftEdgeAnchor": 1,
-                  "relativeToOriginalWindowSize": true,
-                  "rightEdgeAnchor": 2,
-                  "topEdgeAnchor": 1,
-                  "useLegacyBottomAndRightAnchors": false
-                }
-              ]
-            }
-          ],
-          "objectsFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "objectName": "ScoreLabel"
-              },
-              {
-                "objectName": "PlayerNameInput"
-              },
-              {
-                "objectName": "SubmitButton"
-              },
-              {
-                "objectName": "RestartButton"
-              },
-              {
-                "objectName": "Panel"
-              }
-            ]
-          },
-          "objectsGroups": [],
-          "layers": [
-            {
-              "ambientLightColorB": 200,
-              "ambientLightColorG": 200,
-              "ambientLightColorR": 200,
-              "camera3DFarPlaneDistance": 10000,
-              "camera3DFieldOfView": 45,
-              "camera3DNearPlaneDistance": 3,
-              "cameraType": "",
-              "followBaseLayerCamera": false,
-              "isLightingLayer": false,
-              "isLocked": false,
-              "name": "",
-              "renderingType": "",
-              "visibility": true,
-              "cameras": [
-                {
-                  "defaultSize": true,
-                  "defaultViewport": true,
-                  "height": 0,
-                  "viewportBottom": 1,
-                  "viewportLeft": 0,
-                  "viewportRight": 1,
-                  "viewportTop": 0,
-                  "width": 0
-                }
-              ],
-              "effects": []
-            }
-          ],
-          "instances": [
-            {
-              "angle": 0,
-              "customSize": false,
-              "height": 67,
-              "layer": "",
-              "name": "ScoreLabel",
-              "persistentUuid": "e0571581-5b6f-4e0b-928a-92dd21b3851d",
-              "width": 384,
-              "x": 36,
-              "y": 41,
-              "zOrder": 18,
-              "numberProperties": [],
-              "stringProperties": [],
-              "initialVariables": []
-            },
-            {
-              "angle": 0,
-              "customSize": true,
-              "depth": 1,
-              "height": 96,
-              "layer": "",
-              "name": "PlayerNameInput",
-              "persistentUuid": "1b66c419-4bc7-406f-91e7-7deeb515ff67",
-              "width": 360,
-              "x": 40,
-              "y": 160,
-              "zOrder": 19,
-              "numberProperties": [],
-              "stringProperties": [],
-              "initialVariables": []
-            },
-            {
-              "angle": 0,
-              "customSize": false,
-              "height": 0,
-              "layer": "",
-              "name": "RestartButton",
-              "persistentUuid": "d9bfca46-e22c-42c9-a581-b88dbe1f5967",
-              "width": 0,
-              "x": 224,
-              "y": 320,
-              "zOrder": 35,
-              "numberProperties": [],
-              "stringProperties": [],
-              "initialVariables": []
-            },
-            {
-              "angle": 0,
-              "customSize": true,
-              "depth": 48,
-              "height": 106,
-              "layer": "",
-              "name": "SubmitButton",
-              "persistentUuid": "3ad1036e-666f-4a8c-9b85-6d882e192ee8",
-              "width": 216,
-              "x": 432,
-              "y": 150,
-              "zOrder": 37,
-              "numberProperties": [],
-              "stringProperties": [],
-              "initialVariables": []
-            },
-            {
-              "angle": 0,
-              "customSize": true,
-              "depth": 0,
-              "height": 480,
-              "layer": "",
-              "name": "Panel",
-              "persistentUuid": "273f403b-d896-4fa8-81bd-ef1d5d6bd006",
-              "width": 688,
-              "x": 0,
-              "y": 0,
-              "zOrder": 1,
-              "numberProperties": [],
-              "stringProperties": [],
-              "initialVariables": []
-            }
-          ]
+          "variants": []
         }
       ]
     }
