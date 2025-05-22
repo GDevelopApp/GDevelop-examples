@@ -233,6 +233,11 @@ const sortedStartingPointConfigs = [
   { slug: 'starting-3D-platformer', title: '3D Platformer' },
   { slug: 'starting-first-person', title: '3D First Person' },
   { slug: 'starting-3d-driving', title: '3D Driving' },
+  {
+    slug: 'starting-point-and-click',
+    pixelArtSlug: 'starting-point-and-click-pixel',
+    title: 'Point and Click',
+  },
 ];
 const sortedStartingPointSlugs = new Set(
   sortedStartingPointConfigs.map(({ slug }) => slug)
