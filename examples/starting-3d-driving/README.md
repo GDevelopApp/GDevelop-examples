@@ -1,1 +1,1 @@
-Starting point for a physics game, optimized for pixel art.
+Starting point for a 3D physics car game.
