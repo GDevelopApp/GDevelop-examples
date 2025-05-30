@@ -180,9 +180,9 @@
               "massOverride": 0,
               "density": 1,
               "friction": 7,
-              "restitution": 0.01,
-              "linearDamping": 0.01,
-              "angularDamping": 0.01,
+              "restitution": 0,
+              "linearDamping": 0,
+              "angularDamping": 0,
               "gravityScale": 1,
               "layers": 17,
               "masks": 17
@@ -194,8 +194,9 @@
             }
           ],
           "content": {
-            "FieldDimensionX": 65,
-            "FieldDimensionY": 65
+            "FieldDimensionX": 54,
+            "FieldDimensionY": 54,
+            "Color": "54;37;19"
           }
         },
         {
@@ -319,7 +320,7 @@
               "wheelOffsetY": 0,
               "wheelOffsetZ": 0,
               "wheelRadius": 6,
-              "wheelWidth": 4,
+              "wheelWidth": 5,
               "brakeTorqueMax": 3000,
               "handBrakeTorqueMax": 6000,
               "hasBackWheelDrive": true,
@@ -439,6 +440,8 @@
               "IsElevatingWithObject": false
             },
             {
+              "name": "TopDownMovement",
+              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
               "acceleration": 1000,
               "allowDiagonals": true,
               "angleOffset": 0,
@@ -448,9 +451,7 @@
               "ignoreDefaultControls": false,
               "maxSpeed": 10000,
               "movementAngleOffset": 0,
-              "name": "TopDownMovement",
               "rotateObject": false,
-              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
               "viewpoint": "TopDown"
             }
           ],
@@ -479,9 +480,9 @@
           "effects": [],
           "behaviors": [],
           "content": {
-            "FieldDimensionX": 33,
-            "FieldDimensionY": 33,
-            "Color": "255;255;255"
+            "FieldDimensionX": 26,
+            "FieldDimensionY": 26,
+            "Color": "54;37;19"
           }
         }
       ],
@@ -549,7 +550,7 @@
                   "parameters": [
                     "TileSize",
                     "=",
-                    "2048"
+                    "4000"
                   ]
                 },
                 {
@@ -667,13 +668,23 @@
                   "parameters": [
                     "NearHeightMap3D",
                     "Resizable",
-                    "TileSize",
-                    "TileSize"
+                    "TileSize + 240",
+                    "TileSize + 240"
                   ]
                 },
                 {
                   "type": {
                     "value": "EndlessTerrain::UpdateTerrain"
+                  },
+                  "parameters": [
+                    "",
+                    "NearHeightMap3D",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "EndlessTerrain::SmoothTerrainBorders"
                   },
                   "parameters": [
                     "",
@@ -860,7 +871,7 @@
                     "Car",
                     "Object3D",
                     "=",
-                    "500"
+                    "1000"
                   ]
                 }
               ]
@@ -890,7 +901,7 @@
                     "Car",
                     "Object3D",
                     "=",
-                    "500"
+                    "1000"
                   ]
                 },
                 {
@@ -1245,6 +1256,16 @@
                         "=",
                         "NewPlayerTileX"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"Roll: \" + NewPlayerTileX + \" \" + NewPlayerTileY",
+                        "\"info\"",
+                        ""
+                      ]
                     }
                   ]
                 }
@@ -1403,6 +1424,16 @@
                         "TileY",
                         "=",
                         "NewPlayerTileY"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "\"Roll: \" + NewPlayerTileX + \" \" + NewPlayerTileY",
+                        "\"info\"",
+                        ""
                       ]
                     }
                   ]
@@ -1614,6 +1645,7 @@
                 "        this.vertices = geometry.attributes.position.array;",
                 "        this.mesh = new THREE.Mesh(",
                 "            geometry,",
+                "            //new THREE.MeshStandardMaterial({color: 255 * Math.random()})",
                 "            new THREE.MeshStandardMaterial({color: gdjs.rgbOrHexStringToNumber(color)})",
                 "        );",
                 "        this.mesh.rotation.order = 'ZYX';",
@@ -1693,18 +1725,19 @@
                 "    updateIfNeeded() {",
                 "        if (this.heightMap.isDirty) {",
                 "            this.physics.recreateBody();",
+                "",
+                "            // const body = this.physics._body;",
+                "            // console.log(",
+                "            //     \"AABB\",",
+                "            //     body.GetWorldSpaceBounds().get_mMin().GetX(),",
+                "            //     body.GetWorldSpaceBounds().get_mMin().GetY(),",
+                "            //     body.GetWorldSpaceBounds().get_mMin().GetZ(),",
+                "            //     \"to\",",
+                "            //     body.GetWorldSpaceBounds().get_mMax().GetX(),",
+                "            //     body.GetWorldSpaceBounds().get_mMax().GetY(),",
+                "            //     body.GetWorldSpaceBounds().get_mMax().GetZ()",
+                "            // );",
                 "        }",
-                "        const body = this.physics._body;",
-                "        // console.log(",
-                "        //     \"AABB\",",
-                "        //     body.GetWorldSpaceBounds().get_mMin().GetX(),",
-                "        //     body.GetWorldSpaceBounds().get_mMin().GetY(),",
-                "        //     body.GetWorldSpaceBounds().get_mMin().GetZ(),",
-                "        //     \"to\",",
-                "        //     body.GetWorldSpaceBounds().get_mMax().GetX(),",
-                "        //     body.GetWorldSpaceBounds().get_mMax().GetY(),",
-                "        //     body.GetWorldSpaceBounds().get_mMax().GetZ()",
-                "        // );",
                 "    }",
                 "",
                 "    /**",
@@ -1738,16 +1771,16 @@
                 "        }",
                 "        const shape = shapeSettings.Create().Get();",
                 "",
-                "        console.log(",
-                "            \"Shape local AABB\",",
-                "            shape.GetLocalBounds().get_mMin().GetX(),",
-                "            shape.GetLocalBounds().get_mMin().GetY(),",
-                "            shape.GetLocalBounds().get_mMin().GetZ(),",
-                "            \"to\",",
-                "            shape.GetLocalBounds().get_mMax().GetX(),",
-                "            shape.GetLocalBounds().get_mMax().GetY(),",
-                "            shape.GetLocalBounds().get_mMax().GetZ()",
-                "        );",
+                "        // console.log(",
+                "        //     \"Shape local AABB\",",
+                "        //     shape.GetLocalBounds().get_mMin().GetX(),",
+                "        //     shape.GetLocalBounds().get_mMin().GetY(),",
+                "        //     shape.GetLocalBounds().get_mMin().GetZ(),",
+                "        //     \"to\",",
+                "        //     shape.GetLocalBounds().get_mMax().GetX(),",
+                "        //     shape.GetLocalBounds().get_mMax().GetY(),",
+                "        //     shape.GetLocalBounds().get_mMax().GetZ()",
+                "        // );",
                 "        ",
                 "        const position = physics._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0));",
                 "        const rotation = this._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1));",
@@ -10859,11 +10892,32 @@
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
-                  "actions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DimX",
+                        "=",
+                        "Object.FieldDimensionX()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DimY",
+                        "=",
+                        "Object.FieldDimensionY()"
+                      ]
+                    }
+                  ],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Repeat",
-                      "repeatExpression": "Object.FieldDimensionY()",
+                      "repeatExpression": "DimY",
                       "conditions": [],
                       "actions": [
                         {
@@ -10880,7 +10934,7 @@
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "Object.FieldDimensionX()",
+                          "repeatExpression": "DimX",
                           "conditions": [],
                           "actions": [
                             {
@@ -10890,20 +10944,10 @@
                               "parameters": [
                                 "Object",
                                 "=",
-                                "1600 * Noise::Noise2d(\"Terrain\", Object.X() + Object.Width() * IndexX / (Object.FieldDimensionX() - 1), Object.Y() + Object.Height() * IndexY / (Object.FieldDimensionY() - 1))",
+                                "1600 * Noise::Noise2d(\"Terrain\", Object.X() + Object.Width() * IndexX / (DimX - 1), Object.Y() + Object.Height() * IndexY / (DimY - 1))",
                                 "IndexX",
                                 "IndexY",
                                 ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SetNumberVariable"
-                              },
-                              "parameters": [
-                                "IndexX",
-                                "+",
-                                "1"
                               ]
                             }
                           ],
@@ -10924,6 +10968,22 @@
                                     "IndexX",
                                     "IndexY",
                                     ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "IndexX",
+                                    "+",
+                                    "1"
                                   ]
                                 }
                               ]
@@ -10957,6 +11017,286 @@
                     },
                     {
                       "name": "IndexY",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "name": "DimX",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "name": "DimY",
+                      "type": "number",
+                      "value": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "HeightMap3D::HeightMap3D",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "Smooth terrain borders",
+          "functionType": "Action",
+          "name": "SmoothTerrainBorders",
+          "sentence": "Smooth terrain borders of _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DimX",
+                        "=",
+                        "Object.FieldDimensionX()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "DimY",
+                        "=",
+                        "Object.FieldDimensionY()"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Repeat",
+                      "repeatExpression": "DimY",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "IndexX",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Repeat",
+                          "repeatExpression": "DimX",
+                          "conditions": [],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "IndexX",
+                                        "=",
+                                        "0"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "IndexY",
+                                        "=",
+                                        "0"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "IndexX",
+                                        "=",
+                                        "DimX - 1"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "IndexY",
+                                        "=",
+                                        "DimY - 1"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "HeightMap3D::HeightMap3D::SetGridValue"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "-",
+                                    "10",
+                                    "IndexX",
+                                    "IndexY",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "IndexX",
+                                        "=",
+                                        "1"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "IndexY",
+                                        "=",
+                                        "1"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "IndexX",
+                                        "=",
+                                        "DimX - 2"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "IndexY",
+                                        "=",
+                                        "DimY - 2"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "HeightMap3D::HeightMap3D::SetGridValue"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "-",
+                                    "10",
+                                    "IndexX",
+                                    "IndexY",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "IndexX",
+                                    "+",
+                                    "1"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "IndexY",
+                                "+",
+                                "1"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "name": "IndexX",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "name": "IndexY",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "name": "DimX",
+                      "type": "number",
+                      "value": 0
+                    },
+                    {
+                      "name": "DimY",
                       "type": "number",
                       "value": 0
                     }
