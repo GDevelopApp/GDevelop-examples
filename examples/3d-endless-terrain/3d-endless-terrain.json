@@ -194,8 +194,8 @@
             }
           ],
           "content": {
-            "FieldDimensionX": 54,
-            "FieldDimensionY": 54,
+            "FieldDimensionX": 52,
+            "FieldDimensionY": 52,
             "Color": "54;37;19"
           }
         },
@@ -668,8 +668,8 @@
                   "parameters": [
                     "NearHeightMap3D",
                     "Resizable",
-                    "TileSize + 240",
-                    "TileSize + 240"
+                    "TileSize + 160",
+                    "TileSize + 160"
                   ]
                 },
                 {
@@ -689,6 +689,7 @@
                   "parameters": [
                     "",
                     "NearHeightMap3D",
+                    "1",
                     ""
                   ]
                 }
@@ -842,6 +843,17 @@
                   "parameters": [
                     "",
                     "FarHeightMap3D",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "EndlessTerrain::SmoothTerrainBorders"
+                  },
+                  "parameters": [
+                    "",
+                    "FarHeightMap3D",
+                    "100",
                     ""
                   ]
                 }
@@ -1165,6 +1177,26 @@
                     },
                     {
                       "type": {
+                        "value": "EndlessTerrain::SmoothTerrainBorders"
+                      },
+                      "parameters": [
+                        "",
+                        "NearHeightMap3D",
+                        "1",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HeightMap3D::HeightMap3D::ForceUpdate"
+                      },
+                      "parameters": [
+                        "NearHeightMap3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
                         "value": "MettreX"
                       },
                       "parameters": [
@@ -1222,6 +1254,26 @@
                     },
                     {
                       "type": {
+                        "value": "EndlessTerrain::SmoothTerrainBorders"
+                      },
+                      "parameters": [
+                        "",
+                        "NearHeightMap3D",
+                        "1",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HeightMap3D::HeightMap3D::ForceUpdate"
+                      },
+                      "parameters": [
+                        "NearHeightMap3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
                         "value": "MettreX"
                       },
                       "parameters": [
@@ -1242,6 +1294,26 @@
                       },
                       "parameters": [
                         "",
+                        "FarHeightMap3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "EndlessTerrain::SmoothTerrainBorders"
+                      },
+                      "parameters": [
+                        "",
+                        "FarHeightMap3D",
+                        "100",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HeightMap3D::HeightMap3D::ForceUpdate"
+                      },
+                      "parameters": [
                         "FarHeightMap3D",
                         ""
                       ]
@@ -1334,6 +1406,26 @@
                     },
                     {
                       "type": {
+                        "value": "EndlessTerrain::SmoothTerrainBorders"
+                      },
+                      "parameters": [
+                        "",
+                        "NearHeightMap3D",
+                        "1",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HeightMap3D::HeightMap3D::ForceUpdate"
+                      },
+                      "parameters": [
+                        "NearHeightMap3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
                         "value": "MettreY"
                       },
                       "parameters": [
@@ -1391,6 +1483,26 @@
                     },
                     {
                       "type": {
+                        "value": "EndlessTerrain::SmoothTerrainBorders"
+                      },
+                      "parameters": [
+                        "",
+                        "NearHeightMap3D",
+                        "1",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HeightMap3D::HeightMap3D::ForceUpdate"
+                      },
+                      "parameters": [
+                        "NearHeightMap3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
                         "value": "MettreY"
                       },
                       "parameters": [
@@ -1411,6 +1523,26 @@
                       },
                       "parameters": [
                         "",
+                        "FarHeightMap3D",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "EndlessTerrain::SmoothTerrainBorders"
+                      },
+                      "parameters": [
+                        "",
+                        "FarHeightMap3D",
+                        "100",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "HeightMap3D::HeightMap3D::ForceUpdate"
+                      },
+                      "parameters": [
                         "FarHeightMap3D",
                         ""
                       ]
@@ -1460,7 +1592,7 @@
           "ambientLightColorB": 200,
           "ambientLightColorG": 200,
           "ambientLightColorR": 200,
-          "camera3DFarPlaneDistance": 50000,
+          "camera3DFarPlaneDistance": 20000,
           "camera3DFieldOfView": 45,
           "camera3DNearPlaneDistance": 30,
           "cameraType": "",
@@ -1664,16 +1796,21 @@
                 "        // );",
                 "    }",
                 "",
-                "    updateIfNeeded() {",
-                "        if (this.hasChangedThisFrame) {",
-                "            this.hasChangedThisFrame = false;",
-                "            this.isDirty = true;",
+                "    forceUpdate() {",
+                "        if (this.hasChangedThisFrame || this.isDirty) {",
+                "            this.isDirty = false;",
+                "            this.mesh.geometry.attributes.position.needsUpdate = true;",
+                "            this.mesh.geometry.computeVertexNormals();",
                 "        }",
+                "    }",
+                "",
+                "    updateIfNeeded() {",
                 "        if (this.isDirty && !this.object.isHidden()) {",
                 "            this.isDirty = false;",
                 "            this.mesh.geometry.attributes.position.needsUpdate = true;",
                 "            this.mesh.geometry.computeVertexNormals();",
                 "        }",
+                "        this.hasChangedThisFrame = false;",
                 "    }",
                 "",
                 "    /**",
@@ -1684,6 +1821,7 @@
                 "    setGridValue(indexX, indexY, value) {",
                 "        this.vertices[this.getVerticeZIndex(indexX, indexY)] = value;",
                 "        this.hasChangedThisFrame = true;",
+                "        this.isDirty = true;",
                 "    }",
                 "",
                 "    /**",
@@ -2214,6 +2352,36 @@
                     "const object = objects[0];\r",
                     "\r",
                     "object.__heightMap3DExtension.heightMap.updateIfNeeded();\r",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "HeightMap3D::HeightMap3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Update height map",
+              "functionType": "Action",
+              "name": "ForceUpdate",
+              "sentence": "Update height map of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.CustomRuntimeObject} */",
+                    "const object = objects[0];",
+                    "",
+                    "eventsFunctionContext.returnValue = object.__heightMap3DExtension.heightMap.forceUpdate();",
                     ""
                   ],
                   "parameterObjects": "Object",
@@ -11051,10 +11219,10 @@
           "objectGroups": []
         },
         {
-          "fullName": "Smooth terrain borders",
+          "fullName": "Move down terrain borders",
           "functionType": "Action",
           "name": "SmoothTerrainBorders",
-          "sentence": "Smooth terrain borders of _PARAM1_",
+          "sentence": "Move down terrain borders of _PARAM1_ by _PARAM2_",
           "events": [
             {
               "type": "BuiltinCommonInstructions::ForEach",
@@ -11171,75 +11339,7 @@
                                   "parameters": [
                                     "Object",
                                     "-",
-                                    "10",
-                                    "IndexX",
-                                    "IndexY",
-                                    ""
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "BuiltinCommonInstructions::Or"
-                                  },
-                                  "parameters": [],
-                                  "subInstructions": [
-                                    {
-                                      "type": {
-                                        "value": "NumberVariable"
-                                      },
-                                      "parameters": [
-                                        "IndexX",
-                                        "=",
-                                        "1"
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "NumberVariable"
-                                      },
-                                      "parameters": [
-                                        "IndexY",
-                                        "=",
-                                        "1"
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "NumberVariable"
-                                      },
-                                      "parameters": [
-                                        "IndexX",
-                                        "=",
-                                        "DimX - 2"
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "NumberVariable"
-                                      },
-                                      "parameters": [
-                                        "IndexY",
-                                        "=",
-                                        "DimY - 2"
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "HeightMap3D::HeightMap3D::SetGridValue"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "-",
-                                    "10",
+                                    "DeltaHeight",
                                     "IndexX",
                                     "IndexY",
                                     ""
@@ -11316,6 +11416,11 @@
               "name": "Object",
               "supplementaryInformation": "HeightMap3D::HeightMap3D",
               "type": "objectList"
+            },
+            {
+              "description": "Border delta height",
+              "name": "DeltaHeight",
+              "type": "expression"
             }
           ],
           "objectGroups": []
