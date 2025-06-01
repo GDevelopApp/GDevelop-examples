@@ -124,6 +124,14 @@
         "name": "assets\\Heightmap.png",
         "smoothed": true,
         "userAdded": false
+      },
+      {
+        "file": "assets/New image.png",
+        "kind": "image",
+        "metadata": "{\"extension\":\".png\",\"pskl\":{}}",
+        "name": "New image",
+        "smoothed": true,
+        "userAdded": false
       }
     ],
     "resourceFolders": []
@@ -2237,19 +2245,30 @@
         "windowMask": false
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "CameraElevationAngle",
+          "type": "number",
+          "value": 90
+        },
+        {
+          "name": "CameraRotationAngle",
+          "type": "number",
+          "value": 0
+        }
+      ],
       "instances": [
         {
           "angle": 0,
           "customSize": true,
           "depth": 64,
-          "height": 500,
+          "height": 800,
           "layer": "",
           "name": "NewHeightMap3D",
           "persistentUuid": "644853ac-2a9d-414d-86aa-a9967cf996bd",
-          "width": 500,
-          "x": 401,
-          "y": 105,
+          "width": 800,
+          "x": 251,
+          "y": -35,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -2269,7 +2288,9 @@
             "HeightMapImage": "assets\\Heightmap.png",
             "FieldDimensionX": 257,
             "FieldDimensionY": 257,
-            "WhiteValue": 100
+            "WhiteValue": 100,
+            "ImageOffsetX": 0,
+            "ImageOffsetY": 0
           }
         }
       ],
@@ -2281,7 +2302,164 @@
           }
         ]
       },
-      "events": [],
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Camera rotation",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ThirdPersonCamera::LookFromDistanceAtPosition"
+                  },
+                  "parameters": [
+                    "",
+                    "SceneWindowWidth() / 2",
+                    "SceneWindowHeight() / 2",
+                    "1200",
+                    "0",
+                    "90",
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MousePointerLock::RequestPointerLock"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonReleased"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MousePointerLock::ExitPointerLock"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CameraElevationAngle",
+                        "=",
+                        "clamp(CameraElevationAngle + MousePointerLock::MovementY() / 5, 15, 89)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CameraRotationAngle",
+                        "+",
+                        "MousePointerLock::MovementX() / 5"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::LookFromDistanceAtPosition"
+                      },
+                      "parameters": [
+                        "",
+                        "SceneWindowWidth() / 2",
+                        "SceneWindowHeight() / 2",
+                        "1200",
+                        "CameraRotationAngle",
+                        "CameraElevationAngle",
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
       "layers": [
         {
           "ambientLightColorB": 200,
@@ -2429,7 +2607,7 @@
                 "        this.mesh.rotation.order = 'ZYX';",
                 "        this.mesh.position.x = 32;",
                 "        this.mesh.position.y = 32;",
-                "        //this.mesh.scale.y = -1;",
+                "        this.mesh.scale.y = -1;",
                 "        object.get3DRendererObject().add(this.mesh);",
                 "        // // Ensure a forward compatibility when vertexColors will be set to true",
                 "        // // in the engine to allow to tint 3D custom objects.",
@@ -2488,7 +2666,7 @@
                 "     * @returns {integer}",
                 "     */",
                 "    getVerticeZIndex(indexX, indexY) {",
-                "        return 2 + 3 * (indexX + (this.dimY - 1 - indexY) * this.dimX);",
+                "        return 2 + 3 * (indexX + indexY * this.dimX);",
                 "    }",
                 "",
                 "    /**",
@@ -2586,6 +2764,9 @@
                 "            // Jolt.HeightFieldShapeConstantValues.prototype.cNoCollisionValue;",
                 "        }",
                 "        const shape = shapeSettings.Create().Get();",
+                "        Jolt.destroy(shapeSettings);",
+                "        const scaledShape = shape.ScaleShape(_sharedData.getVec3(1, 1, -1)).Get();",
+                "        ",
                 "",
                 "        // console.log(",
                 "        //     \"Shape local AABB\",",
@@ -2602,7 +2783,7 @@
                 "        const rotation = this._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1));",
                 "",
                 "        // console.log(\"position\", position.GetX(), position.GetY(), position.GetZ());",
-                "        const creationSettings = new Jolt.BodyCreationSettings(shape, position, rotation, Jolt.EMotionType_Static, physics.getBodyLayer());",
+                "        const creationSettings = new Jolt.BodyCreationSettings(scaledShape, position, rotation, Jolt.EMotionType_Static, physics.getBodyLayer());",
                 "        const body = _sharedData.bodyInterface.CreateBody(creationSettings);",
                 "        Jolt.destroy(creationSettings);",
                 "        _sharedData.bodyInterface.AddBody(",
