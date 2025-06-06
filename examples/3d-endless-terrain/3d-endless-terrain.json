@@ -1039,8 +1039,19 @@
                   "parameters": [
                     "NearHeightMap3D",
                     "Resizable",
-                    "TileSize + 160*0",
-                    "TileSize + 160*0"
+                    "TileSize",
+                    "TileSize"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetDepth"
+                  },
+                  "parameters": [
+                    "NearHeightMap3D",
+                    "Object3D",
+                    "=",
+                    "3200"
                   ]
                 },
                 {
@@ -1198,6 +1209,17 @@
                 },
                 {
                   "type": {
+                    "value": "Scene3D::Base3DBehavior::SetDepth"
+                  },
+                  "parameters": [
+                    "FarHeightMap3D",
+                    "Object3D",
+                    "=",
+                    "3200"
+                  ]
+                },
+                {
+                  "type": {
                     "value": "EndlessTerrain::UpdateTerrain"
                   },
                   "parameters": [
@@ -1234,16 +1256,36 @@
                     "TileSize / 2",
                     ""
                   ]
-                },
+                }
+              ],
+              "events": [
                 {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::SetZ"
-                  },
-                  "parameters": [
-                    "Car",
-                    "Object3D",
-                    "=",
-                    "1000"
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "PickNearest"
+                      },
+                      "parameters": [
+                        "NearHeightMap3D",
+                        "Car.X()",
+                        "Car.Y()",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Car",
+                        "Object3D",
+                        "=",
+                        "NearHeightMap3D.FieldZ(Car.X(), Car.Y())"
+                      ]
+                    }
                   ]
                 }
               ]
@@ -2261,7 +2303,7 @@
         {
           "angle": 0,
           "customSize": true,
-          "depth": 64,
+          "depth": 100,
           "height": 800,
           "layer": "",
           "name": "NewHeightMap3D",
@@ -2270,6 +2312,22 @@
           "x": 226,
           "y": -36,
           "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "New3DBox",
+          "persistentUuid": "389157a8-3aeb-4ba5-bb5c-ef228d9e8ae3",
+          "width": 0,
+          "x": 385,
+          "y": 457,
+          "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -2314,6 +2372,42 @@
             "GridDimensionY": 4,
             "Wireframe": true
           }
+        },
+        {
+          "assetStoreId": "",
+          "name": "New3DBox",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 100,
+            "height": 100,
+            "depth": 100,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Y",
+            "frontFaceResourceName": "",
+            "backFaceResourceName": "",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "",
+            "rightFaceResourceName": "",
+            "topFaceResourceName": "",
+            "bottomFaceResourceName": "",
+            "frontFaceVisible": true,
+            "backFaceVisible": false,
+            "leftFaceVisible": true,
+            "rightFaceVisible": true,
+            "topFaceVisible": true,
+            "bottomFaceVisible": true,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "materialType": "Basic",
+            "tint": "255;255;255"
+          }
         }
       ],
       "objectsFolderStructure": {
@@ -2324,6 +2418,9 @@
           },
           {
             "objectName": "NewHeightMap3D2"
+          },
+          {
+            "objectName": "New3DBox"
           }
         ]
       },
@@ -2593,6 +2690,10 @@
                 "",
                 "const vertexColors = [];",
                 "",
+                "const defaultWidth = 64;",
+                "const defaultHeight = 64;",
+                "const defaultDepth = 64;",
+                "",
                 "class HeightMap {",
                 "    /** @type {gdjs.CustomRuntimeObject3D} */",
                 "    object;",
@@ -2630,8 +2731,8 @@
                 "            new THREE.MeshStandardMaterial({ color: gdjs.rgbOrHexStringToNumber(color), wireframe })",
                 "        );",
                 "        this.mesh.rotation.order = 'ZYX';",
-                "        this.mesh.position.x = 32;",
-                "        this.mesh.position.y = 32;",
+                "        this.mesh.position.x = defaultWidth / 2;",
+                "        this.mesh.position.y = defaultHeight / 2;",
                 "        this.mesh.scale.y = -1;",
                 "        object.get3DRendererObject().add(this.mesh);",
                 "        // // Ensure a forward compatibility when vertexColors will be set to true",
@@ -2669,20 +2770,21 @@
                 "    /**",
                 "     * @param indexX {integer}",
                 "     * @param indexY {integer}",
-                "     * @param value {float}",
+                "     * @param value {float} a value between 0 and 1",
                 "     */",
                 "    setGridValue(indexX, indexY, value) {",
-                "        this.vertices[this.getVerticeZIndex(indexX, indexY)] = value;",
+                "        this.vertices[this.getVerticeZIndex(indexX, indexY)] =",
+                "            defaultDepth * gdjs.evtTools.common.clamp(0, 1, value);",
                 "        this.setAsDirty();",
                 "    }",
                 "",
                 "    /**",
                 "     * @param indexX {integer}",
                 "     * @param indexY {integer}",
-                "     * @returns {float}",
+                "     * @returns {float} a value between 0 and 1",
                 "     */",
                 "    getGridValue(indexX, indexY) {",
-                "        return this.vertices[this.getVerticeZIndex(indexX, indexY)];",
+                "        return this.vertices[this.getVerticeZIndex(indexX, indexY)] / defaultDepth;",
                 "    }",
                 "",
                 "    /**",
@@ -2697,9 +2799,9 @@
                 "    /**",
                 "     * @param pointX {float} position in the scene",
                 "     * @param pointY {float} position in the scene",
-                "     * @return {float} the field value",
+                "     * @return {float} the Z coordinate of the field point",
                 "     */",
-                "    getHeight(pointX, pointY) {",
+                "    getFieldZ(pointX, pointY) {",
                 "        const objectX = this.object.getX();",
                 "        const objectY = this.object.getY();",
                 "        const objectWidth = this.object.getWidth();",
@@ -2716,38 +2818,41 @@
                 "        const floatPartY = y - integerPartY;",
                 "        const bottomLeft = this.getGridValue(integerPartX, integerPartY + 1);",
                 "        const topRight = this.getGridValue(integerPartX + 1, integerPartY);",
+                "        let fieldValue = 0;",
                 "        if (floatPartX + floatPartY > 1) {",
                 "            // Bottom right triangle",
                 "            const bottomRight = this.getGridValue(integerPartX + 1, integerPartY + 1);",
-                "            return (floatPartX + floatPartY - 1) * bottomRight + (1 - floatPartX) * bottomLeft + (1 - floatPartY) * topRight;",
+                "            fieldValue = (floatPartX + floatPartY - 1) * bottomRight +",
+                "                (1 - floatPartX) * bottomLeft + (1 - floatPartY) * topRight;",
                 "        }",
                 "        else {",
                 "            // Top left triangle",
                 "            const topLeft = this.getGridValue(integerPartX, integerPartY);",
-                "            return (1 - floatPartX - floatPartY) * topLeft + floatPartX * topRight + floatPartY * bottomLeft;",
+                "            fieldValue = (1 - floatPartX - floatPartY) * topLeft +",
+                "                floatPartX * topRight + floatPartY * bottomLeft;",
                 "        }",
+                "        return this.object.getZ() + fieldValue * this.object.getDepth();",
                 "    }",
                 "",
                 "    /**",
                 "     * @param texture {PIXI.Texture}",
-                "     * @param blackValue {float}",
-                "     * @param whiteValue {float}",
                 "     * @param offsetX {integer}",
                 "     * @param offsetY {integer}",
                 "     */",
-                "    loadHeightMapFromTexture(texture, blackValue, whiteValue, offsetX, offsetY) {",
+                "    loadHeightMapFromTexture(texture, offsetX, offsetY) {",
                 "        const imageData = getImageData(texture, offsetX, offsetY, this.dimX, this.dimY);",
                 "        const size = this.dimX * this.dimY;",
-                "        const colorRange = 1 << 16 - 1;",
-                "        const valueRange = whiteValue - blackValue;",
-                "        const colorScale = valueRange / colorRange;",
-                "        const colorOrigin = - colorRange * blackValue / valueRange;",
+                "        const colorRange = 0xffff;",
+                "        const colorScale = defaultDepth / colorRange;",
                 "",
-                "        for (let verticeIndex = 0, colorIndex = 0; verticeIndex < 3 * size; verticeIndex += 3, colorIndex += 4) {",
+                "        for (",
+                "            let verticeIndex = 0, colorIndex = 0;",
+                "            verticeIndex < 3 * size;",
+                "            verticeIndex += 3, colorIndex += 4) {",
                 "            // Read red and green channel to workaround canvas being 8 bits.",
                 "            // Users need to convert their 16 bits grayscale images into 8 bits RGB.",
                 "            const color = 256 * imageData.data[colorIndex] + imageData.data[colorIndex + 1];",
-                "            this.vertices[verticeIndex + 2] = (color - colorOrigin) * colorScale;",
+                "            this.vertices[verticeIndex + 2] = color * colorScale;",
                 "        }",
                 "        this.setAsDirty(true);",
                 "    }",
@@ -2804,10 +2909,11 @@
                 "        const shapeSettings = new Jolt.HeightFieldShapeSettings();",
                 "        const width = object.getWidth() * _sharedData.worldInvScale;",
                 "        const height = object.getHeight() * _sharedData.worldInvScale;",
-                "        shapeSettings.mOffset.Set(-width / 2, 0, -height / 2);",
+                "        const depth = object.getDepth() * _sharedData.worldInvScale;",
+                "        shapeSettings.mOffset.Set(-width / 2, -depth / 2, -height / 2);",
                 "        shapeSettings.mScale.Set(",
                 "            width / (dimX - 1),",
-                "            1,",
+                "            object.getDepth() / defaultDepth,",
                 "            height / (dimY - 1),",
                 "        );",
                 "        // console.log(\"object\", object.getWidth(), object.getHeight());",
@@ -2815,7 +2921,10 @@
                 "        shapeSettings.mSampleCount = dimX;",
                 "        const totalSize = dimX * dimY;",
                 "        shapeSettings.mHeightSamples.resize(totalSize);",
-                "        const heightSamples = new Float32Array(Jolt.HEAPF32.buffer, Jolt.getPointer(shapeSettings.mHeightSamples.data()), totalSize);",
+                "        const heightSamples = new Float32Array(",
+                "            Jolt.HEAPF32.buffer,",
+                "            Jolt.getPointer(shapeSettings.mHeightSamples.data()),",
+                "            totalSize);",
                 "        // console.log(\"heightSamples.length\", heightSamples.length);",
                 "        for (let index = 0; index < heightSamples.length; index++) {",
                 "            heightSamples[index] = vertices[2 + 3 * index] * _sharedData.worldInvScale;",
@@ -2842,7 +2951,8 @@
                 "        const rotation = this._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1));",
                 "",
                 "        // console.log(\"position\", position.GetX(), position.GetY(), position.GetZ());",
-                "        const creationSettings = new Jolt.BodyCreationSettings(scaledShape, position, rotation, Jolt.EMotionType_Static, physics.getBodyLayer());",
+                "        const creationSettings = new Jolt.BodyCreationSettings(",
+                "            scaledShape, position, rotation, Jolt.EMotionType_Static, physics.getBodyLayer());",
                 "        const body = _sharedData.bodyInterface.CreateBody(creationSettings);",
                 "        Jolt.destroy(creationSettings);",
                 "        _sharedData.bodyInterface.AddBody(",
@@ -3132,10 +3242,10 @@
         {
           "areaMaxX": 64,
           "areaMaxY": 64,
-          "areaMaxZ": 32,
+          "areaMaxZ": 64,
           "areaMinX": 0,
           "areaMinY": 0,
-          "areaMinZ": -32,
+          "areaMinZ": 0,
           "defaultName": "",
           "description": "A height map in 3D.",
           "fullName": "3D height map",
@@ -3222,16 +3332,16 @@
           "instances": [
             {
               "angle": 0,
-              "customSize": false,
-              "height": 0,
+              "customSize": true,
+              "depth": 64,
+              "height": 64,
               "keepRatio": true,
               "layer": "",
               "name": "Placeholder",
               "persistentUuid": "fc9b8b2b-f491-40ae-a136-ad0a5165a09d",
-              "width": 0,
+              "width": 64,
               "x": 0,
               "y": 0,
-              "z": -32,
               "zOrder": 1,
               "numberProperties": [],
               "stringProperties": [],
@@ -3286,8 +3396,6 @@
                     "\r",
                     "const imageResourceName = object._getHeightMapImage();\r",
                     "if (imageResourceName) {\r",
-                    "    const blackValue = object._getBlackValue();\r",
-                    "    const whiteValue = object._getWhiteValue();\r",
                     "    const offsetX = object._getImageOffsetX();\r",
                     "    const offsetY = object._getImageOffsetY();\r",
                     "\r",
@@ -3296,7 +3404,7 @@
                     "        .getImageManager()\r",
                     "        .getPIXITexture(imageResourceName);\r",
                     "    object.__heightMap3DExtension.heightMap.loadHeightMapFromTexture(\r",
-                    "        texture, blackValue, whiteValue, offsetX, offsetY);\r",
+                    "        texture, offsetX, offsetY);\r",
                     "}"
                   ],
                   "parameterObjects": "Object",
@@ -3447,7 +3555,7 @@
               "objectGroups": []
             },
             {
-              "description": "The field value at a grid index.",
+              "description": "the field value at a grid index. The value is bewteen 0 and 1.",
               "fullName": "Grid value",
               "functionType": "ExpressionAndCondition",
               "name": "GridValue",
@@ -3544,11 +3652,11 @@
               "objectGroups": []
             },
             {
-              "description": "the field value at a given position in the scene.",
-              "fullName": "Field value",
+              "description": "the field Z at a given position in the scene.",
+              "fullName": "Field point Z",
               "functionType": "ExpressionAndCondition",
-              "name": "FieldValue",
-              "sentence": "the field value at position _PARAM1_ ; _PARAM2_",
+              "name": "FieldZ",
+              "sentence": "the field Z at position _PARAM1_ ; _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::JsCode",
@@ -3559,7 +3667,7 @@
                     "const pointX = eventsFunctionContext.getArgument(\"PointX\");",
                     "const pointY = eventsFunctionContext.getArgument(\"PointY\");",
                     "",
-                    "eventsFunctionContext.returnValue = object.__heightMap3DExtension.heightMap.getHeight(pointX, pointY);"
+                    "eventsFunctionContext.returnValue = object.__heightMap3DExtension.heightMap.getFieldZ(pointX, pointY);"
                   ],
                   "parameterObjects": "Object",
                   "useStrict": true,
@@ -3707,26 +3815,6 @@
                 "image"
               ],
               "name": "HeightMapImage"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "unit": "Pixel",
-              "label": "Height value for black",
-              "description": "",
-              "group": "Image",
-              "extraInformation": [],
-              "name": "BlackValue"
-            },
-            {
-              "value": "1000",
-              "type": "Number",
-              "unit": "Pixel",
-              "label": "Height value for white",
-              "description": "",
-              "group": "Image",
-              "extraInformation": [],
-              "name": "WhiteValue"
             },
             {
               "value": "0",
@@ -12011,7 +12099,7 @@
                               "parameters": [
                                 "Object",
                                 "=",
-                                "1600 * Noise::Noise2d(\"Terrain\", Object.X() + Object.Width() * IndexX / (DimX - 1), Object.Y() + Object.Height() * IndexY / (DimY - 1))",
+                                "(Noise::Noise2d(\"Terrain\", Object.X() + Object.Width() * IndexX / (DimX - 1), Object.Y() + Object.Height() * IndexY / (DimY - 1)) + 1) / 2",
                                 "IndexX",
                                 "IndexY",
                                 ""
