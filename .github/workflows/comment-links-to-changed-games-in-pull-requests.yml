@@ -11,7 +11,7 @@ jobs:
 
       - name: Get changed files
         id: changed-game-files
-        uses: tj-actions/changed-files@v23.1
+        uses: tj-actions/changed-files@v35
         with:
           files: |
             examples/**/*.json
@@ -31,7 +31,7 @@ jobs:
           CHANGED_GAMES_LINKS="${CHANGED_GAMES_LINKS//$'\n'/'%0A'}"
           CHANGED_GAMES_LINKS="${CHANGED_GAMES_LINKS//$'\r'/'%0D'}"
 
-          echo "::set-output name=changed-games-links::$CHANGED_GAMES_LINKS"
+          echo "changed-games-links=$CHANGED_GAMES_LINKS" >> $GITHUB_OUTPUT
 
       - name: Find the existing comment about games in the PR
         uses: peter-evans/find-comment@v2
@@ -42,8 +42,9 @@ jobs:
           body-includes: "### Preview the game(s) changed or added in this Pull Request"
 
       - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
