@@ -1,0 +1,2 @@
+This template simplifies the saving of all objects. In this template users can learn how to save 1000's of objects into local storage and then load it later with just a few events.
+This would be extremely helpful to new users and also help them make a really good game.
