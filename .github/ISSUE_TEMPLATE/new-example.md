@@ -4,8 +4,8 @@ about: Submit a new example to be added to the repository
 title: New example
 labels: '✨ New example'
 assignees: ''
-
 ---
+
 <!--
 **⚠️ Please edit and complete this before submitting your game:**
 -->
@@ -30,9 +30,15 @@ A clear and concise description of what the example is, how useful it is.
 ## Game folder
 
 <!--
-Finally, attach a zip file containing your game and all its resources (images, sounds, etc...)
+Finally, attach a zip file containing your game project folder and all its resources (images, sounds, etc...)
 
 You also may have to create an account on GitHub before posting.
 If your game is high quality and useful, it will be added to the list of GDevelop community examples.
 When you're ready, remove this last paragraph and click on "Submit new issue". Thanks 🙌
+-->
+
+## Game preview
+
+<!--
+You can add a few screenshots of your game and a link to play it to show how cool your example is.
 -->
