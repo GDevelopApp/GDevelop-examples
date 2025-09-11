@@ -1,1 +1,3 @@
-Starting point for a top-down game, optimized for pixel art.
+A 2D, top-down, game where the player can move around on a small level with solid obstacles.
+Support for both mobile controls and keyboard.
+Assets and game are optimized for pixel art.
