@@ -1,0 +1,1 @@
+Allow to check if a gamepad works correctly with the extension.
