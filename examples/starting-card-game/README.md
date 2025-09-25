@@ -1,0 +1,2 @@
+A simple card game where the player draws cards from a deck and can drag the revealed cards on the screen. The player can also return cards to the deck or choose to shuffle the deck.
+Support for mouse and touch.
