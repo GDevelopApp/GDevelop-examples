@@ -1,2 +1,4 @@
+# Flappy Bird
+
 A game where the player must constantly tap to jump on the screen, avoiding to touch the ground and obstacles as they progress in a challenging level. It is similar to Flappy Bird.
 Support for keyboard and mobile controls.

@@ -1,2 +1,4 @@
+# Beat'em up
+
 A 2D, side-view, beat'em up style game where the player controls a character that can move in the level and attack other characters who are trying to hurt him.
 Support for keyboard and mobile controls.

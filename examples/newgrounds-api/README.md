@@ -1,1 +1,3 @@
-A demo on how to use New grounds API extension.
+# Newgrounds API Demo
+
+A demo on how to use the Newgrounds API extension.

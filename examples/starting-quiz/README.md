@@ -1,2 +1,4 @@
-A basic quizz game showing a question on the screen with 4 buttons allowing to choose an answer. Once an answer is selected, a win/lose sound is played and the next question is displayed. Questions are stored in a scene variable.
+# Quiz game
+
+A basic quiz game showing a question on the screen with 4 buttons allowing to choose an answer. Once an answer is selected, a win/lose sound is played and the next question is displayed. Questions are stored in a scene variable.
 Support for both mouse and touchscreens.

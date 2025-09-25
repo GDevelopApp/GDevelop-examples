@@ -1,1 +1,3 @@
+# 2D Platformer Shooter
+
 A 2D Mega Man-like starter game where the player controls a character who can jump on platforms and shoot bullets that can hit enemies. Support for mobile and keyboard controls.

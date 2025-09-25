@@ -1,4 +1,4 @@
-# Calcopus
+# Calcopus (Spine Demo)
 
 An example of project with Spine object used. Player needs to resolve simple math tasks quickly in order to find the lowest value.
 What is demonstrated in this project:

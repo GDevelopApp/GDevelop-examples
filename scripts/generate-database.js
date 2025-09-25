@@ -341,6 +341,46 @@ const getQuickCustomizationImageUrl = (gameFolderPath, allFiles) => {
 };
 
 /**
+ * Extract example name and descriptions from README content
+ * @param {string} readmeFileContent
+ * @param {string} slug
+ * @returns {{exampleName: string, shortDescription: string, description: string}}
+ */
+const extractExampleNameAndDescriptions = (readmeFileContent, slug) => {
+  const cleanedContent = readmeFileContent.replace(/\r\n/g, '\n').trim();
+
+  // Extract example name from README header or format from slug
+  let exampleName;
+  let contentAfterHeader = cleanedContent;
+
+  // Check if README starts with a markdown header
+  const headerMatch = cleanedContent.match(/^#\s+(.+)$/m);
+  if (headerMatch && cleanedContent.indexOf(headerMatch[0]) === 0) {
+    // Use the header text as the example name
+    exampleName = headerMatch[1].trim();
+    // Remove the header and any immediately following empty lines from content
+    contentAfterHeader = cleanedContent
+      .substring(headerMatch[0].length)
+      .replace(/^\n+/, '');
+  } else {
+    // Use formatted slug as before
+    exampleName = formatExampleName(slug);
+  }
+
+  // Split content into short description and description
+  const contentParagraphs = contentAfterHeader.split('\n\n');
+  const shortDescription = contentParagraphs[0]
+    ? contentParagraphs[0].trim()
+    : '';
+  const description =
+    contentParagraphs.length > 1
+      ? contentParagraphs.slice(1).join('\n\n').trim()
+      : '';
+
+  return { exampleName, shortDescription, description };
+};
+
+/**
  * Extract the information about the example games from the examples folder.
  * @param {libGDevelop} gd
  * @param {Record<string, gdPlatformExtension>} platformExtensionsMap
@@ -449,16 +489,10 @@ const extractExamples = async (
           );
           return null;
         }
-        const readmeFileContent = readmeFileWithMetadata.parsedContent
-          .replace(/\r\n/g, '\n')
-          .trim();
-        const exampleName = formatExampleName(slug);
+        const readmeFileContent = readmeFileWithMetadata.parsedContent;
 
-        const shortDescription = readmeFileContent.split('\n\n')[0];
-        const description = readmeFileContent
-          .split('\n\n')
-          .slice(1)
-          .join('\n\n');
+        const { exampleName, shortDescription, description } =
+          extractExampleNameAndDescriptions(readmeFileContent, slug);
 
         const tags = [
           ...fileWithMetadata.tags,

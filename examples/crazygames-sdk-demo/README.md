@@ -1,1 +1,3 @@
+# CrazyGames SDK Demo
+
 Showcase all the features from the CrazyGames SDK V3 extension. The project can be exported as HTML5 game to be imported in the QA tools on CrazyGames website.
