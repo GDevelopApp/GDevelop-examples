@@ -870,6 +870,33 @@
                       "conditions": [
                         {
                           "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "ForceFeedbackSpinSpeed",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "ForceFeedbackSpinSpeed",
+                            "=",
+                            "abs(Object.Object3D::RotationX() / ForceFeedbackSpinDuration)"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
                             "value": "Scene3D::Base3DBehavior::RotationX"
                           },
                           "parameters": [
@@ -889,7 +916,7 @@
                             "Object",
                             "Object3D",
                             "=",
-                            "min(0, Object.Object3D::RotationX() + 80 * TimeDelta())"
+                            "min(0, Object.Object3D::RotationX() + ForceFeedbackSpinSpeed * TimeDelta())"
                           ]
                         }
                       ]
@@ -918,9 +945,54 @@
                             "Object",
                             "Object3D",
                             "=",
-                            "max(0, Object.Object3D::RotationX() - 80 * TimeDelta())"
+                            "max(0, Object.Object3D::RotationX() - ForceFeedbackSpinSpeed * TimeDelta())"
                           ]
                         }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "CurrentHorizontalAngularSpeed",
+                            "!=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "CurrentVerticalAngularSpeed",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ForceFeedbackSpinSpeed",
+                        "=",
+                        "0"
                       ]
                     }
                   ]
@@ -1176,7 +1248,7 @@
                       "parameters": [
                         "CurrentHorizontalAngularSpeed",
                         "=",
-                        "40"
+                        "HorizontalAngularSpeedMax"
                       ]
                     }
                   ]
@@ -1215,7 +1287,7 @@
                       "parameters": [
                         "CurrentHorizontalAngularSpeed",
                         "=",
-                        "-40"
+                        "-HorizontalAngularSpeedMax"
                       ]
                     }
                   ]
@@ -1254,7 +1326,7 @@
                       "parameters": [
                         "CurrentVerticalAngularSpeed",
                         "=",
-                        "40"
+                        "VerticalAngularSpeedMax"
                       ]
                     }
                   ]
@@ -1293,7 +1365,7 @@
                       "parameters": [
                         "CurrentVerticalAngularSpeed",
                         "=",
-                        "-40"
+                        "-VerticalAngularSpeedMax"
                       ]
                     }
                   ]
@@ -1354,12 +1426,26 @@
               "name": "CurrentHorizontalAngularSpeed"
             },
             {
+              "value": "45",
+              "type": "Number",
+              "unit": "AngularSpeed",
+              "label": "Horizontal max angular speed",
+              "name": "HorizontalAngularSpeedMax"
+            },
+            {
               "value": "0",
               "type": "Number",
               "unit": "AngularSpeed",
               "label": "Current vertical angular speed",
               "hidden": true,
               "name": "CurrentVerticalAngularSpeed"
+            },
+            {
+              "value": "45",
+              "type": "Number",
+              "unit": "AngularSpeed",
+              "label": "Vertical max angular speed",
+              "name": "VerticalAngularSpeedMax"
             },
             {
               "value": "20",
@@ -1391,6 +1477,23 @@
               "label": "Forward Z",
               "hidden": true,
               "name": "ForwardZ"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Force feedback spin speed",
+              "hidden": true,
+              "name": "ForceFeedbackSpinSpeed"
+            },
+            {
+              "value": "0.5",
+              "type": "Number",
+              "unit": "PixelSpeed",
+              "label": "Force feedback spin duration",
+              "description": "Spin back to level with the horizon when direction inputs are released. Can be set to 0 to disable it.",
+              "hidden": true,
+              "name": "ForceFeedbackSpinDuration"
             }
           ],
           "sharedPropertyDescriptors": []
