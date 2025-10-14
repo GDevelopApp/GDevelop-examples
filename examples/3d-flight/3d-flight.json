@@ -599,7 +599,7 @@
               "RotationHalfwayDuration": 0.25,
               "ElevationHalfwayDuration": 0.25,
               "TranslationZHalfwayDuration": 0.125,
-              "Distance": 100,
+              "Distance": 60,
               "OffsetX": 0,
               "OffsetY": 0,
               "OffsetZ": 0,
@@ -1396,6 +1396,23 @@
                   "actions": [
                     {
                       "type": {
+                        "value": "PhysicsAirplane3D::PhysicsAirplane3D::TurnX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "-CurrentSpin",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
                         "value": "PhysicsAirplane3D::PhysicsAirplane3D::RotateZ"
                       },
                       "parameters": [
@@ -1475,6 +1492,23 @@
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "PhysicsAirplane3D::PhysicsAirplane3D::TurnX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "CurrentSpin",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
@@ -1507,6 +1541,16 @@
                         "Object3D",
                         "=",
                         "AngleDifference(Object.Object3D::RotationX(), 0)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "CurrentSpin",
+                        "=",
+                        "0"
                       ]
                     }
                   ],
@@ -1641,6 +1685,103 @@
                         "0"
                       ]
                     }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "CurrentHorizontalAngularSpeed",
+                                "<",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Delta",
+                                "=",
+                                "min(CurrentSpin + SpinSpeed * TimeDelta(), SpinMax) - CurrentSpin"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "CurrentHorizontalAngularSpeed",
+                                ">",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "Delta",
+                                "=",
+                                "max(CurrentSpin - SpinSpeed * TimeDelta(), -SpinMax) - CurrentSpin"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "CurrentSpin",
+                                "+",
+                                "Delta"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "PhysicsAirplane3D::PhysicsAirplane3D::TurnX"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "Delta",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "variables": [
+                        {
+                          "name": "Delta",
+                          "type": "number",
+                          "value": 0
+                        }
+                      ]
+                    }
                   ]
                 },
                 {
@@ -1668,6 +1809,22 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "DebuggerTools::ConsoleLog"
+                      },
+                      "parameters": [
+                        "ToString(Object.Object3D::RotationX())",
+                        "\"info\"",
+                        ""
+                      ]
+                    }
+                  ]
                 }
               ],
               "parameters": [
@@ -1681,6 +1838,57 @@
                   "name": "Behavior",
                   "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
                   "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Turn around local X axis",
+              "functionType": "Action",
+              "name": "TurnX",
+              "private": true,
+              "sentence": "Turn _PARAM0_ of _PARAM2_° around local X axis",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.RuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const angle = eventsFunctionContext.getArgument(\"Angle\");",
+                    "",
+                    "const threeObject = object.get3DRendererObject();",
+                    "threeObject.rotateX(gdjs.toRad(angle));",
+                    "",
+                    "const rotationX = gdjs.toDegrees(threeObject.rotation.x);",
+                    "const rotationY = gdjs.toDegrees(threeObject.rotation.y);",
+                    "const rotationZ = gdjs.toDegrees(threeObject.rotation.z);",
+                    "// These methods overrides threeObject.rotation",
+                    "object.setRotationX(rotationX);",
+                    "object.setRotationY(rotationY);",
+                    "object.setAngle(rotationZ);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Angle",
+                  "name": "Angle",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -2140,6 +2348,28 @@
               "description": "Spin back to level with the horizon when direction inputs are released. Can be set to 0 to disable it.",
               "hidden": true,
               "name": "ForceFeedbackSpinDuration"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "",
+              "hidden": true,
+              "name": "CurrentSpin"
+            },
+            {
+              "value": "60",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Max spin",
+              "name": "SpinMax"
+            },
+            {
+              "value": "120",
+              "type": "Number",
+              "unit": "AngularSpeed",
+              "label": "Spin speed",
+              "name": "SpinSpeed"
             }
           ],
           "sharedPropertyDescriptors": []
@@ -2244,8 +2474,6 @@
                 "        this.right.normalize();",
                 "        this.up.normalize();",
                 "        this.forward.normalize();",
-                "",
-                "        console.log(this.forward);",
                 "    }",
                 "}",
                 "",
@@ -3439,12 +3667,10 @@
                     "targetQuaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -gdjs.toRad(behavior._getElevationAngleOffset())));",
                     "",
                     "threeCamera.quaternion.slerp(targetQuaternion, ratio);",
-                    "//threeCamera.quaternion.copy(objectQuaternion);",
                     "",
                     "// The layer angle takes over the 3D camera Z rotation.",
                     "layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));",
-                    "",
-                    "console.log(ratio)"
+                    ""
                   ],
                   "parameterObjects": "Object",
                   "useStrict": true,
