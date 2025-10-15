@@ -611,7 +611,7 @@
           }
         },
         {
-          "assetStoreId": "bb6e82cd7891683fcc1fdb922ea7e98762edcf8eaff44d334840bcdae2b28170",
+          "assetStoreId": "7eb8798d1380ef3a7ff7fb915355bccedb961714ea575acc23f7ce371ab97b16",
           "name": "Spaceship",
           "type": "Scene3D::Model3DObject",
           "variables": [],
@@ -636,7 +636,7 @@
               "massCenterOffsetY": 0,
               "massCenterOffsetZ": 0,
               "massOverride": 0,
-              "density": 10,
+              "density": 40,
               "friction": 0.3,
               "restitution": 0.1,
               "linearDamping": 0.1,
@@ -655,8 +655,9 @@
               "ForwardY": 0,
               "ForwardZ": 0,
               "Object3D": "Object3D",
-              "HorizontalAngularSpeedMax": 90,
-              "VerticalAngularSpeedMax": 90
+              "HorizontalAngularSpeedMax": 45,
+              "VerticalAngularSpeedMax": 45,
+              "SpinMax": 60
             },
             {
               "name": "ThirdPersonCamera",
@@ -665,12 +666,12 @@
               "RotationHalfwayDuration": 0.25,
               "ElevationHalfwayDuration": 0.25,
               "TranslationZHalfwayDuration": 0.125,
-              "Distance": 60,
+              "Distance": 13,
               "OffsetX": 0,
-              "OffsetY": 0,
-              "OffsetZ": 0,
+              "OffsetY": -5,
+              "OffsetZ": 4,
               "RotationAngleOffset": 0,
-              "ElevationAngleOffset": 20,
+              "ElevationAngleOffset": 0,
               "FollowFreeAreaZMax": 0,
               "FollowFreeAreaZMin": 0,
               "RotationLogSpeed": 2.0247e-320,
@@ -688,8 +689,8 @@
           "content": {
             "centerLocation": "ModelOrigin",
             "crossfadeDuration": 0.10000000149011612,
-            "depth": 2.527252912521364,
-            "height": 11.139095306396486,
+            "depth": 1.263626456260682,
+            "height": 5.569547653198243,
             "isCastingShadow": true,
             "isReceivingShadow": true,
             "keepAspectRatio": true,
@@ -699,7 +700,7 @@
             "rotationX": 90,
             "rotationY": 0,
             "rotationZ": 90,
-            "width": 8.656633615493778,
+            "width": 4.328316807746889,
             "animations": []
           }
         },
@@ -1065,8 +1066,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 32,
-                        "y": 32
+                        "x": 64,
+                        "y": 64
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1280,6 +1281,58 @@
                 "Raycaster3D::IntersectionX()",
                 "Raycaster3D::IntersectionY()",
                 "Raycaster3D::IntersectionZ()",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Avoid the spaceship spin from changing the camera target."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "ThirdPersonCamera::ThirdPersonCamera::SetOffsetX"
+              },
+              "parameters": [
+                "Spaceship",
+                "ThirdPersonCamera",
+                "=",
+                "XFromAngleAndDistance(90 + Spaceship.PhysicsAirplane3D::CurrentSpin(), 4)",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "ThirdPersonCamera::ThirdPersonCamera::SetOffsetZ"
+              },
+              "parameters": [
+                "Spaceship",
+                "ThirdPersonCamera",
+                "=",
+                "YFromAngleAndDistance(90 + Spaceship.PhysicsAirplane3D::CurrentSpin(), 4)",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "ThirdPersonCamera::ThirdPersonCamera::MoveCameraCloser"
+              },
+              "parameters": [
+                "Spaceship",
+                "ThirdPersonCamera",
                 ""
               ]
             }
@@ -1787,16 +1840,6 @@
                         "=",
                         "AngleDifference(Object.Object3D::RotationX(), 0)"
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "CurrentSpin",
-                        "=",
-                        "0"
-                      ]
                     }
                   ],
                   "events": [
@@ -1881,6 +1924,60 @@
                             "Object3D",
                             "=",
                             "max(0, Object.Object3D::RotationX() - ForceFeedbackSpinSpeed * TimeDelta())"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "CurrentSpin",
+                            "<",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "CurrentSpin",
+                            "=",
+                            "min(0, CurrentSpin + ForceFeedbackSpinSpeed * TimeDelta())"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "CurrentSpin",
+                            ">",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "CurrentSpin",
+                            "=",
+                            "max(0, CurrentSpin - ForceFeedbackSpinSpeed * TimeDelta())"
                           ]
                         }
                       ]
@@ -2608,6 +2705,47 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the current spin of the object.",
+              "fullName": "Current spin",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D physics airplane state",
+              "name": "CurrentSpin",
+              "sentence": "the current spin",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "CurrentSpin"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "propertyDescriptors": [
@@ -2722,7 +2860,7 @@
               "value": "0",
               "type": "Number",
               "unit": "DegreeAngle",
-              "label": "",
+              "label": "Current spin",
               "hidden": true,
               "name": "CurrentSpin"
             },
@@ -2797,7 +2935,7 @@
                 "    return;",
                 "}",
                 "",
-                "class ObjectLocalBasis {",
+                "class CameraLocalBasis {",
                 "    /** @type {gdjs.RuntimeObject} */",
                 "    object;",
                 "    rotationMatrix = new THREE.Matrix4();",
@@ -2846,7 +2984,58 @@
                 "    }",
                 "}",
                 "",
+                "class ObjectLocalBasis {",
+                "    /** @type {gdjs.RuntimeObject} */",
+                "    object;",
+                "    rotationMatrix = new THREE.Matrix4();",
+                "    forward = new THREE.Vector3();",
+                "    up = new THREE.Vector3();",
+                "    right = new THREE.Vector3();",
+                "",
+                "    /**",
+                "     * @param object {gdjs.RuntimeObject}",
+                "     */",
+                "    constructor(object) {",
+                "        this.object = object;",
+                "    }",
+                "",
+                "    update() {",
+                "        const threeObject = this.object.get3DRendererObject();",
+                "        this.rotationMatrix.makeRotationFromEuler(threeObject.rotation);",
+                "",
+                "        // threeCamera.matrixWorld is a 4x4. In Three.js, the columns correspond to:",
+                "        //   [ right.x,   up.x,    forwardNeg.x,  pos.x",
+                "        //     right.y,   up.y,    forwardNeg.y,  pos.y",
+                "        //     right.z,   up.z,    forwardNeg.z,  pos.z",
+                "        //     0,         0,       0,             1     ]",
+                "        //",
+                "        // By default, a Three.js camera looks down the -Z axis, so the \"forward\" axis",
+                "        // in the matrix is actually the negative Z column. We'll call it \"forward\" below.",
+                "        const elements = this.rotationMatrix.elements;",
+                "",
+                "        // Local right axis in world space:",
+                "        this.up.set(elements[8], elements[9], elements[10]);",
+                "        // Local forward axis in world space (note we take the negative of that column).",
+                "        this.forward.set(",
+                "            elements[0],",
+                "            elements[1],",
+                "            elements[2]",
+                "        );",
+                "",
+                "        // Local up axis in world space: orthogonal to both right and forward.",
+                "        this.right.crossVectors(this.forward, this.up);",
+                "",
+                "        // Normalize them, just in case (they should generally be unit vectors).",
+                "        this.right.normalize();",
+                "        this.up.normalize();",
+                "        this.forward.normalize();",
+                "",
+                "        console.log(this.forward, this.up, this.right);",
+                "    }",
+                "}",
+                "",
                 "gdjs.__thirdPersonCameraExtension = {",
+                "    CameraLocalBasis,",
                 "    ObjectLocalBasis",
                 "};",
                 ""
@@ -3399,11 +3588,12 @@
                 {
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": [
-                    "const { ObjectLocalBasis } = gdjs.__thirdPersonCameraExtension;\r",
+                    "const { CameraLocalBasis, ObjectLocalBasis } = gdjs.__thirdPersonCameraExtension;\r",
                     "const object = objects[0];\r",
                     "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\r",
                     "behavior.__thirdPersonCameraExtension = {\r",
-                    "    localBasis: new ObjectLocalBasis(object)\r",
+                    "    cameraLocalBasis: new CameraLocalBasis(object),\r",
+                    "    objectlocalBasis: new ObjectLocalBasis(object)\r",
                     "};"
                   ],
                   "parameterObjects": "Object",
@@ -3804,12 +3994,31 @@
                           "actions": [
                             {
                               "type": {
+                                "value": "ThirdPersonCamera::ThirdPersonCamera::MoveToObject"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "OffsetX",
+                                "OffsetY",
+                                "OffsetZ",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
                                 "value": "SetCameraCenterX"
                               },
                               "parameters": [
                                 "",
-                                "=",
-                                "Object.CenterX() - Distance * ForwardX",
+                                "-",
+                                "Distance * ForwardX",
                                 "Object.Layer()",
                                 ""
                               ]
@@ -3820,8 +4029,8 @@
                               },
                               "parameters": [
                                 "",
-                                "=",
-                                "Object.CenterY() - Distance * ForwardY",
+                                "-",
+                                "Distance * ForwardY",
                                 "Object.Layer()",
                                 ""
                               ]
@@ -3832,8 +4041,8 @@
                               },
                               "parameters": [
                                 "",
-                                "=",
-                                "CameraZ - Distance * ForwardZ",
+                                "-",
+                                "Distance * ForwardZ",
                                 "Object.Layer()",
                                 ""
                               ]
@@ -4067,6 +4276,69 @@
               "objectGroups": []
             },
             {
+              "fullName": "Move to object",
+              "functionType": "Action",
+              "name": "MoveToObject",
+              "private": true,
+              "sentence": "Change the camera position to _PARAM0_ with offset _PARAM2_, _PARAM3_, _PARAM4_ ",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.RuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const localOffsetX = eventsFunctionContext.getArgument(\"LocalOffsetX\");",
+                    "const localOffsetY = eventsFunctionContext.getArgument(\"LocalOffsetY\");",
+                    "const localOffsetZ = eventsFunctionContext.getArgument(\"LocalOffsetZ\");",
+                    "",
+                    "const layer = object.getInstanceContainer().getLayer(object.getLayer());",
+                    "",
+                    "const { objectlocalBasis } = behavior.__thirdPersonCameraExtension;",
+                    "/** @type {{forward: THREE.Vector3, up: THREE.Vector3, right: THREE.Vector3 }} */",
+                    "const { forward, up, right } = objectlocalBasis;",
+                    "",
+                    "layer.setCameraX(object.getCenterXInScene() + localOffsetX * right.x + localOffsetY * forward.x + localOffsetZ * up.x);",
+                    "layer.setCameraY(object.getCenterYInScene() + localOffsetX * right.y + localOffsetY * forward.y + localOffsetZ * up.y);",
+                    "layer.setCameraZ(object.getCenterZInScene() + localOffsetX * right.z + localOffsetY * forward.z + localOffsetZ * up.z);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
+                  "type": "behavior"
+                },
+                {
+                  "description": "X offset",
+                  "name": "LocalOffsetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Y offset",
+                  "name": "LocalOffsetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Z offset",
+                  "name": "LocalOffsetZ",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "fullName": "Update local basis",
               "functionType": "Action",
               "name": "UpdateLocalBasis",
@@ -4077,11 +4349,12 @@
                   "inlineCode": [
                     "const object = objects[0];",
                     "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { localBasis } = behavior.__thirdPersonCameraExtension;",
-                    "localBasis.update();",
-                    "behavior._setForwardX(localBasis.forward.x);",
-                    "behavior._setForwardY(localBasis.forward.y);",
-                    "behavior._setForwardZ(localBasis.forward.z);",
+                    "const { cameraLocalBasis, objectlocalBasis } = behavior.__thirdPersonCameraExtension;",
+                    "cameraLocalBasis.update();",
+                    "objectlocalBasis.update();",
+                    "behavior._setForwardX(cameraLocalBasis.forward.x);",
+                    "behavior._setForwardY(cameraLocalBasis.forward.y);",
+                    "behavior._setForwardZ(cameraLocalBasis.forward.z);",
                     ""
                   ],
                   "parameterObjects": "Object",
@@ -5718,7 +5991,6 @@
                 " * @param {float} z",
                 " */",
                 "function moveToProjectedPoint(objects, layer3D, x, y, z) {",
-                "    console.log(x, y, z);",
                 "    const threeCamera = layer3D.getRenderer().getThreeCamera();",
                 "",
                 "    const isPointBehindCamera = vector.set(x, -y, z).sub(threeCamera.position).dot(threeCamera.getWorldDirection(cameraDirection)) < 0;",
