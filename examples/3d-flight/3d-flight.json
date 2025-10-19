@@ -5098,9 +5098,49 @@
                 "    }",
                 "}",
                 "",
+                "/**",
+                " * It can be built the follow:",
+                " * ",
+                " * `objectDefaultRotation.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI/2);`",
+                " * ",
+                " * `objectDefaultRotation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI/2));`",
+                " * ",
+                " */",
+                "const objectDefaultRotation = new THREE.Quaternion(0.5, -0.5, -0.5, 0.5);",
+                "const targetQuaternion = new THREE.Quaternion();",
+                "const yAxis = new THREE.Vector3(0, 1, 0);",
+                "const zAxis = new THREE.Vector3(0, 0, 1);",
+                "const quaternion = new THREE.Quaternion();",
+                "const objectRotation = new THREE.Euler();",
+                "",
+                "/**",
+                " * @param object {gdjs.RuntimeObject}",
+                " * @param ratio {number}",
+                " * @param elevationAngleOffset {number}",
+                " */",
+                "function slerpCamera(object, ratio, rotationAngleOffset, elevationAngleOffset) {",
+                "    const layer = object.getInstanceContainer().getLayer(object.getLayer());",
+                "    const threeCamera = layer.getRenderer().getThreeCamera();",
+                "    const threeObject = object.get3DRendererObject();",
+                "",
+                "    objectRotation.copy(threeObject.rotation);",
+                "    objectRotation.z = -objectRotation.z;",
+                "    objectRotation.x = -objectRotation.x;",
+                "    targetQuaternion.setFromEuler(objectRotation);",
+                "    targetQuaternion.multiply(quaternion.setFromAxisAngle(zAxis, -gdjs.toRad(rotationAngleOffset)));",
+                "    targetQuaternion.multiply(quaternion.setFromAxisAngle(yAxis, gdjs.toRad(elevationAngleOffset)));",
+                "    targetQuaternion.multiply(objectDefaultRotation);",
+                "",
+                "    threeCamera.quaternion.slerp(targetQuaternion, ratio);",
+                "",
+                "    // The layer angle takes over the 3D camera Z rotation.",
+                "    layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));",
+                "}",
+                "",
                 "gdjs.__thirdPersonCameraExtension = {",
                 "    CameraLocalBasis,",
-                "    ObjectLocalBasis",
+                "    ObjectLocalBasis,",
+                "    slerpCamera,",
                 "};",
                 ""
               ],
@@ -6028,34 +6068,35 @@
                           ]
                         }
                       ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ThirdPersonCamera::ThirdPersonCamera::Slerp"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "1 - exp(TimeDelta() * RotationLogSpeed)",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ThirdPersonCamera::ThirdPersonCamera::UpdateLocalBasis"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            ""
-                          ]
-                        }
-                      ],
+                      "actions": [],
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [],
                           "actions": [
+                            {
+                              "type": {
+                                "value": "ThirdPersonCamera::ThirdPersonCamera::Slerp"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "1 - exp(TimeDelta() * RotationLogSpeed)",
+                                "RotationAngleOffset",
+                                "ElevationAngleOffset",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ThirdPersonCamera::ThirdPersonCamera::UpdateLocalBasis"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            },
                             {
                               "type": {
                                 "value": "ThirdPersonCamera::ThirdPersonCamera::MoveToObject"
@@ -6068,13 +6109,7 @@
                                 "OffsetZ",
                                 ""
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
+                            },
                             {
                               "type": {
                                 "value": "SetCameraCenterX"
@@ -6284,34 +6319,18 @@
               "functionType": "Action",
               "name": "Slerp",
               "private": true,
-              "sentence": "Lerp the camera to _PARAM0_ with a ratio of _PARAM2_",
+              "sentence": "Lerp the camera to _PARAM0_ with a ratio of _PARAM2_ with rotation offset _PARAM3_° and elevation offset _PARAM4_°",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": [
                     "/** @type {gdjs.RuntimeObject3D} */",
                     "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
                     "const ratio = eventsFunctionContext.getArgument(\"Ratio\");",
+                    "const rotationAngleOffset = eventsFunctionContext.getArgument(\"NewRotationAngleOffset\");",
+                    "const elevationAngleOffset = eventsFunctionContext.getArgument(\"NewElevationAngleOffset\");",
                     "",
-                    "const layer = object.getInstanceContainer().getLayer(object.getLayer());",
-                    "const threeCamera = layer.getRenderer().getThreeCamera();",
-                    "const threeObject = object.get3DRendererObject();",
-                    "",
-                    "const objectDefaultRotation = new THREE.Quaternion();",
-                    "objectDefaultRotation.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI/2);",
-                    "objectDefaultRotation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI/2));",
-                    "",
-                    "const objectRotation = threeObject.rotation.clone();",
-                    "objectRotation.z = -objectRotation.z;",
-                    "objectRotation.x = -objectRotation.x;",
-                    "const targetQuaternion = new THREE.Quaternion().setFromEuler(objectRotation).multiply(objectDefaultRotation);",
-                    "targetQuaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -gdjs.toRad(behavior._getElevationAngleOffset())));",
-                    "",
-                    "threeCamera.quaternion.slerp(targetQuaternion, ratio);",
-                    "",
-                    "// The layer angle takes over the 3D camera Z rotation.",
-                    "layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));",
+                    "gdjs.__thirdPersonCameraExtension.slerpCamera(object, ratio, rotationAngleOffset, elevationAngleOffset);",
                     ""
                   ],
                   "parameterObjects": "Object",
@@ -6334,6 +6353,16 @@
                 {
                   "description": "Ratio",
                   "name": "Ratio",
+                  "type": "expression"
+                },
+                {
+                  "description": "Rotation angle offset",
+                  "name": "NewRotationAngleOffset",
+                  "type": "expression"
+                },
+                {
+                  "description": "Elevation angle offset",
+                  "name": "NewElevationAngleOffset",
                   "type": "expression"
                 }
               ],
@@ -6406,7 +6435,8 @@
               "fullName": "Update local basis",
               "functionType": "Action",
               "name": "UpdateLocalBasis",
-              "sentence": "",
+              "private": true,
+              "sentence": "Update local basis of _PARAM0_ and the camera",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::JsCode",
