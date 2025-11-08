@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 242,
+    "build": 245,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -19,7 +19,7 @@
     "sizeOnStartupMode": "",
     "templateSlug": "starting-top-down",
     "version": "1.0.0",
-    "name": "starting_3dtwinstickshooter",
+    "name": "starting-3d-twin-stick-shooter",
     "description": "",
     "author": "",
     "windowWidth": 1280,
@@ -199,7 +199,8 @@
         "gridAlpha": 0.8,
         "snap": false,
         "zoomFactor": 0.34375202416123274,
-        "windowMask": false
+        "windowMask": false,
+        "selectedLayer": ""
       },
       "objectsGroups": [
         {
@@ -293,7 +294,7 @@
           "height": 0,
           "keepRatio": true,
           "layer": "",
-          "name": "TopDown_Character",
+          "name": "Player",
           "persistentUuid": "9b0c35a1-d7ed-48b1-9f0d-f2fbbf7c17f7",
           "width": 0,
           "x": 634,
@@ -553,7 +554,7 @@
         },
         {
           "assetStoreId": "",
-          "name": "TopDown_Character",
+          "name": "Player",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -590,6 +591,7 @@
               "RandomizedAngle": 0
             },
             {
+              "isFolded": true,
               "name": "SmoothCamera",
               "type": "SmoothCamera::SmoothCamera",
               "LeftwardSpeed": 0.9,
@@ -752,13 +754,13 @@
         "folderName": "__ROOT",
         "children": [
           {
-            "objectName": "TopDown_Character"
-          },
-          {
-            "objectName": "Enemy"
+            "objectName": "Player"
           },
           {
             "objectName": "Bullet"
+          },
+          {
+            "objectName": "Enemy"
           },
           {
             "objectName": "Background"
@@ -827,6 +829,36 @@
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetCenter"
+              },
+              "parameters": [
+                "Background",
+                "=",
+                "CameraCenterX() - mod(CameraCenterX(), 160) + 160",
+                "=",
+                "CameraCenterY() - mod(CameraCenterY(), 160) - 160"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Enemy logic"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
@@ -848,8 +880,8 @@
               "parameters": [
                 "",
                 "Enemy",
-                "TopDown_Character.X() + (RandomWithStep(-1,1,2) * SceneWindowWidth())",
-                "TopDown_Character.Y() + (RandomWithStep(-1,1,2) * SceneWindowHeight())",
+                "Player.X() + (RandomWithStep(-1, 1, 2) * SceneWindowWidth())",
+                "Player.Y() + (RandomWithStep(-1, 1, 2) * SceneWindowHeight())",
                 ""
               ]
             },
@@ -874,7 +906,7 @@
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character",
+                "Player",
                 "100",
                 "0"
               ]
@@ -885,25 +917,25 @@
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
+                "Player.CenterX()",
+                "Player.CenterY()",
                 "0",
                 ""
               ]
-            },
-            {
-              "type": {
-                "value": "SetCenter"
-              },
-              "parameters": [
-                "Background",
-                "=",
-                "CameraCenterX() - mod(CameraCenterX(), 160) + 160",
-                "=",
-                "CameraCenterY() - mod(CameraCenterY(), 160) - 160"
-              ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Player movement"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -941,7 +973,7 @@
                 "value": "RotateTowardPosition"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "CursorX()",
                 "CursorY()",
                 "0",
@@ -953,12 +985,12 @@
                 "value": "FireBullet::FireBullet::Fire"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "FireBullet",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
+                "Player.CenterX()",
+                "Player.CenterY()",
                 "Bullet",
-                "TopDown_Character.Angle()",
+                "Player.Angle()",
                 "400",
                 "300"
               ]
@@ -984,7 +1016,7 @@
                 "value": "RotateTowardAngle"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "SpriteMultitouchJoystick::StickAngle(2, \"Secondary\")",
                 "0",
                 "0"
@@ -995,17 +1027,29 @@
                 "value": "FireBullet::FireBullet::Fire"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "FireBullet",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
+                "Player.CenterX()",
+                "Player.CenterY()",
                 "Bullet",
-                "TopDown_Character.Angle()",
+                "Player.Angle()",
                 "400",
                 "300"
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Health management"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -1081,7 +1125,7 @@
                 "value": "CollisionNP"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "Enemy",
                 "",
                 "",
@@ -5053,6 +5097,7 @@
             }
           ],
           "instances": [],
+          "editionSettings": {},
           "eventsFunctions": [
             {
               "fullName": "",

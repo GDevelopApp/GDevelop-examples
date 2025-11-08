@@ -1,5 +1,3 @@
 # Top-down RTS (unit selection)
 
-A 3D, top-down, simple game where the player can draw a selection around its units and then tap on the screen to move the selected units to this point (avoiding obstacles).
-
-Support for mouse and touch.
+A 3D angled top-down RTS-style game where the player can click to select individual units or click and drag to select multiple units. Selected units can be given a waypoint to move to, using pathfinding to navigate around impassable obstacles, like buildings. Water areas are passable but less preferred, so units will avoid them if a better path exists. Unit selection and waypoint placement can be done with either mouse or touch screen controls.

@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 242,
+    "build": 245,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -19,7 +19,7 @@
     "sizeOnStartupMode": "",
     "templateSlug": "starting-top-down",
     "version": "1.0.0",
-    "name": "starting_3dvampiresurvivor",
+    "name": "starting-3d-vampire-survivor",
     "description": "",
     "author": "",
     "windowWidth": 1280,
@@ -198,8 +198,9 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.34375202416123274,
-        "windowMask": false
+        "zoomFactor": 0.32169117647059,
+        "windowMask": false,
+        "selectedLayer": ""
       },
       "objectsGroups": [],
       "variables": [],
@@ -264,7 +265,7 @@
           "height": 0,
           "keepRatio": true,
           "layer": "",
-          "name": "TopDown_Character",
+          "name": "Player",
           "persistentUuid": "9b0c35a1-d7ed-48b1-9f0d-f2fbbf7c17f7",
           "width": 0,
           "x": 634,
@@ -419,11 +420,11 @@
             "topFaceResourceName": "",
             "bottomFaceResourceName": "",
             "frontFaceVisible": true,
-            "backFaceVisible": true,
-            "leftFaceVisible": true,
-            "rightFaceVisible": true,
-            "topFaceVisible": true,
-            "bottomFaceVisible": true,
+            "backFaceVisible": false,
+            "leftFaceVisible": false,
+            "rightFaceVisible": false,
+            "topFaceVisible": false,
+            "bottomFaceVisible": false,
             "frontFaceResourceRepeat": true,
             "backFaceResourceRepeat": false,
             "leftFaceResourceRepeat": false,
@@ -438,7 +439,7 @@
         },
         {
           "assetStoreId": "",
-          "name": "TopDown_Character",
+          "name": "Player",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -637,7 +638,7 @@
         "folderName": "__ROOT",
         "children": [
           {
-            "objectName": "TopDown_Character"
+            "objectName": "Player"
           },
           {
             "objectName": "Enemy"
@@ -709,6 +710,36 @@
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetCenter"
+              },
+              "parameters": [
+                "Background",
+                "=",
+                "CameraCenterX() - mod(CameraCenterX(), 320) +160",
+                "=",
+                "CameraCenterY() - mod(CameraCenterY(), 320) - 320"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Enemy logic"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
@@ -730,8 +761,8 @@
               "parameters": [
                 "",
                 "Enemy",
-                "TopDown_Character.X() + (RandomWithStep(-1,1,2) * SceneWindowWidth()/1.5)",
-                "TopDown_Character.Y() + (RandomWithStep(-1,1,2) * SceneWindowHeight()/1.5) - 100",
+                "Player.X() + (RandomWithStep(-1, 1, 2) * SceneWindowWidth() / 1.5)",
+                "Player.Y() + (RandomWithStep(-1, 1, 2) * SceneWindowHeight() / 1.5) - 100",
                 ""
               ]
             },
@@ -752,28 +783,28 @@
           "actions": [
             {
               "type": {
-                "value": "SetCenter"
-              },
-              "parameters": [
-                "Background",
-                "=",
-                "CameraCenterX() - mod(CameraCenterX(), 320) +160",
-                "=",
-                "CameraCenterY() - mod(CameraCenterY(), 320) - 320"
-              ]
-            },
-            {
-              "type": {
                 "value": "AddForceVers"
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character",
+                "Player",
                 "100",
                 "0"
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Fire bullets"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -784,7 +815,7 @@
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character",
+                "Player",
                 "500",
                 ""
               ]
@@ -795,8 +826,8 @@
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
+                "Player.CenterX()",
+                "Player.CenterY()",
                 ""
               ]
             }
@@ -807,10 +838,10 @@
                 "value": "FireBullet::FireBullet::FireTowardPosition"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "FireBullet",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
+                "Player.CenterX()",
+                "Player.CenterY()",
                 "Bullet",
                 "Enemy.CenterX()",
                 "Enemy.CenterY()",
@@ -826,10 +857,22 @@
                 "Bullet",
                 "Object3D",
                 "=",
-                "TopDown_Character.Object3D::Depth()/2"
+                "Player.Object3D::Depth() / 2"
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Health management"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -905,7 +948,7 @@
                 "value": "CollisionNP"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "Enemy",
                 "",
                 "",
@@ -4877,6 +4920,7 @@
             }
           ],
           "instances": [],
+          "editionSettings": {},
           "eventsFunctions": [
             {
               "fullName": "",

@@ -1,4 +1,3 @@
 # 3D Flight Simulator
 
-A 3D game where the player pilots a plane that can freely move through the sky, with an arcade-style feel. There is a ground surface, and the plane cannot pass through it.
-Supports both keyboard and mobile controls for the player’s aircraft.
+A 3D flight game with a plane represented by a 3D model and a ground object the plane cannot pass below. The player controls the plane’s tilt (left/right), pitch (forward/backward), and speed using keyboard or mobile touch controls. A third-person camera follows the plane, following its angle and pitch automatically, to properly follow the player movement.
