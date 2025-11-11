@@ -1,4 +1,3 @@
 # 2D Driving
 
-A 2D physics-based, top-down, game where the player is controlling a 2D car.
-It has some obstacles that can be pushed away. Support keyboard and mobile controls for the player car.
+A top-down 2D car driving game where the player accelerates and steers using keyboard or mobile controls. The car uses physics-based movement and can collide with other physics obstacles in the scene. The engine sound effect increases in volume as the car’s speed increases.

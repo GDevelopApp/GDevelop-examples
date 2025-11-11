@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 242,
+    "build": 245,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -19,7 +19,7 @@
     "sizeOnStartupMode": "",
     "templateSlug": "starting-platformer",
     "version": "1.0.0",
-    "name": "starting_3dendlessrunner",
+    "name": "starting-3d-endless-runner",
     "description": "",
     "author": "",
     "windowWidth": 1280,
@@ -215,7 +215,8 @@
         "gridAlpha": 0.8,
         "snap": false,
         "zoomFactor": 0.41943397827591883,
-        "windowMask": false
+        "windowMask": false,
+        "selectedLayer": ""
       },
       "objectsGroups": [
         {
@@ -259,7 +260,7 @@
           "height": 96,
           "keepRatio": true,
           "layer": "MobileControls",
-          "name": "Distance",
+          "name": "Distance_UIText",
           "persistentUuid": "fb74c02c-1e3b-40d9-9002-7ac7f9de6d3a",
           "width": 1280,
           "x": 0,
@@ -276,7 +277,7 @@
           "height": 64,
           "keepRatio": true,
           "layer": "",
-          "name": "Point_Right",
+          "name": "Boundary_Right",
           "persistentUuid": "43d7ea15-3ff2-4a18-a3d7-00f1a8576afa",
           "width": 64,
           "x": 3648,
@@ -292,7 +293,7 @@
           "height": 0,
           "keepRatio": true,
           "layer": "",
-          "name": "Point_Left",
+          "name": "Boundary_Left",
           "persistentUuid": "25d15929-d5d9-4bdd-ac47-4785f11bcc38",
           "width": 0,
           "x": -1152,
@@ -811,7 +812,7 @@
           "height": 0,
           "keepRatio": true,
           "layer": "",
-          "name": "Platformer_Character",
+          "name": "Player",
           "persistentUuid": "736ec17f-276c-4919-acfa-bee037dea12c",
           "width": 0,
           "x": 73,
@@ -839,7 +840,7 @@
           "assetStoreId": "",
           "bold": false,
           "italic": false,
-          "name": "Distance",
+          "name": "Distance_UIText",
           "smoothed": true,
           "type": "TextObject::Text",
           "underlined": false,
@@ -881,7 +882,7 @@
         {
           "adaptCollisionMaskAutomatically": true,
           "assetStoreId": "",
-          "name": "Point_Right",
+          "name": "Boundary_Right",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -947,7 +948,7 @@
         {
           "adaptCollisionMaskAutomatically": true,
           "assetStoreId": "",
-          "name": "Point_Left",
+          "name": "Boundary_Left",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
@@ -1255,7 +1256,7 @@
         },
         {
           "assetStoreId": "",
-          "name": "Platformer_Character",
+          "name": "Player",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -1356,7 +1357,7 @@
         "folderName": "__ROOT",
         "children": [
           {
-            "objectName": "Platformer_Character"
+            "objectName": "Player"
           },
           {
             "objectName": "Platform_Ground"
@@ -1371,13 +1372,13 @@
             "objectName": "Background"
           },
           {
-            "objectName": "Distance"
+            "objectName": "Distance_UIText"
           },
           {
-            "objectName": "Point_Right"
+            "objectName": "Boundary_Right"
           },
           {
-            "objectName": "Point_Left"
+            "objectName": "Boundary_Left"
           },
           {
             "objectName": "Camera"
@@ -1438,7 +1439,7 @@
                 "value": "PlatformBehavior::SimulateRightKey"
               },
               "parameters": [
-                "Platformer_Character",
+                "Player",
                 "PlatformerObject"
               ]
             }
@@ -1481,7 +1482,7 @@
                 "value": "PlatformBehavior::SimulateJumpKey"
               },
               "parameters": [
-                "Platformer_Character",
+                "Player",
                 "PlatformerObject"
               ]
             }
@@ -1495,7 +1496,7 @@
                 "value": "CollisionNP"
               },
               "parameters": [
-                "Platformer_Character",
+                "Player",
                 "Hazard",
                 "",
                 "",
@@ -1525,7 +1526,7 @@
                 "value": "TextContainerCapability::TextContainerBehavior::SetValue"
               },
               "parameters": [
-                "Distance",
+                "Distance_UIText",
                 "Text",
                 "=",
                 "ToString(floor(TimeFromStart()))"
@@ -1538,7 +1539,7 @@
               "parameters": [
                 "Background",
                 "=",
-                "Platformer_Character.X()/2"
+                "Player.X() / 2"
               ]
             },
             {
@@ -1546,9 +1547,9 @@
                 "value": "MettreX"
               },
               "parameters": [
-                "Point_Left",
+                "Boundary_Left",
                 "=",
-                "Platformer_Character.X()-Point_Left.DistanceFromPlayer"
+                "Player.X() - Boundary_Left.DistanceFromPlayer"
               ]
             },
             {
@@ -1556,9 +1557,9 @@
                 "value": "MettreX"
               },
               "parameters": [
-                "Point_Right",
+                "Boundary_Right",
                 "=",
-                "Platformer_Character.X()+Point_Right.DistanceFromPlayer"
+                "Player.X() + Boundary_Right.DistanceFromPlayer"
               ]
             }
           ]
@@ -1573,7 +1574,7 @@
               "parameters": [
                 "RepeatingObjects",
                 "<",
-                "Point_Left.X()"
+                "Boundary_Left.X()"
               ]
             }
           ],
@@ -1597,8 +1598,8 @@
                   },
                   "parameters": [
                     "Platform_Ground",
-                    "Point_Right.X()",
-                    "Point_Right.Y()",
+                    "Boundary_Right.X()",
+                    "Boundary_Right.Y()",
                     ""
                   ]
                 }
@@ -1638,7 +1639,7 @@
                   "parameters": [
                     "RepeatingObjects",
                     "=",
-                    "Point_Right.X()"
+                    "Boundary_Right.X()"
                   ]
                 }
               ]
