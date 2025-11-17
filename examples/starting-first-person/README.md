@@ -1,5 +1,3 @@
 # 3D First Person
 
-A 3D, physics-based, first person game where the player can move and look around.
-It has a ground, platforms and obstacles which can be pushed away.
-Support for both mobile and keyboard/mouse controls.
+A 3D physics-based first-person game where the player can look around and turn using the game camera, as well as jump and fall within the environment. The scene includes a ground surface to walk on, solid platforms the player can land on and cannot pass through, and a pushable physics box that reacts realistically when the player pushes it. The game supports both keyboard/mouse controls and mobile touch controls.

@@ -1,4 +1,5 @@
 # 3D First Person Survival Crafting
 
-A 3D, first-person survival game where the player can gathers resources.
-Supports both mobile and keyboard/mouse controls.
+A 3D physics-based first-person game where the player can look around and turn using the camera, as well as jump and fall within the environment. The scene includes a ground surface, solid tree and boulder objects that the player can't pass through, and a 3D box with rocks and logs placed on it. The player can pick up objects and store them in an inventory, then place objects back onto the ground using raycasting to determine the placement location. Harvestable trees and boulders can be clicked to add resources to the inventory. The inventory uses UI icons to display the contents of the inventory, as well as allow the player to select which item to use and choose which slot a picked-up object will occupy. 
+
+This setup works well for any game where the player picks up resources and crafts things with those resources, especially for survival crafting games. The game supports both keyboard/mouse controls and mobile touch controls.
