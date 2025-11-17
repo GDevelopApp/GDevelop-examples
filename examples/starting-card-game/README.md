@@ -1,4 +1,3 @@
 # Card Game
 
-A simple card game where the player draws cards from a deck and can drag the revealed cards on the screen. The player can also return cards to the deck or choose to shuffle the deck.
-Support for mouse and touch.
+A top-down 2D card game where cards and the deck are represented by sprite objects. Cards use the draggable behavior, allowing the player to move them around the table. The deck stores an array that tracks which cards remain in the deck, and cards can be drawn or placed back on top to update the deck’s internal list. The setup is suitable for games like blackjack, solitaire, and other common card-based mechanics. The game supports both mouse and mobile touch controls.

@@ -1,5 +1,5 @@
 # Point-and-click adventure
 
-A 2D, side-view, point-and-click game where the player taps on the screen to move their character, who automatically walks around obstacles. The player can interact with other characters: when close, a dialog opens with a question offering two choices.
+A 2D, angled side-view, point-and-click game where the player click/taps on a location in the game scene, and the player character uses pathfinding to navigate there. When an NPC is clicked/tapped on, the player character will walk to their location and a dialog box opens. The dialog box has text and two clickable options for the player to choose from.
 
-Support for mouse and touch.
+The game supports both mouse and mobile touch controls.

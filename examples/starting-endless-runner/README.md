@@ -1,4 +1,3 @@
 # 2D Endless Runner
 
-A 2d, side-view, endless runner - similar to games like Geometry Dash. It has a player object which can jump, some platforms, obstacles to avoid. The level is a repeating layout. It displays a score increasing as the player progresses.
-Support for mobile and keyboard controls.
+A 2D side scrolling endless runner platformer where the player constantly moves to the right, and can jump or fall to navigate the level. The player dies if they collide with hazard objects. The scene continuously scrolls, moving objects that go off the left side of the screen to the right side of the screen to repopulate the path. The UI displays the distance traveled by the player. The game supports both keyboard and mobile touch screen controls for jumping.

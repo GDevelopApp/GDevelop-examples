@@ -1,4 +1,3 @@
 # Clicker Game
 
-A clicker game where the player clicks a button to earn money. Another button allows them to purchase a system that generate passive income every few seconds and upgrade it to be faster. A score counter displays the current amount of money.
-Support for mouse and touch.
+A 2D clicker game where the main clickable object uses the button behavior and plays a tweening effect whenever it’s pressed. A money/score object tracks and displays the player’s earnings, which increase through clicking or by purchasing the passive upgrade. An upgrade button with a progress bar can be clicked on to buy the passive upgrade, which generates money over time and can be purchased repeatedly to increase its level, increasing both the amount earned passively and the cost of the next upgrade. The game supports both mouse and mobile touch controls.
