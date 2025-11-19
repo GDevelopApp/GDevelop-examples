@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 239,
+    "build": 245,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -19,7 +19,7 @@
     "sizeOnStartupMode": "",
     "templateSlug": "starting-top-down",
     "version": "1.0.0",
-    "name": "starting_vampiresurvivor",
+    "name": "starting-vampire-survivor",
     "description": "",
     "author": "",
     "windowWidth": 1280,
@@ -178,7 +178,8 @@
         "gridAlpha": 0.8,
         "snap": false,
         "zoomFactor": 0.5468750000000022,
-        "windowMask": false
+        "windowMask": false,
+        "selectedLayer": ""
       },
       "objectsGroups": [],
       "variables": [],
@@ -189,7 +190,7 @@
           "height": 0,
           "keepRatio": true,
           "layer": "",
-          "name": "TopDown_Character",
+          "name": "Player",
           "persistentUuid": "ebd4e918-fdc8-4c06-baef-2e0f46c2cfd5",
           "width": 0,
           "x": 608,
@@ -206,7 +207,7 @@
           "keepRatio": true,
           "layer": "MobileControls",
           "locked": true,
-          "name": "Joystick",
+          "name": "MoveJoystick",
           "persistentUuid": "b0c31bb4-0add-4dda-9367-c5136e4b118d",
           "width": 0,
           "x": 176,
@@ -224,7 +225,7 @@
           "keepRatio": true,
           "layer": "Background",
           "locked": true,
-          "name": "Background",
+          "name": "RepeatingBackground",
           "persistentUuid": "f454010e-3716-4d3a-9164-74c7e450b60f",
           "width": 1280,
           "x": 0,
@@ -239,7 +240,7 @@
         {
           "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
-          "name": "TopDown_Character",
+          "name": "Player",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -404,7 +405,7 @@
         },
         {
           "assetStoreId": "e71bd69f896d6c7531b48c65ceb5da25071d4fbdeb518aeceecba8d21f34ed8d",
-          "name": "Joystick",
+          "name": "MoveJoystick",
           "type": "SpriteMultitouchJoystick::SpriteMultitouchJoystick",
           "variant": "",
           "variables": [],
@@ -489,7 +490,7 @@
         {
           "assetStoreId": "",
           "height": 352,
-          "name": "Background",
+          "name": "RepeatingBackground",
           "texture": "assets\\StartingTiledGround.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 640,
@@ -566,7 +567,7 @@
         {
           "adaptCollisionMaskAutomatically": true,
           "assetStoreId": "",
-          "name": "Bullet",
+          "name": "PlayerBullet",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -634,22 +635,22 @@
         "folderName": "__ROOT",
         "children": [
           {
-            "objectName": "TopDown_Character"
+            "objectName": "Player"
           },
           {
             "objectName": "Enemy"
           },
           {
-            "objectName": "Bullet"
+            "objectName": "PlayerBullet"
           },
           {
-            "objectName": "Background"
+            "objectName": "RepeatingBackground"
           },
           {
             "folderName": "Mobile Controls",
             "children": [
               {
-                "objectName": "Joystick"
+                "objectName": "MoveJoystick"
               }
             ]
           }
@@ -682,6 +683,44 @@
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "TiledSpriteObject::XOffset"
+              },
+              "parameters": [
+                "RepeatingBackground",
+                "=",
+                "CameraCenterX()"
+              ]
+            },
+            {
+              "type": {
+                "value": "TiledSpriteObject::YOffset"
+              },
+              "parameters": [
+                "RepeatingBackground",
+                "=",
+                "CameraCenterY()"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Enemy logic"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
@@ -703,8 +742,8 @@
               "parameters": [
                 "",
                 "Enemy",
-                "TopDown_Character.X() + (RandomWithStep(-1,1,2) * SceneWindowWidth()/2)",
-                "TopDown_Character.Y() + (RandomWithStep(-1,1,2) * SceneWindowHeight()/2)",
+                "Player.X() + (RandomWithStep(-1, 1, 2) * SceneWindowWidth() / 2)",
+                "Player.Y() + (RandomWithStep(-1, 1, 2) * SceneWindowHeight() / 2)",
                 ""
               ]
             },
@@ -725,42 +764,28 @@
           "actions": [
             {
               "type": {
-                "value": "TiledSpriteObject::XOffset"
-              },
-              "parameters": [
-                "Background",
-                "=",
-                "CameraCenterX()"
-              ]
-            },
-            {
-              "type": {
-                "value": "TiledSpriteObject::YOffset"
-              },
-              "parameters": [
-                "Background",
-                "=",
-                "CameraCenterY()"
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
                 "value": "AddForceVers"
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character",
+                "Player",
                 "100",
                 "0"
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Fire bullets"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -771,7 +796,7 @@
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character",
+                "Player",
                 "500",
                 ""
               ]
@@ -782,8 +807,8 @@
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
+                "Player.CenterX()",
+                "Player.CenterY()",
                 ""
               ]
             }
@@ -794,11 +819,11 @@
                 "value": "FireBullet::FireBullet::FireTowardPosition"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "FireBullet",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
-                "Bullet",
+                "Player.CenterX()",
+                "Player.CenterY()",
+                "PlayerBullet",
                 "Enemy.CenterX()",
                 "Enemy.CenterY()",
                 "300",
@@ -815,7 +840,7 @@
                 "value": "CollisionNP"
               },
               "parameters": [
-                "Bullet",
+                "PlayerBullet",
                 "Enemy",
                 "",
                 "",
@@ -840,11 +865,23 @@
                 "value": "Delete"
               },
               "parameters": [
-                "Bullet",
+                "PlayerBullet",
                 ""
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Health management"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -881,7 +918,7 @@
                 "value": "CollisionNP"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "Enemy",
                 "",
                 "",
@@ -4106,6 +4143,7 @@
               "extraInformation": [
                 "PlatformBehavior::PlatformerObjectBehavior"
               ],
+              "choices": [],
               "name": "Property"
             },
             {
@@ -4119,9 +4157,15 @@
               "type": "Choice",
               "label": "Joystick name",
               "group": "Controls",
-              "extraInformation": [
-                "Primary",
-                "Secondary"
+              "choices": [
+                {
+                  "label": "Primary",
+                  "value": "Primary"
+                },
+                {
+                  "label": "Secondary",
+                  "value": "Secondary"
+                }
               ],
               "name": "JoystickIdentifier"
             },
@@ -4656,6 +4700,7 @@
               "extraInformation": [
                 "TopDownMovementBehavior::TopDownMovementBehavior"
               ],
+              "choices": [],
               "name": "TopDownMovement"
             },
             {
@@ -4668,9 +4713,15 @@
               "value": "Primary",
               "type": "Choice",
               "label": "Joystick name",
-              "extraInformation": [
-                "Primary",
-                "Secondary"
+              "choices": [
+                {
+                  "label": "Primary",
+                  "value": "Primary"
+                },
+                {
+                  "label": "Secondary",
+                  "value": "Secondary"
+                }
               ],
               "name": "JoystickIdentifier"
             },
@@ -4679,10 +4730,19 @@
               "type": "Choice",
               "label": "Stick mode",
               "group": "Controls",
-              "extraInformation": [
-                "Analog",
-                "360°",
-                "8 Directions"
+              "choices": [
+                {
+                  "label": "Analog",
+                  "value": "Analog"
+                },
+                {
+                  "label": "360°",
+                  "value": "360°"
+                },
+                {
+                  "label": "8 Directions",
+                  "value": "8 Directions"
+                }
               ],
               "name": "StickMode"
             }
@@ -4807,6 +4867,7 @@
             }
           ],
           "instances": [],
+          "editionSettings": {},
           "eventsFunctions": [
             {
               "fullName": "",
@@ -5701,9 +5762,15 @@
               "value": "Primary",
               "type": "Choice",
               "label": "Joystick name",
-              "extraInformation": [
-                "Primary",
-                "Secondary"
+              "choices": [
+                {
+                  "label": "Primary",
+                  "value": "Primary"
+                },
+                {
+                  "label": "Secondary",
+                  "value": "Secondary"
+                }
               ],
               "name": "JoystickIdentifier"
             },
@@ -5722,6 +5789,7 @@
               "extraInformation": [
                 "Thumb"
               ],
+              "choices": [],
               "hidden": true,
               "name": "ThumbAnchorOrigin"
             },
@@ -5741,6 +5809,7 @@
               "extraInformation": [
                 "Thumb"
               ],
+              "choices": [],
               "hidden": true,
               "name": "ThumbIsScaledProportionally"
             },
@@ -10872,6 +10941,7 @@
               "extraInformation": [
                 "PlatformBehavior::PlatformerObjectBehavior"
               ],
+              "choices": [],
               "name": "PlatformerCharacter"
             },
             {
@@ -10881,6 +10951,7 @@
               "extraInformation": [
                 "SmoothCamera::SmoothCamera"
               ],
+              "choices": [],
               "name": "SmoothCamera"
             },
             {
@@ -15917,6 +15988,7 @@
                 "Linear",
                 "Exponential"
               ],
+              "choices": [],
               "advanced": true,
               "name": "ExponentialCoolingRate"
             },

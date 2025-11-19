@@ -1,5 +1,5 @@
 # 2D RPG
 
-A 2D top-down RPG-style game where the player can explore the map and interact with other characters. When near a character, a dialog appears with text and two choices.
+A 2D angled top-down RPG-style game, where the player can move left, right, up, or down, but cannot walk through building objects. When near an NPC, the player can press an action button to open a dialog box with text and two choice buttons. The camera smoothly follows the player along the X and Y axis. 
 
-Support for keyboard and mobile controls.
+This setup is ideal for JRPGs, similar to those made with RPG maker. The player character can be controlled with keyboard or touch screen controls.
