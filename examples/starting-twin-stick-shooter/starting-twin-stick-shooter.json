@@ -19,7 +19,7 @@
     "sizeOnStartupMode": "",
     "templateSlug": "starting-top-down",
     "version": "1.0.0",
-    "name": "starting_twinstickshooter",
+    "name": "starting-twin-stick-shooter",
     "description": "",
     "author": "",
     "windowWidth": 1280,
@@ -202,7 +202,7 @@
           "height": 0,
           "keepRatio": true,
           "layer": "",
-          "name": "TopDown_Character",
+          "name": "Player",
           "persistentUuid": "ebd4e918-fdc8-4c06-baef-2e0f46c2cfd5",
           "width": 0,
           "x": 608,
@@ -237,7 +237,7 @@
           "keepRatio": true,
           "layer": "Background",
           "locked": true,
-          "name": "Background",
+          "name": "RepeatingBackground",
           "persistentUuid": "f454010e-3716-4d3a-9164-74c7e450b60f",
           "width": 1280,
           "x": 0,
@@ -269,7 +269,7 @@
         {
           "adaptCollisionMaskAutomatically": false,
           "assetStoreId": "",
-          "name": "TopDown_Character",
+          "name": "Player",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -519,7 +519,7 @@
         {
           "assetStoreId": "",
           "height": 352,
-          "name": "Background",
+          "name": "RepeatingBackground",
           "texture": "assets\\StartingTiledGround.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 640,
@@ -596,7 +596,7 @@
         {
           "adaptCollisionMaskAutomatically": true,
           "assetStoreId": "",
-          "name": "Bullet",
+          "name": "PlayerBullet",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -750,16 +750,16 @@
         "folderName": "__ROOT",
         "children": [
           {
-            "objectName": "TopDown_Character"
+            "objectName": "Player"
+          },
+          {
+            "objectName": "PlayerBullet"
           },
           {
             "objectName": "Enemy"
           },
           {
-            "objectName": "Bullet"
-          },
-          {
-            "objectName": "Background"
+            "objectName": "RepeatingBackground"
           },
           {
             "folderName": "Mobile Controls",
@@ -801,6 +801,44 @@
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "TiledSpriteObject::XOffset"
+              },
+              "parameters": [
+                "RepeatingBackground",
+                "=",
+                "CameraCenterX()"
+              ]
+            },
+            {
+              "type": {
+                "value": "TiledSpriteObject::YOffset"
+              },
+              "parameters": [
+                "RepeatingBackground",
+                "=",
+                "CameraCenterY()"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Enemy logic"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
@@ -822,8 +860,8 @@
               "parameters": [
                 "",
                 "Enemy",
-                "TopDown_Character.X() + (RandomWithStep(-1, 1, 2) * SceneWindowWidth() / 2)",
-                "TopDown_Character.Y() + (RandomWithStep(-1, 1, 2) * SceneWindowHeight() / 2)",
+                "Player.X() + (RandomWithStep(-1, 1, 2) * SceneWindowWidth() / 2)",
+                "Player.Y() + (RandomWithStep(-1, 1, 2) * SceneWindowHeight() / 2)",
                 ""
               ]
             },
@@ -844,37 +882,11 @@
           "actions": [
             {
               "type": {
-                "value": "TiledSpriteObject::XOffset"
-              },
-              "parameters": [
-                "Background",
-                "=",
-                "CameraCenterX()"
-              ]
-            },
-            {
-              "type": {
-                "value": "TiledSpriteObject::YOffset"
-              },
-              "parameters": [
-                "Background",
-                "=",
-                "CameraCenterY()"
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
                 "value": "AddForceVers"
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character",
+                "Player",
                 "100",
                 "0"
               ]
@@ -885,13 +897,25 @@
               },
               "parameters": [
                 "Enemy",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
+                "Player.CenterX()",
+                "Player.CenterY()",
                 "0",
                 ""
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Player movement"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -929,7 +953,7 @@
                 "value": "RotateTowardPosition"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "CursorX()",
                 "CursorY()",
                 "0",
@@ -941,12 +965,12 @@
                 "value": "FireBullet::FireBullet::Fire"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "FireBullet",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
-                "Bullet",
-                "TopDown_Character.Angle()",
+                "Player.CenterX()",
+                "Player.CenterY()",
+                "PlayerBullet",
+                "Player.Angle()",
                 "400",
                 "300"
               ]
@@ -972,7 +996,7 @@
                 "value": "RotateTowardAngle"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "SpriteMultitouchJoystick::StickAngle(2, \"Secondary\")",
                 "0",
                 "0"
@@ -983,17 +1007,29 @@
                 "value": "FireBullet::FireBullet::Fire"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "FireBullet",
-                "TopDown_Character.CenterX()",
-                "TopDown_Character.CenterY()",
-                "Bullet",
-                "TopDown_Character.Angle()",
+                "Player.CenterX()",
+                "Player.CenterY()",
+                "PlayerBullet",
+                "Player.Angle()",
                 "400",
                 "300"
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Health management"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -1003,7 +1039,7 @@
                 "value": "CollisionNP"
               },
               "parameters": [
-                "Bullet",
+                "PlayerBullet",
                 "Enemy",
                 "",
                 "",
@@ -1028,7 +1064,7 @@
                 "value": "Delete"
               },
               "parameters": [
-                "Bullet",
+                "PlayerBullet",
                 ""
               ]
             }
@@ -1069,7 +1105,7 @@
                 "value": "CollisionNP"
               },
               "parameters": [
-                "TopDown_Character",
+                "Player",
                 "Enemy",
                 "",
                 "",

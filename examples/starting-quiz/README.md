@@ -1,4 +1,3 @@
 # Quiz game
 
-A basic quiz game showing a question on the screen with 4 buttons allowing to choose an answer. Once an answer is selected, a win/lose sound is played and the next question is displayed. Questions are stored in a scene variable.
-Support for both mouse and touchscreens.
+A 2D quiz game with a question text box, four answer buttons, and an array variable that stores all questions, their possible answers, and which answer is correct. Each answer button is a text object that automatically updates to display the answer choices for the current question. When the player clicks or taps the correct answer, the game advances to the next question. The game supports both mouse and mobile touch controls.

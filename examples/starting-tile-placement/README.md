@@ -1,4 +1,3 @@
 # Tile-based builder/strategy
 
-A 2D, top-down, game where tiles can be selected, like in a strategy game, and placed on a grid.
-Support for both mouse and touchscreens.
+A 2D game with an angled top-down view where tiles are represented by 2D sprites such as units, castle towers, and trees. Players can select the type of tile to place using UI buttons, and a placement indicator shows where the tile will be positioned. The game prevents overlapping placements and includes a ground grid to indicate valid placement locations. Tile selection and placement can be done with mouse or mobile touch controls, making it suitable for tower defense or city builder-style gameplay.
