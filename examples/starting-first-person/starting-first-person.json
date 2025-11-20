@@ -2504,13 +2504,13 @@
       "name": "SpriteMultitouchJoystick",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_controller_joystick_arrows_direction.svg",
       "shortDescription": "Joysticks or buttons for touchscreens.",
-      "version": "1.8.3",
+      "version": "1.9.0",
       "description": [
-        "Multitouch joysticks can be used the same way as physical gamepads:",
+        "Multitouch joysticks are objects showing a joystick on the screen, useful for mobile. They work like a physical gamepad:",
         "- 4 or 8 directions",
         "- Analogus pads",
         "- Player selection",
-        "- Controls mapping for top-down movement and platformer characters",
+        "- Automatic \"mapper\" behaviors for 2D and 3D movement behaviors (platformer characters, top-down movement, 3D character etc...). Add one of these to the object with the movement behavior (i.e: the player most of the time) and the behavior will then be controlled automatically by the virtual joystick (it works by reading the multitouch joystick state and simulating controls). No need for additional events to make it work once the behaviors are set up.",
         "",
         "There are ready-to-use joysticks in the asset-store [multitouch joysticks pack](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=multitouch-joysticks-multitouch-joysticks)."
       ],
@@ -2574,6 +2574,28 @@
         }
       ],
       "eventsFunctions": [
+        {
+          "description": "Check if the events are running for the editor.",
+          "fullName": "Editor is running",
+          "functionType": "Condition",
+          "name": "IsInGameEdition",
+          "private": true,
+          "sentence": "Events are running for the editor",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const game = runtimeScene.getGame();\r",
+                "eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
         {
           "fullName": "Accelerated speed",
           "functionType": "Expression",
@@ -2992,11 +3014,11 @@
           "objectGroups": []
         },
         {
-          "description": "Check if a button is pressed on a gamepad.",
-          "fullName": "Multitouch controller button pressed",
+          "description": "Check if a button was just pressed on a multitouch controller.",
+          "fullName": "Multitouch controller button just pressed",
           "functionType": "Condition",
-          "name": "IsButtonPressed",
-          "sentence": "Button _PARAM2_ of multitouch controller _PARAM1_ is pressed",
+          "name": "IsButtonJustPressed",
+          "sentence": "Button _PARAM2_ of multitouch controller _PARAM1_ was just pressed",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -3008,7 +3030,7 @@
                   "parameters": [
                     "Controllers[ControllerIdentifier].Buttons[Button].State",
                     "=",
-                    "\"Pressed\""
+                    "\"JustPressed\""
                   ]
                 }
               ],
@@ -3040,7 +3062,73 @@
           "objectGroups": []
         },
         {
-          "description": "Check if a button is released on a gamepad.",
+          "description": "Check if a button is pressed on a multitouch controller.",
+          "fullName": "Multitouch controller button pressed",
+          "functionType": "Condition",
+          "name": "IsButtonPressed",
+          "sentence": "Button _PARAM2_ of multitouch controller _PARAM1_ is pressed",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Controllers[ControllerIdentifier].Buttons[Button].State",
+                        "=",
+                        "\"Pressed\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "Controllers[ControllerIdentifier].Buttons[Button].State",
+                        "=",
+                        "\"JustPressed\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Multitouch controller identifier (1, 2, 3, 4...)",
+              "name": "ControllerIdentifier",
+              "type": "expression"
+            },
+            {
+              "description": "Button name",
+              "name": "Button",
+              "supplementaryInformation": "[\"A\",\"CROSS\",\"B\",\"CIRCLE\",\"X\",\"SQUARE\",\"Y\",\"TRIANGLE\",\"LB\",\"L1\",\"RB\",\"R1\",\"LT\",\"L2\",\"RT\",\"R2\",\"UP\",\"DOWN\",\"LEFT\",\"RIGHT\",\"BACK\",\"SHARE\",\"START\",\"OPTIONS\",\"CLICK_STICK_LEFT\",\"CLICK_STICK_RIGHT\",\"PS_BUTTON\",\"CLICK_TOUCHPAD\"]",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if a button is released on a multitouch controller.",
           "fullName": "Multitouch controller button released",
           "functionType": "Condition",
           "name": "IsButtonReleased",
@@ -3126,7 +3214,7 @@
             {
               "description": "Button state",
               "name": "ButtonState",
-              "supplementaryInformation": "[\"Idle\",\"Pressed\",\"Released\"]",
+              "supplementaryInformation": "[\"Idle\",\"Pressed\",\"JustPressed\",\"Released\"]",
               "type": "stringWithSelector"
             }
           ],
@@ -4499,145 +4587,26 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "HasGameJustResumed"
+                        "inverted": true,
+                        "value": "SpriteMultitouchJoystick::IsInGameEdition"
                       },
                       "parameters": [
+                        "",
                         ""
                       ]
                     }
                   ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::MultitouchJoystick::Reset"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Manage touches",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
+                  "actions": [],
                   "events": [
                     {
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
-                            "value": "HasAnyTouchOrMouseStarted"
+                            "value": "HasGameJustResumed"
                           },
                           "parameters": [
                             ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
-                            "TouchIndex",
-                            "=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Repeat",
-                          "repeatExpression": "StartedTouchOrMouseCount()",
-                          "conditions": [],
-                          "actions": [],
-                          "events": [
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "NumberVariable"
-                                  },
-                                  "parameters": [
-                                    "TouchId",
-                                    "=",
-                                    "0"
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "value": "CollisionPoint"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "TouchX(StartedTouchOrMouseId(TouchIndex), Object.Layer(), 0)",
-                                    "TouchY(StartedTouchOrMouseId(TouchIndex), Object.Layer(), 0)"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "SetNumberVariable"
-                                  },
-                                  "parameters": [
-                                    "TouchId",
-                                    "=",
-                                    "StartedTouchOrMouseId(TouchIndex)"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "SetNumberVariable"
-                                  },
-                                  "parameters": [
-                                    "TouchIndex",
-                                    "+",
-                                    "1"
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "Move thumb back to center when not being pressed (acts like a spring on a real controller)"
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "HasTouchEnded"
-                          },
-                          "parameters": [
-                            "",
-                            "TouchId"
                           ]
                         }
                       ],
@@ -4653,61 +4622,198 @@
                           ]
                         }
                       ]
-                    }
-                  ],
-                  "parameters": []
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Update joystick position",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
+                    },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Manage touches",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
                         {
-                          "type": {
-                            "value": "NumberVariable"
-                          },
-                          "parameters": [
-                            "TouchId",
-                            "!=",
-                            "0"
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::MultitouchJoystick::SetJoystickAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "AngleBetweenPositions(Object.CenterX(), Object.CenterY(), TouchX(TouchId, Object.Layer(), 0), TouchY(TouchId, Object.Layer(), 0))",
-                            "AngleBetweenPositions(Object.CenterX(), Object.CenterY(), TouchX(TouchId, Object.Layer(), 0), TouchY(TouchId, Object.Layer(), 0))"
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "HasAnyTouchOrMouseStarted"
+                              },
+                              "parameters": [
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TouchIndex",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Repeat",
+                              "repeatExpression": "StartedTouchOrMouseCount()",
+                              "conditions": [],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "NumberVariable"
+                                      },
+                                      "parameters": [
+                                        "TouchId",
+                                        "=",
+                                        "0"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "CollisionPoint"
+                                      },
+                                      "parameters": [
+                                        "Object",
+                                        "TouchX(StartedTouchOrMouseId(TouchIndex), Object.Layer(), 0)",
+                                        "TouchY(StartedTouchOrMouseId(TouchIndex), Object.Layer(), 0)"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "SetNumberVariable"
+                                      },
+                                      "parameters": [
+                                        "TouchId",
+                                        "=",
+                                        "StartedTouchOrMouseId(TouchIndex)"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "SetNumberVariable"
+                                      },
+                                      "parameters": [
+                                        "TouchIndex",
+                                        "+",
+                                        "1"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
                           ]
                         },
                         {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::MultitouchJoystick::SetJoystickForce"
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
                           },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "clamp(2 * DistanceBetweenPositions(Object.CenterX(), Object.CenterY(), TouchX(TouchId, Object.Layer(), 0), TouchY(TouchId, Object.Layer(), 0)) / Object.Width(), 0, 1)",
-                            ""
+                          "comment": "Move thumb back to center when not being pressed (acts like a spring on a real controller)"
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "HasTouchEnded"
+                              },
+                              "parameters": [
+                                "",
+                                "TouchId"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SpriteMultitouchJoystick::MultitouchJoystick::Reset"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            }
                           ]
                         }
-                      ]
+                      ],
+                      "parameters": []
+                    },
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Update joystick position",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "TouchId",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SpriteMultitouchJoystick::MultitouchJoystick::SetJoystickAngle"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "AngleBetweenPositions(Object.CenterX(), Object.CenterY(), TouchX(TouchId, Object.Layer(), 0), TouchY(TouchId, Object.Layer(), 0))",
+                                "AngleBetweenPositions(Object.CenterX(), Object.CenterY(), TouchX(TouchId, Object.Layer(), 0), TouchY(TouchId, Object.Layer(), 0))"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SpriteMultitouchJoystick::MultitouchJoystick::SetJoystickForce"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                "=",
+                                "clamp(2 * DistanceBetweenPositions(Object.CenterX(), Object.CenterY(), TouchX(TouchId, Object.Layer(), 0), TouchY(TouchId, Object.Layer(), 0)) / Object.Width(), 0, 1)",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
                     }
-                  ],
-                  "parameters": []
+                  ]
                 }
               ],
               "parameters": [
@@ -5582,7 +5688,7 @@
           "sharedPropertyDescriptors": []
         },
         {
-          "description": "Detect button presses made on a touchscreen.",
+          "description": "Detect presses made on a touchscreen on the object so it acts like a button and automatically trigger the button having the same identifier for the mapper behaviors.",
           "fullName": "Multitouch button",
           "name": "MultitouchButton",
           "objectType": "",
@@ -5598,11 +5704,11 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "SpriteMultitouchJoystick::MultitouchButton::IsReleased"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "IsReleased",
+                        "True",
                         ""
                       ]
                     }
@@ -5626,6 +5732,44 @@
                         "Object",
                         "Behavior",
                         "\"Idle\"",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsJustPressed",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "IsJustPressed",
+                        "False",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SpriteMultitouchJoystick::MultitouchButton::SetButtonState"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "\"Pressed\"",
                         ""
                       ]
                     }
@@ -5723,7 +5867,17 @@
                               "parameters": [
                                 "Object",
                                 "Behavior",
-                                "\"Pressed\"",
+                                "\"JustPressed\"",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetBooleanVariable"
+                              },
+                              "parameters": [
+                                "IsJustPressed",
+                                "True",
                                 ""
                               ]
                             }
@@ -5796,6 +5950,16 @@
                     },
                     {
                       "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "IsJustPressed",
+                        "False",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
                         "value": "SetNumberVariable"
                       },
                       "parameters": [
@@ -5823,11 +5987,11 @@
               "objectGroups": []
             },
             {
-              "description": "Check if button is released.",
-              "fullName": "Button released",
+              "description": "Check if the button was just pressed.",
+              "fullName": "Button just pressed",
               "functionType": "Condition",
-              "name": "IsReleased",
-              "sentence": "Button _PARAM0_ is released",
+              "name": "IsJustPressed",
+              "sentence": "Button _PARAM0_ was just pressed",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -5837,7 +6001,7 @@
                         "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "IsReleased",
+                        "IsJustPressed",
                         "True",
                         ""
                       ]
@@ -5871,7 +6035,7 @@
               "objectGroups": []
             },
             {
-              "description": "Check if button is pressed.",
+              "description": "Check if the button is pressed.",
               "fullName": "Button pressed",
               "functionType": "Condition",
               "name": "IsPressed",
@@ -5888,6 +6052,54 @@
                         "TouchId",
                         "!=",
                         "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "SpriteMultitouchJoystick::MultitouchButton",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the button is released.",
+              "fullName": "Button released",
+              "functionType": "Condition",
+              "name": "IsReleased",
+              "sentence": "Button _PARAM0_ is released",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsReleased",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -5959,7 +6171,7 @@
                 {
                   "description": "Button state",
                   "name": "ButtonState",
-                  "supplementaryInformation": "[\"Idle\",\"Pressed\",\"Released\"]",
+                  "supplementaryInformation": "[\"Idle\",\"JustPressed\",\"Pressed\",\"Released\"]",
                   "type": "stringWithSelector"
                 }
               ],
@@ -5999,6 +6211,13 @@
               "label": "Button released",
               "hidden": true,
               "name": "IsReleased"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "Button just pressed",
+              "hidden": true,
+              "name": "IsJustPressed"
             },
             {
               "value": "0",
@@ -8414,7 +8633,6 @@
             }
           ],
           "instances": [],
-          "editionSettings": {},
           "eventsFunctions": [
             {
               "fullName": "",
@@ -8533,72 +8751,90 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "MettreAutour"
-                      },
-                      "parameters": [
-                        "Thumb",
-                        "Border",
-                        "Border.MultitouchJoystick::JoystickForce() * Border.Width() / 2",
-                        "Border.MultitouchJoystick::JoystickAngle()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
-                        "value": "BooleanVariable"
-                      },
-                      "parameters": [
-                        "ShouldBeHiddenWhenReleased",
-                        "True",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
                         "inverted": true,
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
+                        "value": "SpriteMultitouchJoystick::IsInGameEdition"
                       },
                       "parameters": [
-                        "Object",
+                        "",
                         ""
                       ]
                     }
                   ],
-                  "actions": [
+                  "actions": [],
+                  "events": [
                     {
-                      "type": {
-                        "value": "Cache"
-                      },
-                      "parameters": [
-                        "Object"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "MettreAutour"
+                          },
+                          "parameters": [
+                            "Thumb",
+                            "Border",
+                            "Border.MultitouchJoystick::JoystickForce() * Border.Width() / 2",
+                            "Border.MultitouchJoystick::JoystickAngle()"
+                          ]
+                        }
                       ]
                     },
                     {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::ActivateControl"
-                      },
-                      "parameters": [
-                        "Object",
-                        "no",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetBooleanVariable"
-                      },
-                      "parameters": [
-                        "ShouldBeHiddenWhenReleased",
-                        "False",
-                        ""
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "ShouldBeHiddenWhenReleased",
+                            "True",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
+                          },
+                          "parameters": [
+                            "Object",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Cache"
+                          },
+                          "parameters": [
+                            "Object"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::ActivateControl"
+                          },
+                          "parameters": [
+                            "Object",
+                            "no",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetBooleanVariable"
+                          },
+                          "parameters": [
+                            "ShouldBeHiddenWhenReleased",
+                            "False",
+                            ""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -11321,7 +11557,7 @@
       "name": "SpriteToggleSwitch",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Interface Elements/8d0cd8cd0c9318f4f6efde6ee6b4c192bd19306467f80c9970387a259300f895_Interface Elements_interface_ui_toggle_switch_on_off.svg",
       "shortDescription": "Toggle switch that users can click or touch.",
-      "version": "2.0.0",
+      "version": "2.0.2",
       "description": [
         "Toggle switch that users can click or touch. The switch can be customized with sprites.",
         "",
@@ -11351,7 +11587,30 @@
       "dependencies": [],
       "globalVariables": [],
       "sceneVariables": [],
-      "eventsFunctions": [],
+      "eventsFunctions": [
+        {
+          "description": "Check if the events are running for the editor.",
+          "fullName": "Editor is running",
+          "functionType": "Condition",
+          "name": "IsInGameEdition",
+          "private": true,
+          "sentence": "Events are running for the editor",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const game = runtimeScene.getGame();\r",
+                "eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        }
+      ],
       "eventsBasedBehaviors": [
         {
           "description": "The finite state machine used internally by the switch object.",
@@ -11699,107 +11958,15 @@
               "sentence": "Check _PARAM0_: _PARAM2_",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "Avoid a started touch to interfere with a state change from events."
-                },
-                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::And"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "GetArgumentAsBoolean"
-                              },
-                              "parameters": [
-                                "\"Value\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "SpriteToggleSwitch::SwitchFSM::IsChecked"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "BuiltinCommonInstructions::And"
-                          },
-                          "parameters": [],
-                          "subInstructions": [
-                            {
-                              "type": {
-                                "value": "GetArgumentAsBoolean"
-                              },
-                              "parameters": [
-                                "\"Value\""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "SpriteToggleSwitch::SwitchFSM::IsChecked"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SpriteToggleSwitch::ButtonFSM::ResetState"
-                      },
-                      "parameters": [
-                        "Object",
-                        "ButtonFSM",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
                         "value": "BooleanVariable"
                       },
                       "parameters": [
                         "Value",
-                        "True",
+                        "False",
                         ""
                       ]
                     }
@@ -11815,6 +11982,47 @@
                         ""
                       ]
                     }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Avoid a started touch to interfere with a state change from events."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SpriteToggleSwitch::SwitchFSM::IsChecked"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SpriteToggleSwitch::ButtonFSM::ResetState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ButtonFSM",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 },
                 {
@@ -11840,6 +12048,36 @@
                         "IsChecked",
                         "True",
                         ""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "SpriteToggleSwitch::SwitchFSM::IsChecked"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SpriteToggleSwitch::ButtonFSM::ResetState"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ButtonFSM",
+                            ""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -12039,59 +12277,27 @@
               "sentence": "",
               "events": [
                 {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Finite state machine",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SpriteToggleSwitch::IsInGameEdition"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [],
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "The \"Validated\" state only last one frame."
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "StringVariable"
-                          },
-                          "parameters": [
-                            "State",
-                            "=",
-                            "\"Validated\""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetStringVariable"
-                          },
-                          "parameters": [
-                            "State",
-                            "=",
-                            "\"Idle\""
-                          ]
-                        }
-                      ]
-                    },
-                    {
                       "colorB": 228,
                       "colorG": 176,
                       "colorR": 74,
                       "creationTime": 0,
-                      "name": "Check position",
+                      "name": "Finite state machine",
                       "source": "",
                       "type": "BuiltinCommonInstructions::Group",
                       "events": [
@@ -12105,498 +12311,133 @@
                             "textG": 0,
                             "textR": 0
                           },
-                          "comment": "Make sure the cursor position is only checked once per frame."
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetBooleanVariable"
-                              },
-                              "parameters": [
-                                "MouseIsInside",
-                                "False",
-                                ""
-                              ]
-                            }
-                          ]
+                          "comment": "The \"Validated\" state only last one frame."
                         },
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
                             {
                               "type": {
-                                "value": "BooleanVariable"
+                                "value": "StringVariable"
                               },
                               "parameters": [
-                                "ShouldCheckHovering",
-                                "True",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CollisionPoint"
-                              },
-                              "parameters": [
-                                "Object",
-                                "MouseOnlyCursorX(Object.Layer(), 0)",
-                                "MouseOnlyCursorY(Object.Layer(), 0)"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetBooleanVariable"
-                              },
-                              "parameters": [
-                                "MouseIsInside",
-                                "True",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Comment",
-                          "color": {
-                            "b": 109,
-                            "g": 230,
-                            "r": 255,
-                            "textB": 0,
-                            "textG": 0,
-                            "textR": 0
-                          },
-                          "comment": "Touches are always pressed, so ShouldCheckHovering doesn't matter."
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetBooleanVariable"
-                              },
-                              "parameters": [
-                                "TouchIsInside",
-                                "False",
-                                ""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "NumberVariable"
-                              },
-                              "parameters": [
-                                "TouchId",
-                                "!=",
-                                "0"
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "CollisionPoint"
-                              },
-                              "parameters": [
-                                "Object",
-                                "TouchX(TouchId, Object.Layer(), 0)",
-                                "TouchY(TouchId, Object.Layer(), 0)"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetBooleanVariable"
-                              },
-                              "parameters": [
-                                "TouchIsInside",
-                                "True",
-                                ""
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "parameters": []
-                    },
-                    {
-                      "colorB": 228,
-                      "colorG": 176,
-                      "colorR": 74,
-                      "creationTime": 0,
-                      "name": "Handle touch start",
-                      "source": "",
-                      "type": "BuiltinCommonInstructions::Group",
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "HasAnyTouchOrMouseStarted"
-                              },
-                              "parameters": [
-                                ""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetNumberVariable"
-                              },
-                              "parameters": [
-                                "Index",
+                                "State",
                                 "=",
-                                "0"
+                                "\"Validated\""
                               ]
                             }
                           ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringVariable"
+                              },
+                              "parameters": [
+                                "State",
+                                "=",
+                                "\"Idle\""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Check position",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
                           "events": [
                             {
-                              "type": "BuiltinCommonInstructions::Repeat",
-                              "repeatExpression": "StartedTouchOrMouseCount()",
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Make sure the cursor position is only checked once per frame."
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
                               "conditions": [],
-                              "actions": [],
-                              "events": [
+                              "actions": [
                                 {
-                                  "type": "BuiltinCommonInstructions::Standard",
-                                  "conditions": [
-                                    {
-                                      "type": {
-                                        "value": "CollisionPoint"
-                                      },
-                                      "parameters": [
-                                        "Object",
-                                        "TouchX(StartedTouchOrMouseId(Index), Object.Layer(), 0)",
-                                        "TouchY(StartedTouchOrMouseId(Index), Object.Layer(), 0)"
-                                      ]
-                                    }
-                                  ],
-                                  "actions": [
-                                    {
-                                      "type": {
-                                        "value": "SetNumberVariable"
-                                      },
-                                      "parameters": [
-                                        "TouchId",
-                                        "=",
-                                        "StartedTouchOrMouseId(Index)"
-                                      ]
-                                    },
-                                    {
-                                      "type": {
-                                        "value": "SetBooleanVariable"
-                                      },
-                                      "parameters": [
-                                        "TouchIsInside",
-                                        "True",
-                                        ""
-                                      ]
-                                    }
-                                  ],
-                                  "events": [
-                                    {
-                                      "type": "BuiltinCommonInstructions::Standard",
-                                      "conditions": [
-                                        {
-                                          "type": {
-                                            "value": "BuiltinCommonInstructions::Or"
-                                          },
-                                          "parameters": [],
-                                          "subInstructions": [
-                                            {
-                                              "type": {
-                                                "value": "SpriteToggleSwitch::ButtonFSM::PropertyState"
-                                              },
-                                              "parameters": [
-                                                "Object",
-                                                "Behavior",
-                                                "=",
-                                                "\"Hovered\""
-                                              ]
-                                            },
-                                            {
-                                              "type": {
-                                                "value": "SpriteToggleSwitch::ButtonFSM::PropertyState"
-                                              },
-                                              "parameters": [
-                                                "Object",
-                                                "Behavior",
-                                                "=",
-                                                "\"Idle\""
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ],
-                                      "actions": [
-                                        {
-                                          "type": {
-                                            "value": "SetStringVariable"
-                                          },
-                                          "parameters": [
-                                            "State",
-                                            "=",
-                                            "\"PressedInside\""
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "BuiltinCommonInstructions::Standard",
-                                  "conditions": [],
-                                  "actions": [
-                                    {
-                                      "type": {
-                                        "value": "SetNumberVariable"
-                                      },
-                                      "parameters": [
-                                        "Index",
-                                        "+",
-                                        "1"
-                                      ]
-                                    }
+                                  "type": {
+                                    "value": "SetBooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "MouseIsInside",
+                                    "False",
+                                    ""
                                   ]
                                 }
                               ]
-                            }
-                          ]
-                        }
-                      ],
-                      "parameters": []
-                    },
-                    {
-                      "colorB": 228,
-                      "colorG": 176,
-                      "colorR": 74,
-                      "creationTime": 0,
-                      "name": "Apply position changes",
-                      "source": "",
-                      "type": "BuiltinCommonInstructions::Group",
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "BooleanVariable"
-                              },
-                              "parameters": [
-                                "MouseIsInside",
-                                "True",
-                                ""
-                              ]
                             },
-                            {
-                              "type": {
-                                "value": "StringVariable"
-                              },
-                              "parameters": [
-                                "State",
-                                "=",
-                                "\"Hovered\""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetStringVariable"
-                              },
-                              "parameters": [
-                                "State",
-                                "=",
-                                "\"Idle\""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "BooleanVariable"
-                              },
-                              "parameters": [
-                                "MouseIsInside",
-                                "True",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "StringVariable"
-                              },
-                              "parameters": [
-                                "State",
-                                "=",
-                                "\"Idle\""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetStringVariable"
-                              },
-                              "parameters": [
-                                "State",
-                                "=",
-                                "\"Hovered\""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "inverted": true,
-                                "value": "BooleanVariable"
-                              },
-                              "parameters": [
-                                "TouchIsInside",
-                                "True",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "StringVariable"
-                              },
-                              "parameters": [
-                                "State",
-                                "=",
-                                "\"PressedInside\""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetStringVariable"
-                              },
-                              "parameters": [
-                                "State",
-                                "=",
-                                "\"PressedOutside\""
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "BooleanVariable"
-                              },
-                              "parameters": [
-                                "TouchIsInside",
-                                "True",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
-                                "value": "StringVariable"
-                              },
-                              "parameters": [
-                                "State",
-                                "=",
-                                "\"PressedOutside\""
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetStringVariable"
-                              },
-                              "parameters": [
-                                "State",
-                                "=",
-                                "\"PressedInside\""
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "parameters": []
-                    },
-                    {
-                      "colorB": 228,
-                      "colorG": 176,
-                      "colorR": 74,
-                      "creationTime": 0,
-                      "name": "Handle touch end",
-                      "source": "",
-                      "type": "BuiltinCommonInstructions::Group",
-                      "events": [
-                        {
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "HasTouchEnded"
-                              },
-                              "parameters": [
-                                "",
-                                "TouchId"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetNumberVariable"
-                              },
-                              "parameters": [
-                                "TouchId",
-                                "=",
-                                "0"
-                              ]
-                            }
-                          ],
-                          "events": [
                             {
                               "type": "BuiltinCommonInstructions::Standard",
                               "conditions": [
                                 {
                                   "type": {
-                                    "value": "StringVariable"
+                                    "value": "BooleanVariable"
                                   },
                                   "parameters": [
-                                    "State",
-                                    "=",
-                                    "\"PressedInside\""
+                                    "ShouldCheckHovering",
+                                    "True",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "CollisionPoint"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "MouseOnlyCursorX(Object.Layer(), 0)",
+                                    "MouseOnlyCursorY(Object.Layer(), 0)"
                                   ]
                                 }
                               ],
                               "actions": [
                                 {
                                   "type": {
-                                    "value": "SetStringVariable"
+                                    "value": "SetBooleanVariable"
                                   },
                                   "parameters": [
-                                    "State",
-                                    "=",
-                                    "\"Validated\""
+                                    "MouseIsInside",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "Touches are always pressed, so ShouldCheckHovering doesn't matter."
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetBooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "TouchIsInside",
+                                    "False",
+                                    ""
                                   ]
                                 }
                               ]
@@ -12606,24 +12447,221 @@
                               "conditions": [
                                 {
                                   "type": {
-                                    "inverted": true,
-                                    "value": "StringVariable"
+                                    "value": "NumberVariable"
                                   },
                                   "parameters": [
-                                    "State",
-                                    "=",
-                                    "\"PressedInside\""
+                                    "TouchId",
+                                    "!=",
+                                    "0"
                                   ]
                                 },
                                 {
                                   "type": {
+                                    "value": "CollisionPoint"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "TouchX(TouchId, Object.Layer(), 0)",
+                                    "TouchY(TouchId, Object.Layer(), 0)"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetBooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "TouchIsInside",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Handle touch start",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "HasAnyTouchOrMouseStarted"
+                                  },
+                                  "parameters": [
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "Index",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Repeat",
+                                  "repeatExpression": "StartedTouchOrMouseCount()",
+                                  "conditions": [],
+                                  "actions": [],
+                                  "events": [
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [
+                                        {
+                                          "type": {
+                                            "value": "CollisionPoint"
+                                          },
+                                          "parameters": [
+                                            "Object",
+                                            "TouchX(StartedTouchOrMouseId(Index), Object.Layer(), 0)",
+                                            "TouchY(StartedTouchOrMouseId(Index), Object.Layer(), 0)"
+                                          ]
+                                        }
+                                      ],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "SetNumberVariable"
+                                          },
+                                          "parameters": [
+                                            "TouchId",
+                                            "=",
+                                            "StartedTouchOrMouseId(Index)"
+                                          ]
+                                        },
+                                        {
+                                          "type": {
+                                            "value": "SetBooleanVariable"
+                                          },
+                                          "parameters": [
+                                            "TouchIsInside",
+                                            "True",
+                                            ""
+                                          ]
+                                        }
+                                      ],
+                                      "events": [
+                                        {
+                                          "type": "BuiltinCommonInstructions::Standard",
+                                          "conditions": [
+                                            {
+                                              "type": {
+                                                "value": "BuiltinCommonInstructions::Or"
+                                              },
+                                              "parameters": [],
+                                              "subInstructions": [
+                                                {
+                                                  "type": {
+                                                    "value": "SpriteToggleSwitch::ButtonFSM::PropertyState"
+                                                  },
+                                                  "parameters": [
+                                                    "Object",
+                                                    "Behavior",
+                                                    "=",
+                                                    "\"Hovered\""
+                                                  ]
+                                                },
+                                                {
+                                                  "type": {
+                                                    "value": "SpriteToggleSwitch::ButtonFSM::PropertyState"
+                                                  },
+                                                  "parameters": [
+                                                    "Object",
+                                                    "Behavior",
+                                                    "=",
+                                                    "\"Idle\""
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "actions": [
+                                            {
+                                              "type": {
+                                                "value": "SetStringVariable"
+                                              },
+                                              "parameters": [
+                                                "State",
+                                                "=",
+                                                "\"PressedInside\""
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "value": "SetNumberVariable"
+                                          },
+                                          "parameters": [
+                                            "Index",
+                                            "+",
+                                            "1"
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Apply position changes",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
                                     "inverted": true,
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "MouseIsInside",
+                                    "True",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
                                     "value": "StringVariable"
                                   },
                                   "parameters": [
                                     "State",
                                     "=",
-                                    "\"Validated\""
+                                    "\"Hovered\""
                                   ]
                                 }
                               ],
@@ -12639,14 +12677,232 @@
                                   ]
                                 }
                               ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "MouseIsInside",
+                                    "True",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "=",
+                                    "\"Idle\""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetStringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "=",
+                                    "\"Hovered\""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": true,
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "TouchIsInside",
+                                    "True",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "=",
+                                    "\"PressedInside\""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetStringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "=",
+                                    "\"PressedOutside\""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "TouchIsInside",
+                                    "True",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "=",
+                                    "\"PressedOutside\""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetStringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "=",
+                                    "\"PressedInside\""
+                                  ]
+                                }
+                              ]
                             }
-                          ]
+                          ],
+                          "parameters": []
+                        },
+                        {
+                          "colorB": 228,
+                          "colorG": 176,
+                          "colorR": 74,
+                          "creationTime": 0,
+                          "name": "Handle touch end",
+                          "source": "",
+                          "type": "BuiltinCommonInstructions::Group",
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "HasTouchEnded"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "TouchId"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "TouchId",
+                                    "=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "StringVariable"
+                                      },
+                                      "parameters": [
+                                        "State",
+                                        "=",
+                                        "\"PressedInside\""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "SetStringVariable"
+                                      },
+                                      "parameters": [
+                                        "State",
+                                        "=",
+                                        "\"Validated\""
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "inverted": true,
+                                        "value": "StringVariable"
+                                      },
+                                      "parameters": [
+                                        "State",
+                                        "=",
+                                        "\"PressedInside\""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": true,
+                                        "value": "StringVariable"
+                                      },
+                                      "parameters": [
+                                        "State",
+                                        "=",
+                                        "\"Validated\""
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "SetStringVariable"
+                                      },
+                                      "parameters": [
+                                        "State",
+                                        "=",
+                                        "\"Idle\""
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "parameters": []
                         }
                       ],
                       "parameters": []
                     }
-                  ],
-                  "parameters": []
+                  ]
                 }
               ],
               "parameters": [
@@ -13299,7 +13555,6 @@
               "initialVariables": []
             }
           ],
-          "editionSettings": {},
           "eventsFunctions": [
             {
               "fullName": "",
@@ -13362,12 +13617,11 @@
                   "conditions": [
                     {
                       "type": {
-                        "inverted": true,
                         "value": "BooleanVariable"
                       },
                       "parameters": [
                         "IsChecked",
-                        "True",
+                        "False",
                         ""
                       ]
                     }
@@ -13468,12 +13722,11 @@
                     },
                     {
                       "type": {
-                        "inverted": true,
                         "value": "BooleanVariable"
                       },
                       "parameters": [
                         "PreviousIsChecked",
-                        "True",
+                        "False",
                         ""
                       ]
                     }
@@ -13506,12 +13759,11 @@
                   "conditions": [
                     {
                       "type": {
-                        "inverted": true,
                         "value": "BooleanVariable"
                       },
                       "parameters": [
                         "IsChecked",
-                        "True",
+                        "False",
                         ""
                       ]
                     },
@@ -14060,7 +14312,6 @@
               "fullName": "Is pressed",
               "functionType": "Condition",
               "name": "IsPressed",
-              "private": true,
               "sentence": "_PARAM0_ is pressed",
               "events": [
                 {
@@ -14069,6 +14320,49 @@
                     {
                       "type": {
                         "value": "SpriteToggleSwitch::ButtonFSM::IsPressed"
+                      },
+                      "parameters": [
+                        "State",
+                        "ButtonFSM",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "SpriteToggleSwitch::SpriteToggleSwitch",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the button is currently being pressed outside with mouse or touch.",
+              "fullName": "Is held outside",
+              "functionType": "Condition",
+              "name": "IsPressedOutside",
+              "sentence": "_PARAM0_ is held outside",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SpriteToggleSwitch::ButtonFSM::IsPressedOutside"
                       },
                       "parameters": [
                         "State",
