@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 244,
+    "build": 247,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -388,8 +388,7 @@
           "name": "rotate-screen-icon.png"
         }
       }
-    ],
-    "resourceFolders": []
+    ]
   },
   "objects": [],
   "objectsFolderStructure": {
@@ -1806,6 +1805,16 @@
               "JumpButton": "A"
             },
             {
+              "name": "PlatformerCamera3D",
+              "type": "PlatformerCamera3D::PlatformerCamera3D",
+              "PhysicsCharacter3D": "PhysicsCharacter3D",
+              "ThirdPersonCamera": "ThirdPersonCamera",
+              "IsCameraLocked": false,
+              "ControlKind": "Keyboard",
+              "Object3D": "Object3D",
+              "AirFollowFreeAreaBottom": 70
+            },
+            {
               "name": "Player",
               "type": "Player::Player",
               "Object3D": "Object3D",
@@ -2054,7 +2063,13 @@
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Collectible",
+              "type": "Collectible::Collectible",
+              "Object3D": "Object3D"
+            }
+          ],
           "content": {
             "centerLocation": "ModelOrigin",
             "crossfadeDuration": 0,
@@ -3393,1013 +3408,6 @@
       },
       "events": [
         {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "DepartScene"
-              },
-              "parameters": [
-                ""
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "Cache"
-              },
-              "parameters": [
-                "Barrel"
-              ]
-            },
-            {
-              "type": {
-                "value": "Background::CreateObjectOnCylinder"
-              },
-              "parameters": [
-                "",
-                "Cloud",
-                "Object3D",
-                "Scale",
-                "48",
-                "700",
-                "1200",
-                "2500",
-                "8000",
-                "-400",
-                "800",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "SetAngle"
-              },
-              "parameters": [
-                "Coin",
-                "=",
-                "RandomFloat(360)"
-              ]
-            },
-            {
-              "type": {
-                "value": "SetCameraAngle"
-              },
-              "parameters": [
-                "",
-                "=",
-                "Character.Angle() + 90",
-                "",
-                ""
-              ]
-            }
-          ],
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "SystemInfo::HasTouchScreen"
-                  },
-                  "parameters": [
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
-                  },
-                  "parameters": [
-                    "",
-                    "\"Touch controls\"",
-                    "0",
-                    "0",
-                    "0"
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "Cache"
-                      },
-                      "parameters": [
-                        "WalkJoystick"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::ActivateControl"
-                      },
-                      "parameters": [
-                        "WalkJoystick",
-                        "",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
-              },
-              "parameters": [
-                "",
-                "WalkJoystick",
-                "\"Left\"",
-                ""
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
-              },
-              "parameters": [
-                "WalkJoystick",
-                "CursorX(\"UI\")"
-              ]
-            }
-          ]
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "name": "Camera controls",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Camera object rotates along with the player's cursor, and the in game camera rotates based on the position of the Camera object"
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                  },
-                  "parameters": [
-                    "WalkJoystick",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetStringVariable"
-                  },
-                  "parameters": [
-                    "ControlKind",
-                    "=",
-                    "\"Touch\""
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BooleanVariable"
-                      },
-                      "parameters": [
-                        "IsCameraLocked",
-                        "False",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                      },
-                      "parameters": [
-                        "Character",
-                        "ThirdPersonCamera",
-                        "=",
-                        "2",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Gamepads::StickForce"
-                  },
-                  "parameters": [
-                    "",
-                    ">",
-                    "0",
-                    "1",
-                    "\"Left\"",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetStringVariable"
-                  },
-                  "parameters": [
-                    "ControlKind",
-                    "=",
-                    "\"Gamepad\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "2",
-                    ""
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BooleanVariable"
-                      },
-                      "parameters": [
-                        "IsCameraLocked",
-                        "False",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                      },
-                      "parameters": [
-                        "Character",
-                        "ThirdPersonCamera",
-                        "=",
-                        "2",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "AnyKeyPressed"
-                  },
-                  "parameters": [
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetStringVariable"
-                  },
-                  "parameters": [
-                    "ControlKind",
-                    "=",
-                    "\"Keyboard\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "2",
-                    ""
-                  ]
-                }
-              ],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BooleanVariable"
-                      },
-                      "parameters": [
-                        "IsCameraLocked",
-                        "False",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                      },
-                      "parameters": [
-                        "Character",
-                        "ThirdPersonCamera",
-                        "=",
-                        "2",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Not"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Or"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "AnyKeyPressed"
-                          },
-                          "parameters": [
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Gamepads::StickForce"
-                          },
-                          "parameters": [
-                            "",
-                            ">",
-                            "0",
-                            "1",
-                            "\"Left\"",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::IsPressed"
-                          },
-                          "parameters": [
-                            "WalkJoystick",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "StringVariable"
-                      },
-                      "parameters": [
-                        "ControlKind",
-                        "=",
-                        "\"Keyboard\""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                      },
-                      "parameters": [
-                        "Character",
-                        "ThirdPersonCamera",
-                        "=",
-                        "1000000",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "StringVariable"
-                      },
-                      "parameters": [
-                        "ControlKind",
-                        "!=",
-                        "\"Keyboard\""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                      },
-                      "parameters": [
-                        "Character",
-                        "ThirdPersonCamera",
-                        "=",
-                        "0.5",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetBooleanVariable"
-                      },
-                      "parameters": [
-                        "IsCameraLocked",
-                        "False",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "MouseButtonFromTextPressed"
-                  },
-                  "parameters": [
-                    "",
-                    "\"Left\""
-                  ]
-                },
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "MousePointerLock::isPointerLocked"
-                  },
-                  "parameters": [
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [],
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "SystemInfo::HasTouchScreen"
-                      },
-                      "parameters": [
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "MousePointerLock::RequestPointerLock"
-                      },
-                      "parameters": [
-                        "",
-                        ""
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "SystemInfo::HasTouchScreen"
-                      },
-                      "parameters": [
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
-                      },
-                      "parameters": [
-                        "",
-                        "WalkJoystick",
-                        "\"Left\"",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "inverted": true,
-                        "value": "SpriteMultitouchJoystick::MultitouchButton::IsPressed"
-                      },
-                      "parameters": [
-                        "JumpButton",
-                        "MultitouchButton",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "MousePointerLock::RequestPointerLock"
-                      },
-                      "parameters": [
-                        "",
-                        ""
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "MousePointerLock::isPointerLocked"
-                  },
-                  "parameters": [
-                    "",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "MousePointerLock::IsMoving"
-                  },
-                  "parameters": [
-                    "",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetCameraRotation"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "+",
-                    "180 * MousePointerLock::MovementX() / SceneWindowWidth()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetElevationAngleOffset"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "+",
-                    "90 * MousePointerLock::MovementY() / SceneWindowHeight()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetBooleanVariable"
-                  },
-                  "parameters": [
-                    "IsCameraLocked",
-                    "True",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Gamepads::C_Controller_X_is_connected"
-                  },
-                  "parameters": [
-                    "",
-                    "1",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Gamepads::StickForce"
-                  },
-                  "parameters": [
-                    "",
-                    ">",
-                    "0",
-                    "1",
-                    "\"Right\"",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetCameraRotation"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "+",
-                    "180 * Gamepads::StickForceX(1, \"Right\") * TimeDelta()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetElevationAngleOffset"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "+",
-                    "90 * Gamepads::StickForceY(1, \"Right\") * TimeDelta()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetBooleanVariable"
-                  },
-                  "parameters": [
-                    "IsCameraLocked",
-                    "True",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BooleanVariable"
-                  },
-                  "parameters": [
-                    "IsCameraLocked",
-                    "True",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "1000000",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Make sure the camera doesn't get upsidedown."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::SetRotationY"
-                  },
-                  "parameters": [
-                    "Character",
-                    "Object3D",
-                    "=",
-                    "clamp(Character.RotationY(), -90, 90)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetElevationAngleOffset"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "clamp(Character.ThirdPersonCamera::ElevationAngleOffset(), -90, 90)",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Let the character jumps or fells a bit before the camera follow them."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "Physics3D::PhysicsCharacter3D::IsOnFloor"
-                  },
-                  "parameters": [
-                    "Character",
-                    "PhysicsCharacter3D"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetFollowFreeAreaZMin"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "70",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "Physics3D::PhysicsCharacter3D::IsOnFloor"
-                  },
-                  "parameters": [
-                    "Character",
-                    "PhysicsCharacter3D"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetFollowFreeAreaZMin"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "0",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Avoid to rotate the camera more than 90° when the character goes backward."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetTargetedRotationAngle"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "Character.PhysicsCharacter3D::ForwardAngle()",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Or"
-                  },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "KeyFromTextPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "\"s\""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::CompareNumbers"
-                      },
-                      "parameters": [
-                        "abs(AngleDifference(90, SpriteMultitouchJoystick::StickAngle(1, \"Primary\")))",
-                        "<",
-                        "90"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::CompareNumbers"
-                      },
-                      "parameters": [
-                        "abs(AngleDifference(90, Gamepads::StickAngle(1, \"Left\")))",
-                        "<",
-                        "90"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetTargetedRotationAngle"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "180 - Character.PhysicsCharacter3D::ForwardAngle()",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Avoid to rotate the camera when the character goes backward."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::CompareNumbers"
-                  },
-                  "parameters": [
-                    "abs(AngleDifference(Character.ThirdPersonCamera::TargetedRotationAngle() + 90, CameraAngle()))",
-                    ">",
-                    "90"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    "=",
-                    "1000000",
-                    ""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "value": "ThirdPersonCamera::ThirdPersonCamera::MoveCameraCloser"
-                  },
-                  "parameters": [
-                    "Character",
-                    "ThirdPersonCamera",
-                    ""
-                  ]
-                }
-              ]
-            }
-          ],
-          "parameters": []
-        },
-        {
           "colorB": 228,
           "colorG": 176,
           "colorR": 74,
@@ -4412,16 +3420,6 @@
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
-                {
-                  "type": {
-                    "value": "Rotate"
-                  },
-                  "parameters": [
-                    "Coin",
-                    "45",
-                    ""
-                  ]
-                },
                 {
                   "type": {
                     "value": "SteamPipe::PushCharacterUpward"
@@ -4513,44 +3511,15 @@
               "actions": [
                 {
                   "type": {
-                    "value": "Delete"
+                    "value": "Collectible::Collectible::Explode"
                   },
                   "parameters": [
                     "Coin",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "CoinExplosion",
-                    "Coin.CenterX()",
-                    "Coin.CenterY()",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::SetZ"
-                  },
-                  "parameters": [
+                    "Collectible",
                     "CoinExplosion",
                     "Object3D",
-                    "=",
-                    "Coin.Object3D::CenterZ()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetAngle"
-                  },
-                  "parameters": [
-                    "CoinExplosion",
-                    "=",
-                    "Character.Angle()"
+                    "Character.Angle()",
+                    ""
                   ]
                 }
               ]
@@ -4660,6 +3629,270 @@
             }
           ],
           "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "UI",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "Barrel"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Background::CreateObjectOnCylinder"
+                  },
+                  "parameters": [
+                    "",
+                    "Cloud",
+                    "Object3D",
+                    "Scale",
+                    "48",
+                    "700",
+                    "1200",
+                    "2500",
+                    "8000",
+                    "-400",
+                    "800",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetCameraAngle"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Character.Angle() + 90",
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SystemInfo::HasTouchScreen"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Touch controls\"",
+                        "0",
+                        "0",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Cache"
+                          },
+                          "parameters": [
+                            "WalkJoystick"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::ActivateControl"
+                          },
+                          "parameters": [
+                            "WalkJoystick",
+                            "",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
+                  },
+                  "parameters": [
+                    "",
+                    "WalkJoystick",
+                    "\"Left\"",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SpriteMultitouchJoystick::SpriteMultitouchJoystick::TeleportAndPress"
+                  },
+                  "parameters": [
+                    "WalkJoystick",
+                    "CursorX(\"UI\")"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "MouseButtonFromTextPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Left\""
+                  ]
+                },
+                {
+                  "type": {
+                    "inverted": true,
+                    "value": "MousePointerLock::isPointerLocked"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SystemInfo::HasTouchScreen"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MousePointerLock::RequestPointerLock"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "SystemInfo::HasTouchScreen"
+                      },
+                      "parameters": [
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SpriteMultitouchJoystick::HasTouchStartedOnScreenSide"
+                      },
+                      "parameters": [
+                        "",
+                        "WalkJoystick",
+                        "\"Left\"",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SpriteMultitouchJoystick::IsButtonPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "1",
+                        "\"A\"",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "MousePointerLock::RequestPointerLock"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ThirdPersonCamera::ThirdPersonCamera::MoveCameraCloser"
+                  },
+                  "parameters": [
+                    "Character",
+                    "ThirdPersonCamera",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
         }
       ],
       "layers": [
@@ -4761,6 +3994,10 @@
           "type": "AnimatableCapability::AnimatableBehavior"
         },
         {
+          "name": "Collectible",
+          "type": "Collectible::Collectible"
+        },
+        {
           "name": "Effect",
           "type": "EffectCapability::EffectBehavior"
         },
@@ -4815,6 +4052,10 @@
         {
           "name": "Platformer3DMultitouchMapper",
           "type": "SpriteMultitouchJoystick::Platformer3DMultitouchMapper"
+        },
+        {
+          "name": "PlatformerCamera3D",
+          "type": "PlatformerCamera3D::PlatformerCamera3D"
         },
         {
           "name": "Player",
@@ -5908,6 +5149,183 @@
     },
     {
       "author": "",
+      "category": "",
+      "extensionNamespace": "",
+      "fullName": "",
+      "gdevelopVersion": "",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "Collectible",
+      "previewIconUrl": "",
+      "shortDescription": "",
+      "version": "",
+      "description": "",
+      "tags": [],
+      "authorIds": [],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Rotate around itself.",
+          "fullName": "Collectible",
+          "name": "Collectible",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "RandomFloat(360)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Rotate"
+                      },
+                      "parameters": [
+                        "Object",
+                        "45",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Collectible::Collectible",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Replace the collectible with an explosion.",
+              "fullName": "Explode",
+              "functionType": "Action",
+              "name": "Explode",
+              "sentence": "_PARAM0_ explode into _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Delete"
+                      },
+                      "parameters": [
+                        "Object",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "CoinExplosion",
+                        "Object.CenterX()",
+                        "Object.CenterY()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "CoinExplosion",
+                        "Object3D",
+                        "=",
+                        "Object.Object3D::CenterZ()"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Collectible::Collectible",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Coin explosion",
+                  "name": "CoinExplosion",
+                  "type": "objectList"
+                },
+                {
+                  "description": "3D capability",
+                  "name": "Object3D",
+                  "supplementaryInformation": "Scene3D::Base3DBehavior",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "3D capability",
+              "extraInformation": [
+                "Scene3D::Base3DBehavior"
+              ],
+              "choices": [],
+              "name": "Object3D"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        }
+      ],
+      "eventsBasedObjects": []
+    },
+    {
+      "author": "",
       "category": "Input",
       "extensionNamespace": "",
       "fullName": "3D character keyboard mapper",
@@ -6812,7 +6230,7 @@
       "name": "Gamepads",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gamepad-variant-outline.svg",
       "shortDescription": "Add support for gamepads (or other controllers) to your game, giving access to information such as button presses, axis positions, trigger pressure, etc...",
-      "version": "0.9.0",
+      "version": "0.9.1",
       "description": [
         "Add support for gamepads (or other physical controllers).",
         "",
@@ -7093,7 +6511,27 @@
                 "    }\r",
                 "}();\r",
                 "\r",
-                "function onScenePostEvents() {\r",
+                "/**\r",
+                " * @param {gdjs.RuntimeScene} runtimeScene\r",
+                " */\r",
+                "function addFrameBeginningTaskIfNeeded(runtimeScene) {\r",
+                "    const taskManager = runtimeScene.getAsyncTasksManager();\r",
+                "    for (const taskWithCallback of taskManager.tasksWithCallback) {\r",
+                "        if (taskWithCallback.asyncTask === frameBeginningTask) {\r",
+                "            return;\r",
+                "        }\r",
+                "    }\r",
+                "    // Async tasks are run before everything.\r",
+                "    // This is a hack to make sure that button states are updated\r",
+                "    // before mapping behavior events.\r",
+                "    taskManager.addTask(frameBeginningTask);\r",
+                "}\r",
+                "\r",
+                "/**\r",
+                " * @param {gdjs.RuntimeScene} runtimeScene\r",
+                " */\r",
+                "function onScenePostEvents(runtimeScene) {\r",
+                "    addFrameBeginningTaskIfNeeded(runtimeScene);\r",
                 "    /** @type {Gamepad[]} */\r",
                 "    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];\r",
                 "    for (let playerId = 0; playerId < gamepads.length; playerId++) {\r",
@@ -7274,6 +6712,7 @@
                 "    getGamepad,\r",
                 "    onScenePostEvents,\r",
                 "    frameBeginningTask,\r",
+                "    addFrameBeginningTaskIfNeeded,\r",
                 "}"
               ],
               "parameterObjects": "",
@@ -7292,12 +6731,7 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": [
-                "// Async tasks are run before everything.\r",
-                "// This is a hack to make sure that button states are updated\r",
-                "// before mapping behavior events.\r",
-                "runtimeScene.getAsyncTasksManager().addTask(gdjs._extensionController.frameBeginningTask);"
-              ],
+              "inlineCode": "gdjs._extensionController.addFrameBeginningTaskIfNeeded(runtimeScene);",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -7315,7 +6749,7 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "gdjs._extensionController.onScenePostEvents();",
+                "gdjs._extensionController.onScenePostEvents(runtimeScene);",
                 ""
               ],
               "parameterObjects": "",
@@ -19855,7 +19289,7 @@
           "functionType": "Condition",
           "name": "isEmulatingPointerLock",
           "private": true,
-          "sentence": "The mouse pointer is lock is emulated",
+          "sentence": "The mouse pointer lock is emulated",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -28412,13 +27846,13 @@
       "category": "General",
       "extensionNamespace": "",
       "fullName": "3D collision",
-      "gdevelopVersion": "",
+      "gdevelopVersion": ">=5.5.222",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZlY3Rvci1pbnRlcnNlY3Rpb24iIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMy4xNCwxQTIuMTQsMi4xNCAwIDAsMCAxLDMuMTRWNUgzVjNINVYxSDMuMTRNNywxVjNIMTBWMUg3TTEyLDFWM0gxNFY1SDE2VjMuMTRDMTYsMS45NiAxNS4wNCwxIDEzLjg2LDFIMTJNMSw3VjEwSDNWN0gxTTksN0M3Ljg5LDcgNyw3Ljg5IDcsOUM3LDExLjMzIDcsMTYgNywxNkM3LDE2IDExLjU3LDE2IDEzLjg2LDE2QTIuMTQsMi4xNCAwIDAsMCAxNiwxMy44NkMxNiwxMS41NyAxNiw3IDE2LDdDMTYsNyAxMS4zMyw3IDksN00xOCw3VjlIMjBWMTFIMjJWOUMyMiw3Ljg5IDIxLjExLDcgMjAsN0gxOE05LDlIMTRWMTRIOVY5TTEsMTJWMTMuODZDMSwxNS4wNCAxLjk2LDE2IDMuMTQsMTZINVYxNEgzVjEySDFNMjAsMTNWMTZIMjJWMTNIMjBNNywxOFYyMEM3LDIxLjExIDcuODksMjIgOSwyMkgxMVYyMEg5VjE4SDdNMjAsMThWMjBIMThWMjJIMjBDMjEuMTEsMjIgMjIsMjEuMTEgMjIsMjBWMThIMjBNMTMsMjBWMjJIMTZWMjBIMTNaIiAvPjwvc3ZnPg==",
       "name": "Collision3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/7a5696a515bf40813692e118147568392a854f65f5b50750c9b9aaa967aba7df_vector-intersection.svg",
       "shortDescription": "Check collision and distance between 3D objects.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "description": "Check collision and distance between 3D objects and separate them from each other.",
       "origin": {
         "identifier": "Collision3D",
@@ -28973,7 +28407,7 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "\r",
-                "const otherObjects = eventsFunctionContext.getObjectsLists(\"OtherObject\");\r",
+                "const otherObjects = eventsFunctionContext.getObjects(\"OtherObject\");\r",
                 "\r",
                 "if (objects.length > 0 && otherObjects.length > 0) {\r",
                 "    eventsFunctionContext.returnValue = gdjs._collision3DExtension.getDistanceToObject(\r",
@@ -29017,7 +28451,7 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "\r",
-                "const otherObjects = eventsFunctionContext.getObjectsLists(\"OtherObject\");\r",
+                "const otherObjects = eventsFunctionContext.getObjects(\"OtherObject\");\r",
                 "\r",
                 "if (objects.length > 0 && otherObjects.length > 0) {\r",
                 "    eventsFunctionContext.returnValue = gdjs._collision3DExtension.getSqDistanceToObject(\r",
@@ -34545,7 +33979,7 @@
       "name": "ThirdPersonCamera",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Virtual Reality/94e95d2c318e1f3dc7151a351024e13c574e1e44669c6696aa107d60230073f6_Virtual Reality_3d_vision_eye_vr.svg",
       "shortDescription": "Move the camera  to look at an object from a given distance.",
-      "version": "1.7.1",
+      "version": "1.8.0",
       "description": [
         "Move the camera  to look at an object from a given distance with a rotation and an elevation angles.",
         "",
@@ -34570,6 +34004,131 @@
       "globalVariables": [],
       "sceneVariables": [],
       "eventsFunctions": [
+        {
+          "description": "Define helper classes JavaScript code.",
+          "fullName": "Define helper classes",
+          "functionType": "Action",
+          "name": "DefineHelperClasses",
+          "private": true,
+          "sentence": "Define helper classes JavaScript code",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "if (gdjs.__thirdPersonCameraExtension) {",
+                "    return;",
+                "}",
+                "",
+                "class CameraLocalBasis {",
+                "    /** @type {gdjs.RuntimeObject} */",
+                "    object;",
+                "    rotationMatrix = new THREE.Matrix4();",
+                "    forward = new THREE.Vector3();",
+                "",
+                "    /**",
+                "     * @param object {gdjs.RuntimeObject}",
+                "     */",
+                "    constructor(object) {",
+                "        this.object = object;",
+                "    }",
+                "",
+                "    update() {",
+                "        const layer = this.object.getInstanceContainer().getLayer(this.object.getLayer());",
+                "        const threeCamera = layer.getRenderer().getThreeCamera();",
+                "        this.rotationMatrix.makeRotationFromEuler(threeCamera.rotation);",
+                "        const elements = this.rotationMatrix.elements;",
+                "",
+                "        this.forward.set(-elements[8], elements[9], -elements[10]);",
+                "        // Normalize them, just in case (they should generally be unit vectors).",
+                "        this.forward.normalize();",
+                "    }",
+                "}",
+                "",
+                "class ObjectLocalBasis {",
+                "    /** @type {gdjs.RuntimeObject} */",
+                "    object;",
+                "    rotationMatrix = new THREE.Matrix4();",
+                "    forward = new THREE.Vector3();",
+                "    up = new THREE.Vector3();",
+                "    right = new THREE.Vector3();",
+                "",
+                "    /**",
+                "     * @param object {gdjs.RuntimeObject}",
+                "     */",
+                "    constructor(object) {",
+                "        this.object = object;",
+                "    }",
+                "",
+                "    update() {",
+                "        const threeObject = this.object.get3DRendererObject();",
+                "        this.rotationMatrix.makeRotationFromEuler(threeObject.rotation);",
+                "        const elements = this.rotationMatrix.elements;",
+                "",
+                "        this.up.set(elements[8], elements[9], elements[10]);",
+                "        this.forward.set(elements[0], elements[1], elements[2]);",
+                "        this.right.crossVectors(this.forward, this.up);",
+                "",
+                "        // Normalize them, just in case (they should generally be unit vectors).",
+                "        this.right.normalize();",
+                "        this.up.normalize();",
+                "        this.forward.normalize();",
+                "    }",
+                "}",
+                "",
+                "/**",
+                " * It can be built the follow:",
+                " * ",
+                " * `objectDefaultRotation.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI/2);`",
+                " * ",
+                " * `objectDefaultRotation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI/2));`",
+                " * ",
+                " */",
+                "const objectDefaultRotation = new THREE.Quaternion(0.5, -0.5, -0.5, 0.5);",
+                "const targetQuaternion = new THREE.Quaternion();",
+                "const yAxis = new THREE.Vector3(0, 1, 0);",
+                "const zAxis = new THREE.Vector3(0, 0, 1);",
+                "const quaternion = new THREE.Quaternion();",
+                "const objectRotation = new THREE.Euler();",
+                "",
+                "/**",
+                " * @param object {gdjs.RuntimeObject}",
+                " * @param ratio {number}",
+                " * @param elevationAngleOffset {number}",
+                " */",
+                "function slerpCamera(object, ratio, rotationAngleOffset, elevationAngleOffset) {",
+                "    const layer = object.getInstanceContainer().getLayer(object.getLayer());",
+                "    const threeCamera = layer.getRenderer().getThreeCamera();",
+                "    const threeObject = object.get3DRendererObject();",
+                "",
+                "    objectRotation.copy(threeObject.rotation);",
+                "    objectRotation.z = -objectRotation.z;",
+                "    objectRotation.x = -objectRotation.x;",
+                "    targetQuaternion.setFromEuler(objectRotation);",
+                "    targetQuaternion.multiply(quaternion.setFromAxisAngle(zAxis, -gdjs.toRad(rotationAngleOffset)));",
+                "    targetQuaternion.multiply(quaternion.setFromAxisAngle(yAxis, gdjs.toRad(elevationAngleOffset)));",
+                "    targetQuaternion.multiply(objectDefaultRotation);",
+                "",
+                "    threeCamera.quaternion.slerp(targetQuaternion, ratio);",
+                "",
+                "    // The layer angle takes over the 3D camera Z rotation.",
+                "    layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));",
+                "}",
+                "",
+                "gdjs.__thirdPersonCameraExtension = {",
+                "    CameraLocalBasis,",
+                "    ObjectLocalBasis,",
+                "    slerpCamera,",
+                "};",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
         {
           "description": "Move the camera to look at a position from a distance.",
           "fullName": "Look at a position from a distance (deprecated)",
@@ -35093,6 +34652,36 @@
               "sentence": "",
               "events": [
                 {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::DefineHelperClasses"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const { CameraLocalBasis, ObjectLocalBasis } = gdjs.__thirdPersonCameraExtension;\r",
+                    "const object = objects[0];\r",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\r",
+                    "behavior.__thirdPersonCameraExtension = {\r",
+                    "    cameraLocalBasis: new CameraLocalBasis(object),\r",
+                    "    objectlocalBasis: new ObjectLocalBasis(object)\r",
+                    "};"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                },
+                {
                   "type": "BuiltinCommonInstructions::Comment",
                   "color": {
                     "b": 109,
@@ -35351,18 +34940,146 @@
                   "comment": "At each frame, the camera must catchup the target by a given ratio (speed)\ncameraX(t) - targetX = (cameraX(t - 1) - targetX) * (1 - speed)\n\nThe frame rate must not impact on the catch-up speed, we don't want a speed in ratio per frame but a speed ratio per second, like this:\ncameraX(t) - targetX = (cameraX(t - 1s) - targetX) * (1 - speed)\n\nOk, but we still need to process each frame, we can use a exponent for this:\ncameraX(t) - targetX = (cameraX(t - timeDelta) - targetX) * (1 - speed)^timeDelta\ncameraX(t) = targetX + (cameraX(t - timeDelta) - targetX) * exp(timeDelta * ln((1 - speed)))\n\npow is probably more efficient than precalculated log if the speed is changed continuously but this might be rare enough."
                 },
                 {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Z translation",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "RotationMode",
+                        "=",
+                        "\"ZYX\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsRotatingWithObject",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::Slerp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "1 - exp(TimeDelta() * RotationLogSpeed)",
+                        "RotationAngleOffset",
+                        "ElevationAngleOffset",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::UpdateLocalBasis"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::MoveToObject"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "OffsetX",
+                        "OffsetY",
+                        "OffsetZ",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterX"
+                      },
+                      "parameters": [
+                        "",
+                        "-",
+                        "Distance * ForwardX",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterY"
+                      },
+                      "parameters": [
+                        "",
+                        "-",
+                        "Distance * ForwardY",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::SetCameraZ"
+                      },
+                      "parameters": [
+                        "",
+                        "-",
+                        "Distance * ForwardZ",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "RotationMode",
+                            "!=",
+                            "\"ZYX\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "IsRotatingWithObject",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [],
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [],
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Z translation",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Standard",
@@ -35418,131 +35135,306 @@
                             }
                           ]
                         }
-                      ]
+                      ],
+                      "parameters": []
+                    },
+                    {
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Z rotation",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "IsRotatingWithObject",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TargetedRotationAngle",
+                                "=",
+                                "Object.Angle()"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "RotationMode",
+                                    "!=",
+                                    "\"Z\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "IsElevatingWithObject",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TargetedElevationAngle",
+                                "=",
+                                "Object.Object3D::RotationY()"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "CameraRotationAngle",
+                                "=",
+                                "TargetedRotationAngle + 90 + RotationAngleOffset + AngleDifference(CameraAngle(Object.Layer()), TargetedRotationAngle + 90 + RotationAngleOffset) * exp(TimeDelta() * RotationLogSpeed)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "CameraElevationAngle",
+                                "=",
+                                "TargetedElevationAngle + ElevationAngleOffset + AngleDifference(90 - Scene3D::CameraRotationX(Object.Layer()), TargetedElevationAngle + ElevationAngleOffset) * exp(TimeDelta() * ElevationLogSpeed)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ThirdPersonCamera::LookFromDistanceAtPosition3D"
+                              },
+                              "parameters": [
+                                "",
+                                "Object.CenterX() + ThirdPersonCamera::RotatedX(CameraRotationAngle, OffsetX, -OffsetY)",
+                                "Object.CenterY() + ThirdPersonCamera::RotatedY(CameraRotationAngle, OffsetX, -OffsetY)",
+                                "CameraZ + OffsetZ",
+                                "Distance",
+                                "CameraRotationAngle",
+                                "CameraElevationAngle",
+                                "Object.Layer()",
+                                ""
+                              ]
+                            }
+                          ],
+                          "variables": [
+                            {
+                              "folded": true,
+                              "name": "CameraRotationAngle",
+                              "type": "number",
+                              "value": 0
+                            },
+                            {
+                              "name": "CameraElevationAngle",
+                              "type": "number",
+                              "value": 0
+                            }
+                          ]
+                        }
+                      ],
+                      "parameters": []
                     }
-                  ],
-                  "parameters": []
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
                 },
                 {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Z rotation",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BooleanVariable"
-                          },
-                          "parameters": [
-                            "IsRotatingWithObject",
-                            "True",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
-                            "TargetedRotationAngle",
-                            "=",
-                            "Object.Angle()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BooleanVariable"
-                          },
-                          "parameters": [
-                            "IsElevatingWithObject",
-                            "True",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
-                            "TargetedElevationAngle",
-                            "=",
-                            "Object.Object3D::RotationY()"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
-                            "CameraRotationAngle",
-                            "=",
-                            "TargetedRotationAngle + 90 + RotationAngleOffset + AngleDifference(CameraAngle(Object.Layer()), TargetedRotationAngle + 90 + RotationAngleOffset) * exp(TimeDelta() * RotationLogSpeed)"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
-                            "CameraElevationAngle",
-                            "=",
-                            "TargetedElevationAngle + ElevationAngleOffset + AngleDifference(90 - Scene3D::CameraRotationX(Object.Layer()), TargetedElevationAngle + ElevationAngleOffset) * exp(TimeDelta() * ElevationLogSpeed)"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ThirdPersonCamera::LookFromDistanceAtPosition3D"
-                          },
-                          "parameters": [
-                            "",
-                            "Object.CenterX() + ThirdPersonCamera::RotatedX(CameraRotationAngle, OffsetX, -OffsetY)",
-                            "Object.CenterY() + ThirdPersonCamera::RotatedY(CameraRotationAngle, OffsetX, -OffsetY)",
-                            "CameraZ + OffsetZ",
-                            "Distance",
-                            "CameraRotationAngle",
-                            "CameraElevationAngle",
-                            "",
-                            ""
-                          ]
-                        }
-                      ],
-                      "variables": [
-                        {
-                          "folded": true,
-                          "name": "CameraRotationAngle",
-                          "type": "number",
-                          "value": 0
-                        },
-                        {
-                          "name": "CameraElevationAngle",
-                          "type": "number",
-                          "value": 0
-                        }
-                      ]
-                    }
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Lerp camera",
+              "functionType": "Action",
+              "name": "Slerp",
+              "private": true,
+              "sentence": "Lerp the camera rotation to _PARAM0_ with a ratio of _PARAM2_ with rotation offset _PARAM3_° and elevation offset _PARAM4_°",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.RuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const ratio = eventsFunctionContext.getArgument(\"Ratio\");",
+                    "const rotationAngleOffset = eventsFunctionContext.getArgument(\"NewRotationAngleOffset\");",
+                    "const elevationAngleOffset = eventsFunctionContext.getArgument(\"NewElevationAngleOffset\");",
+                    "",
+                    "gdjs.__thirdPersonCameraExtension.slerpCamera(object, ratio, rotationAngleOffset, elevationAngleOffset);",
+                    ""
                   ],
-                  "parameters": []
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Ratio",
+                  "name": "Ratio",
+                  "type": "expression"
+                },
+                {
+                  "description": "Rotation angle offset",
+                  "name": "NewRotationAngleOffset",
+                  "type": "expression"
+                },
+                {
+                  "description": "Elevation angle offset",
+                  "name": "NewElevationAngleOffset",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Move to object",
+              "functionType": "Action",
+              "name": "MoveToObject",
+              "private": true,
+              "sentence": "Change the camera position to _PARAM0_ with offset _PARAM2_, _PARAM3_, _PARAM4_ ",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.RuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const localOffsetX = eventsFunctionContext.getArgument(\"LocalOffsetX\");",
+                    "const localOffsetY = eventsFunctionContext.getArgument(\"LocalOffsetY\");",
+                    "const localOffsetZ = eventsFunctionContext.getArgument(\"LocalOffsetZ\");",
+                    "",
+                    "const layer = object.getInstanceContainer().getLayer(object.getLayer());",
+                    "",
+                    "const { objectlocalBasis } = behavior.__thirdPersonCameraExtension;",
+                    "/** @type {{forward: THREE.Vector3, up: THREE.Vector3, right: THREE.Vector3 }} */",
+                    "const { forward, up, right } = objectlocalBasis;",
+                    "",
+                    "layer.setCameraX(object.getCenterXInScene() + localOffsetX * right.x + localOffsetY * forward.x + localOffsetZ * up.x);",
+                    "layer.setCameraY(object.getCenterYInScene() + localOffsetX * right.y + localOffsetY * forward.y + localOffsetZ * up.y);",
+                    "layer.setCameraZ(object.getCenterZInScene() + localOffsetX * right.z + localOffsetY * forward.z + localOffsetZ * up.z);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
+                  "type": "behavior"
+                },
+                {
+                  "description": "X offset",
+                  "name": "LocalOffsetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Y offset",
+                  "name": "LocalOffsetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Z offset",
+                  "name": "LocalOffsetZ",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Update local basis",
+              "functionType": "Action",
+              "name": "UpdateLocalBasis",
+              "private": true,
+              "sentence": "Update local basis of _PARAM0_ and the camera",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const { cameraLocalBasis, objectlocalBasis } = behavior.__thirdPersonCameraExtension;",
+                    "cameraLocalBasis.update();",
+                    "objectlocalBasis.update();",
+                    "behavior._setForwardX(cameraLocalBasis.forward.x);",
+                    "behavior._setForwardY(cameraLocalBasis.forward.y);",
+                    "behavior._setForwardZ(cameraLocalBasis.forward.z);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
                 }
               ],
               "parameters": [
@@ -36900,7 +36792,7 @@
               "value": "0.125",
               "type": "Number",
               "unit": "Second",
-              "label": "Halfway  time for rotation",
+              "label": "Halfway time for rotation",
               "group": "Catch-up speed",
               "quickCustomizationVisibility": "hidden",
               "name": "RotationHalfwayDuration"
@@ -36910,6 +36802,7 @@
               "type": "Number",
               "unit": "Second",
               "label": "Halfway  time for elevation rotation",
+              "description": "Only used by Z and ZY rotation modes",
               "group": "Catch-up speed",
               "quickCustomizationVisibility": "hidden",
               "name": "ElevationHalfwayDuration"
@@ -36919,6 +36812,7 @@
               "type": "Number",
               "unit": "Second",
               "label": "Halfway time on Z axis",
+              "description": "Only used by Z and ZY rotation modes",
               "group": "Catch-up speed",
               "quickCustomizationVisibility": "hidden",
               "name": "TranslationZHalfwayDuration"
@@ -36961,6 +36855,7 @@
               "unit": "DegreeAngle",
               "label": "Rotation angle offset",
               "group": "Position",
+              "advanced": true,
               "name": "RotationAngleOffset"
             },
             {
@@ -37045,15 +36940,36 @@
               "value": "false",
               "type": "Boolean",
               "label": "Automatically rotate the camera with the object (elevation)",
+              "description": "Best left unchecked, use the rotation mode instead",
+              "deprecated": true,
               "quickCustomizationVisibility": "hidden",
               "name": "IsElevatingWithObject"
+            },
+            {
+              "value": "Z",
+              "type": "Choice",
+              "label": "Rotation mode",
+              "choices": [
+                {
+                  "label": "Horizontal rotation (good for characters)",
+                  "value": "Z"
+                },
+                {
+                  "label": "Vertical and horizontal rotations (good for cars)",
+                  "value": "ZY"
+                },
+                {
+                  "label": "All rotations (good for spaceships)",
+                  "value": "ZYX"
+                }
+              ],
+              "name": "RotationMode"
             },
             {
               "value": "0",
               "type": "Number",
               "unit": "DegreeAngle",
               "label": "Targeted camera rotation angle",
-              "description": "When this angle is set, the camera follow this value instead of the object angle.",
               "hidden": true,
               "name": "TargetedRotationAngle"
             },
@@ -37062,9 +36978,32 @@
               "type": "Number",
               "unit": "DegreeAngle",
               "label": "Targeted camera rotation angle",
-              "description": "When this angle is set, the camera follow this value instead of the object angle.",
               "hidden": true,
               "name": "TargetedElevationAngle"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Forward X",
+              "hidden": true,
+              "name": "ForwardX"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Forward Y",
+              "hidden": true,
+              "name": "ForwardY"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Forward Z",
+              "hidden": true,
+              "name": "ForwardZ"
             }
           ],
           "sharedPropertyDescriptors": []
@@ -53344,7 +53283,7 @@
       "name": "ScreenOrientationChecker",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/0126888931a4a4f82bb2824df9f096347ace1c47f510c44df42aa8dc9e49e24a_screen-rotation.svg",
       "shortDescription": "Display a customizable screen asking the user to rotate their phone/tablet if not in the right orientation.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "description": "Display a customizable screen asking the user to rotate their phone/tablet if not in the right orientation.",
       "origin": {
         "identifier": "ScreenOrientationChecker",
@@ -53567,44 +53506,7 @@
                     {
                       "looping": false,
                       "timeBetweenFrames": 0.08,
-                      "sprites": [
-                        {
-                          "hasCustomCollisionMask": true,
-                          "image": "rotate-screen-icon.png",
-                          "points": [],
-                          "originPoint": {
-                            "name": "origine",
-                            "x": 52.5,
-                            "y": 56.5
-                          },
-                          "centerPoint": {
-                            "automatic": true,
-                            "name": "centre",
-                            "x": 0,
-                            "y": 0
-                          },
-                          "customCollisionMask": [
-                            [
-                              {
-                                "x": 0,
-                                "y": 1
-                              },
-                              {
-                                "x": 105,
-                                "y": 1
-                              },
-                              {
-                                "x": 105,
-                                "y": 113
-                              },
-                              {
-                                "x": 0,
-                                "y": 113
-                              }
-                            ]
-                          ]
-                        }
-                      ]
+                      "sprites": []
                     }
                   ]
                 }
@@ -53693,22 +53595,35 @@
             },
             {
               "angle": 0,
-              "customSize": false,
-              "height": 0,
-              "keepRatio": true,
+              "customSize": true,
+              "depth": 0.9624060150375939,
+              "height": 96,
               "layer": "",
               "name": "Icon",
               "persistentUuid": "39cbfc66-13f4-43dc-b6ef-2bda83153277",
-              "width": 0,
-              "x": 204,
-              "y": 64,
+              "width": 96,
+              "x": 158,
+              "y": 16,
               "zOrder": 16,
               "numberProperties": [],
               "stringProperties": [],
               "initialVariables": []
             }
           ],
-          "editionSettings": {},
+          "editionSettings": {
+            "grid": false,
+            "gridType": "rectangular",
+            "gridWidth": 32,
+            "gridHeight": 32,
+            "gridOffsetX": 0,
+            "gridOffsetY": 0,
+            "gridColor": 10401023,
+            "gridAlpha": 0.8,
+            "snap": false,
+            "zoomFactor": 1.75,
+            "windowMask": false,
+            "selectedLayer": ""
+          },
           "eventsFunctions": [
             {
               "fullName": "",
@@ -54764,6 +54679,959 @@
           ]
         }
       ]
+    },
+    {
+      "author": "",
+      "category": "Camera",
+      "extensionNamespace": "",
+      "fullName": "3D Platformer thrid person camera",
+      "gdevelopVersion": "",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXJ1biIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMy41LDUuNUMxNC41OSw1LjUgMTUuNSw0LjU4IDE1LjUsMy41QzE1LjUsMi4zOCAxNC41OSwxLjUgMTMuNSwxLjVDMTIuMzksMS41IDExLjUsMi4zOCAxMS41LDMuNUMxMS41LDQuNTggMTIuMzksNS41IDEzLjUsNS41TTkuODksMTkuMzhMMTAuODksMTVMMTMsMTdWMjNIMTVWMTUuNUwxMi44OSwxMy41TDEzLjUsMTAuNUMxNC43OSwxMiAxNi43OSwxMyAxOSwxM1YxMUMxNy4wOSwxMSAxNS41LDEwIDE0LjY5LDguNThMMTMuNjksN0MxMy4yOSw2LjM4IDEyLjY5LDYgMTIsNkMxMS42OSw2IDExLjUsNi4wOCAxMS4xOSw2LjA4TDYsOC4yOFYxM0g4VjkuNThMOS43OSw4Ljg4TDguMTksMTdMMy4yOSwxNkwyLjg5LDE4TDkuODksMTkuMzhaIiAvPjwvc3ZnPg==",
+      "name": "PlatformerCamera3D",
+      "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/9c46751a1bc104989c2d9c728f36220473e26ed7db2b0590a92841bbdfbd86c7_run.svg",
+      "shortDescription": "Allow players to rotate the camera and move the character in the camera direction.",
+      "version": "1.0.0",
+      "description": "Allow players to rotate the camera and move the character in the camera direction.",
+      "tags": [
+        "3d"
+      ],
+      "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+      ],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Allow players to rotate the camera and move the character in the camera direction.",
+          "fullName": "3D Platformer thrid person camera",
+          "name": "PlatformerCamera3D",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Camera controls",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Camera object rotates along with the player's cursor, and the in game camera rotates based on the position of the Camera object"
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "SpriteMultitouchJoystick::StickForce"
+                          },
+                          "parameters": [
+                            "",
+                            ">",
+                            "0",
+                            "1",
+                            "\"Primary\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "ControlKind",
+                            "=",
+                            "\"Touch\""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "IsCameraLocked",
+                                "False",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ThirdPersonCamera",
+                                "=",
+                                "MovingRotationHalfwayDuration",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::StickForce"
+                          },
+                          "parameters": [
+                            "",
+                            ">",
+                            "0",
+                            "1",
+                            "\"Left\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "ControlKind",
+                            "=",
+                            "\"Gamepad\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "MovingRotationHalfwayDuration",
+                            ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "IsCameraLocked",
+                                "False",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ThirdPersonCamera",
+                                "=",
+                                "MovingRotationHalfwayDuration",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "AnyKeyPressed"
+                          },
+                          "parameters": [
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "ControlKind",
+                            "=",
+                            "\"Keyboard\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "ControlKind",
+                            "!=",
+                            "\"Keyboard\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Not"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "Gamepads::StickForce"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    ">",
+                                    "0",
+                                    "1",
+                                    "\"Left\"",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SpriteMultitouchJoystick::StickForce"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    ">",
+                                    "0",
+                                    "1",
+                                    "\"Primary\"",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "IdlingRotationHalfwayDuration",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetBooleanVariable"
+                          },
+                          "parameters": [
+                            "IsCameraLocked",
+                            "False",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "ControlKind",
+                            "=",
+                            "\"Keyboard\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetBooleanVariable"
+                          },
+                          "parameters": [
+                            "IsCameraLocked",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MousePointerLock::isPointerLocked"
+                          },
+                          "parameters": [
+                            "",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "MousePointerLock::IsMoving"
+                          },
+                          "parameters": [
+                            "",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetCameraRotation"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "+",
+                            "MouseRotationSensitivityX * MousePointerLock::MovementX() / SceneWindowWidth()",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetElevationAngleOffset"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "+",
+                            "MouseRotationSensitivityY * MousePointerLock::MovementY() / SceneWindowHeight()",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetBooleanVariable"
+                          },
+                          "parameters": [
+                            "IsCameraLocked",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Gamepads::C_Controller_X_is_connected"
+                          },
+                          "parameters": [
+                            "",
+                            "1",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Gamepads::StickForce"
+                          },
+                          "parameters": [
+                            "",
+                            ">",
+                            "0",
+                            "1",
+                            "\"Right\"",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetCameraRotation"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "+",
+                            "GamepadRotationSensitivityX * Gamepads::StickForceX(1, \"Right\") * TimeDelta()",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetElevationAngleOffset"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "+",
+                            "GamepadRotationSensitivityY * Gamepads::StickForceY(1, \"Right\") * TimeDelta()",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetBooleanVariable"
+                          },
+                          "parameters": [
+                            "IsCameraLocked",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "IsCameraLocked",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "1000000",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Make sure the camera doesn't get upsidedown."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetRotationY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Object3D",
+                            "=",
+                            "clamp(Object.Object3D::RotationY(), -90, 90)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetElevationAngleOffset"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "clamp(Object.ThirdPersonCamera::ElevationAngleOffset(), -90, 90)",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Let the character jumps or fells a bit before the camera follow them."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "Physics3D::PhysicsCharacter3D::IsOnFloor"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PhysicsCharacter3D"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetFollowFreeAreaZMin"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "AirFollowFreeAreaBottom",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "Physics3D::PhysicsCharacter3D::IsOnFloor"
+                          },
+                          "parameters": [
+                            "Object",
+                            "PhysicsCharacter3D"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetFollowFreeAreaZMin"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "0",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Avoid to rotate the camera more than 90° when the character goes backward."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetTargetedRotationAngle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "Object.PhysicsCharacter3D::ForwardAngle()",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "PlatformerCamera3D::PlatformerCamera3D::WasBackwardKeyPressed"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Behavior",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::And"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "PlatformerCamera3D::PlatformerCamera3D::WasStickUsed"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    ""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BuiltinCommonInstructions::Or"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": [
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "abs(AngleDifference(90, SpriteMultitouchJoystick::StickAngle(1, \"Primary\")))",
+                                        "<",
+                                        "90"
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "abs(AngleDifference(90, Gamepads::StickAngle(1, \"Left\")))",
+                                        "<",
+                                        "90"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetTargetedRotationAngle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "180 - Object.PhysicsCharacter3D::ForwardAngle()",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "Avoid to rotate the camera when the character goes backward."
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::CompareNumbers"
+                          },
+                          "parameters": [
+                            "abs(AngleDifference(Object.ThirdPersonCamera::TargetedRotationAngle() + 90, CameraAngle()))",
+                            ">",
+                            "90"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetRotationHalfwayDuration"
+                          },
+                          "parameters": [
+                            "Object",
+                            "ThirdPersonCamera",
+                            "=",
+                            "1000000",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerCamera3D::PlatformerCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the backward key is pressed for the 3D character.",
+              "fullName": "Backward key is pressed",
+              "functionType": "Condition",
+              "name": "WasBackwardKeyPressed",
+              "private": true,
+              "sentence": "Backward key of _PARAM0_ is pressed",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "/** @type {gdjs.PhysicsCharacter3DRuntimeBehavior} */",
+                    "const characterBehavior = object.getBehavior(behavior._getPhysicsCharacter3D());",
+                    "",
+                    "eventsFunctionContext.returnValue = characterBehavior.wasBackwardKeyPressed();",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerCamera3D::PlatformerCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the Stick is used for the 3D character.",
+              "fullName": "Stick is used",
+              "functionType": "Condition",
+              "name": "WasStickUsed",
+              "private": true,
+              "sentence": "The stick of _PARAM0_ is used",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "/** @type {gdjs.PhysicsCharacter3DRuntimeBehavior} */",
+                    "const characterBehavior = object.getBehavior(behavior._getPhysicsCharacter3D());",
+                    "",
+                    "eventsFunctionContext.returnValue = characterBehavior.wasStickUsed();",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PlatformerCamera3D::PlatformerCamera3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "3D capability",
+              "extraInformation": [
+                "Scene3D::Base3DBehavior"
+              ],
+              "choices": [],
+              "name": "Object3D"
+            },
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "3D physics character",
+              "extraInformation": [
+                "Physics3D::PhysicsCharacter3D"
+              ],
+              "choices": [],
+              "name": "PhysicsCharacter3D"
+            },
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "Third person camera",
+              "extraInformation": [
+                "ThirdPersonCamera::ThirdPersonCamera"
+              ],
+              "choices": [],
+              "name": "ThirdPersonCamera"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "",
+              "hidden": true,
+              "name": "IsCameraLocked"
+            },
+            {
+              "value": "Keyboard",
+              "type": "String",
+              "label": "",
+              "hidden": true,
+              "name": "ControlKind"
+            },
+            {
+              "value": "0.5",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Halfway time for rotation when idling",
+              "group": "Camera following",
+              "name": "IdlingRotationHalfwayDuration"
+            },
+            {
+              "value": "2",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Halfway time for rotation when idling",
+              "group": "Camera following",
+              "name": "MovingRotationHalfwayDuration"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Follow free area bottom in the air",
+              "group": "Camera following",
+              "name": "AirFollowFreeAreaBottom"
+            },
+            {
+              "value": "180",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Mouse horizontal rotation sensivity",
+              "description": "How much degrees to rotate when the mouse covers 1 screen width",
+              "group": "Camera rotation",
+              "name": "MouseRotationSensitivityX"
+            },
+            {
+              "value": "90",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Mouse vertical rotation sensivity",
+              "description": "How much degrees to rotate when the mouse covers 1 screen height",
+              "group": "Camera rotation",
+              "name": "MouseRotationSensitivityY"
+            },
+            {
+              "value": "180",
+              "type": "Number",
+              "unit": "AngularSpeed",
+              "label": "Gamepad horizontal rotation sensivity",
+              "group": "Camera rotation",
+              "name": "GamepadRotationSensitivityX"
+            },
+            {
+              "value": "90",
+              "type": "Number",
+              "unit": "AngularSpeed",
+              "label": "Gamepad vertical rotation sensivity",
+              "group": "Camera rotation",
+              "name": "GamepadRotationSensitivityY"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        }
+      ],
+      "eventsBasedObjects": []
     }
   ],
   "externalLayouts": [
@@ -54824,13 +55692,16 @@
         "gridType": "rectangular",
         "gridWidth": 32,
         "gridHeight": 32,
+        "gridDepth": 32,
         "gridOffsetX": 0,
         "gridOffsetY": 0,
+        "gridOffsetZ": 0,
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
         "zoomFactor": 0.546875,
-        "windowMask": false
+        "windowMask": false,
+        "selectedLayer": ""
       }
     }
   ]
