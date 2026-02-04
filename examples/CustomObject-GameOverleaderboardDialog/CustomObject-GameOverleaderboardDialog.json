@@ -282,7 +282,19 @@
         "selectedLayer": "",
         "gameEditorMode": "instances-editor"
       },
-      "objectsGroups": [],
+      "objectsGroups": [
+        {
+          "name": "Dialog",
+          "objects": [
+            {
+              "name": "SkullGameOverDialog"
+            },
+            {
+              "name": "TinySkullGameOverDialog"
+            }
+          ]
+        }
+      ],
       "variables": [
         {
           "name": "TransitionPhase",
@@ -330,12 +342,16 @@
         {
           "assetStoreId": "8796a5aeb2fe35a1775d0168a3d324cb6c95fe10e6c25a615c31623d8720a25c",
           "name": "SkullGameOverDialog",
-          "persistentUuid": "55800859-d89c-4198-85b4-bf017948d3f4",
           "type": "LeaderboardDialog::LeaderboardDialog",
           "variant": "Skull game over dialog",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
           "content": {
             "Prefix": ""
           }
@@ -343,12 +359,16 @@
         {
           "assetStoreId": "67de35e21c7eb90825c36e94215a47769bfe60c8dd1df20fb03977bfd86dd332",
           "name": "TinySkullGameOverDialog",
-          "persistentUuid": "22444c95-a18b-4b0b-948d-0be9aeed4e41",
           "type": "LeaderboardDialog::LeaderboardDialog",
           "variant": "Tiny skull game over dialog",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
           "content": {}
         }
       ],
@@ -369,10 +389,9 @@
           "conditions": [
             {
               "type": {
-                "value": "LeaderboardDialog::LeaderboardDialog::IsRestartClicked"
+                "value": "SceneJustBegins"
               },
               "parameters": [
-                "SkullGameOverDialog",
                 ""
               ]
             }
@@ -380,11 +399,26 @@
           "actions": [
             {
               "type": {
-                "value": "Scene"
+                "value": "OpacityCapability::OpacityBehavior::SetValue"
               },
               "parameters": [
-                "",
-                "\"Game Scene - GameOverScreen\"",
+                "Dialog",
+                "Opacity",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "Tween::TweenBehavior::AddObjectOpacityTween2"
+              },
+              "parameters": [
+                "Dialog",
+                "Tween",
+                "\"FadeIn\"",
+                "255",
+                "\"easeInQuad\"",
+                "0.3",
                 ""
               ]
             }
@@ -398,12 +432,60 @@
                 "value": "LeaderboardDialog::LeaderboardDialog::IsRestartClicked"
               },
               "parameters": [
-                "TinySkullGameOverDialog",
+                "Dialog",
                 ""
               ]
             }
           ],
           "actions": [
+            {
+              "type": {
+                "value": "PickAllInstances"
+              },
+              "parameters": [
+                "",
+                "Dialog"
+              ]
+            },
+            {
+              "type": {
+                "value": "LeaderboardDialog::LeaderboardDialog::TweenOut"
+              },
+              "parameters": [
+                "Dialog",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": [
+                "0.2"
+              ]
+            },
+            {
+              "type": {
+                "value": "Tween::TweenBehavior::AddObjectOpacityTween2"
+              },
+              "parameters": [
+                "Dialog",
+                "Tween",
+                "\"FadeOut\"",
+                "0",
+                "\"easeOutQuad\"",
+                "0.5",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": [
+                "0.7"
+              ]
+            },
             {
               "type": {
                 "value": "Scene"
@@ -464,6 +546,10 @@
         {
           "name": "Resizable",
           "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "Tween",
+          "type": "Tween::TweenBehavior"
         }
       ]
     },
@@ -2763,6 +2849,74 @@
                         "Text",
                         "=",
                         "Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Fade out the decoration objects of the dialog.",
+              "fullName": "Fade out decorations",
+              "functionType": "Action",
+              "name": "TweenOut",
+              "sentence": "Fade out the decorations of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TweenIntoView::TweenIntoView::TweenOut"
+                      },
+                      "parameters": [
+                        "Decoration",
+                        "TweenIntoView",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Fade in the decoration objects of the dialog.",
+              "fullName": "Fade in decorations",
+              "functionType": "Action",
+              "name": "TweenIn",
+              "sentence": "Fade in the decorations of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TweenIntoView::TweenIntoView::TweenIn"
+                      },
+                      "parameters": [
+                        "Decoration",
+                        "TweenIntoView",
+                        ""
                       ]
                     }
                   ]
@@ -7533,7 +7687,6 @@
               "description": "Check if isHovered.",
               "fullName": "IsHovered",
               "functionType": "Condition",
-              "group": "Hover text style configuration",
               "name": "IsHovered",
               "sentence": "_PARAM0_ isHovered",
               "events": [
@@ -7583,7 +7736,6 @@
               "description": "Change if isHovered.",
               "fullName": "IsHovered",
               "functionType": "Action",
-              "group": "Hover text style configuration",
               "name": "SetIsHovered",
               "sentence": "_PARAM0_ isHovered: _PARAM2_",
               "events": [
@@ -8047,7 +8199,6 @@
               "description": "Check if isHovered.",
               "fullName": "IsHovered",
               "functionType": "Condition",
-              "group": "Hover text style configuration",
               "name": "IsHovered",
               "sentence": "_PARAM0_ isHovered",
               "events": [
@@ -8097,7 +8248,6 @@
               "description": "Change if isHovered.",
               "fullName": "IsHovered",
               "functionType": "Action",
-              "group": "Hover text style configuration",
               "name": "SetIsHovered",
               "sentence": "_PARAM0_ isHovered: _PARAM2_",
               "events": [
