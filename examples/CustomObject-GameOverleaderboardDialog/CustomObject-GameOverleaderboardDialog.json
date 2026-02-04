@@ -497,6 +497,56 @@
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextReleased"
+              },
+              "parameters": [
+                "",
+                "\"x\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "LeaderboardDialog::LeaderboardDialog::TweenOut"
+              },
+              "parameters": [
+                "Dialog",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextReleased"
+              },
+              "parameters": [
+                "",
+                "\"c\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "LeaderboardDialog::LeaderboardDialog::TweenIn"
+              },
+              "parameters": [
+                "Dialog",
+                ""
+              ]
+            }
+          ]
         }
       ],
       "layers": [
@@ -1915,6 +1965,23 @@
                             }
                           ]
                         }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TweenIntoView::TweenIntoView::SetShouldBeDeleted"
+                      },
+                      "parameters": [
+                        "Decoration",
+                        "TweenIntoView",
+                        "no",
+                        ""
                       ]
                     }
                   ]
@@ -4810,24 +4877,24 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "BooleanVariable"
+                        "value": "StringVariable"
                       },
                       "parameters": [
-                        "Initialized",
+                        "State",
                         "=",
-                        ""
+                        "\"JustCreated\""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "SetBooleanVariable"
+                        "value": "SetStringVariable"
                       },
                       "parameters": [
-                        "Initialized",
-                        "True",
-                        ""
+                        "State",
+                        "=",
+                        "\"Ready\""
                       ]
                     }
                   ],
@@ -4909,6 +4976,15 @@
                         "Object",
                         "\"FadeInDelay\""
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "ResetObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"FadeIn\""
+                      ]
                     }
                   ],
                   "events": [
@@ -4973,6 +5049,34 @@
                             "TweenDuration"
                           ]
                         }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"FadeIn\"",
+                        ">=",
+                        "Duration"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetStringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"FadedIn\""
                       ]
                     }
                   ]
@@ -5095,16 +5199,6 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "BooleanVariable"
-                      },
-                      "parameters": [
-                        "ShouldBeDeleted",
-                        "True",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
                         "value": "CompareObjectTimer"
                       },
                       "parameters": [
@@ -5118,11 +5212,40 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "Delete"
+                        "value": "SetStringVariable"
                       },
                       "parameters": [
-                        "Object",
-                        ""
+                        "State",
+                        "=",
+                        "\"FadedOut\""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "ShouldBeDeleted",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "Object",
+                            ""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -5160,7 +5283,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.X()"
+                        "TargetX"
                       ]
                     }
                   ]
@@ -5185,7 +5308,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.X() - Distance"
+                        "TargetX - Distance"
                       ]
                     }
                   ],
@@ -5210,7 +5333,7 @@
                             "value": "SetReturnNumber"
                           },
                           "parameters": [
-                            "CameraBorderLeft(Object.Layer()) + Object.X() - Object.BoundingBoxRight()"
+                            "CameraBorderLeft(Object.Layer()) + TargetX - Object.BoundingBoxRight()"
                           ]
                         }
                       ]
@@ -5237,7 +5360,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.X() + Distance"
+                        "TargetX + Distance"
                       ]
                     }
                   ],
@@ -5262,7 +5385,7 @@
                             "value": "SetReturnNumber"
                           },
                           "parameters": [
-                            "CameraBorderRight(Object.Layer()) + Object.X() - Object.BoundingBoxLeft()"
+                            "CameraBorderRight(Object.Layer()) + TargetX - Object.BoundingBoxLeft()"
                           ]
                         }
                       ]
@@ -5305,7 +5428,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "Object.Y()"
+                        "TargetY"
                       ]
                     }
                   ],
@@ -5330,7 +5453,7 @@
                             "value": "SetReturnNumber"
                           },
                           "parameters": [
-                            "Object.Y() - Distance"
+                            "TargetY - Distance"
                           ]
                         }
                       ],
@@ -5355,7 +5478,7 @@
                                 "value": "SetReturnNumber"
                               },
                               "parameters": [
-                                "CameraBorderTop(Object.Layer()) + Object.Y() - Object.BoundingBoxBottom()"
+                                "CameraBorderTop(Object.Layer()) + TargetY - Object.BoundingBoxBottom()"
                               ]
                             }
                           ]
@@ -5382,7 +5505,7 @@
                             "value": "SetReturnNumber"
                           },
                           "parameters": [
-                            "Object.Y() + Distance"
+                            "TargetY + Distance"
                           ]
                         }
                       ],
@@ -5407,7 +5530,7 @@
                                 "value": "SetReturnNumber"
                               },
                               "parameters": [
-                                "CameraBorderBottom(Object.Layer()) + Object.Y() - Object.BoundingBoxTop()"
+                                "CameraBorderBottom(Object.Layer()) + TargetY - Object.BoundingBoxTop()"
                               ]
                             }
                           ]
@@ -5444,7 +5567,18 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "!=",
+                        "\"FadingIn\""
+                      ]
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
@@ -5454,141 +5588,242 @@
                         "Object",
                         "\"FadeInDelay\""
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Comment",
-                  "color": {
-                    "b": 109,
-                    "g": 230,
-                    "r": 255,
-                    "textB": 0,
-                    "textG": 0,
-                    "textR": 0
-                  },
-                  "comment": "When an animation is already occuring, we only start it back from the start\nbecause current object position is unlikly to be relevent."
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
+                    },
                     {
                       "type": {
-                        "inverted": true,
-                        "value": "Tween::IsPlaying"
+                        "value": "Tween::StopTween"
                       },
                       "parameters": [
                         "Object",
                         "Tween",
-                        "\"Move\""
+                        "\"Move\"",
+                        ""
                       ]
                     },
                     {
                       "type": {
-                        "inverted": true,
-                        "value": "Tween::IsPlaying"
+                        "value": "Tween::StopTween"
                       },
                       "parameters": [
                         "Object",
                         "Tween",
-                        "\"Fade\""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "TargetX",
-                        "=",
-                        "Object.X()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "TargetY",
-                        "=",
-                        "Object.Y()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "TargetOpacity",
-                        "=",
-                        "Object.Opacity::Value()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BooleanVariable"
-                      },
-                      "parameters": [
-                        "ShouldMove",
-                        "True",
+                        "\"Fade\"",
                         ""
                       ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetX"
-                      },
-                      "parameters": [
-                        "Object",
-                        "=",
-                        "Object.Behavior::OriginX()"
-                      ]
                     },
                     {
                       "type": {
-                        "value": "SetY"
+                        "value": "RemoveObjectTimer"
                       },
                       "parameters": [
                         "Object",
-                        "=",
-                        "Object.Behavior::OriginY()"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BooleanVariable"
-                      },
-                      "parameters": [
-                        "ShouldFade",
-                        "True",
-                        ""
+                        "\"FadeOut\""
                       ]
                     }
                   ],
-                  "actions": [
+                  "events": [
                     {
-                      "type": {
-                        "value": "OpacityCapability::OpacityBehavior::SetValue"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Opacity",
-                        "=",
-                        "0"
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "State",
+                                "=",
+                                "\"JustStarted\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "State",
+                                "=",
+                                "\"Ready\""
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "TargetX",
+                            "=",
+                            "Object.X()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "TargetY",
+                            "=",
+                            "Object.Y()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "TargetOpacity",
+                            "=",
+                            "Object.Opacity::Value()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "State",
+                                "=",
+                                "\"JustStarted\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "State",
+                                "=",
+                                "\"Ready\""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "State",
+                                "=",
+                                "\"FadedIn\""
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "We evaluate the origin every time because the window may have been resized."
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "ShouldMove",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetX"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "Object.Behavior::OriginX()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetY"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "Object.Behavior::OriginY()"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "ShouldFade",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "OpacityCapability::OpacityBehavior::SetValue"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Opacity",
+                                "=",
+                                "0"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"FadingIn\""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -5618,7 +5853,18 @@
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "!=",
+                        "\"FadingOut\""
+                      ]
+                    }
+                  ],
                   "actions": [
                     {
                       "type": {
@@ -5627,6 +5873,138 @@
                       "parameters": [
                         "Object",
                         "\"FadeOutDelay\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::StopTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"Move\"",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Tween::StopTween"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Tween",
+                        "\"Fade\"",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "RemoveObjectTimer"
+                      },
+                      "parameters": [
+                        "Object",
+                        "\"FadeIn\""
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"FadedOut\""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "ShouldMove",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetX"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "TargetX"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetY"
+                              },
+                              "parameters": [
+                                "Object",
+                                "=",
+                                "TargetY"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "ShouldFade",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "OpacityCapability::OpacityBehavior::SetValue"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Opacity",
+                                "=",
+                                "TargetOpacity"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"FadingOut\""
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -5643,6 +6021,80 @@
                   "name": "Behavior",
                   "supplementaryInformation": "TweenIntoView::TweenIntoView",
                   "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set whether to delete the object when the \"tween out of view\" action has finished.",
+              "fullName": "Delete after tween out",
+              "functionType": "Action",
+              "group": "Tween into view configuration",
+              "name": "SetShouldBeDeleted",
+              "sentence": "Should delete _PARAM0_ when the \"tween out of view\" action has finished: _PARAM2_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "ShouldBeDeleted",
+                        "False",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "Value",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "ShouldBeDeleted",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TweenIntoView::TweenIntoView",
+                  "type": "behavior"
+                },
+                {
+                  "defaultValue": "yes",
+                  "description": "Should delete the object when the \"tween out of view\" action has finished",
+                  "name": "Value",
+                  "optional": true,
+                  "type": "yesorno"
                 }
               ],
               "objectGroups": []
@@ -5983,7 +6435,7 @@
             {
               "value": "true",
               "type": "Boolean",
-              "label": "Delete the object when TweenOut action is finished",
+              "label": "Delete the object when the \"tween out of view\" action has finished",
               "group": "Timing",
               "name": "ShouldBeDeleted"
             },
@@ -5995,17 +6447,9 @@
               "name": "ShouldFade"
             },
             {
-              "value": "",
-              "type": "Boolean",
-              "label": "",
-              "group": "Timing",
-              "hidden": true,
-              "name": "Initialized"
-            },
-            {
               "value": "0",
               "type": "Number",
-              "label": "The X position at the beginning of fade in",
+              "label": "The X position at the end of fade in",
               "group": "Motion",
               "hidden": true,
               "name": "TargetX"
@@ -6013,7 +6457,7 @@
             {
               "value": "0",
               "type": "Number",
-              "label": "The Y position at the beginning of fade in",
+              "label": "The Y position at the end of fade in",
               "group": "Motion",
               "hidden": true,
               "name": "TargetY"
@@ -6344,6 +6788,30 @@
               "group": "Opacity",
               "hidden": true,
               "name": "TargetOpacity"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "The X position at the beginning of fade in",
+              "group": "Motion",
+              "hidden": true,
+              "name": "OriginX"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "The Y position at the beginning of fade in",
+              "group": "Motion",
+              "hidden": true,
+              "name": "OriginY"
+            },
+            {
+              "value": "JustCreated",
+              "type": "String",
+              "label": "",
+              "group": "Timing",
+              "hidden": true,
+              "name": "State"
             }
           ],
           "propertiesFolderStructure": {
@@ -6371,7 +6839,7 @@
                     "propertyName": "ShouldBeDeleted"
                   },
                   {
-                    "propertyName": "Initialized"
+                    "propertyName": "State"
                   }
                 ]
               },
@@ -6392,6 +6860,12 @@
                   },
                   {
                     "propertyName": "PositionEasingOut"
+                  },
+                  {
+                    "propertyName": "OriginX"
+                  },
+                  {
+                    "propertyName": "OriginY"
                   },
                   {
                     "propertyName": "TargetX"
