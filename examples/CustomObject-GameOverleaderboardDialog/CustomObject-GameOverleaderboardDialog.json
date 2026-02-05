@@ -372,6 +372,17 @@
             }
           ],
           "content": {}
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "NewSprite",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": []
         }
       ],
       "objectsFolderStructure": {
@@ -382,6 +393,9 @@
           },
           {
             "objectName": "TinySkullGameOverDialog"
+          },
+          {
+            "objectName": "NewSprite"
           }
         ]
       },
@@ -479,13 +493,35 @@
                 "0.5",
                 ""
               ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "LeaderboardDialog::LeaderboardDialog::HasTweenedOut"
+              },
+              "parameters": [
+                "Dialog",
+                ""
+              ]
             },
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": []
+            }
+          ],
+          "actions": [
             {
               "type": {
                 "value": "Wait"
               },
               "parameters": [
-                "0.7"
+                "0.2"
               ]
             },
             {
@@ -584,6 +620,10 @@
       ],
       "behaviorsSharedData": [
         {
+          "name": "Animation",
+          "type": "AnimatableCapability::AnimatableBehavior"
+        },
+        {
           "name": "Effect",
           "type": "EffectCapability::EffectBehavior"
         },
@@ -598,6 +638,10 @@
         {
           "name": "Resizable",
           "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "Scale",
+          "type": "ScalableCapability::ScalableBehavior"
         },
         {
           "name": "Tween",
@@ -2934,6 +2978,40 @@
               "objectGroups": []
             },
             {
+              "description": "Fade in the decoration objects of the dialog.",
+              "fullName": "Fade in decorations",
+              "functionType": "Action",
+              "name": "TweenIn",
+              "sentence": "Fade in the decorations of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TweenIntoView::TweenIntoView::TweenIn"
+                      },
+                      "parameters": [
+                        "Decoration",
+                        "TweenIntoView",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "Fade out the decoration objects of the dialog.",
               "fullName": "Fade out decorations",
               "functionType": "Action",
@@ -2968,11 +3046,11 @@
               "objectGroups": []
             },
             {
-              "description": "Fade in the decoration objects of the dialog.",
-              "fullName": "Fade in decorations",
-              "functionType": "Action",
-              "name": "TweenIn",
-              "sentence": "Fade in the decorations of _PARAM0_",
+              "description": "Check if the fade in animation of the decorations is finished.",
+              "fullName": "Decorations are faded in",
+              "functionType": "Condition",
+              "name": "HasTweenedIn",
+              "sentence": "Fade in animation of _PARAM0_ is finished",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -2980,12 +3058,94 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "TweenIntoView::TweenIntoView::TweenIn"
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "TweenIntoView::TweenIntoView::IsTweenedIn"
                       },
                       "parameters": [
                         "Decoration",
                         "TweenIntoView",
                         ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "False"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "LeaderboardDialog::LeaderboardDialog",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the fade out animation of the decorations is finished.",
+              "fullName": "Decorations are faded out",
+              "functionType": "Condition",
+              "name": "HasTweenedOut",
+              "sentence": "Fade out animation of _PARAM0_ is finished",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "TweenIntoView::TweenIntoView::IsTweenedOut"
+                      },
+                      "parameters": [
+                        "Decoration",
+                        "TweenIntoView",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "False"
                       ]
                     }
                   ]
@@ -4837,14 +4997,16 @@
         "When objects are created, or if they exist at the beginning of the scene, they are put ouside of screen and tweened back to their initial position.",
         "",
         "This extension can be used to:",
-        "- Make smooth transitions for in UI",
+        "- Make smooth transitions for UI",
         "- Animate simple cutscenes"
       ],
       "tags": [
         "fade",
         "move"
       ],
-      "authorIds": [],
+      "authorIds": [
+        "9MGDlUQAh8QUilno4JPycekjRCJ3"
+      ],
       "dependencies": [],
       "globalVariables": [],
       "sceneVariables": [],
@@ -4963,7 +5125,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeInDelay\"",
+                        "\"TweenIntoView_FadeInDelay\"",
                         ">=",
                         "Delay"
                       ]
@@ -4976,7 +5138,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeInDelay\""
+                        "\"TweenIntoView_FadeInDelay\""
                       ]
                     },
                     {
@@ -4985,7 +5147,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeIn\""
+                        "\"TweenIntoView_FadeIn\""
                       ]
                     }
                   ],
@@ -5012,7 +5174,7 @@
                           "parameters": [
                             "Object",
                             "Tween",
-                            "\"Move\"",
+                            "\"TweenIntoView_Move\"",
                             "TargetX",
                             "TargetY",
                             "PositionEasingIn",
@@ -5044,7 +5206,7 @@
                           "parameters": [
                             "Object",
                             "Tween",
-                            "\"Fade\"",
+                            "\"TweenIntoView_Fade\"",
                             "TargetOpacity",
                             "OpacityEasingIn",
                             "Duration * 0.8",
@@ -5064,7 +5226,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeIn\"",
+                        "\"TweenIntoView_FadeIn\"",
                         ">=",
                         "Duration"
                       ]
@@ -5104,7 +5266,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeOutDelay\"",
+                        "\"TweenIntoView_FadeOutDelay\"",
                         ">=",
                         "Delay"
                       ]
@@ -5117,7 +5279,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeOutDelay\""
+                        "\"TweenIntoView_FadeOutDelay\""
                       ]
                     },
                     {
@@ -5126,7 +5288,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeOut\""
+                        "\"TweenIntoView_FadeOut\""
                       ]
                     }
                   ],
@@ -5153,7 +5315,7 @@
                           "parameters": [
                             "Object",
                             "Tween",
-                            "\"Move\"",
+                            "\"TweenIntoView_Move\"",
                             "Object.Behavior::OriginX()",
                             "Object.Behavior::OriginY()",
                             "PositionEasingOut",
@@ -5185,7 +5347,7 @@
                           "parameters": [
                             "Object",
                             "Tween",
-                            "\"Fade\"",
+                            "\"TweenIntoView_Fade\"",
                             "0",
                             "OpacityEasingOut",
                             "Duration * 0.8",
@@ -5205,7 +5367,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeOut\"",
+                        "\"TweenIntoView_FadeOut\"",
                         ">=",
                         "Duration"
                       ]
@@ -5588,7 +5750,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeInDelay\""
+                        "\"TweenIntoView_FadeInDelay\""
                       ]
                     },
                     {
@@ -5598,7 +5760,7 @@
                       "parameters": [
                         "Object",
                         "Tween",
-                        "\"Move\"",
+                        "\"TweenIntoView_Move\"",
                         ""
                       ]
                     },
@@ -5609,7 +5771,7 @@
                       "parameters": [
                         "Object",
                         "Tween",
-                        "\"Fade\"",
+                        "\"TweenIntoView_Fade\"",
                         ""
                       ]
                     },
@@ -5619,7 +5781,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeOut\""
+                        "\"TweenIntoView_FadeOut\""
                       ]
                     }
                   ],
@@ -5874,7 +6036,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeOutDelay\""
+                        "\"TweenIntoView_FadeOutDelay\""
                       ]
                     },
                     {
@@ -5884,7 +6046,7 @@
                       "parameters": [
                         "Object",
                         "Tween",
-                        "\"Move\"",
+                        "\"TweenIntoView_Move\"",
                         ""
                       ]
                     },
@@ -5895,7 +6057,7 @@
                       "parameters": [
                         "Object",
                         "Tween",
-                        "\"Fade\"",
+                        "\"TweenIntoView_Fade\"",
                         ""
                       ]
                     },
@@ -5905,7 +6067,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "\"FadeIn\""
+                        "\"TweenIntoView_FadeIn\""
                       ]
                     }
                   ],
@@ -6007,6 +6169,102 @@
                             "\"FadingOut\""
                           ]
                         }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TweenIntoView::TweenIntoView",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object finished tweening into view.",
+              "fullName": "Tweened into view",
+              "functionType": "Condition",
+              "name": "IsTweenedIn",
+              "sentence": "_PARAM0_ finished tweening into view",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"FadedIn\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "TweenIntoView::TweenIntoView",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object finished tweened out of view.",
+              "fullName": "Tweened out of view",
+              "functionType": "Condition",
+              "name": "IsTweenedOut",
+              "sentence": "_PARAM0_ finished tweening out of view",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"FadedOut\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
                       ]
                     }
                   ]
