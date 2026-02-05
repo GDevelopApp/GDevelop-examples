@@ -8515,14 +8515,14 @@
       "author": "@4ian",
       "category": "Game mechanic",
       "extensionNamespace": "",
-      "fullName": "Fire bullets",
       "gdevelopVersion": ">=5.5.222",
+      "fullName": "Fire bullets",
       "helpPath": "/extensions/fire-bullet/details",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWJ1bGxldCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xNCwyMkgxMFYyMUgxNFYyMk0xMywxMFY3SDExVjEwTDEwLDExLjVWMjBIMTRWMTEuNUwxMywxME0xMiwyQzEyLDIgMTEsMyAxMSw1VjZIMTNWNUMxMyw1IDEzLDMgMTIsMloiIC8+PC9zdmc+",
       "name": "FireBullet",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/bullet.svg",
       "shortDescription": "Fire bullets, manage ammo, reloading and overheating.",
-      "version": "0.9.1",
+      "version": "0.9.2",
       "description": [
         "This extension allows objects to fire bullets. To use it, add the behavior to the object that will shoot, then use the provided action to launch another object as the bullet.",
         "",
@@ -8533,7 +8533,7 @@
         "- Overheat",
         "",
         "The speed can be specified when using the actions to fire the bullets.",
-        "The bullets are automatically given a permanent force to make them move (no need to use a linear movement or move them with another behavior).",
+        "The bullets are automatically given a permanent force to make them move in the 2D plane (no need to use a linear movement or move them with another behavior).",
         "",
         "It can be used for:",
         "- Twin-stick shooters ([open the project online](https://editor.gdevelop.io/?project=example://conviction-of-gun-dude-desktop))",
@@ -8568,7 +8568,7 @@
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
-          "description": "Fire bullets, manage ammo, reloading, and overheating. Once added to your object that must shoot, use the behavior action in your events to fire another object as a bullet. This action will also make the bullet move (using a permanent force) at the speed specified in the action.",
+          "description": "Fire bullets with built-in cooldown, ammo, reloading, and overheating. Once added to your object that must shoot, use the behavior actions to fire another object as a bullet. These actions check all constraints internally (can be called without conditions, they will only fire when ready) and will make the bullet move (using a permanent force).",
           "fullName": "Fire bullets",
           "name": "FireBullet",
           "objectType": "",
@@ -9142,11 +9142,11 @@
               "objectGroups": []
             },
             {
-              "description": "Fire bullets toward an object at a specified speed.",
+              "description": "Fire bullets toward an object at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
               "fullName": "Fire bullets toward an object",
               "functionType": "Action",
               "name": "FireTowardObject",
-              "sentence": "Fire _PARAM4_ from _PARAM0_, at position _PARAM2_; _PARAM3_, toward _PARAM5_ with speed _PARAM6_ px/s",
+              "sentence": "Fire _PARAM4_ from _PARAM0_ (if ready), at position _PARAM2_; _PARAM3_, toward _PARAM5_ with speed _PARAM6_ px/s",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -9211,11 +9211,11 @@
               "objectGroups": []
             },
             {
-              "description": "Fire bullets toward a position at a specified speed.",
+              "description": "Fire bullets toward a position at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
               "fullName": "Fire bullets toward a position",
               "functionType": "Action",
               "name": "FireTowardPosition",
-              "sentence": "Fire _PARAM4_ from _PARAM0_, at position _PARAM2_; _PARAM3_, toward position _PARAM5_;_PARAM6_ with speed _PARAM7_ px/s",
+              "sentence": "Fire _PARAM4_ from _PARAM0_ (if ready), at position _PARAM2_; _PARAM3_, toward position _PARAM5_;_PARAM6_ with speed _PARAM7_ px/s",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -9285,11 +9285,11 @@
               "objectGroups": []
             },
             {
-              "description": "Fire bullets in the direction of a given angle at a specified speed.",
+              "description": "Fire bullets in the direction of a given angle at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
               "fullName": "Fire bullets toward an angle",
               "functionType": "Action",
               "name": "Fire",
-              "sentence": "Fire _PARAM4_ from _PARAM0_, at position _PARAM2_; _PARAM3_, toward angle _PARAM5_ and speed _PARAM6_ px/s",
+              "sentence": "Fire _PARAM4_ from _PARAM0_ (if ready), at position _PARAM2_; _PARAM3_, toward angle _PARAM5_ and speed _PARAM6_ px/s",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -13250,12 +13250,17 @@
               "unit": "Second",
               "label": "Firing cooldown",
               "description": "Objects cannot shoot while firing cooldown is active.",
+              "group": "",
+              "extraInformation": [],
               "name": "FireCooldown"
             },
             {
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "HasJustFired"
             },
@@ -13263,6 +13268,9 @@
               "value": "true",
               "type": "Boolean",
               "label": "Rotate bullets to match their trajectory",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "name": "RotateBullet"
             },
             {
@@ -13272,6 +13280,7 @@
               "label": "Firing arc",
               "description": "Multi-Fire bullets will be evenly spaced inside the firing arc",
               "group": "Multi-Fire",
+              "extraInformation": [],
               "name": "FiringArc"
             },
             {
@@ -13280,6 +13289,7 @@
               "label": "Number of bullets created at once",
               "description": "Multi-Fire bullets will be evenly spaced inside the firing arc",
               "group": "Multi-Fire",
+              "extraInformation": [],
               "name": "BulletQuantity"
             },
             {
@@ -13289,6 +13299,7 @@
               "label": "Angle variance",
               "description": "Make imperfect aim (between 0 and 180 degrees).",
               "group": "Firing variance",
+              "extraInformation": [],
               "advanced": true,
               "name": "AngleVariance"
             },
@@ -13299,6 +13310,7 @@
               "label": "Bullet speed variance",
               "description": "Bullet speed will be adjusted by a random value within this range.",
               "group": "Firing variance",
+              "extraInformation": [],
               "advanced": true,
               "name": "BulletSpeedVariance"
             },
@@ -13306,6 +13318,9 @@
               "value": "0",
               "type": "Number",
               "label": "Ammo quantity (current)",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "AmmoQuantity"
             },
@@ -13315,6 +13330,7 @@
               "label": "Shots per reload ",
               "description": "Use 0 to disable reloading.",
               "group": "Reload",
+              "extraInformation": [],
               "advanced": true,
               "name": "ShotsPerReload"
             },
@@ -13325,6 +13341,7 @@
               "label": "Reloading duration",
               "description": "Objects cannot shoot while reloading is in progress.",
               "group": "Reload",
+              "extraInformation": [],
               "advanced": true,
               "name": "ReloadDuration"
             },
@@ -13332,7 +13349,9 @@
               "value": "0",
               "type": "Number",
               "label": "Max ammo ",
+              "description": "",
               "group": "Ammo",
+              "extraInformation": [],
               "advanced": true,
               "name": "MaxAmmo"
             },
@@ -13340,6 +13359,9 @@
               "value": "0",
               "type": "Number",
               "label": "Shots before next reload",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "ShotsBeforeNextReload"
             },
@@ -13348,6 +13370,8 @@
               "type": "Number",
               "label": "Total shots fired",
               "description": "Regardless of how many bullets are created, only 1 shot will be counted per frame",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "TotalShotsFired"
             },
@@ -13355,6 +13379,9 @@
               "value": "0",
               "type": "Number",
               "label": "Total bullets created",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "TotalBulletsCreated"
             },
@@ -13362,7 +13389,9 @@
               "value": "0",
               "type": "Number",
               "label": "Starting ammo",
+              "description": "",
               "group": "Ammo",
+              "extraInformation": [],
               "advanced": true,
               "name": "StartingAmmo"
             },
@@ -13370,6 +13399,9 @@
               "value": "0",
               "type": "Number",
               "label": "Total reloads completed",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "TotalReloadsCompleted"
             },
@@ -13377,7 +13409,9 @@
               "value": "true",
               "type": "Boolean",
               "label": "Unlimited ammo",
+              "description": "",
               "group": "Ammo",
+              "extraInformation": [],
               "advanced": true,
               "name": "UnlimitedAmmo"
             },
@@ -13385,6 +13419,9 @@
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "ReloadInProgress"
             },
@@ -13394,6 +13431,7 @@
               "label": "Heat increase per shot (between 0 and 1)",
               "description": " Object is overheated when Heat reaches 1.",
               "group": "Overheat",
+              "extraInformation": [],
               "advanced": true,
               "name": "HeatIncreasePerShot"
             },
@@ -13401,6 +13439,9 @@
               "value": "0",
               "type": "Number",
               "label": "Heat level (Range: 0 to 1)",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "HeatLevel"
             },
@@ -13408,7 +13449,9 @@
               "value": "true",
               "type": "Boolean",
               "label": "Reload automatically",
+              "description": "",
               "group": "Reload",
+              "extraInformation": [],
               "advanced": true,
               "name": "AutomaticReloading"
             },
@@ -13419,6 +13462,7 @@
               "label": "Overheat duration",
               "description": "Object cannot shoot while overheat duration is active.",
               "group": "Overheat",
+              "extraInformation": [],
               "advanced": true,
               "name": "OverheatDuration"
             },
@@ -13426,7 +13470,9 @@
               "value": "0.1",
               "type": "Number",
               "label": "Linear cooling rate (per second)",
+              "description": "",
               "group": "Overheat",
+              "extraInformation": [],
               "advanced": true,
               "name": "LinearCoolingRate"
             },
@@ -13440,7 +13486,6 @@
                 "Linear",
                 "Exponential"
               ],
-              "choices": [],
               "advanced": true,
               "name": "ExponentialCoolingRate"
             },
@@ -13450,6 +13495,7 @@
               "label": "Layer the bullets are created on",
               "description": "Base layer by default.",
               "group": "Shooting configuration",
+              "extraInformation": [],
               "hidden": true,
               "name": "BulletLayer"
             },
@@ -13457,6 +13503,9 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
+              "group": "",
+              "extraInformation": [],
               "hidden": true,
               "name": "RandomizedAngle"
             }
