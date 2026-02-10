@@ -308,7 +308,37 @@
         "selectedLayer": "",
         "gameEditorMode": "instances-editor"
       },
-      "objectsGroups": [],
+      "objectsGroups": [
+        {
+          "name": "VolumeSetting",
+          "objects": [
+            {
+              "name": "BlackAndWhiteLeftVolumeSetting"
+            },
+            {
+              "name": "BlackAndWhiteRightVolumeSetting"
+            },
+            {
+              "name": "BlackAndWhiteUpVolumeSetting"
+            },
+            {
+              "name": "BlackAndWhiteDownVolumeSetting"
+            },
+            {
+              "name": "TinyBlackAndWhiteLeftVolumeSetting"
+            },
+            {
+              "name": "TinyBlackAndWhiteRightVolumeSetting"
+            },
+            {
+              "name": "TinyBlackAndWhiteUpVolumeSetting"
+            },
+            {
+              "name": "TinyBlackAndWhiteDownVolumeSetting"
+            }
+          ]
+        }
+      ],
       "variables": [],
       "instances": [
         {
@@ -604,6 +634,101 @@
                 "yes",
                 "100",
                 "1"
+              ]
+            }
+          ]
+        },
+        {
+          "disabled": true,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneJustBegins"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": [
+                "0.01"
+              ]
+            },
+            {
+              "type": {
+                "value": "CollapsibleVolumeControl::CollapsibleVolumeControl::TweenOpen"
+              },
+              "parameters": [
+                "VolumeSetting",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": [
+                "0.5"
+              ]
+            },
+            {
+              "type": {
+                "value": "RenderToFile::SaveAllObjectsImage"
+              },
+              "parameters": [
+                "",
+                "\"/home/davy/Téléchargements/AssetPreview\"",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": [
+                "0.5"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextReleased"
+              },
+              "parameters": [
+                "",
+                "\"Space\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetGlobalVolume"
+              },
+              "parameters": [
+                "VolumeSetting",
+                "=",
+                "50"
+              ]
+            },
+            {
+              "type": {
+                "value": "Scene"
+              },
+              "parameters": [
+                "",
+                "\"Game Scene - VolumeSettings\"",
+                ""
               ]
             }
           ]
@@ -1488,6 +1613,114 @@
                             "MasterVolume"
                           ]
                         }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Handle GlobalVolume changes done in the main events."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsMuted",
+                        "True",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GlobalVolume"
+                      },
+                      "parameters": [
+                        "",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "IsMuted",
+                        "False",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "AnimatableCapability::AnimatableBehavior::SetName"
+                      },
+                      "parameters": [
+                        "MuteButton",
+                        "Animation",
+                        "=",
+                        "\"On\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsMuted",
+                        "False",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "GlobalVolume"
+                      },
+                      "parameters": [
+                        "",
+                        "!=",
+                        "MasterVolume"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "MasterVolume",
+                        "=",
+                        "GlobalVolume()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PanelSpriteSlider::PanelSpriteSlider::SetValue"
+                      },
+                      "parameters": [
+                        "VolumeSlider",
+                        "=",
+                        "MasterVolume",
+                        ""
                       ]
                     }
                   ]
@@ -19878,6 +20111,237 @@
           ]
         }
       ]
+    },
+    {
+      "author": "Arthur Pacaud (arthuro555)",
+      "category": "Advanced",
+      "extensionNamespace": "",
+      "fullName": "Render to file",
+      "gdevelopVersion": ">=5.5.222",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNhbWVyYS1lbmhhbmNlIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTksM0w3LjE3LDVINEEyLDIgMCAwLDAgMiw3VjE5QTIsMiAwIDAsMCA0LDIxSDIwQTIsMiAwIDAsMCAyMiwxOVY3QTIsMiAwIDAsMCAyMCw1SDE2LjgzTDE1LDNNMTIsMThBNSw1IDAgMCwxIDcsMTNBNSw1IDAgMCwxIDEyLDhBNSw1IDAgMCwxIDE3LDEzQTUsNSAwIDAsMSAxMiwxOE0xMiwxN0wxMy4yNSwxNC4yNUwxNiwxM0wxMy4yNSwxMS43NUwxMiw5TDEwLjc1LDExLjc1TDgsMTNMMTAuNzUsMTQuMjUiIC8+PC9zdmc+",
+      "name": "RenderToFile",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/camera-enhance.svg",
+      "shortDescription": "Renders objects into PNG files.",
+      "version": "1.0.0",
+      "description": "Renders objects into PNG files.",
+      "tags": [],
+      "authorIds": [
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
+      ],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onFirstSceneLoaded",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const fs = typeof require !== 'undefined' ? require('fs/promises') : null;",
+                "const path = typeof require !== 'undefined' ? require('path') : null",
+                "",
+                "const rgbToHex = (rgbArray) => gdjs.rgbToHexNumber(rgbArray[0], rgbArray[1], rgbArray[2]);",
+                "",
+                "if (gdjs.PanelSpriteRuntimeObjectRenderer)",
+                "{",
+                "    const originalEnsureUpToDate = gdjs.PanelSpriteRuntimeObjectRenderer.prototype.ensureUpToDate;",
+                "    gdjs.PanelSpriteRuntimeObjectRenderer.prototype.ensureUpToDate = function () {",
+                "        originalEnsureUpToDate.call(this);",
+                "        this._spritesContainer.cacheAsBitmap = false;",
+                "    }",
+                "}",
+                "if (gdjs.TextInputRuntimeObject)",
+                "{",
+                "    gdjs.TextInputRuntimeObject.prototype.getRendererObject = function () {",
+                "        /** @type {PIXI.Graphics} */",
+                "        let graphics = this._renderer.graphics;",
+                "        if (!graphics) {",
+                "            graphics = new PIXI.Graphics();",
+                "            this._renderer.graphics = graphics;",
+                "            this.getInstanceContainer()",
+                "                .getLayer('')",
+                "                .getRenderer()",
+                "                .addRendererObject(graphics, this.getZOrder());",
+                "            ",
+                "            const text = new PIXI.Text(' ', { align: 'left' });",
+                "            graphics.addChild(text);",
+                "            this._renderer.text = text;",
+                "        }",
+                "        return graphics;",
+                "    }",
+                "    const originalUpdatePreRender = gdjs.TextInputRuntimeObjectRenderer.prototype.updatePreRender;",
+                "    gdjs.TextInputRuntimeObjectRenderer.prototype.updatePreRender = function () {",
+                "        originalUpdatePreRender.call(this);",
+                "        const object = this._object;",
+                "        /** @type {PIXI.Graphics} */",
+                "        const graphics = this.graphics;",
+                "        /** @type {PIXI.Text} */",
+                "        const text = this.text;",
+                "        graphics.x = object.x;",
+                "        graphics.y = object.y;",
+                "        graphics.clear();",
+                "        graphics.lineStyle(object._borderWidth, rgbToHex(object._borderColor), object._borderOpacity);",
+                "        graphics.beginFill(rgbToHex(object._fillColor), object._fillOpacity);",
+                "        graphics.drawRect(0, 0, object.getWidth(), object.getHeight());",
+                "        graphics.endFill();",
+                "        text.text = object._placeholder;",
+                "        const style = text.style;",
+                "        style.fontSize = object._fontSize;",
+                "        style.fontFamily = '\"' + object.getInstanceContainer().getGame().getFontManager().getFontFamily(object._fontResourceName) + '\"';;",
+                "        style.fill = \"#888\";",
+                "        text.x = 4;",
+                "        text.y = (object.getHeight() - object._fontSize) / 2;",
+                "    }",
+                "}",
+                "",
+                "// Create a new application (extract will be auto-added to renderer)",
+                "const app = new PIXI.Application();",
+                "",
+                "/**",
+                " * @param object {gdjs.RuntimeObject}",
+                " * @param path {string}",
+                " */",
+                "async function saveObjectImage(object, path) {",
+                "    if (!fs) {",
+                "        return;",
+                "    }",
+                "    // Render the graphics as an HTMLImageElement",
+                "    /** @type {HTMLImageElement} */",
+                "    const image = await app.renderer.extract.image(object.getRendererObject());",
+                "",
+                "    try {",
+                "        await fs.writeFile(path, image.src",
+                "            .replace('data:image/png;base64,', ''), 'base64');",
+                "    }",
+                "    catch (err) {",
+                "        console.error(",
+                "            'Unable to save the screenshot at path: ' + path",
+                "        );",
+                "    }",
+                "}",
+                "",
+                "/**",
+                " * @param {string} pascalCaseName",
+                " * @returns {string}",
+                " */",
+                "const addSpacesToPascalCase = (pascalCaseName) => {",
+                "    let name = pascalCaseName",
+                "        .replace(/([A-Z]+|\\d+)/g, ' $1')",
+                "        .replace(",
+                "            /_(\\w)/g,",
+                "            (",
+                "                // @ts-ignore Unused",
+                "                match,",
+                "                $1",
+                "            ) => ' ' + $1.toUpperCase()",
+                "        )",
+                "        .replace(/_/g, '')",
+                "        .replace(/\\s+/g, ' ')",
+                "        .trim();",
+                "    name = name.charAt(0) === ' ' ? name.substring(1) : name;",
+                "    return name;",
+                "};",
+                "",
+                "/**",
+                " * @param instanceContainer {gdjs.RuntimeInstanceContainer}",
+                " * @param folderPath {string}",
+                " */",
+                "async function saveAllObjectsImage(instanceContainer, folderPath) {",
+                "    if (!fs) {",
+                "        return;",
+                "    }",
+                "    for (const object of instanceContainer.getAdhocListOfAllInstances()) {",
+                "        saveObjectImage(object, path.join(",
+                "            folderPath, addSpacesToPascalCase(object.getName()) + '.preview.png'));",
+                "    }",
+                "}",
+                "",
+                "gdjs.__renderToFileExtension = {",
+                "    saveObjectImage,",
+                "    saveAllObjectsImage",
+                "};",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Renders an object and puts the rendered image into a sprite object.",
+          "fullName": "Render an object into a file",
+          "functionType": "Action",
+          "name": "SaveObjectImage",
+          "sentence": "Render _PARAM1_ into file _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const objects = eventsFunctionContext.getObjects(\"Object\");",
+                "const path = eventsFunctionContext.getArgument(\"Path\");",
+                "",
+                "gdjs.__renderToFileExtension.saveObject(objects[0], path);",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "The object to render",
+              "name": "Object",
+              "type": "objectList"
+            },
+            {
+              "description": "Path",
+              "name": "Path",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Renders all the objects of the scene intoa folder.",
+          "fullName": "Render all objects into a file",
+          "functionType": "Action",
+          "name": "SaveAllObjectsImage",
+          "sentence": "Render all objects into folder _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "const path = eventsFunctionContext.getArgument(\"Path\");",
+                "",
+                "gdjs.__renderToFileExtension.saveAllObjectsImage(runtimeScene, path);",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Folder",
+              "name": "Path",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": []
     }
   ],
   "externalLayouts": []
