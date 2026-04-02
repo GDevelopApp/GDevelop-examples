@@ -7554,6 +7554,17 @@
                     "3",
                     ""
                   ]
+                },
+                {
+                  "type": {
+                    "value": "Light3D::SetLightShadowCountMax"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "1",
+                    ""
+                  ]
                 }
               ]
             }
@@ -42509,6 +42520,14 @@
                 "    value: 20",
                 "};",
                 "",
+                "const editorLightShadowCountMax = {",
+                "    value: 1",
+                "};",
+                "",
+                "const lightShadowCountMax = {",
+                "    value: 4",
+                "};",
+                "",
                 "/**",
                 " * Get the platforms manager of an instance container.",
                 " * @param {gdjs.RuntimeScene & {__lightManager: LightManager}} runtimeScene",
@@ -42517,8 +42536,8 @@
                 "    if (!runtimeScene.__lightManager) {",
                 "        // Create the shared manager if necessary.",
                 "        runtimeScene.__lightManager = isInGameEdition ?",
-                "            new LightManager(editorLightCountMax, 1) :",
-                "            new LightManager(lightCountMax, 4);",
+                "            new LightManager(editorLightCountMax, editorLightShadowCountMax) :",
+                "            new LightManager(lightCountMax, lightShadowCountMax);",
                 "    }",
                 "    return runtimeScene.__lightManager;",
                 "}",
@@ -42605,7 +42624,7 @@
                 "",
                 "    /**",
                 "     * @param maxCount {{value: number}}",
-                "     * @param shadowCount {number}",
+                "     * @param shadowCount {{value: number}}",
                 "     */",
                 "    constructor(maxCount, shadowCount) {",
                 "        this.visibleObjects = new CappedLightList(",
@@ -42614,7 +42633,7 @@
                 "            (object) => { object.__light3D.visible = false; }",
                 "        );",
                 "        this.shadowObjects = new CappedLightList(",
-                "            { value: shadowCount },",
+                "            shadowCount,",
                 "            (object) => { object.__light3D.castShadow = true; },",
                 "            (object) => { object.__light3D.castShadow = false; }",
                 "        );",
@@ -42643,6 +42662,7 @@
                 "gdjs.__light3DExtension = {",
                 "    Light3DRenderer,",
                 "    lightCountMax,",
+                "    lightShadowCountMax,",
                 "}"
               ],
               "parameterObjects": "",
@@ -42729,6 +42749,83 @@
           ],
           "parameters": [],
           "objectGroups": []
+        },
+        {
+          "description": "the maximum number of nearest lights displayed with shadow simultaneously.",
+          "fullName": "Max lights with shadow count",
+          "functionType": "ExpressionAndCondition",
+          "name": "LightShadowCountMax",
+          "sentence": "max lights with shadow count",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Light3D::DefineHelperClasses"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "",
+                "eventsFunctionContext.returnValue = gdjs.__light3DExtension.lightShadowCountMax.value;"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "LightShadowCountMax",
+          "name": "SetLightShadowCountMax",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Light3D::DefineHelperClasses"
+                  },
+                  "parameters": [
+                    "",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "",
+                "const value = eventsFunctionContext.getArgument(\"Value\");",
+                "",
+                "gdjs.__light3DExtension.lightShadowCountMax.value = value;"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
         }
       ],
       "eventsFunctionsFolderStructure": {
@@ -42748,6 +42845,12 @@
           },
           {
             "functionName": "SetLightCountMax"
+          },
+          {
+            "functionName": "LightShadowCountMax"
+          },
+          {
+            "functionName": "SetLightShadowCountMax"
           }
         ]
       },
