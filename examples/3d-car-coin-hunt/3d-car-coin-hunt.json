@@ -1,7 +1,7 @@
 {
   "firstLayout": "Menu",
   "gdVersion": {
-    "build": 262,
+    "build": 265,
     "major": 5,
     "minor": 6,
     "revision": 0
@@ -87,7 +87,6 @@
     "playableDevices": [
       "keyboard",
       "gamepad",
-      "mobile",
       "mobile"
     ],
     "extensionProperties": [],
@@ -1264,6 +1263,17 @@
             },
             {
               "name": "RoadBend"
+            }
+          ]
+        },
+        {
+          "name": "Light",
+          "objects": [
+            {
+              "name": "NewSpotLight"
+            },
+            {
+              "name": "NewPointLight"
             }
           ]
         }
@@ -7352,7 +7362,12 @@
           "variant": "",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
           "content": {
             "ShadowQuality": "High",
             "Intensity": 4,
@@ -8856,7 +8871,7 @@
                 "value": "Tween::IsPlaying"
               },
               "parameters": [
-                "NewSpotLight",
+                "Light",
                 "Tween",
                 "\"Color\""
               ]
@@ -8876,10 +8891,21 @@
             },
             {
               "type": {
+                "value": "Light3D::PointLight3D::SetColor"
+              },
+              "parameters": [
+                "NewPointLight",
+                "=",
+                "\"208;2;27\"",
+                ""
+              ]
+            },
+            {
+              "type": {
                 "value": "Tween::TweenBehavior::AddObjectColorTween2"
               },
               "parameters": [
-                "NewSpotLight",
+                "Light",
                 "Tween",
                 "\"Color\"",
                 "\"248;231;28\"",
@@ -42558,7 +42584,7 @@
                 "}",
                 "",
                 "const editorLightCountMax = {",
-                "    value: 4",
+                "    value: 20",
                 "};",
                 "",
                 "const lightCountMax = {",
@@ -43132,10 +43158,11 @@
                     "if (!object.setColor && !object.getColor) {",
                     "    const prototype = Object.getPrototypeOf(object);",
                     "    prototype.setColor = function(tint) {",
-                    "        this.SetColor(tint, eventsFunctionContext);",
+                    "        this._setColor(tint);",
+                    "        this.__spotLightAdapter.setColor(tint);",
                     "    }",
                     "    prototype.getColor = function() {",
-                    "        return this.Color(eventsFunctionContext);",
+                    "        return this._getColor(eventsFunctionContext);",
                     "    }",
                     "}",
                     ""
@@ -45217,10 +45244,11 @@
                     "if (!object.setColor && !object.getColor) {",
                     "    const prototype = Object.getPrototypeOf(object);",
                     "    prototype.setColor = function(tint) {",
-                    "        this.SetColor(tint, eventsFunctionContext);",
+                    "        this._setColor(tint);",
+                    "        this.__pointLightAdapter.setColor(tint);",
                     "    }",
                     "    prototype.getColor = function() {",
-                    "        return this.Color(eventsFunctionContext);",
+                    "        return this._getColor(eventsFunctionContext);",
                     "    }",
                     "}",
                     ""
