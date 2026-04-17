@@ -353,6 +353,17 @@
           "identifier": "https://asset-resources.gdevelop.io/public-resources/3D Platformer Game Kit/Props/b3083ee63f966b628eba08d319b0ad1d508687a733c74a3923425f9e888567a3_Spiky Ball.glb",
           "name": "Spiky Ball.glb"
         }
+      },
+      {
+        "file": "assets/Bottle Ketchup.glb",
+        "kind": "model3D",
+        "metadata": "",
+        "name": "Bottle Ketchup.glb",
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/3D Food/Food/7ba9cd4e680a78bcdd6e7a54366442cb53b8c2ebd1abc5ec5577f512ae025247_Bottle Ketchup.glb",
+          "name": "Bottle Ketchup.glb"
+        }
       }
     ]
   },
@@ -385,7 +396,7 @@
         "gridColor": 16098851,
         "gridAlpha": 0.5,
         "snap": true,
-        "zoomFactor": 0.8993607583666625,
+        "zoomFactor": 0.8700232859857305,
         "windowMask": false,
         "selectedLayer": "",
         "gameEditorMode": "instances-editor"
@@ -2492,8 +2503,8 @@
               "density": 0.1,
               "friction": 0.3,
               "restitution": 0.5,
-              "linearDamping": 0.1,
-              "angularDamping": 0.1,
+              "linearDamping": 0.001,
+              "angularDamping": 0.001,
               "gravityScale": 0.1,
               "layers": 17,
               "masks": 17
@@ -2514,6 +2525,61 @@
             "rotationY": 0,
             "rotationZ": 90,
             "width": 2,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "d8dbeeda69bcc73dfea92f1612b271dda441199d3465ce94949fc92ec63e3799",
+          "name": "BottleKetchup",
+          "persistentUuid": "68feedd8-b094-4a94-8448-56d03d160ce4",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Physics3D",
+              "type": "Physics3D::Physics3DBehavior",
+              "object3D": "Object3D",
+              "bodyType": "Dynamic",
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Capsule",
+              "shapeOrientation": "X",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeDimensionC": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "shapeOffsetZ": 0,
+              "massCenterOffsetX": 0,
+              "massCenterOffsetY": 0,
+              "massCenterOffsetZ": 0,
+              "massOverride": 0,
+              "density": 0.1,
+              "friction": 0.3,
+              "restitution": 0.5,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "gravityScale": 0.1,
+              "layers": 17,
+              "masks": 17
+            }
+          ],
+          "content": {
+            "centerLocation": "ObjectCenter",
+            "crossfadeDuration": 0.10000000149011612,
+            "depth": 1.5,
+            "height": 1.5,
+            "isCastingShadow": true,
+            "isReceivingShadow": true,
+            "keepAspectRatio": false,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "Bottle Ketchup.glb",
+            "originLocation": "ObjectCenter",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": -90,
+            "width": 8,
             "animations": []
           }
         }
@@ -2544,6 +2610,9 @@
           },
           {
             "objectName": "SpikyBall"
+          },
+          {
+            "objectName": "BottleKetchup"
           },
           {
             "objectName": "Wood"
@@ -3109,12 +3178,30 @@
                 "FireBullet",
                 "Object3D",
                 "2",
-                "0",
-                "0",
-                "SpikyBall",
+                "-3",
+                "-1",
+                "BottleKetchup",
                 "Object3D",
                 "Physics3D",
-                "500",
+                "300",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "FireBullet::FireBullet::FireForward3D"
+              },
+              "parameters": [
+                "Spaceship",
+                "FireBullet",
+                "Object3D",
+                "2",
+                "3",
+                "-1",
+                "BottleKetchup",
+                "Object3D",
+                "Physics3D",
+                "300",
                 ""
               ]
             }
@@ -27698,7 +27785,7 @@
     {
       "author": "@4ian",
       "category": "Game mechanic",
-      "dimension": "2D",
+      "dimension": "2D/3D",
       "extensionNamespace": "",
       "fullName": "Fire bullets",
       "gdevelopVersion": ">=5.5.222",
@@ -27707,7 +27794,7 @@
       "name": "FireBullet",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/bullet.svg",
       "shortDescription": "Fire bullets with ammo count, reload timer, and overheat management.",
-      "version": "0.9.2",
+      "version": "0.10.0",
       "description": [
         "This extension allows objects to fire bullets. To use it, add the behavior to the object that will shoot, then use the provided action to launch another object as the bullet.",
         "",
@@ -27796,6 +27883,33 @@
                 "        this.right.normalize();",
                 "        this.up.normalize();",
                 "        this.forward.normalize();",
+                "    }",
+                "",
+                "    /**",
+                "     * @param offsetX {number}",
+                "     */",
+                "    getWorldOffsetX(offsetX, offsetY, offsetZ) {",
+                "        return offsetX * this.forward.x +",
+                "            offsetY * this.right.x +",
+                "            offsetZ * this.up.y;",
+                "    }",
+                "",
+                "    /**",
+                "     * @param offsetY {number}",
+                "     */",
+                "    getWorldOffsetY(offsetX, offsetY, offsetZ) {",
+                "        return offsetX * this.forward.y +",
+                "            offsetY * this.right.y +",
+                "            offsetZ * this.up.y;",
+                "    }",
+                "",
+                "    /**",
+                "     * @param offsetX {number}",
+                "     */",
+                "    getWorldOffsetZ(offsetX, offsetY, offsetZ) {",
+                "        return offsetX * this.forward.z +",
+                "            offsetY * this.right.z +",
+                "            offsetZ * this.up.z;",
                 "    }",
                 "}",
                 "",
@@ -32609,7 +32723,7 @@
                       "parameters": [
                         "Bullet",
                         "+",
-                        "OffsetX * ForwardX"
+                        "Object.Behavior::WorldOffsetX(OffsetX, OffsetY, OffsetZ)"
                       ]
                     },
                     {
@@ -32619,7 +32733,7 @@
                       "parameters": [
                         "Bullet",
                         "+",
-                        "OffsetX * ForwardY"
+                        "Object.Behavior::WorldOffsetY(OffsetX, OffsetY, OffsetZ)"
                       ]
                     },
                     {
@@ -32630,7 +32744,7 @@
                         "Bullet",
                         "Object3D2",
                         "+",
-                        "OffsetX * ForwardZ"
+                        "Object.Behavior::WorldOffsetZ(OffsetX, OffsetY, OffsetZ)"
                       ]
                     },
                     {
@@ -32641,7 +32755,7 @@
                         "Bullet",
                         "Physics3D",
                         "=",
-                        "Speed * ForwardX"
+                        "Speed * Object.Behavior::ForwardX()"
                       ]
                     },
                     {
@@ -32652,7 +32766,7 @@
                         "Bullet",
                         "Physics3D",
                         "=",
-                        "Speed * ForwardY"
+                        "Speed * Object.Behavior::ForwardY()"
                       ]
                     },
                     {
@@ -32663,7 +32777,56 @@
                         "Bullet",
                         "Physics3D",
                         "=",
-                        "Speed * ForwardZ"
+                        "Speed * Object.Behavior::ForwardZ()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "RotateBullet",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "=",
+                        "Object.Angle()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetRotationY"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Object3D2",
+                        "=",
+                        "Object.Object3D::RotationY()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetRotationX"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Object3D2",
+                        "=",
+                        "Object.Object3D::RotationX()"
                       ]
                     }
                   ]
@@ -32730,6 +32893,7 @@
             {
               "fullName": "Update local basis",
               "functionType": "Action",
+              "group": "3D Helpers",
               "name": "UpdateLocalBasis",
               "private": true,
               "sentence": "Update local basis of _PARAM0_",
@@ -32741,11 +32905,6 @@
                     "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
                     "const { objectlocalBasis } = behavior.__fireBulletExtension;",
                     "objectlocalBasis.update();",
-                    "behavior._setForwardX(objectlocalBasis.forward.x);",
-                    "behavior._setForwardY(objectlocalBasis.forward.y);",
-                    "behavior._setForwardZ(objectlocalBasis.forward.z);",
-                    "",
-                    "console.log(objectlocalBasis.forward);",
                     ""
                   ],
                   "parameterObjects": "Object",
@@ -32753,6 +32912,309 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "World offset X",
+              "functionType": "Expression",
+              "group": "3D Helpers",
+              "name": "WorldOffsetX",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const { objectlocalBasis } = behavior.__fireBulletExtension;",
+                    "",
+                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
+                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
+                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
+                    "",
+                    "eventsFunctionContext.returnValue = objectlocalBasis.getWorldOffsetX(offsetX, offsetY, offsetZ);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Local offset X",
+                  "name": "OffsetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Local offset Y",
+                  "name": "OffsetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Local offset Z",
+                  "name": "OffsetZ",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "World offset Y",
+              "functionType": "Expression",
+              "group": "3D Helpers",
+              "name": "WorldOffsetY",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const { objectlocalBasis } = behavior.__fireBulletExtension;",
+                    "",
+                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
+                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
+                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
+                    "",
+                    "eventsFunctionContext.returnValue = objectlocalBasis.getWorldOffsetY(offsetX, offsetY, offsetZ);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Local offset X",
+                  "name": "OffsetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Local offset Y",
+                  "name": "OffsetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Local offset Z",
+                  "name": "OffsetZ",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "World offset Z",
+              "functionType": "Expression",
+              "group": "3D Helpers",
+              "name": "WorldOffsetZ",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const { objectlocalBasis } = behavior.__fireBulletExtension;",
+                    "",
+                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
+                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
+                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
+                    "",
+                    "eventsFunctionContext.returnValue = objectlocalBasis.getWorldOffsetZ(offsetX, offsetY, offsetZ);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Local offset X",
+                  "name": "OffsetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Local offset Y",
+                  "name": "OffsetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Local offset Z",
+                  "name": "OffsetZ",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "World offset X",
+              "functionType": "Expression",
+              "group": "3D Helpers",
+              "name": "ForwardX",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const { objectlocalBasis } = behavior.__fireBulletExtension;",
+                    "",
+                    "eventsFunctionContext.returnValue = objectlocalBasis.forward.x;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "World offset Y",
+              "functionType": "Expression",
+              "group": "3D Helpers",
+              "name": "ForwardY",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const { objectlocalBasis } = behavior.__fireBulletExtension;",
+                    "",
+                    "eventsFunctionContext.returnValue = objectlocalBasis.forward.y;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "World offset Z",
+              "functionType": "Expression",
+              "group": "3D Helpers",
+              "name": "ForwardZ",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
+                    "const { objectlocalBasis } = behavior.__fireBulletExtension;",
+                    "",
+                    "eventsFunctionContext.returnValue = objectlocalBasis.forward.z;",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
@@ -32791,7 +33253,30 @@
                 "functionName": "FireForward3D"
               },
               {
-                "functionName": "UpdateLocalBasis"
+                "folderName": "3D Helpers",
+                "children": [
+                  {
+                    "functionName": "UpdateLocalBasis"
+                  },
+                  {
+                    "functionName": "ForwardX"
+                  },
+                  {
+                    "functionName": "ForwardY"
+                  },
+                  {
+                    "functionName": "ForwardZ"
+                  },
+                  {
+                    "functionName": "WorldOffsetX"
+                  },
+                  {
+                    "functionName": "WorldOffsetY"
+                  },
+                  {
+                    "functionName": "WorldOffsetZ"
+                  }
+                ]
               },
               {
                 "folderName": "Firing",
@@ -33250,30 +33735,6 @@
               "label": "",
               "hidden": true,
               "name": "RandomizedAngle"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "",
-              "group": "3D",
-              "hidden": true,
-              "name": "ForwardX"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "",
-              "group": "3D",
-              "hidden": true,
-              "name": "ForwardY"
-            },
-            {
-              "value": "",
-              "type": "Number",
-              "label": "",
-              "group": "3D",
-              "hidden": true,
-              "name": "ForwardZ"
             }
           ],
           "propertiesFolderStructure": {
@@ -33386,20 +33847,6 @@
               },
               {
                 "propertyName": "RandomizedAngle"
-              },
-              {
-                "folderName": "3D",
-                "children": [
-                  {
-                    "propertyName": "ForwardZ"
-                  },
-                  {
-                    "propertyName": "ForwardY"
-                  },
-                  {
-                    "propertyName": "ForwardX"
-                  }
-                ]
               }
             ]
           }
