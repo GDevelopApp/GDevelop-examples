@@ -18,6 +18,7 @@
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "templateSlug": "",
+    "useDeprecatedZeroAsDefaultStringVariable": true,
     "version": "1.0.0",
     "name": "3d-flight",
     "description": "",
@@ -1342,6 +1343,12 @@
               "ForwardX": 2.0247e-320,
               "ForwardY": 2.0247e-320,
               "ForwardZ": 2.0247e-320
+            },
+            {
+              "name": "FireBullet3D",
+              "type": "FireBullet::FireBullet3D",
+              "Object3D": "Object3D",
+              "FireBullet": "FireBullet"
             },
             {
               "name": "Physics3D",
@@ -3254,9 +3261,9 @@
                 "Spaceship.X()",
                 "Spaceship.Y()",
                 "Spaceship.Object3D::Z()",
-                "Spaceship.X() + 10000 * Spaceship.PhysicsAirplane3D::ForwardX()",
-                "Spaceship.Y() + 10000 * Spaceship.PhysicsAirplane3D::ForwardY()",
-                "Spaceship.Object3D::Z() + 10000 * Spaceship.PhysicsAirplane3D::ForwardZ()",
+                "Spaceship.X() + 10000 * Spaceship.Object3D::ForwardX()",
+                "Spaceship.Y() + 10000 * Spaceship.Object3D::ForwardY()",
+                "Spaceship.Object3D::Z() + 10000 * Spaceship.Object3D::ForwardZ()",
                 ""
               ]
             }
@@ -3559,12 +3566,11 @@
           "actions": [
             {
               "type": {
-                "value": "FireBullet::FireBullet::FireForwardObject3D"
+                "value": "FireBullet::FireBullet3D::FireForwardObject3D"
               },
               "parameters": [
                 "Spaceship",
-                "FireBullet",
-                "Object3D",
+                "FireBullet3D",
                 "2",
                 "-3",
                 "-1",
@@ -3577,12 +3583,11 @@
             },
             {
               "type": {
-                "value": "FireBullet::FireBullet::FireForwardObject3D"
+                "value": "FireBullet::FireBullet3D::FireForwardObject3D"
               },
               "parameters": [
                 "Spaceship",
-                "FireBullet",
-                "Object3D",
+                "FireBullet3D",
                 "2",
                 "3",
                 "-1",
@@ -3596,7 +3601,6 @@
           ]
         },
         {
-          "disabled": true,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -3612,44 +3616,41 @@
           "actions": [
             {
               "type": {
-                "value": "FireBullet::FireBullet::FireForwardCamera3D"
+                "value": "FireBullet::FireBullet3D::FireForwardCamera3D"
               },
               "parameters": [
                 "Spaceship",
-                "FireBullet",
-                "Object3D",
+                "FireBullet3D",
                 "20",
-                "-2",
+                "-3",
                 "5",
                 "BottleKetchup",
                 "Object3D",
                 "Physics3D",
-                "0",
+                "300",
                 ""
               ]
             },
             {
               "type": {
-                "value": "FireBullet::FireBullet::FireForwardCamera3D"
+                "value": "FireBullet::FireBullet3D::FireForwardCamera3D"
               },
               "parameters": [
                 "Spaceship",
-                "FireBullet",
-                "Object3D",
+                "FireBullet3D",
                 "20",
-                "2",
+                "3",
                 "5",
                 "BottleKetchup",
                 "Object3D",
                 "Physics3D",
-                "0",
+                "300",
                 ""
               ]
             }
           ]
         },
         {
-          "disabled": true,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -3658,26 +3659,25 @@
               },
               "parameters": [
                 "",
-                "\"c\""
+                "\"v\""
               ]
             }
           ],
           "actions": [
             {
               "type": {
-                "value": "FireBullet::FireBullet::FireForwardCamera3D"
+                "value": "FireBullet::FireBullet3D::FireForwardCamera3D"
               },
               "parameters": [
                 "Spaceship",
-                "FireBullet",
-                "Object3D",
+                "FireBullet3D",
                 "20",
                 "0",
                 "0",
                 "Male_Casual",
                 "Object3D",
                 "Physics3D",
-                "0",
+                "300",
                 ""
               ]
             }
@@ -3833,6 +3833,10 @@
           "type": "FireBullet::FireBullet"
         },
         {
+          "name": "FireBullet3D",
+          "type": "FireBullet::FireBullet3D"
+        },
+        {
           "name": "Flippable",
           "type": "FlippableCapability::FlippableBehavior"
         },
@@ -3912,35 +3916,7 @@
                 "    return;",
                 "}",
                 "",
-                "const rotationMatrix = new THREE.Matrix4();",
-                "",
-                "class ObjectLocalBasis {",
-                "    /** @type {gdjs.RuntimeObject} */",
-                "    object;",
-                "    forward = new THREE.Vector3();",
-                "",
-                "    /**",
-                "     * @param object {gdjs.RuntimeObject}",
-                "     */",
-                "    constructor(object) {",
-                "        this.object = object;",
-                "    }",
-                "",
-                "    update() {",
-                "        const threeObject = this.object.get3DRendererObject();",
-                "        rotationMatrix.makeRotationFromEuler(threeObject.rotation);",
-                "        const elements = rotationMatrix.elements;",
-                "        this.forward.set(",
-                "            elements[0],",
-                "            elements[1],",
-                "            elements[2]",
-                "        );",
-                "        this.forward.normalize();",
-                "    }",
-                "}",
-                "",
                 "gdjs.__physicsAirplane3DExtension = {",
-                "    ObjectLocalBasis",
                 "};",
                 ""
               ],
@@ -3991,20 +3967,6 @@
                       ]
                     }
                   ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const { ObjectLocalBasis } = gdjs.__physicsAirplane3DExtension;\r",
-                    "const object = objects[0];\r",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\r",
-                    "behavior.__physicsAirplane3DExtension = {\r",
-                    "    localBasis: new ObjectLocalBasis(object)\r",
-                    "};"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": false
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -4194,23 +4156,13 @@
                             },
                             {
                               "type": {
-                                "value": "PhysicsAirplane3D::PhysicsAirplane3D::UpdateLocalBasis"
-                              },
-                              "parameters": [
-                                "Object",
-                                "Behavior",
-                                ""
-                              ]
-                            },
-                            {
-                              "type": {
                                 "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
                               },
                               "parameters": [
                                 "Object",
                                 "Physics3DBehavior",
                                 "=",
-                                "CurrentForwardSpeed * ForwardX"
+                                "CurrentForwardSpeed * Object.Object3D::ForwardX()"
                               ]
                             },
                             {
@@ -4221,7 +4173,7 @@
                                 "Object",
                                 "Physics3DBehavior",
                                 "=",
-                                "CurrentForwardSpeed * ForwardY"
+                                "CurrentForwardSpeed * Object.Object3D::ForwardY()"
                               ]
                             },
                             {
@@ -4232,7 +4184,7 @@
                                 "Object",
                                 "Physics3DBehavior",
                                 "=",
-                                "CurrentForwardSpeed * ForwardZ"
+                                "CurrentForwardSpeed * Object.Object3D::ForwardZ()"
                               ]
                             },
                             {
@@ -4824,45 +4776,6 @@
               "objectGroups": []
             },
             {
-              "fullName": "Update local basis",
-              "functionType": "Action",
-              "name": "UpdateLocalBasis",
-              "private": true,
-              "sentence": "Update local basis of _PARAM0_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { localBasis } = behavior.__physicsAirplane3DExtension;",
-                    "localBasis.update();",
-                    "behavior._setForwardX(localBasis.forward.x);",
-                    "behavior._setForwardY(localBasis.forward.y);",
-                    "behavior._setForwardZ(localBasis.forward.z);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
               "description": "Simulate a press of the turn right key.",
               "fullName": "Simulate turn right key press",
               "functionType": "Action",
@@ -5198,129 +5111,6 @@
               "objectGroups": []
             },
             {
-              "description": "the forward X of the object.",
-              "fullName": "Forward X",
-              "functionType": "ExpressionAndCondition",
-              "group": "3D physics airplane state",
-              "name": "ForwardX",
-              "sentence": "the forward X",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "ForwardX"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "the forward Y of the object.",
-              "fullName": "Forward Y",
-              "functionType": "ExpressionAndCondition",
-              "group": "3D physics airplane state",
-              "name": "ForwardY",
-              "sentence": "the forward Y",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "ForwardY"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "the forward Z of the object.",
-              "fullName": "Forward Z",
-              "functionType": "ExpressionAndCondition",
-              "group": "3D physics airplane state",
-              "name": "ForwardZ",
-              "sentence": "the forward Z",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetReturnNumber"
-                      },
-                      "parameters": [
-                        "ForwardZ"
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
               "description": "the current spin of the object.",
               "fullName": "Current spin",
               "functionType": "ExpressionAndCondition",
@@ -5624,9 +5414,6 @@
                 "functionName": "TurnZ"
               },
               {
-                "functionName": "UpdateLocalBasis"
-              },
-              {
                 "folderName": "3D physics airplane state",
                 "children": [
                   {
@@ -5652,15 +5439,6 @@
                   },
                   {
                     "functionName": "SimulateTurnVerticallyStick"
-                  },
-                  {
-                    "functionName": "ForwardX"
-                  },
-                  {
-                    "functionName": "ForwardY"
-                  },
-                  {
-                    "functionName": "ForwardZ"
                   },
                   {
                     "functionName": "CurrentSpin"
@@ -5782,30 +5560,6 @@
             {
               "value": "0",
               "type": "Number",
-              "unit": "Pixel",
-              "label": "Forward X",
-              "hidden": true,
-              "name": "ForwardX"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "unit": "Pixel",
-              "label": "Forward Y",
-              "hidden": true,
-              "name": "ForwardY"
-            },
-            {
-              "value": "0",
-              "type": "Number",
-              "unit": "Pixel",
-              "label": "Forward Z",
-              "hidden": true,
-              "name": "ForwardZ"
-            },
-            {
-              "value": "0",
-              "type": "Number",
               "unit": "PixelSpeed",
               "label": "Force feedback spin speed",
               "hidden": true,
@@ -5901,15 +5655,6 @@
                 "propertyName": "ForwardDeceleration"
               },
               {
-                "propertyName": "ForwardX"
-              },
-              {
-                "propertyName": "ForwardY"
-              },
-              {
-                "propertyName": "ForwardZ"
-              },
-              {
                 "propertyName": "ForceFeedbackSpinSpeed"
               },
               {
@@ -5993,62 +5738,6 @@
                 "    return;",
                 "}",
                 "",
-                "class CameraLocalBasis {",
-                "    /** @type {gdjs.RuntimeObject} */",
-                "    object;",
-                "    rotationMatrix = new THREE.Matrix4();",
-                "    forward = new THREE.Vector3();",
-                "",
-                "    /**",
-                "     * @param object {gdjs.RuntimeObject}",
-                "     */",
-                "    constructor(object) {",
-                "        this.object = object;",
-                "    }",
-                "",
-                "    update() {",
-                "        const layer = this.object.getInstanceContainer().getLayer(this.object.getLayer());",
-                "        const threeCamera = layer.getRenderer().getThreeCamera();",
-                "        this.rotationMatrix.makeRotationFromEuler(threeCamera.rotation);",
-                "        const elements = this.rotationMatrix.elements;",
-                "",
-                "        this.forward.set(-elements[8], elements[9], -elements[10]);",
-                "        // Normalize them, just in case (they should generally be unit vectors).",
-                "        this.forward.normalize();",
-                "    }",
-                "}",
-                "",
-                "class ObjectLocalBasis {",
-                "    /** @type {gdjs.RuntimeObject} */",
-                "    object;",
-                "    rotationMatrix = new THREE.Matrix4();",
-                "    forward = new THREE.Vector3();",
-                "    up = new THREE.Vector3();",
-                "    right = new THREE.Vector3();",
-                "",
-                "    /**",
-                "     * @param object {gdjs.RuntimeObject}",
-                "     */",
-                "    constructor(object) {",
-                "        this.object = object;",
-                "    }",
-                "",
-                "    update() {",
-                "        const threeObject = this.object.get3DRendererObject();",
-                "        this.rotationMatrix.makeRotationFromEuler(threeObject.rotation);",
-                "        const elements = this.rotationMatrix.elements;",
-                "",
-                "        this.up.set(elements[8], elements[9], elements[10]);",
-                "        this.forward.set(elements[0], elements[1], elements[2]);",
-                "        this.right.crossVectors(this.forward, this.up);",
-                "",
-                "        // Normalize them, just in case (they should generally be unit vectors).",
-                "        this.right.normalize();",
-                "        this.up.normalize();",
-                "        this.forward.normalize();",
-                "    }",
-                "}",
-                "",
                 "/**",
                 " * It can be built the follow:",
                 " * ",
@@ -6090,8 +5779,6 @@
                 "",
                 "//@ts-ignore",
                 "gdjs.__thirdPersonCameraExtension = {",
-                "    CameraLocalBasis,",
-                "    ObjectLocalBasis,",
                 "    slerpCamera,",
                 "};",
                 ""
@@ -6676,21 +6363,6 @@
                   ]
                 },
                 {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const { CameraLocalBasis, ObjectLocalBasis } = gdjs.__thirdPersonCameraExtension;\r",
-                    "const object = objects[0];\r",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\r",
-                    "behavior.__thirdPersonCameraExtension = {\r",
-                    "    cameraLocalBasis: new CameraLocalBasis(object),\r",
-                    "    objectlocalBasis: new ObjectLocalBasis(object)\r",
-                    "};"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": false
-                },
-                {
                   "type": "BuiltinCommonInstructions::Comment",
                   "color": {
                     "b": 109,
@@ -6988,23 +6660,13 @@
                     },
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::UpdateLocalBasis"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
                         "value": "ThirdPersonCamera::ThirdPersonCamera::MoveToObject"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "OffsetX",
                         "OffsetY",
+                        "OffsetX",
                         "OffsetZ",
                         ""
                       ]
@@ -7016,7 +6678,7 @@
                       "parameters": [
                         "",
                         "-",
-                        "Distance * ForwardX",
+                        "Distance * Scene3D::CameraForwardX(Object.Layer())",
                         "Object.Layer()",
                         ""
                       ]
@@ -7028,7 +6690,7 @@
                       "parameters": [
                         "",
                         "-",
-                        "Distance * ForwardY",
+                        "Distance * Scene3D::CameraForwardY(Object.Layer())",
                         "Object.Layer()",
                         ""
                       ]
@@ -7040,7 +6702,7 @@
                       "parameters": [
                         "",
                         "-",
-                        "Distance * ForwardZ",
+                        "Distance * Scene3D::CameraForwardZ(Object.Layer())",
                         "Object.Layer()",
                         ""
                       ]
@@ -7366,29 +7028,46 @@
               "sentence": "Change the camera position to _PARAM0_ with offset _PARAM2_, _PARAM3_, _PARAM4_ ",
               "events": [
                 {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "/** @type {gdjs.RuntimeObject3D} */",
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const localOffsetX = eventsFunctionContext.getArgument(\"LocalOffsetX\");",
-                    "const localOffsetY = eventsFunctionContext.getArgument(\"LocalOffsetY\");",
-                    "const localOffsetZ = eventsFunctionContext.getArgument(\"LocalOffsetZ\");",
-                    "",
-                    "const layer = object.getInstanceContainer().getLayer(object.getLayer());",
-                    "",
-                    "const { objectlocalBasis } = behavior.__thirdPersonCameraExtension;",
-                    "/** @type {{forward: THREE.Vector3, up: THREE.Vector3, right: THREE.Vector3 }} */",
-                    "const { forward, up, right } = objectlocalBasis;",
-                    "",
-                    "layer.setCameraX(object.getCenterXInScene() + localOffsetX * right.x + localOffsetY * forward.x + localOffsetZ * up.x);",
-                    "layer.setCameraY(object.getCenterYInScene() + localOffsetX * right.y + localOffsetY * forward.y + localOffsetZ * up.y);",
-                    "layer.setCameraZ(object.getCenterZInScene() + localOffsetX * right.z + localOffsetY * forward.z + localOffsetZ * up.z);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetCameraCenterX"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "Object.CenterX() + LocalOffsetX * Object.Object3D::ForwardX() + LocalOffsetY * Object.Object3D::RightX() + LocalOffsetZ * Object.Object3D::UpX()",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterY"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "Object.CenterY() + LocalOffsetX * Object.Object3D::ForwardY() + LocalOffsetY * Object.Object3D::RightY() + LocalOffsetZ * Object.Object3D::UpY()",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::SetCameraZ"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "Object.Object3D::CenterZ() + LocalOffsetX * Object.Object3D::ForwardZ() + LocalOffsetY * Object.Object3D::RightZ() + LocalOffsetZ * Object.Object3D::UpZ()",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    }
+                  ]
                 }
               ],
               "parameters": [
@@ -7417,46 +7096,6 @@
                   "description": "Z offset",
                   "name": "LocalOffsetZ",
                   "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Update local basis",
-              "functionType": "Action",
-              "name": "UpdateLocalBasis",
-              "private": true,
-              "sentence": "Update local basis of _PARAM0_ and the camera",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { cameraLocalBasis, objectlocalBasis } = behavior.__thirdPersonCameraExtension;",
-                    "cameraLocalBasis.update();",
-                    "objectlocalBasis.update();",
-                    "behavior._setForwardX(cameraLocalBasis.forward.x);",
-                    "behavior._setForwardY(cameraLocalBasis.forward.y);",
-                    "behavior._setForwardZ(cameraLocalBasis.forward.z);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
-                  "type": "behavior"
                 }
               ],
               "objectGroups": []
@@ -8818,9 +8457,6 @@
               },
               {
                 "functionName": "MoveToObject"
-              },
-              {
-                "functionName": "UpdateLocalBasis"
               },
               {
                 "functionName": "JumpToTargetedRotation"
@@ -28331,98 +27967,6 @@
                 "    return;",
                 "}",
                 "",
-                "class LocalBasis {",
-                "    forward = new THREE.Vector3();",
-                "    up = new THREE.Vector3();",
-                "    right = new THREE.Vector3();",
-                "",
-                "    /**",
-                "     * @param offsetX {number}",
-                "     */",
-                "    getWorldOffsetX(offsetX, offsetY, offsetZ) {",
-                "        return offsetX * this.forward.x +",
-                "            offsetY * this.right.x +",
-                "            offsetZ * this.up.y;",
-                "    }",
-                "",
-                "    /**",
-                "     * @param offsetY {number}",
-                "     */",
-                "    getWorldOffsetY(offsetX, offsetY, offsetZ) {",
-                "        return offsetX * this.forward.y +",
-                "            offsetY * this.right.y +",
-                "            offsetZ * this.up.y;",
-                "    }",
-                "",
-                "    /**",
-                "     * @param offsetX {number}",
-                "     */",
-                "    getWorldOffsetZ(offsetX, offsetY, offsetZ) {",
-                "        return offsetX * this.forward.z +",
-                "            offsetY * this.right.z +",
-                "            offsetZ * this.up.z;",
-                "    }",
-                "}",
-                "",
-                "class CameraLocalBasis extends LocalBasis {",
-                "    /** @type {gdjs.RuntimeObject} */",
-                "    object;",
-                "    rotationMatrix = new THREE.Matrix4();",
-                "",
-                "    /**",
-                "     * @param object {gdjs.RuntimeObject}",
-                "     */",
-                "    constructor(object) {",
-                "        super();",
-                "        this.object = object;",
-                "    }",
-                "",
-                "    update() {",
-                "        const layer = this.object.getInstanceContainer().getLayer(this.object.getLayer());",
-                "        const threeCamera = layer.getRenderer().getThreeCamera();",
-                "        this.rotationMatrix.makeRotationFromEuler(threeCamera.rotation);",
-                "        const elements = this.rotationMatrix.elements;",
-                "",
-                "        this.forward.set(-elements[8], elements[9], -elements[10]);",
-                "        this.right.set(elements[0], -elements[1], elements[2]);",
-                "        this.up.crossVectors(this.forward, this.right);",
-                "",
-                "        // Normalize them, just in case (they should generally be unit vectors).",
-                "        this.forward.normalize();",
-                "        this.right.normalize();",
-                "        this.up.normalize();",
-                "    }",
-                "}",
-                "",
-                "class ObjectLocalBasis extends LocalBasis {",
-                "    /** @type {gdjs.RuntimeObject} */",
-                "    object;",
-                "    rotationMatrix = new THREE.Matrix4();",
-                "",
-                "    /**",
-                "     * @param object {gdjs.RuntimeObject}",
-                "     */",
-                "    constructor(object) {",
-                "        super();",
-                "        this.object = object;",
-                "    }",
-                "",
-                "    update() {",
-                "        const threeObject = this.object.get3DRendererObject();",
-                "        this.rotationMatrix.makeRotationFromEuler(threeObject.rotation);",
-                "        const elements = this.rotationMatrix.elements;",
-                "",
-                "        this.forward.set(elements[0], elements[1], elements[2]);",
-                "        this.up.set(elements[8], elements[9], elements[10]);",
-                "        this.right.crossVectors(this.forward, this.up);",
-                "",
-                "        // Normalize them, just in case (they should generally be unit vectors).",
-                "        this.forward.normalize();",
-                "        this.right.normalize();",
-                "        this.up.normalize();",
-                "    }",
-                "}",
-                "",
                 "/**",
                 " * It can be built the follow:",
                 " * ",
@@ -28454,8 +27998,6 @@
                 "",
                 "//@ts-ignore",
                 "gdjs.__fireBulletExtension = {",
-                "    CameraLocalBasis,",
-                "    ObjectLocalBasis,",
                 "    rotateObjectToFaceSameWayAsCamera",
                 "};",
                 ""
@@ -28564,32 +28106,8 @@
                         "=",
                         "ShotsPerReload"
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "FireBullet::DefineHelperClasses"
-                      },
-                      "parameters": [
-                        "",
-                        ""
-                      ]
                     }
                   ]
-                },
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const { CameraLocalBasis, ObjectLocalBasis } = gdjs.__fireBulletExtension;\r",
-                    "const object = objects[0];\r",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\r",
-                    "behavior.__fireBulletExtension = {\r",
-                    "    cameraLocalBasis: new CameraLocalBasis(object),\r",
-                    "    objectLocalBasis: new ObjectLocalBasis(object)\r",
-                    "};"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": false
                 }
               ],
               "parameters": [
@@ -33233,26 +32751,17 @@
               "objectGroups": []
             },
             {
-              "description": "Fire bullets from the object at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
-              "fullName": "Fire bullets from 3D object",
+              "description": "Notify that the object has just fired something. This is used by the 3D fire actions.",
+              "fullName": "Notify has just fired",
               "functionType": "Action",
-              "name": "FireForwardObject3D",
-              "sentence": "Fire _PARAM6_ from _PARAM0_ (if ready) with offset _PARAM3_ ; _PARAM4_ ; _PARAM5_  at speed _PARAM9_ px/s",
+              "group": "Firing",
+              "name": "NotifyHasJustFired",
+              "private": true,
+              "sentence": "Notify _PARAM0_ has just fired",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "FireBullet::FireBullet::IsReadyToShoot"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ""
-                      ]
-                    }
-                  ],
+                  "conditions": [],
                   "actions": [
                     {
                       "type": {
@@ -33262,166 +32771,6 @@
                         "HasJustFired",
                         "True",
                         ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Create"
-                      },
-                      "parameters": [
-                        "",
-                        "Bullet",
-                        "0",
-                        "0",
-                        "Object.Layer()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetCenter"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "=",
-                        "Object.CenterX()",
-                        "=",
-                        "Object.CenterY()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Scene3D::Base3DBehavior::SetCenterZ"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Object3D2",
-                        "=",
-                        "Object.Object3D::CenterZ()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "FireBullet::FireBullet::UpdateObjectLocalBasis"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetX"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "+",
-                        "Object.Behavior::WorldOffsetX(OffsetX, OffsetY, OffsetZ)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetY"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "+",
-                        "Object.Behavior::WorldOffsetY(OffsetX, OffsetY, OffsetZ)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Scene3D::Base3DBehavior::SetZ"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Object3D2",
-                        "+",
-                        "Object.Behavior::WorldOffsetZ(OffsetX, OffsetY, OffsetZ)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Physics3D",
-                        "=",
-                        "Speed * Object.Behavior::ForwardX()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityY"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Physics3D",
-                        "=",
-                        "Speed * Object.Behavior::ForwardY()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityZ"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Physics3D",
-                        "=",
-                        "Speed * Object.Behavior::ForwardZ()"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BooleanVariable"
-                          },
-                          "parameters": [
-                            "RotateBullet",
-                            "True",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "SetAngle"
-                          },
-                          "parameters": [
-                            "Bullet",
-                            "=",
-                            "Object.Angle()"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Scene3D::Base3DBehavior::SetRotationY"
-                          },
-                          "parameters": [
-                            "Bullet",
-                            "Object3D2",
-                            "=",
-                            "Object.Object3D::RotationY()"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Scene3D::Base3DBehavior::SetRotationX"
-                          },
-                          "parameters": [
-                            "Bullet",
-                            "Object3D2",
-                            "=",
-                            "Object.Object3D::RotationX()"
-                          ]
-                        }
                       ]
                     }
                   ]
@@ -33438,967 +32787,6 @@
                   "name": "Behavior",
                   "supplementaryInformation": "FireBullet::FireBullet",
                   "type": "behavior"
-                },
-                {
-                  "description": "3D capability",
-                  "name": "Object3D",
-                  "supplementaryInformation": "Scene3D::Base3DBehavior",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Forward offset",
-                  "longDescription": "Offset on local X axis of the object.",
-                  "name": "OffsetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Offset to the right",
-                  "longDescription": "Offset on local Y axis of the object.",
-                  "name": "OffsetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Upward offset",
-                  "longDescription": "Offset on local Z axis of the object.",
-                  "name": "OffsetZ",
-                  "type": "expression"
-                },
-                {
-                  "description": "The bullet object",
-                  "name": "Bullet",
-                  "type": "objectListOrEmptyIfJustDeclared"
-                },
-                {
-                  "description": "3D capability",
-                  "name": "Object3D2",
-                  "supplementaryInformation": "Scene3D::Base3DBehavior",
-                  "type": "behavior"
-                },
-                {
-                  "description": "3D physics engine",
-                  "name": "Physics3D",
-                  "supplementaryInformation": "Physics3D::Physics3DBehavior",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Speed of the bullet, in pixels per second",
-                  "name": "Speed",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Update camera local basis",
-              "functionType": "Action",
-              "group": "3D Helpers",
-              "name": "UpdateCameraLocalBasis",
-              "private": true,
-              "sentence": "Update camera local basis of _PARAM0_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { cameraLocalBasis } = behavior.__fireBulletExtension;",
-                    "cameraLocalBasis.update();",
-                    "console.log(cameraLocalBasis.forward, cameraLocalBasis.up, cameraLocalBasis.right);"
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": false
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "World offset X",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "WorldOffsetX",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { objectLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
-                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
-                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
-                    "",
-                    "eventsFunctionContext.returnValue = objectLocalBasis.getWorldOffsetX(offsetX, offsetY, offsetZ);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Local offset X",
-                  "name": "OffsetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Y",
-                  "name": "OffsetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Z",
-                  "name": "OffsetZ",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "World offset Y",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "WorldOffsetY",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { objectLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
-                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
-                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
-                    "",
-                    "eventsFunctionContext.returnValue = objectLocalBasis.getWorldOffsetY(offsetX, offsetY, offsetZ);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Local offset X",
-                  "name": "OffsetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Y",
-                  "name": "OffsetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Z",
-                  "name": "OffsetZ",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "World offset Z",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "WorldOffsetZ",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { objectLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
-                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
-                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
-                    "",
-                    "eventsFunctionContext.returnValue = objectLocalBasis.getWorldOffsetZ(offsetX, offsetY, offsetZ);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Local offset X",
-                  "name": "OffsetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Y",
-                  "name": "OffsetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Z",
-                  "name": "OffsetZ",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Forward X",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "ForwardX",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { objectLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "eventsFunctionContext.returnValue = objectLocalBasis.forward.x;",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Forward Y",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "ForwardY",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { objectLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "eventsFunctionContext.returnValue = objectLocalBasis.forward.y;",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Forward Z",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "ForwardZ",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { objectLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "eventsFunctionContext.returnValue = objectLocalBasis.forward.z;",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Update object local basis",
-              "functionType": "Action",
-              "group": "3D Helpers",
-              "name": "UpdateObjectLocalBasis",
-              "private": true,
-              "sentence": "Update local basis of _PARAM0_",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { objectLocalBasis } = behavior.__fireBulletExtension;",
-                    "objectLocalBasis.update();",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": false
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Camera forward X",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "CameraForwardX",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { cameraLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "eventsFunctionContext.returnValue = cameraLocalBasis.forward.x;",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Camera forward Y",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "CameraForwardY",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { cameraLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "eventsFunctionContext.returnValue = cameraLocalBasis.forward.y;",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "Camera forward Z",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "CameraForwardZ",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { cameraLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "eventsFunctionContext.returnValue = cameraLocalBasis.forward.z;",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "description": "Fire bullets from the camera at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
-              "fullName": "Fire bullets from 3D camera",
-              "functionType": "Action",
-              "name": "FireForwardCamera3D",
-              "sentence": "Fire _PARAM6_ from the camera of _PARAM0_ (if ready) with offset _PARAM3_ ; _PARAM4_ ; _PARAM5_  at speed _PARAM9_ px/s",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "FireBullet::FireBullet::IsReadyToShoot"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetBooleanVariable"
-                      },
-                      "parameters": [
-                        "HasJustFired",
-                        "True",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Create"
-                      },
-                      "parameters": [
-                        "",
-                        "Bullet",
-                        "0",
-                        "0",
-                        "Object.Layer()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetCenter"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "=",
-                        "CameraCenterX(Object.Layer())",
-                        "=",
-                        "CameraCenterY(Object.Layer())"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Scene3D::Base3DBehavior::SetCenterZ"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Object3D2",
-                        "=",
-                        "Scene3D::CameraZ(Object.Layer())"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "FireBullet::FireBullet::UpdateCameraLocalBasis"
-                      },
-                      "parameters": [
-                        "Object",
-                        "Behavior",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetX"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "+",
-                        "Object.Behavior::WorldCameraOffsetX(OffsetX, OffsetY, OffsetZ)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetY"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "+",
-                        "Object.Behavior::WorldCameraOffsetY(OffsetX, OffsetY, OffsetZ)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Scene3D::Base3DBehavior::SetZ"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Object3D2",
-                        "+",
-                        "Object.Behavior::WorldCameraOffsetZ(OffsetX, OffsetY, OffsetZ)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Physics3D",
-                        "=",
-                        "Speed * Object.Behavior::CameraForwardX()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityY"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Physics3D",
-                        "=",
-                        "Speed * Object.Behavior::CameraForwardY()"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityZ"
-                      },
-                      "parameters": [
-                        "Bullet",
-                        "Physics3D",
-                        "=",
-                        "Speed * Object.Behavior::CameraForwardZ()"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "BooleanVariable"
-                          },
-                          "parameters": [
-                            "RotateBullet",
-                            "True",
-                            ""
-                          ]
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "FireBullet::RotateObjectToFaceSameWayAsCamera"
-                          },
-                          "parameters": [
-                            "",
-                            "Bullet",
-                            "Object3D2",
-                            ""
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                },
-                {
-                  "description": "3D capability",
-                  "name": "Object3D",
-                  "supplementaryInformation": "Scene3D::Base3DBehavior",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Forward offset",
-                  "longDescription": "Offset on local X axis of the camera.",
-                  "name": "OffsetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Offset to the right",
-                  "longDescription": "Offset on local Y axis of the camera.",
-                  "name": "OffsetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Upward offset",
-                  "longDescription": "Offset on local Z axis of the camera.",
-                  "name": "OffsetZ",
-                  "type": "expression"
-                },
-                {
-                  "description": "The bullet object",
-                  "name": "Bullet",
-                  "type": "objectListOrEmptyIfJustDeclared"
-                },
-                {
-                  "description": "3D capability",
-                  "name": "Object3D2",
-                  "supplementaryInformation": "Scene3D::Base3DBehavior",
-                  "type": "behavior"
-                },
-                {
-                  "description": "3D physics engine",
-                  "name": "Physics3D",
-                  "supplementaryInformation": "Physics3D::Physics3DBehavior",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Speed of the bullet, in pixels per second",
-                  "name": "Speed",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "World camera offset X",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "WorldCameraOffsetX",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { cameraLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
-                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
-                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
-                    "",
-                    "eventsFunctionContext.returnValue = cameraLocalBasis.getWorldOffsetX(offsetX, offsetY, offsetZ);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Local offset X",
-                  "name": "OffsetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Y",
-                  "name": "OffsetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Z",
-                  "name": "OffsetZ",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "World camera offset Y",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "WorldCameraOffsetY",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { cameraLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
-                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
-                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
-                    "",
-                    "eventsFunctionContext.returnValue = cameraLocalBasis.getWorldOffsetY(offsetX, offsetY, offsetZ);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Local offset X",
-                  "name": "OffsetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Y",
-                  "name": "OffsetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Z",
-                  "name": "OffsetZ",
-                  "type": "expression"
-                }
-              ],
-              "objectGroups": []
-            },
-            {
-              "fullName": "World camera offset Z",
-              "functionType": "Expression",
-              "group": "3D Helpers",
-              "name": "WorldCameraOffsetZ",
-              "private": true,
-              "sentence": "",
-              "events": [
-                {
-                  "type": "BuiltinCommonInstructions::JsCode",
-                  "inlineCode": [
-                    "const object = objects[0];",
-                    "const behavior = object.getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));",
-                    "const { cameraLocalBasis } = behavior.__fireBulletExtension;",
-                    "",
-                    "const offsetX = eventsFunctionContext.getArgument(\"OffsetX\");",
-                    "const offsetY = eventsFunctionContext.getArgument(\"OffsetY\");",
-                    "const offsetZ = eventsFunctionContext.getArgument(\"OffsetZ\");",
-                    "",
-                    "eventsFunctionContext.returnValue = cameraLocalBasis.getWorldOffsetZ(offsetX, offsetY, offsetZ);",
-                    ""
-                  ],
-                  "parameterObjects": "Object",
-                  "useStrict": true,
-                  "eventsSheetExpanded": true
-                }
-              ],
-              "expressionType": {
-                "type": "expression"
-              },
-              "parameters": [
-                {
-                  "description": "Object",
-                  "name": "Object",
-                  "type": "object"
-                },
-                {
-                  "description": "Behavior",
-                  "name": "Behavior",
-                  "supplementaryInformation": "FireBullet::FireBullet",
-                  "type": "behavior"
-                },
-                {
-                  "description": "Local offset X",
-                  "name": "OffsetX",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Y",
-                  "name": "OffsetY",
-                  "type": "expression"
-                },
-                {
-                  "description": "Local offset Z",
-                  "name": "OffsetZ",
-                  "type": "expression"
                 }
               ],
               "objectGroups": []
@@ -34423,59 +32811,6 @@
                 "functionName": "Fire"
               },
               {
-                "functionName": "FireForwardObject3D"
-              },
-              {
-                "functionName": "FireForwardCamera3D"
-              },
-              {
-                "folderName": "3D Helpers",
-                "children": [
-                  {
-                    "functionName": "UpdateCameraLocalBasis"
-                  },
-                  {
-                    "functionName": "CameraForwardX"
-                  },
-                  {
-                    "functionName": "CameraForwardY"
-                  },
-                  {
-                    "functionName": "CameraForwardZ"
-                  },
-                  {
-                    "functionName": "WorldCameraOffsetX"
-                  },
-                  {
-                    "functionName": "WorldCameraOffsetY"
-                  },
-                  {
-                    "functionName": "WorldCameraOffsetZ"
-                  },
-                  {
-                    "functionName": "UpdateObjectLocalBasis"
-                  },
-                  {
-                    "functionName": "ForwardX"
-                  },
-                  {
-                    "functionName": "ForwardY"
-                  },
-                  {
-                    "functionName": "ForwardZ"
-                  },
-                  {
-                    "functionName": "WorldOffsetX"
-                  },
-                  {
-                    "functionName": "WorldOffsetY"
-                  },
-                  {
-                    "functionName": "WorldOffsetZ"
-                  }
-                ]
-              },
-              {
                 "folderName": "Firing",
                 "children": [
                   {
@@ -34483,6 +32818,9 @@
                   },
                   {
                     "functionName": "HasJustFired"
+                  },
+                  {
+                    "functionName": "NotifyHasJustFired"
                   },
                   {
                     "functionName": "BulletRotationEnabled"
@@ -35044,6 +33382,560 @@
               },
               {
                 "propertyName": "RandomizedAngle"
+              }
+            ]
+          }
+        },
+        {
+          "description": "",
+          "fullName": "3D fire bullet",
+          "helpPath": "",
+          "iconUrl": "",
+          "name": "FireBullet3D",
+          "objectType": "",
+          "previewIconUrl": "",
+          "eventsFunctions": [
+            {
+              "description": "Fire bullets from the object at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
+              "fullName": "Fire bullets from 3D object",
+              "functionType": "Action",
+              "name": "FireForwardObject3D",
+              "sentence": "Fire _PARAM5_ from _PARAM0_ (if ready) with offset _PARAM2_ ; _PARAM3_ ; _PARAM4_  at speed _PARAM8_ px/s",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "FireBullet::FireBullet::IsReadyToShoot"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FireBullet",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FireBullet::FireBullet::NotifyHasJustFired"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FireBullet",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Bullet",
+                        "0",
+                        "0",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCenter"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "=",
+                        "Object.CenterX()",
+                        "=",
+                        "Object.CenterY()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetCenterZ"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Object3D",
+                        "=",
+                        "Object.Object3D::CenterZ()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetX"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "+",
+                        "OffsetX * Object.Object3D::ForwardX() + OffsetY * Object.Object3D::RightX() + OffsetZ * Object.Object3D::UpX()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetY"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "+",
+                        "OffsetX * Object.Object3D::ForwardY() + OffsetY * Object.Object3D::RightY() + OffsetZ * Object.Object3D::UpY()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Object3D",
+                        "+",
+                        "OffsetX * Object.Object3D::ForwardZ() + OffsetY * Object.Object3D::RightZ() + OffsetZ * Object.Object3D::UpZ()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Physics3D",
+                        "=",
+                        "Speed * Object.Object3D::ForwardX()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityY"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Physics3D",
+                        "=",
+                        "Speed * Object.Object3D::ForwardY()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityZ"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Physics3D",
+                        "=",
+                        "Speed * Object.Object3D::ForwardZ()"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "FireBullet::FireBullet::BulletRotationEnabled"
+                          },
+                          "parameters": [
+                            "Object",
+                            "FireBullet",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "Bullet",
+                            "=",
+                            "Object.Angle()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetRotationY"
+                          },
+                          "parameters": [
+                            "Bullet",
+                            "Object3D",
+                            "=",
+                            "Object.Object3D::RotationY()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetRotationX"
+                          },
+                          "parameters": [
+                            "Bullet",
+                            "Object3D",
+                            "=",
+                            "Object.Object3D::RotationX()"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Forward offset",
+                  "longDescription": "Offset on local X axis of the object.",
+                  "name": "OffsetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Offset to the right",
+                  "longDescription": "Offset on local Y axis of the object.",
+                  "name": "OffsetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Upward offset",
+                  "longDescription": "Offset on local Z axis of the object.",
+                  "name": "OffsetZ",
+                  "type": "expression"
+                },
+                {
+                  "description": "The bullet object",
+                  "name": "Bullet",
+                  "type": "objectListOrEmptyIfJustDeclared"
+                },
+                {
+                  "description": "3D capability",
+                  "name": "Object3D",
+                  "supplementaryInformation": "Scene3D::Base3DBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "3D physics engine",
+                  "name": "Physics3D",
+                  "supplementaryInformation": "Physics3D::Physics3DBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Speed of the bullet, in pixels per second",
+                  "name": "Speed",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Fire bullets from the camera at a specified speed. Call this continuously, the action checks readiness internally — no extra timer or check needed.",
+              "fullName": "Fire bullets from 3D camera",
+              "functionType": "Action",
+              "name": "FireForwardCamera3D",
+              "sentence": "Fire _PARAM5_ from the camera of _PARAM0_ (if ready) with offset _PARAM2_ ; _PARAM3_ ; _PARAM4_  at speed _PARAM8_ px/s",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "FireBullet::FireBullet::IsReadyToShoot"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FireBullet",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FireBullet::FireBullet::NotifyHasJustFired"
+                      },
+                      "parameters": [
+                        "Object",
+                        "FireBullet",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "Bullet",
+                        "0",
+                        "0",
+                        "Object.Layer()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCenter"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "=",
+                        "CameraCenterX(Object.Layer())",
+                        "=",
+                        "CameraCenterY(Object.Layer())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetCenterZ"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Object3D",
+                        "=",
+                        "Scene3D::CameraZ(Object.Layer())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetX"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "+",
+                        "OffsetX * Scene3D::CameraForwardX(Object.Layer()) + OffsetY * Scene3D::CameraRightX(Object.Layer()) + OffsetZ * Scene3D::CameraUpX(Object.Layer())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetY"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "+",
+                        "OffsetX * Scene3D::CameraForwardY(Object.Layer()) + OffsetY * Scene3D::CameraRightY(Object.Layer()) + OffsetZ * Scene3D::CameraUpY(Object.Layer())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetZ"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Object3D",
+                        "+",
+                        "OffsetX * Scene3D::CameraForwardZ(Object.Layer()) + OffsetY * Scene3D::CameraRightZ(Object.Layer()) + OffsetZ * Scene3D::CameraUpZ(Object.Layer())"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityX"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Physics3D",
+                        "=",
+                        "Speed * Scene3D::CameraForwardX()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityY"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Physics3D",
+                        "=",
+                        "Speed * Scene3D::CameraForwardY()"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Physics3D::Physics3DBehavior::SetLinearVelocityZ"
+                      },
+                      "parameters": [
+                        "Bullet",
+                        "Physics3D",
+                        "=",
+                        "Speed * Scene3D::CameraForwardZ()"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "FireBullet::FireBullet::BulletRotationEnabled"
+                          },
+                          "parameters": [
+                            "Object",
+                            "FireBullet",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "FireBullet::RotateObjectToFaceSameWayAsCamera"
+                          },
+                          "parameters": [
+                            "",
+                            "Bullet",
+                            "Object3D",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet3D",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Forward offset",
+                  "longDescription": "Offset on local X axis of the camera.",
+                  "name": "OffsetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Offset to the right",
+                  "longDescription": "Offset on local Y axis of the camera.",
+                  "name": "OffsetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Upward offset",
+                  "longDescription": "Offset on local Z axis of the camera.",
+                  "name": "OffsetZ",
+                  "type": "expression"
+                },
+                {
+                  "description": "The bullet object",
+                  "name": "Bullet",
+                  "type": "objectListOrEmptyIfJustDeclared"
+                },
+                {
+                  "description": "3D capability",
+                  "name": "Object3D",
+                  "supplementaryInformation": "Scene3D::Base3DBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "3D physics engine",
+                  "name": "Physics3D",
+                  "supplementaryInformation": "Physics3D::Physics3DBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Speed of the bullet, in pixels per second",
+                  "name": "Speed",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onCreated",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FireBullet::DefineHelperClasses"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "FireBullet::FireBullet3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "onCreated"
+              },
+              {
+                "functionName": "FireForwardObject3D"
+              },
+              {
+                "functionName": "FireForwardCamera3D"
+              }
+            ]
+          },
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "3D capability",
+              "extraInformation": [
+                "Scene3D::Base3DBehavior"
+              ],
+              "choices": [],
+              "name": "Object3D"
+            },
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "Fire bullets",
+              "extraInformation": [
+                "FireBullet::FireBullet"
+              ],
+              "choices": [],
+              "name": "FireBullet"
+            }
+          ],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "propertyName": "FireBullet"
+              },
+              {
+                "propertyName": "Object3D"
               }
             ]
           }
