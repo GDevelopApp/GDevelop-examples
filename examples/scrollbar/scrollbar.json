@@ -596,12 +596,12 @@
                 },
                 {
                   "type": {
-                    "value": "Scrollbar::Scrollbar::SetScrollCenter"
+                    "value": "Scrollbar::SetPositionFromCamera"
                   },
                   "parameters": [
+                    "",
                     "ScrollBar",
-                    "=",
-                    "CameraCenterY(\"\") - (CameraCenterY(\"UI\") - ScrollBar.CenterY())",
+                    "",
                     ""
                   ]
                 }
@@ -667,12 +667,11 @@
           "actions": [
             {
               "type": {
-                "value": "SetCameraCenterY"
+                "value": "Scrollbar::SetCameraFromPosition"
               },
               "parameters": [
                 "",
-                "=",
-                "ScrollBar.ScrollCenter() + (CameraCenterY(\"UI\") - ScrollBar.CenterY())",
+                "ScrollBar",
                 "",
                 ""
               ]
@@ -869,9 +868,156 @@
       "dependencies": [],
       "globalVariables": [],
       "sceneVariables": [],
-      "eventsFunctions": [],
+      "eventsFunctions": [
+        {
+          "description": "Move the camera according to the scroll position.",
+          "fullName": "Set camera from scroll",
+          "functionType": "Action",
+          "name": "SetCameraFromPosition",
+          "sentence": "Move the camera of _PARAM2_ according to the scroll position of _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "mod(round(Object.Angle() / 90), 2)",
+                    "=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCameraCenterY"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Object.ScrollCenter() + (CameraCenterY(Object.Layer()) - Object.CenterY())",
+                    "ScrolledLayer",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Else",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetCameraCenterX"
+                  },
+                  "parameters": [
+                    "",
+                    "=",
+                    "Object.ScrollCenter() + (CameraCenterX(Object.Layer()) - Object.CenterX())",
+                    "ScrolledLayer",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Scrollbar::Scrollbar",
+              "type": "objectList"
+            },
+            {
+              "description": "Scrolled layer",
+              "name": "ScrolledLayer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Change the scroll position according to the camera.",
+          "fullName": "Set scroll from camera",
+          "functionType": "Action",
+          "name": "SetPositionFromCamera",
+          "sentence": "Change the scroll position of _PARAM1_ according to the camera of _PARAM2_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "mod(round(Object.Angle() / 90), 2)",
+                    "=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scrollbar::Scrollbar::SetScrollCenter"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "CameraCenterY(ScrolledLayer) - (CameraCenterY(Object.Layer()) - Object.CenterY())",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Else",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scrollbar::Scrollbar::SetScrollCenter"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "CameraCenterX(ScrolledLayer) - (CameraCenterX(Object.Layer()) - Object.CenterX())",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "Scrollbar::Scrollbar",
+              "type": "objectList"
+            },
+            {
+              "description": "Scrolled layer",
+              "name": "ScrolledLayer",
+              "type": "layer"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
       "eventsFunctionsFolderStructure": {
-        "folderName": "__ROOT"
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "functionName": "SetPositionFromCamera"
+          },
+          {
+            "functionName": "SetCameraFromPosition"
+          }
+        ]
       },
       "eventsBasedBehaviors": [],
       "eventsBasedObjects": [
