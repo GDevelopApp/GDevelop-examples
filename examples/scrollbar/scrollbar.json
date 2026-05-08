@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 266,
+    "build": 269,
     "major": 5,
     "minor": 6,
     "revision": 0
@@ -214,7 +214,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.713037763069044,
+        "zoomFactor": 0.6672773998330016,
         "windowMask": false,
         "selectedLayer": "",
         "gameEditorMode": "instances-editor"
@@ -602,7 +602,24 @@
           "updateIfNotVisible": false,
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "ScrollableViewport",
+              "type": "ScrollableViewport::ScrollableViewport",
+              "Direction": "Vertical",
+              "IsDragged": false,
+              "StartX": 9.788238970689376e-306,
+              "StartY": 9.788238970694519e-306,
+              "Layer": "Scrolled",
+              "TargetedCameraX": 9.788238970694519e-306,
+              "TargetedCameraY": 9.788238970694519e-306,
+              "WheeledSpeedX": 9.788238970694519e-306,
+              "WheeledSpeedY": 9.788238970694519e-306,
+              "WheelScrollingDuration": 0.25,
+              "OldCameraX": 0.2500000000002275,
+              "OldCameraY": 0.2500000000002275
+            }
+          ],
           "animations": [
             {
               "name": "White",
@@ -669,16 +686,16 @@
             "objectName": "ContentBackground"
           },
           {
-            "objectName": "NoButton"
+            "objectName": "Mask"
           },
           {
             "objectName": "YesButton"
           },
           {
-            "objectName": "ButtonBackground"
+            "objectName": "NoButton"
           },
           {
-            "objectName": "Mask"
+            "objectName": "ButtonBackground"
           },
           {
             "objectName": "WinterBackground"
@@ -728,109 +745,61 @@
           "conditions": [
             {
               "type": {
-                "value": "IsCursorOnObject"
+                "inverted": true,
+                "value": "Scrollbar::Scrollbar::IsThumbDragged"
               },
               "parameters": [
-                "ContentBackground",
-                "",
-                "",
+                "ScrollBar",
                 ""
               ]
             }
           ],
-          "actions": [],
-          "events": [
+          "actions": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "Scrollbar::Scrollbar::IsThumbDragged"
-                  },
-                  "parameters": [
-                    "ScrollBar",
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "DragCameraWithPointer::DragCameraWithPointer"
-                  },
-                  "parameters": [
-                    "",
-                    "0",
-                    "\"Scrolled\"",
-                    "\"vertical\"",
-                    "Left",
-                    ""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scrollbar::SetPositionFromCamera"
-                  },
-                  "parameters": [
-                    "",
-                    "ScrollBar",
-                    "\"Scrolled\"",
-                    ""
-                  ]
-                }
+              "type": {
+                "value": "Scrollbar::SetPositionFromCamera"
+              },
+              "parameters": [
+                "",
+                "ScrollBar",
+                "\"Scrolled\"",
+                ""
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "IsMouseWheelScrollingUp"
-                  },
-                  "parameters": [
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Scrollbar::Scrollbar::SetScrollPosition"
-                  },
-                  "parameters": [
-                    "ScrollBar",
-                    "-",
-                    "100",
-                    ""
-                  ]
-                }
+              "type": {
+                "value": "ActivateBehavior"
+              },
+              "parameters": [
+                "Mask",
+                "ScrollableViewport",
+                "yes"
               ]
-            },
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
             {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "IsMouseWheelScrollingDown"
-                  },
-                  "parameters": [
-                    ""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Scrollbar::Scrollbar::SetScrollPosition"
-                  },
-                  "parameters": [
-                    "ScrollBar",
-                    "+",
-                    "100",
-                    ""
-                  ]
-                }
+              "type": {
+                "value": "Scrollbar::Scrollbar::IsThumbDragged"
+              },
+              "parameters": [
+                "ScrollBar",
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ActivateBehavior"
+              },
+              "parameters": [
+                "Mask",
+                "ScrollableViewport",
+                "no"
               ]
             }
           ]
@@ -1052,6 +1021,10 @@
         {
           "name": "Scale",
           "type": "ScalableCapability::ScalableBehavior"
+        },
+        {
+          "name": "ScrollableViewport",
+          "type": "ScrollableViewport::ScrollableViewport"
         },
         {
           "name": "Text",
@@ -2299,30 +2272,21 @@
       "category": "Camera",
       "dimension": "2D",
       "extensionNamespace": "",
-      "fullName": "Drag camera with the mouse (or touchscreen)",
+      "fullName": "Scrollable viewport",
       "gdevelopVersion": ">=5.5.222",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWRyYWctdmFyaWFudCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0yMi42NywxMkwxOC4xOCwxNi41TDE1LjY3LDE0TDE3LjY1LDEyTDE1LjY3LDEwLjA0TDE4LjE4LDcuNTNMMjIuNjcsMTJNMTIsMS4zM0wxNi40Nyw1LjgyTDEzLjk2LDguMzNMMTIsNi4zNUwxMCw4LjMzTDcuNSw1LjgyTDEyLDEuMzNNMTIsMjIuNjdMNy41MywxOC4xOEwxMC4wNCwxNS42N0wxMiwxNy42NUwxNCwxNS42N0wxNi41LDE4LjE4TDEyLDIyLjY3TTEuMzMsMTJMNS44Miw3LjVMOC4zMywxMEw2LjM1LDEyTDguMzMsMTMuOTZMNS44MiwxNi40N0wxLjMzLDEyTTEyLDEwQTIsMiAwIDAsMSAxNCwxMkEyLDIgMCAwLDEgMTIsMTRBMiwyIDAgMCwxIDEwLDEyQTIsMiAwIDAsMSAxMiwxMFoiIC8+PC9zdmc+",
-      "name": "DragCameraWithPointer",
+      "name": "ScrollableViewport",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/drag-variant.svg",
-      "shortDescription": "Pan/drag camera with mouse or touch. Configurable inertia and bounds.",
-      "version": "1.2.0",
+      "shortDescription": "Move a camera by dragging or with the scroll wheel.",
+      "version": "1.0.0",
       "description": [
-        "Move a camera by dragging the mouse (or touchscreen). ",
+        "Move a camera by dragging or with the scroll wheel.",
         "",
-        "How to use:",
-        "- Run this action on every frame that you want the camera to be movable by the mouse (or touchscreen)",
-        "- Select the mouse button to use (choose \"left\" for touchscreen)",
-        "- Select which directions the camera will move (vertical, horizontal, or both) ",
-        "- Select the layer that will be moved",
-        "",
-        "Tips:",
-        "- If no parameters are selected, the camera will move in both directions when the left mouse button (or touchscreen) are dragged."
+        "It can be used for",
+        "- Making a scroll view ([open the project online](https://editor.gdevelop.io/?project=example://scrollbar))",
+        "- Dragging the camera on a top-down game"
       ],
-      "origin": {
-        "identifier": "DragCameraWithPointer",
-        "name": "gdevelop-extension-store"
-      },
       "tags": [
         "mouse",
         "cursor",
@@ -2334,195 +2298,85 @@
         "gestures"
       ],
       "authorIds": [
-        "GfzRsieyUFVnsRR8OZThsPR29oq2",
-        "gqDaZjCfevOOxBYkK6zlhtZnXCg1"
+        "gqDaZjCfevOOxBYkK6zlhtZnXCg1",
+        "IWykYNRvhCZBN3vEgKEbBPOR3Oc2",
+        "GfzRsieyUFVnsRR8OZThsPR29oq2"
       ],
       "dependencies": [],
       "globalVariables": [],
-      "sceneVariables": [
-        {
-          "name": "ScrollStartX",
-          "type": "number",
-          "value": 0
-        },
-        {
-          "name": "ScrollStartY",
-          "type": "number",
-          "value": 0
-        }
-      ],
+      "sceneVariables": [],
       "eventsFunctions": [
         {
-          "description": "Move a camera by dragging the mouse (or touchscreen).",
-          "fullName": "Drag camera with the mouse",
-          "functionType": "Action",
-          "name": "DragCameraWithPointer",
-          "sentence": "Drag camera on layer _PARAM2_ in _PARAM3_ directions using _PARAM4_ mouse button",
+          "fullName": "",
+          "functionType": "Expression",
+          "name": "MoveToZero",
+          "private": true,
+          "sentence": "",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
-                    "value": "BuiltinCommonInstructions::Or"
+                    "value": "NumberVariable"
                   },
-                  "parameters": [],
-                  "subInstructions": [
-                    {
-                      "type": {
-                        "value": "MouseButtonFromTextPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "InputButton"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::And"
-                      },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "value": "MouseButtonPressed"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "GetArgumentAsBoolean"
-                          },
-                          "parameters": [
-                            "\"InputButton\""
-                          ]
-                        }
-                      ]
-                    }
+                  "parameters": [
+                    "Value",
+                    ">",
+                    "0"
                   ]
                 }
               ],
-              "actions": [],
-              "events": [
+              "actions": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "ScrollStartX",
-                        "=",
-                        "CursorX(Layer, Camera)"
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "SetNumberVariable"
-                      },
-                      "parameters": [
-                        "ScrollStartY",
-                        "=",
-                        "CursorY(Layer, Camera)"
-                      ]
-                    }
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "max(0, Value - Step)"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "StrEqual"
-                      },
-                      "parameters": [
-                        "Direction",
-                        "!=",
-                        "\"vertical\""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetCameraCenterX"
-                      },
-                      "parameters": [
-                        "",
-                        "-",
-                        "CursorX(Layer, Camera) - ScrollStartX",
-                        "Layer",
-                        "Camera"
-                      ]
-                    }
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "Value",
+                    "<",
+                    "0"
                   ]
-                },
+                }
+              ],
+              "actions": [
                 {
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "value": "StrEqual"
-                      },
-                      "parameters": [
-                        "Direction",
-                        "!=",
-                        "\"horizontal\""
-                      ]
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "value": "SetCameraCenterY"
-                      },
-                      "parameters": [
-                        "",
-                        "-",
-                        "CursorY(Layer, Camera) - ScrollStartY",
-                        "Layer",
-                        "Camera"
-                      ]
-                    }
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "min(0, Value + Step)"
                   ]
                 }
               ]
             }
           ],
+          "expressionType": {
+            "type": "expression"
+          },
           "parameters": [
             {
-              "description": "Camera number (default: 0)",
-              "name": "Camera",
+              "description": "Value",
+              "name": "Value",
               "type": "expression"
             },
             {
-              "description": "Camera layer (default: \"\")",
-              "name": "Layer",
-              "type": "layer"
-            },
-            {
-              "description": "Directions that the camera can move (horizontal, vertical, both)",
-              "name": "Direction",
-              "supplementaryInformation": "[\"vertical\",\"horizontal\",\"both\"]",
-              "type": "stringWithSelector"
-            },
-            {
-              "description": "Mouse button (use \"Left\" for touchscreen)",
-              "name": "InputButton",
-              "type": "mouse"
+              "description": "Step",
+              "name": "Step",
+              "type": "expression"
             }
           ],
           "objectGroups": []
@@ -2532,11 +2386,1412 @@
         "folderName": "__ROOT",
         "children": [
           {
-            "functionName": "DragCameraWithPointer"
+            "functionName": "MoveToZero"
           }
         ]
       },
-      "eventsBasedBehaviors": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Move a camera by dragging or with the scroll wheel.",
+          "fullName": "Scrollable viewport",
+          "helpPath": "",
+          "iconUrl": "",
+          "name": "ScrollableViewport",
+          "objectType": "",
+          "previewIconUrl": "",
+          "eventsFunctions": [
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "OldCameraX",
+                        "!=",
+                        "CameraCenterX(Layer)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "SpeedX",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "OldCameraY",
+                        "!=",
+                        "CameraCenterY(Layer)"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "SpeedY",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Dragging",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonFromTextPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "\"Left\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        },
+                        {
+                          "type": {
+                            "value": "IsCursorOnObject"
+                          },
+                          "parameters": [
+                            "Object",
+                            "",
+                            "",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetStringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"Dragged\""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"Dragged\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "SpeedX",
+                            "=",
+                            "0"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "SpeedY",
+                            "=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "StartX",
+                                "=",
+                                "CursorX(Layer)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "StartY",
+                                "=",
+                                "CursorY(Layer)"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "Direction",
+                                "!=",
+                                "\"Vertical\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "SpeedX",
+                                "=",
+                                "(CursorX(Layer) - StartX) / TimeDelta()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetCameraCenterX"
+                              },
+                              "parameters": [
+                                "",
+                                "-",
+                                "CursorX(Layer) - StartX",
+                                "Layer",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "Direction",
+                                "!=",
+                                "\"Horizontal\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "SpeedY",
+                                "=",
+                                "(CursorY(Layer) - StartY) / TimeDelta()"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetCameraCenterY"
+                              },
+                              "parameters": [
+                                "",
+                                "-",
+                                "CursorY(Layer) - StartY",
+                                "Layer",
+                                ""
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "MouseButtonFromTextPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "\"Left\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetStringVariable"
+                              },
+                              "parameters": [
+                                "State",
+                                "=",
+                                "\"Inertia\""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "State",
+                            "=",
+                            "\"Inertia\""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "SpeedX",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetCameraCenterX"
+                              },
+                              "parameters": [
+                                "",
+                                "-",
+                                "SpeedX * TimeDelta()",
+                                "Layer",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "SpeedX",
+                                "=",
+                                "ScrollableViewport::MoveToZero(SpeedX, InertiaDeceleration * TimeDelta())"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "NumberVariable"
+                              },
+                              "parameters": [
+                                "SpeedY",
+                                "!=",
+                                "0"
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetCameraCenterY"
+                              },
+                              "parameters": [
+                                "",
+                                "-",
+                                "SpeedY * TimeDelta()",
+                                "Layer",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "SpeedY",
+                                "=",
+                                "ScrollableViewport::MoveToZero(SpeedY, InertiaDeceleration * TimeDelta())"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Wheel",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "NumberVariable"
+                          },
+                          "parameters": [
+                            "WheelStepSize",
+                            "!=",
+                            "0"
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "IsMouseWheelScrollingUp"
+                              },
+                              "parameters": [
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "IsCursorOnObject"
+                              },
+                              "parameters": [
+                                "Object",
+                                "",
+                                "",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "!=",
+                                    "\"Wheeled\""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetStringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "=",
+                                    "\"Wheeled\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "TargetedCameraX",
+                                    "=",
+                                    "CameraCenterX(Layer)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "TargetedCameraY",
+                                    "=",
+                                    "CameraCenterY(Layer)"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "Direction",
+                                    "=",
+                                    "\"Horizontal\""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ScrollableViewport::ScrollableViewport::SetTargetedCameraX"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "-",
+                                    "WheelStepSize",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Else",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ScrollableViewport::ScrollableViewport::SetTargetedCameraY"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "-",
+                                    "WheelStepSize",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "IsMouseWheelScrollingDown"
+                              },
+                              "parameters": [
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "IsCursorOnObject"
+                              },
+                              "parameters": [
+                                "Object",
+                                "",
+                                "",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "!=",
+                                    "\"Wheeled\""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetStringVariable"
+                                  },
+                                  "parameters": [
+                                    "State",
+                                    "=",
+                                    "\"Wheeled\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "TargetedCameraX",
+                                    "=",
+                                    "CameraCenterX(Layer)"
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "SetNumberVariable"
+                                  },
+                                  "parameters": [
+                                    "TargetedCameraY",
+                                    "=",
+                                    "CameraCenterY(Layer)"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "Direction",
+                                    "=",
+                                    "\"Horizontal\""
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ScrollableViewport::ScrollableViewport::SetTargetedCameraX"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "+",
+                                    "WheelStepSize",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Else",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "ScrollableViewport::ScrollableViewport::SetTargetedCameraY"
+                                  },
+                                  "parameters": [
+                                    "Object",
+                                    "Behavior",
+                                    "+",
+                                    "WheelStepSize",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "State",
+                                "=",
+                                "\"Wheeled\""
+                              ]
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "NumberVariable"
+                                  },
+                                  "parameters": [
+                                    "SpeedX",
+                                    "!=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetCameraCenterX"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "+",
+                                    "SpeedX * TimeDelta()",
+                                    "Layer",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "sign(SpeedX)",
+                                        "=",
+                                        "sign(CameraCenterX(Layer) - TargetedCameraX)"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "SetCameraCenterX"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "=",
+                                        "TargetedCameraX",
+                                        "Layer",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetNumberVariable"
+                                      },
+                                      "parameters": [
+                                        "SpeedX",
+                                        "=",
+                                        "0"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "value": "NumberVariable"
+                                  },
+                                  "parameters": [
+                                    "SpeedY",
+                                    "!=",
+                                    "0"
+                                  ]
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "value": "SetCameraCenterY"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "+",
+                                    "SpeedY * TimeDelta()",
+                                    "Layer",
+                                    ""
+                                  ]
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                                      },
+                                      "parameters": [
+                                        "sign(SpeedY)",
+                                        "=",
+                                        "sign(CameraCenterY(Layer) - TargetedCameraY)"
+                                      ]
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "value": "SetCameraCenterY"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "=",
+                                        "TargetedCameraY",
+                                        "Layer",
+                                        ""
+                                      ]
+                                    },
+                                    {
+                                      "type": {
+                                        "value": "SetNumberVariable"
+                                      },
+                                      "parameters": [
+                                        "SpeedY",
+                                        "=",
+                                        "0"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "!=",
+                        "\"Dragged\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "SpeedX",
+                        "=",
+                        "0"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "SpeedY",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetStringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "OldCameraX",
+                        "=",
+                        "CameraCenterX(Layer)"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "OldCameraY",
+                        "=",
+                        "CameraCenterY(Layer)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScrollableViewport::ScrollableViewport",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if camera is being dragged from this object.",
+              "fullName": "Camera is being dragged",
+              "functionType": "Condition",
+              "name": "IsDragged",
+              "sentence": "Camera is being dragged from _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"Dragged\""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScrollableViewport::ScrollableViewport",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the targetedCameraY of the object.",
+              "fullName": "TargetedCameraY",
+              "functionType": "ExpressionAndCondition",
+              "name": "TargetedCameraY",
+              "private": true,
+              "sentence": "the targetedCameraY",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "TargetedCameraY"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScrollableViewport::ScrollableViewport",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "TargetedCameraY",
+              "name": "SetTargetedCameraY",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TargetedCameraY",
+                        "=",
+                        "Value"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "SpeedY",
+                        "=",
+                        "(TargetedCameraY - CameraCenterY(Layer)) / WheelScrollingDuration"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScrollableViewport::ScrollableViewport",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the targetedCameraX of the object.",
+              "fullName": "TargetedCameraX",
+              "functionType": "ExpressionAndCondition",
+              "name": "TargetedCameraX",
+              "private": true,
+              "sentence": "the targetedCameraX",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "TargetedCameraX"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScrollableViewport::ScrollableViewport",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "TargetedCameraX",
+              "name": "SetTargetedCameraX",
+              "private": true,
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TargetedCameraX",
+                        "=",
+                        "Value"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "SpeedX",
+                        "=",
+                        "(TargetedCameraX - CameraCenterX(Layer)) / WheelScrollingDuration"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScrollableViewport::ScrollableViewport",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "Action",
+              "name": "onDeActivate",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetStringVariable"
+                      },
+                      "parameters": [
+                        "State",
+                        "=",
+                        "\"Idle\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ScrollableViewport::ScrollableViewport",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "doStepPreEvents"
+              },
+              {
+                "functionName": "IsDragged"
+              },
+              {
+                "functionName": "TargetedCameraY"
+              },
+              {
+                "functionName": "SetTargetedCameraY"
+              },
+              {
+                "functionName": "TargetedCameraX"
+              },
+              {
+                "functionName": "SetTargetedCameraX"
+              },
+              {
+                "functionName": "onDeActivate"
+              }
+            ]
+          },
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Choice",
+              "label": "Direction",
+              "choices": [
+                {
+                  "label": "Vertical",
+                  "value": "Vertical"
+                },
+                {
+                  "label": "Horizontal",
+                  "value": "Horizontal"
+                },
+                {
+                  "label": "Both",
+                  "value": "Both"
+                }
+              ],
+              "name": "Direction"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "Camera is being dragged",
+              "group": "Dragging",
+              "hidden": true,
+              "name": "IsDragged"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "group": "Dragging",
+              "hidden": true,
+              "name": "StartX"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "group": "Dragging",
+              "hidden": true,
+              "name": "StartY"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Dragged layer",
+              "description": "The dragged layer must be different from this object layer.",
+              "name": "Layer"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "group": "Wheel",
+              "hidden": true,
+              "name": "TargetedCameraX"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "group": "Wheel",
+              "hidden": true,
+              "name": "TargetedCameraY"
+            },
+            {
+              "value": "0.25",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Wheel scrolling duration",
+              "group": "Wheel",
+              "name": "WheelScrollingDuration"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "hidden": true,
+              "name": "OldCameraX"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "hidden": true,
+              "name": "OldCameraY"
+            },
+            {
+              "value": "120",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Step size",
+              "group": "Wheel",
+              "name": "WheelStepSize"
+            },
+            {
+              "value": "Idle",
+              "type": "String",
+              "label": "",
+              "hidden": true,
+              "name": "State"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "hidden": true,
+              "name": "SpeedX"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "hidden": true,
+              "name": "SpeedY"
+            },
+            {
+              "value": "800",
+              "type": "Number",
+              "unit": "PixelAcceleration",
+              "label": "",
+              "group": "Dragging",
+              "name": "InertiaDeceleration"
+            }
+          ],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "propertyName": "State"
+              },
+              {
+                "propertyName": "Layer"
+              },
+              {
+                "propertyName": "Direction"
+              },
+              {
+                "propertyName": "OldCameraX"
+              },
+              {
+                "propertyName": "OldCameraY"
+              },
+              {
+                "propertyName": "SpeedX"
+              },
+              {
+                "propertyName": "SpeedY"
+              },
+              {
+                "folderName": "Dragging",
+                "children": [
+                  {
+                    "propertyName": "InertiaDeceleration"
+                  },
+                  {
+                    "propertyName": "IsDragged"
+                  },
+                  {
+                    "propertyName": "StartX"
+                  },
+                  {
+                    "propertyName": "StartY"
+                  }
+                ]
+              },
+              {
+                "folderName": "Wheel",
+                "children": [
+                  {
+                    "propertyName": "WheelStepSize"
+                  },
+                  {
+                    "propertyName": "WheelScrollingDuration"
+                  },
+                  {
+                    "propertyName": "TargetedCameraX"
+                  },
+                  {
+                    "propertyName": "TargetedCameraY"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
       "eventsBasedObjects": []
     },
     {
