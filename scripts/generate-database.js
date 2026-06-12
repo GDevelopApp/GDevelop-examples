@@ -110,35 +110,6 @@ const getAllExampleFiles = (allFiles) => {
 };
 
 /**
- *
- * @param {libGDevelop} gd
- * @param {gdProject} project
- * @param {string} baseUrl
- */
-const updateResources = (gd, project, baseUrl) => {
-  const worker = new gd.ArbitraryResourceWorkerJS(
-    project.getResourcesManager()
-  );
-  /** @param {string} file */
-  worker.exposeImage = (file) => {
-    // Don't do anything
-    return file;
-  };
-  /** @param {string} shader */
-  worker.exposeShader = (shader) => {
-    // Don't do anything
-    return shader;
-  };
-  /** @param {string} file */
-  worker.exposeFile = (file) => {
-    if (file.length === 0) return '';
-    return baseUrl + '/' + file;
-  };
-
-  gd.ResourceExposer.exposeWholeProjectResources(project, worker);
-};
-
-/**
  * Check that the resources in the project all have an existing file
  * in the project folder.
  * @param {gdProject} project
@@ -599,8 +570,6 @@ const updateExampleFiles = async (gd, allExampleFiles) => {
       }
 
       const project = loadSerializedProject(gd, projectObject);
-      const gameFolderPath = path.dirname(fileWithMetadata.path);
-      updateResources(gd, project, getResourceUrl(gameFolderPath));
 
       try {
         await writeProjectJSONFile(gd, project, fileWithMetadata.path);
