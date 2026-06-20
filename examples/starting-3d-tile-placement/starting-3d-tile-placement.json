@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 269,
+    "build": 272,
     "major": 5,
     "minor": 6,
     "revision": 0
@@ -18,7 +18,6 @@
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "templateSlug": "starting-top-down",
-    "useDeprecatedZeroAsDefaultStringVariable": true,
     "version": "1.0.0",
     "name": "starting-3d-tile-placement",
     "description": "",
@@ -210,7 +209,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.2817259932079574,
+        "zoomFactor": 0.2912258866911128,
         "windowMask": false,
         "selectedLayer": "",
         "gameEditorMode": "embedded-game"
@@ -642,6 +641,7 @@
         {
           "assetStoreId": "",
           "name": "Unit",
+          "persistentUuid": "9967791f-0b52-48f1-b975-b79cbb8f7063",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -667,6 +667,7 @@
         {
           "assetStoreId": "",
           "name": "Tower",
+          "persistentUuid": "d41aa69a-7c2f-4239-b8e6-89b155b04218",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -692,6 +693,7 @@
         {
           "assetStoreId": "",
           "name": "Tree",
+          "persistentUuid": "d8d64c5a-3e87-4cbd-a1b2-c04e8fc07052",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -1352,8 +1354,8 @@
                 "elevation": 40,
                 "frustumSize": 3000,
                 "intensity": 0.75,
-                "minimumShadowBias": 0,
-                "rotation": 300
+                "minimumShadowBias": 0.000001,
+                "rotation": 40
               },
               "stringParameters": {
                 "color": "255;255;255",
@@ -1677,7 +1679,7 @@
     {
       "author": "",
       "category": "User interface",
-      "dimension": "",
+      "dimension": "2D",
       "extensionNamespace": "",
       "fullName": "Button states and effects",
       "gdevelopVersion": ">=5.5.222",
@@ -1686,7 +1688,7 @@
       "name": "ButtonStates",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/753a9a794bd885058159b7509f06f5a8f67f72decfccb9a1b0efee26f41c3c4c_gesture-tap-button.svg",
       "shortDescription": "Use any object as a button and change appearance according to user interactions.",
-      "version": "1.3.1",
+      "version": "1.4.1",
       "description": [
         "Use the \"Button states\" behavior to track user interactions with an object, including:",
         "",
@@ -4372,6 +4374,103 @@
                     }
                   ],
                   "parameters": []
+                },
+                {
+                  "colorB": 228,
+                  "colorG": 176,
+                  "colorR": 74,
+                  "creationTime": 0,
+                  "name": "Toggle effect",
+                  "source": "",
+                  "type": "BuiltinCommonInstructions::Group",
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "ShouldDisableEffectInIdle",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "ButtonStates::ButtonFSM::IsIdle"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ButtonFSM",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "StringVariable"
+                              },
+                              "parameters": [
+                                "TweenState",
+                                "=",
+                                "\"NoTween\""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "EffectCapability::EffectBehavior::EnableEffect"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Effect",
+                                "EffectName",
+                                "no"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "ButtonStates::ButtonFSM::IsIdle"
+                              },
+                              "parameters": [
+                                "Object",
+                                "ButtonFSM",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "EffectCapability::EffectBehavior::EnableEffect"
+                              },
+                              "parameters": [
+                                "Object",
+                                "Effect",
+                                "EffectName",
+                                "yes"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "parameters": []
                 }
               ],
               "parameters": [
@@ -5852,6 +5951,13 @@
               "name": "FadeOutDuration"
             },
             {
+              "value": "",
+              "type": "Boolean",
+              "label": "Disable the effect in idle state",
+              "advanced": true,
+              "name": "ShouldDisableEffectInIdle"
+            },
+            {
               "value": "Idle",
               "type": "Choice",
               "label": "",
@@ -5972,6 +6078,9 @@
                     "propertyName": "FadeOutDuration"
                   }
                 ]
+              },
+              {
+                "propertyName": "ShouldDisableEffectInIdle"
               },
               {
                 "propertyName": "PreviousState"
