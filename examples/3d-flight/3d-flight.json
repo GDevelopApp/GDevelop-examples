@@ -3026,6 +3026,7 @@
           ],
           "events": [
             {
+              "disabled": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [
@@ -4654,9 +4655,9 @@
                                     "value": "SetNumberVariable"
                                   },
                                   "parameters": [
-                                    "CurrentSpinMax",
+                                    "TargetedSpin",
                                     "=",
-                                    "SpinMax * abs(CurrentHorizontalAngularSpeed) / HorizontalAngularSpeedMax"
+                                    "-SpinMax * CurrentHorizontalAngularSpeed / HorizontalAngularSpeedMax"
                                   ]
                                 }
                               ],
@@ -4669,9 +4670,9 @@
                                         "value": "NumberVariable"
                                       },
                                       "parameters": [
-                                        "CurrentHorizontalAngularSpeed",
+                                        "CurrentSpin",
                                         "<",
-                                        "0"
+                                        "TargetedSpin"
                                       ]
                                     }
                                   ],
@@ -4683,7 +4684,7 @@
                                       "parameters": [
                                         "Delta",
                                         "=",
-                                        "min(CurrentSpin + SpinSpeed * TimeDelta, CurrentSpinMax) - CurrentSpin"
+                                        "min(CurrentSpin + SpinSpeed * TimeDelta, TargetedSpin) - CurrentSpin"
                                       ]
                                     }
                                   ]
@@ -4696,9 +4697,9 @@
                                         "value": "NumberVariable"
                                       },
                                       "parameters": [
-                                        "CurrentHorizontalAngularSpeed",
+                                        "CurrentSpin",
                                         ">",
-                                        "0"
+                                        "TargetedSpin"
                                       ]
                                     }
                                   ],
@@ -4710,7 +4711,7 @@
                                       "parameters": [
                                         "Delta",
                                         "=",
-                                        "max(CurrentSpin - SpinSpeed * TimeDelta, -CurrentSpinMax) - CurrentSpin"
+                                        "max(CurrentSpin - SpinSpeed * TimeDelta, TargetedSpin) - CurrentSpin"
                                       ]
                                     }
                                   ]
@@ -4751,7 +4752,7 @@
                                   "value": 0
                                 },
                                 {
-                                  "name": "CurrentSpinMax",
+                                  "name": "TargetedSpin",
                                   "type": "number",
                                   "value": 0
                                 }
@@ -23650,8 +23651,8 @@
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdhbWVwYWQtdmFyaWFudC1vdXRsaW5lIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTYsOUg4VjExSDEwVjEzSDhWMTVINlYxM0g0VjExSDZWOU0xOC41LDlBMS41LDEuNSAwIDAsMSAyMCwxMC41QTEuNSwxLjUgMCAwLDEgMTguNSwxMkExLjUsMS41IDAgMCwxIDE3LDEwLjVBMS41LDEuNSAwIDAsMSAxOC41LDlNMTUuNSwxMkExLjUsMS41IDAgMCwxIDE3LDEzLjVBMS41LDEuNSAwIDAsMSAxNS41LDE1QTEuNSwxLjUgMCAwLDEgMTQsMTMuNUExLjUsMS41IDAgMCwxIDE1LjUsMTJNMTcsNUE3LDcgMCAwLDEgMjQsMTJBNyw3IDAgMCwxIDE3LDE5QzE1LjA0LDE5IDEzLjI3LDE4LjIgMTIsMTYuOUMxMC43MywxOC4yIDguOTYsMTkgNywxOUE3LDcgMCAwLDEgMCwxMkE3LDcgMCAwLDEgNyw1SDE3TTcsN0E1LDUgMCAwLDAgMiwxMkE1LDUgMCAwLDAgNywxN0M4LjY0LDE3IDEwLjA5LDE2LjIxIDExLDE1SDEzQzEzLjkxLDE2LjIxIDE1LjM2LDE3IDE3LDE3QTUsNSAwIDAsMCAyMiwxMkE1LDUgMCAwLDAgMTcsN0g3WiIgLz48L3N2Zz4=",
       "name": "Gamepads",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/gamepad-variant-outline.svg",
-      "shortDescription": "Add support for gamepads (or other controllers) to your game, giving access to information such as button presses, axis positions, trigger pressure, etc...",
-      "version": "0.9.0",
+      "shortDescription": "Gamepad/controller support: buttons, sticks, triggers, vibration. Mapper behaviors for 2D/3D.",
+      "version": "0.9.1",
       "description": [
         "Add support for gamepads (or other physical controllers).",
         "",
@@ -23932,7 +23933,27 @@
                 "    }\r",
                 "}();\r",
                 "\r",
-                "function onScenePostEvents() {\r",
+                "/**\r",
+                " * @param {gdjs.RuntimeScene} runtimeScene\r",
+                " */\r",
+                "function addFrameBeginningTaskIfNeeded(runtimeScene) {\r",
+                "    const taskManager = runtimeScene.getAsyncTasksManager();\r",
+                "    for (const taskWithCallback of taskManager.tasksWithCallback) {\r",
+                "        if (taskWithCallback.asyncTask === frameBeginningTask) {\r",
+                "            return;\r",
+                "        }\r",
+                "    }\r",
+                "    // Async tasks are run before everything.\r",
+                "    // This is a hack to make sure that button states are updated\r",
+                "    // before mapping behavior events.\r",
+                "    taskManager.addTask(frameBeginningTask);\r",
+                "}\r",
+                "\r",
+                "/**\r",
+                " * @param {gdjs.RuntimeScene} runtimeScene\r",
+                " */\r",
+                "function onScenePostEvents(runtimeScene) {\r",
+                "    addFrameBeginningTaskIfNeeded(runtimeScene);\r",
                 "    /** @type {Gamepad[]} */\r",
                 "    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];\r",
                 "    for (let playerId = 0; playerId < gamepads.length; playerId++) {\r",
@@ -24113,6 +24134,7 @@
                 "    getGamepad,\r",
                 "    onScenePostEvents,\r",
                 "    frameBeginningTask,\r",
+                "    addFrameBeginningTaskIfNeeded,\r",
                 "}"
               ],
               "parameterObjects": "",
@@ -24131,12 +24153,7 @@
           "events": [
             {
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": [
-                "// Async tasks are run before everything.\r",
-                "// This is a hack to make sure that button states are updated\r",
-                "// before mapping behavior events.\r",
-                "runtimeScene.getAsyncTasksManager().addTask(gdjs._extensionController.frameBeginningTask);"
-              ],
+              "inlineCode": "gdjs._extensionController.addFrameBeginningTaskIfNeeded(runtimeScene);",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -24154,7 +24171,7 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
-                "gdjs._extensionController.onScenePostEvents();",
+                "gdjs._extensionController.onScenePostEvents(runtimeScene);",
                 ""
               ],
               "parameterObjects": "",
@@ -36662,7 +36679,7 @@
       "name": "SpriteMultitouchJoystick",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_controller_joystick_arrows_direction.svg",
       "shortDescription": "On-screen multitouch joystick and buttons.",
-      "version": "1.9.0",
+      "version": "1.9.1",
       "description": [
         "Multitouch joysticks are objects showing a joystick on the screen, useful for mobile. They work like a physical gamepad:",
         "- 4 or 8 directions",
@@ -42455,7 +42472,7 @@
                       "parameters": [
                         "Object",
                         "PhysicsCar3D",
-                        "SpriteMultitouchJoystick::StickForceX(ControllerIdentifier, \"Primary\")"
+                        "SpriteMultitouchJoystick::StickForceX(ControllerIdentifier, SteerJoystickIdentifier)"
                       ]
                     }
                   ]
@@ -42485,7 +42502,7 @@
                       "parameters": [
                         "Object",
                         "PhysicsCar3D",
-                        "-SpriteMultitouchJoystick::StickForceY(ControllerIdentifier, \"Secondary\")"
+                        "-SpriteMultitouchJoystick::StickForceY(ControllerIdentifier, SpeedJoystickIdentifier)"
                       ]
                     }
                   ]
