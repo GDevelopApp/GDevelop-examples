@@ -1414,7 +1414,9 @@
               "Object3D": "Object3D",
               "HorizontalAngularSpeedMax": 60,
               "VerticalAngularSpeedMax": 60,
-              "SpinMax": 60
+              "SpinMax": 60,
+              "SpinHalfwayDuration": 0.25,
+              "ForceFeedbackSpinHalfwayDuration": 0.25
             },
             {
               "name": "PhysicsAirplane3DGamepadMapper",
@@ -1448,7 +1450,7 @@
               "Object3D": "Object3D",
               "RotationHalfwayDuration": 0.25,
               "ElevationHalfwayDuration": 0.25,
-              "TranslationZHalfwayDuration": 0.125,
+              "TranslationZHalfwayDuration": 0.0125,
               "Distance": 13,
               "OffsetX": 0,
               "OffsetY": -5,
@@ -4175,6 +4177,30 @@
                         "=",
                         "ForwardSpeedMin"
                       ]
+                    },
+                    {
+                      "type": {
+                        "value": "PhysicsAirplane3D::PhysicsAirplane3D::SetSpinHalfwayDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "SpinHalfwayDuration",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "PhysicsAirplane3D::PhysicsAirplane3D::SetForceFeedbackSpinHalfwayDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "ForceFeedbackSpinHalfwayDuration",
+                        ""
+                      ]
                     }
                   ]
                 }
@@ -4450,46 +4476,7 @@
                           "events": [
                             {
                               "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "NumberVariable"
-                                  },
-                                  "parameters": [
-                                    "ForceFeedbackSpinSpeed",
-                                    "=",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "SetNumberVariable"
-                                  },
-                                  "parameters": [
-                                    "ForceFeedbackSpinSpeed",
-                                    "=",
-                                    "abs(Object.Object3D::RotationX() / ForceFeedbackSpinDuration)"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Scene3D::Base3DBehavior::RotationX"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Object3D",
-                                    "<",
-                                    "0"
-                                  ]
-                                }
-                              ],
+                              "conditions": [],
                               "actions": [
                                 {
                                   "type": {
@@ -4499,55 +4486,9 @@
                                     "Object",
                                     "Object3D",
                                     "=",
-                                    "min(0, Object.Object3D::RotationX() + ForceFeedbackSpinSpeed * TimeDelta)"
+                                    "Object.Object3D::RotationX() * exp(TimeDelta() * ForceFeedbackSpinLogSpeed)"
                                   ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "Scene3D::Base3DBehavior::RotationX"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Object3D",
-                                    ">",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "Scene3D::Base3DBehavior::SetRotationX"
-                                  },
-                                  "parameters": [
-                                    "Object",
-                                    "Object3D",
-                                    "=",
-                                    "max(0, Object.Object3D::RotationX() - ForceFeedbackSpinSpeed * TimeDelta)"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "NumberVariable"
-                                  },
-                                  "parameters": [
-                                    "CurrentSpin",
-                                    "<",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
+                                },
                                 {
                                   "type": {
                                     "value": "SetNumberVariable"
@@ -4555,34 +4496,7 @@
                                   "parameters": [
                                     "CurrentSpin",
                                     "=",
-                                    "min(0, CurrentSpin + ForceFeedbackSpinSpeed * TimeDelta)"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [
-                                {
-                                  "type": {
-                                    "value": "NumberVariable"
-                                  },
-                                  "parameters": [
-                                    "CurrentSpin",
-                                    ">",
-                                    "0"
-                                  ]
-                                }
-                              ],
-                              "actions": [
-                                {
-                                  "type": {
-                                    "value": "SetNumberVariable"
-                                  },
-                                  "parameters": [
-                                    "CurrentSpin",
-                                    "=",
-                                    "max(0, CurrentSpin - ForceFeedbackSpinSpeed * TimeDelta)"
+                                    "CurrentSpin * exp(TimeDelta() * ForceFeedbackSpinLogSpeed)"
                                   ]
                                 }
                               ]
@@ -4633,18 +4547,7 @@
                               ]
                             }
                           ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "SetNumberVariable"
-                              },
-                              "parameters": [
-                                "ForceFeedbackSpinSpeed",
-                                "=",
-                                "0"
-                              ]
-                            }
-                          ],
+                          "actions": [],
                           "events": [
                             {
                               "type": "BuiltinCommonInstructions::Standard",
@@ -4664,18 +4567,7 @@
                               "events": [
                                 {
                                   "type": "BuiltinCommonInstructions::Standard",
-                                  "conditions": [
-                                    {
-                                      "type": {
-                                        "value": "NumberVariable"
-                                      },
-                                      "parameters": [
-                                        "CurrentSpin",
-                                        "<",
-                                        "TargetedSpin"
-                                      ]
-                                    }
-                                  ],
+                                  "conditions": [],
                                   "actions": [
                                     {
                                       "type": {
@@ -4684,34 +4576,7 @@
                                       "parameters": [
                                         "Delta",
                                         "=",
-                                        "min(CurrentSpin + SpinSpeed * TimeDelta, TargetedSpin) - CurrentSpin"
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "BuiltinCommonInstructions::Standard",
-                                  "conditions": [
-                                    {
-                                      "type": {
-                                        "value": "NumberVariable"
-                                      },
-                                      "parameters": [
-                                        "CurrentSpin",
-                                        ">",
-                                        "TargetedSpin"
-                                      ]
-                                    }
-                                  ],
-                                  "actions": [
-                                    {
-                                      "type": {
-                                        "value": "SetNumberVariable"
-                                      },
-                                      "parameters": [
-                                        "Delta",
-                                        "=",
-                                        "max(CurrentSpin - SpinSpeed * TimeDelta, TargetedSpin) - CurrentSpin"
+                                        "TargetedSpin + AngleDifference(CurrentSpin, TargetedSpin) * exp(TimeDelta() * SpinLogSpeed) - CurrentSpin"
                                       ]
                                     }
                                   ]
@@ -6021,12 +5886,12 @@
               "objectGroups": []
             },
             {
-              "description": "the spin speed of the object.",
-              "fullName": "Spin speed",
+              "description": "the halfway time for spinning of the object.",
+              "fullName": "Halfway time for spinning",
               "functionType": "ExpressionAndCondition",
               "group": "3D physics airplane configuration",
-              "name": "SpinSpeed",
-              "sentence": "the spin speed",
+              "name": "SpinHalfwayDuration",
+              "sentence": "the halfway time for spinning",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -6037,7 +5902,7 @@
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "SpinSpeed"
+                        "SpinHalfwayDuration"
                       ]
                     }
                   ]
@@ -6064,11 +5929,23 @@
             {
               "fullName": "",
               "functionType": "ActionWithOperator",
-              "getterName": "SpinSpeed",
+              "getterName": "SpinHalfwayDuration",
               "group": "3D physics airplane configuration",
-              "name": "SetSpinSpeed",
+              "name": "SetSpinHalfwayDuration",
               "sentence": "",
               "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "ln((1 - speed)) = ln(1 / 2) / halfwatTime"
+                },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [],
@@ -6078,9 +5955,122 @@
                         "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "SpinSpeed",
+                        "SpinHalfwayDuration",
                         "=",
                         "Value"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "SpinLogSpeed",
+                        "=",
+                        "log(0.5) / Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the halfway time for force feedback spinning of the object. Spin back to level with the horizon when direction inputs are released. Can be set to 0 to disable it.",
+              "fullName": "Halfway time for force feedback spinning",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D physics airplane configuration",
+              "name": "ForceFeedbackSpinHalfwayDuration",
+              "sentence": "the halfway time for force feedback spinning",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "ForceFeedbackSpinHalfwayDuration"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "PhysicsAirplane3D::PhysicsAirplane3D",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "ForceFeedbackSpinHalfwayDuration",
+              "group": "3D physics airplane configuration",
+              "name": "SetForceFeedbackSpinHalfwayDuration",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "ln((1 - speed)) = ln(1 / 2) / halfwatTime"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ForceFeedbackSpinHalfwayDuration",
+                        "=",
+                        "Value"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ForceFeedbackSpinLogSpeed",
+                        "=",
+                        "log(0.5) / Value"
                       ]
                     }
                   ]
@@ -6207,10 +6197,16 @@
                     "functionName": "SetSpinMax"
                   },
                   {
-                    "functionName": "SpinSpeed"
+                    "functionName": "SpinHalfwayDuration"
                   },
                   {
-                    "functionName": "SetSpinSpeed"
+                    "functionName": "SetSpinHalfwayDuration"
+                  },
+                  {
+                    "functionName": "ForceFeedbackSpinHalfwayDuration"
+                  },
+                  {
+                    "functionName": "SetForceFeedbackSpinHalfwayDuration"
                   }
                 ]
               }
@@ -6306,25 +6302,26 @@
             {
               "value": "0",
               "type": "Number",
-              "unit": "PixelSpeed",
-              "label": "Force feedback spin speed",
+              "label": "",
+              "group": "Spin",
               "hidden": true,
-              "name": "ForceFeedbackSpinSpeed"
+              "name": "ForceFeedbackSpinLogSpeed"
             },
             {
-              "value": "0.5",
+              "value": "0.25",
               "type": "Number",
-              "unit": "PixelSpeed",
-              "label": "Force feedback spin duration",
-              "description": "Spin back to level with the horizon when direction inputs are released. Can be set to 0 to disable it.",
-              "hidden": true,
-              "name": "ForceFeedbackSpinDuration"
+              "unit": "Second",
+              "label": "Halfway time for force feedback spinning",
+              "description": "Spin back to level with the horizon when direction inputs are released.",
+              "group": "Spin",
+              "name": "ForceFeedbackSpinHalfwayDuration"
             },
             {
               "value": "0",
               "type": "Number",
               "unit": "DegreeAngle",
               "label": "Current spin",
+              "group": "Spin",
               "hidden": true,
               "name": "CurrentSpin"
             },
@@ -6333,14 +6330,16 @@
               "type": "Number",
               "unit": "DegreeAngle",
               "label": "Max spin",
+              "group": "Spin",
               "name": "SpinMax"
             },
             {
-              "value": "120",
+              "value": "0.5",
               "type": "Number",
-              "unit": "AngularSpeed",
-              "label": "Spin speed",
-              "name": "SpinSpeed"
+              "unit": "Second",
+              "label": "Halfway time for spinning",
+              "group": "Spin",
+              "name": "SpinHalfwayDuration"
             },
             {
               "value": "0",
@@ -6365,6 +6364,14 @@
               "label": "",
               "hidden": true,
               "name": "TurnVerticallyInput"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "",
+              "group": "Spin",
+              "hidden": true,
+              "name": "SpinLogSpeed"
             }
           ],
           "propertiesFolderStructure": {
@@ -6404,21 +6411,6 @@
                 "propertyName": "ForwardDeceleration"
               },
               {
-                "propertyName": "ForceFeedbackSpinSpeed"
-              },
-              {
-                "propertyName": "ForceFeedbackSpinDuration"
-              },
-              {
-                "propertyName": "CurrentSpin"
-              },
-              {
-                "propertyName": "SpinMax"
-              },
-              {
-                "propertyName": "SpinSpeed"
-              },
-              {
                 "propertyName": "AcceleratorInput"
               },
               {
@@ -6426,6 +6418,29 @@
               },
               {
                 "propertyName": "TurnVerticallyInput"
+              },
+              {
+                "folderName": "Spin",
+                "children": [
+                  {
+                    "propertyName": "SpinMax"
+                  },
+                  {
+                    "propertyName": "CurrentSpin"
+                  },
+                  {
+                    "propertyName": "SpinHalfwayDuration"
+                  },
+                  {
+                    "propertyName": "SpinLogSpeed"
+                  },
+                  {
+                    "propertyName": "ForceFeedbackSpinHalfwayDuration"
+                  },
+                  {
+                    "propertyName": "ForceFeedbackSpinLogSpeed"
+                  }
+                ]
               }
             ]
           }
