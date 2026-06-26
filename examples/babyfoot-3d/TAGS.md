@@ -1,1 +1,1 @@
-game, simple
+game, simple, soccer, football
