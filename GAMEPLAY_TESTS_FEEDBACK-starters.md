@@ -25,6 +25,10 @@ grows as the batches progress.
 | `starting-2d-driving` | Driving and steering · Running into a bush pushes it away |
 | `starting-physics` | The ball falls and rests on the ground · Dragging the ball with the mouse |
 | `starting-physics-pixel` | The ball falls and rests on the ground · Dragging the ball with the mouse |
+| `starting-2d-car-racing` | Driving and steering · Running into a bush pushes it away |
+| `starting-beatemup` | Attacking hits the enemy · The player cannot walk while attacking |
+| `starting-point-and-click` | Clicking sends the player there · The player walks around obstacles |
+| `starting-point-and-click-pixel` | Clicking sends the player there · The player walks around obstacles |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -228,7 +232,20 @@ exposes them:
   allows for everything else. This is the "jump into the middle of the game"
   story, but for object driven state.
 
-### 7. Custom objects hide the state a test wants
+### 7. No access to an object's custom points
+
+`starting-2d-car-racing` decides whether a checkpoint counts by comparing the
+direction of the checkpoint arrow — given by its custom point
+`CheckpointArrow.PointX("TravelDirection")` — with the angle to the car. A
+test cannot read that: the snapshot exposes `x`, `centerX`, `width`... but
+nothing about the object's points, and there is no `getObjectPoint(id,
+name)`. Without it there is no way to know which side of a checkpoint the car
+must approach from, so **the lap and checkpoint logic of that starter is not
+covered** (only its driving is). Points are used by a lot of games to mark
+muzzles, spawn positions and directions — `snapshot.points` (a name to
+`{x, y}` map) would unlock all of them.
+
+### 8. Custom objects hide the state a test wants
 
 `ScoreCounter`, `PanelSpriteButton`, `PanelSpriteContinuousBar`,
 `CombinedTank`... are events based custom objects, and their useful state is
@@ -416,6 +433,22 @@ object stops moving" is needed by every physics game — add a
 harness. `stepUntil` already has `stuckDetection`, which is the same idea
 pointed at a different purpose.
 
+### Hand-rolled overlap checks are not worth it
+
+Checking "the player did not walk through the obstacle" by comparing
+bounding boxes from `width`/`height` failed on a run where the player passed
+96px away from a 64x64 obstacle: sprite dimensions include their transparent
+margins, so the hand-made overlap box was far bigger than what the game
+considers a collision. What worked, and says more, was asserting the
+**shape of the path** instead: the start and the destination were put at the
+same height, so walking straight would keep the player on that line, and
+going around shows up as a measurable detour off it.
+
+The general lesson: when the question is "did it go around / did it get
+there", assert on the trajectory or on the behavior's own state, not on a
+geometry test reconstructed from the snapshot. `has2dLineOfSight` exists but
+answers a different question (is the straight line blocked *now*).
+
 ### Smaller surprises
 
 - `getObjects('X')[0].behaviors.Y.state` throwing on an unknown name with
@@ -460,6 +493,19 @@ pointed at a different purpose.
   was both simpler and right. A game-agnostic "what is this object resting
   on" would need engine support; picking by a distinctive property is the
   practical answer.
+- `behaviors.X.act` (whether a behavior is activated) turned out to be the
+  cleanest way to test a mechanic in `starting-beatemup`, where attacking
+  deactivates the movement behavior so the player is rooted during the
+  animation. It deserves a mention in the guide: it is not obvious that the
+  snapshot answers "is this behavior currently switched off".
+- `snapshot.animation` makes animation driven games easy to test: in a
+  beat'em up the whole state machine *is* the animation name
+  ("Idle" / "AttackBuildUp" / "AttackStrike" / "Hurt"), so the test reads
+  exactly like the events do.
+- The Pathfinding behavior exposes `PathFound` and `DestinationReached`,
+  which replaced a distance threshold that was making a test fail for the
+  wrong reason (the player was still walking the last few pixels). Another
+  case of "the behavior state says what the test means".
 - `setObjectPosition` on a physics body works exactly as documented,
   including for the `PhysicsCar3D` bodies — repositioning the car and the
   tank a short run-up away from their target is what made those two tests
