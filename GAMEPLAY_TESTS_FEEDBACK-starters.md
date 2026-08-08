@@ -35,6 +35,8 @@ grows as the batches progress.
 | `starting-tile-placement` | Picking a tile type · Placing a tile on the board |
 | `starting-card-game` | Drawing a card from the deck · Putting a card back in the deck |
 | `starting-rts-unit-selection` | Selecting a unit and ordering it to move · Selecting every unit at once |
+| `starting-top-down-rpg` | Talking to an NPC · Saying yes in the dialog |
+| `starting-first-person` | Walking and strafing with WASD · Jumping with Space |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -291,7 +293,34 @@ that take an object list (they are as much "state of this object" as the
 object conditions are), and putting the enabled effects of an object in the
 snapshot (`effects: { Selected: true }`).
 
-### 11. Custom objects hide the state a test wants
+### 11. The parts of a custom object report their position *inside* the object
+
+`snapshot.children` is what makes a custom object testable — in
+`starting-top-down-rpg` it is the only way to reach the "Yes" button of the
+`TwoChoicesDialogBox`. But the coordinates of the children are **local to the
+parent**, while the documentation of `centerX`/`centerY` says they are scene
+coordinates ("Use centerX/centerY (never x + width/2)"). It shows in the
+numbers: the dialog sits at `x: 320, y: 416` in the scene and its
+`TextBorder` part reports `x: 0, y: 0`. Clicking a child at its reported
+`centerX`/`centerY` therefore clicks the wrong place, silently — the test
+just observes that nothing happened. The children also report the parent's
+*internal* layer (`""`), not the layer the parent is on (`"Dialog Layer"`),
+so the layer has to be taken from the parent too.
+
+The working conversion is:
+
+```javascript
+const x = parent.x + child.x + child.width / 2;
+const y = parent.y + child.y + child.height / 2;
+harness.setMousePosition(x, y, parent.layer);
+```
+
+Either make the children's `centerX`/`centerY` scene coordinates like every
+other snapshot (preferred — that is what the field is documented to be), or
+say clearly in the guide that children are in the parent's space and give
+this conversion.
+
+### 12. Custom objects hide the state a test wants
 
 `ScoreCounter`, `PanelSpriteButton`, `PanelSpriteContinuousBar`,
 `CombinedTank`... are events based custom objects, and their useful state is
@@ -359,7 +388,10 @@ project run again immediately afterwards succeeds. Useful detail: it only
 ever hit the **first test of a batch**; in the run above, the second test of
 the same batch passed normally right after, so the library had finished
 loading by then. *(Reported as already known and being fixed separately; the
-tests here do not work around it.)*
+tests here do not work around it.)* One data point for the fix:
+`starting-first-person` reproduces it **every time**, on whichever of its
+two tests runs first — so its first test is currently red for that reason
+alone, and both tests pass when they are not the first to run.
 
 ### The result status can be misleading when a test's own step budget is too small
 
@@ -592,6 +624,10 @@ where did it go" is not answerable today.
   card is not on the table", which is true but misleading. Choosing the
   placement area furthest from the deck fixed it. Snapshots carry `width` and
   `height`: a test that positions things should use them.
+- Checking a dialog through its **layer** visibility
+  (`getRuntimeLayer('Dialog Layer').isVisible()`), exactly as the guide
+  recommends, is what made `starting-top-down-rpg` easy: the game shows and
+  hides a whole layer, and the test reads like the events do.
 - `setObjectPosition` on a physics body works exactly as documented,
   including for the `PhysicsCar3D` bodies — repositioning the car and the
   tank a short run-up away from their target is what made those two tests
