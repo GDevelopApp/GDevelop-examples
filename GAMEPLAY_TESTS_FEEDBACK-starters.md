@@ -18,6 +18,10 @@ grows as the batches progress.
 | `starting-top-down-pixel` | Moving in the four directions · Walls block the player |
 | `starting-flappy-bird` | Flapping with Space · Touching a hazard restarts the run |
 | `starting-clicker` | Clicking earns money · Buying the passive upgrade |
+| `starting-shootemup` | The ship fires on its own · Enemies take several hits to be destroyed |
+| `starting-endless-runner` | Running and jumping · Touching a hazard restarts the run |
+| `starting-twin-stick-shooter` | Aiming and firing with the mouse · Enemies take several hits to be destroyed |
+| `starting-vampire-survivor` | The player shoots the nearest enemy on its own · Being touched by an enemy ends the run |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -346,6 +350,25 @@ deterministic. In 3D the same reset costs ~1.4 s of wall clock, so the same
 pattern is not affordable there — one more consequence of the timeout issue
 above.
 
+### Prefer what the level already does over arranging it
+
+For `starting-endless-runner` the first version of the "hazard ends the run"
+test spawned a hazard on the player's path. It failed, and the reason is
+worth recording: the player auto-runs, and the level's **own** first hazard
+is closer than anything a test can usefully place, so the run always ended
+before reaching the spawned one. Dropping the `spawn` entirely made the test
+both simpler and stronger — it now checks that the game's own level kills
+the player. The debugging that got there was a `console.log` of the player
+and hazard positions every ten frames, which is genuinely the most effective
+tool in the harness.
+
+The same run also showed a trap in how "did we reach it" is expressed:
+comparing the player's **centre** to the hazard's **centre** never becomes
+true, because the collision (and the scene restart) happens when the
+bounding boxes touch, well before the centres meet. Assertions about
+reaching something should be written on the distance between the objects,
+not on their coordinates crossing.
+
 ### Smaller surprises
 
 - `getObjects('X')[0].behaviors.Y.state` throwing on an unknown name with
@@ -371,6 +394,18 @@ above.
   is not readable from a test script. Observing that the player object is
   back at its spawn position works, but a `getSceneRestartCount()` (or
   exposing the event log to the script) would say what the test means.
+- `spawn(name, x, y)` places the object's **origin** at `x, y`, so an object
+  whose origin is not its centre lands offset. Spawning then correcting with
+  `setObjectPosition(id, x + (wantedCenterX - snapshot.centerX), ...)` works,
+  but a `spawn(..., { centered: true })` (or simply returning a snapshot that
+  can be fed back) would remove a very repetitive three lines. Note also that
+  the snapshot returned by `spawn` is a *value*: it does not follow the
+  object, so re-reading it after a correction requires a `getObjects().find()`.
+- Games that end a run by restarting the scene (`starting-flappy-bird`,
+  `starting-endless-runner`, `starting-vampire-survivor`) are all tested the
+  same way here: move the player away from its spawn point, then wait for it
+  to be back there. It works, but three different games needed the same
+  workaround for the missing "the scene restarted" signal.
 - `setObjectPosition` on a physics body works exactly as documented,
   including for the `PhysicsCar3D` bodies — repositioning the car and the
   tank a short run-up away from their target is what made those two tests
