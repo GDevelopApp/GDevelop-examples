@@ -1,19 +1,27 @@
-# Gameplay tests feedback — starters batch: platformers, vehicles, FPS
+# Gameplay tests feedback — the `starting-*` games
 
-Starters covered (2 tests each):
+Adding one or two gameplay tests to each starter game of the repository,
+and reporting what the harness made easy, hard or impossible. This document
+grows as the batches progress.
+
+## Coverage
 
 | Starter | Tests |
 | --- | --- |
 | `starting-platformer` | Jumping with Space · Collecting the coins by running into them |
+| `starting-platformer-pixel` | Jumping with Space · Collecting the coins by running into them |
 | `starting-3D-platformer` | Jumping with Space · Collecting a coin by walking into it |
 | `starting-3d-driving` | Accelerating drives the car forward · Running a traffic cone over knocks it away |
 | `starting-3d-tank` | Firing a shell with F · Blowing a target away with a shell |
 | `starting-first-person-shooter` | Walking and strafing with WASD · Shooting a target |
+| `starting-top-down` | Moving in the four directions · Walls block the player |
+| `starting-top-down-pixel` | Moving in the four directions · Walls block the player |
+| `starting-flappy-bird` | Flapping with Space · Touching a hazard restarts the run |
+| `starting-clicker` | Clicking earns money · Buying the passive upgrade |
 
-All ten tests pass, and each was run four times in a row to check for
-flakiness (no flake; the only non-green result across those runs was the
-`Jolt is not defined` boot race described below, which is unrelated to the
-tests themselves).
+Every test listed here passes, and each was run several times in a row to
+check for flakiness. They are also run on CI against the latest Linux build
+of GDevelop published on S3 (see `scripts/run-gameplay-tests.js`).
 
 ---
 
@@ -192,6 +200,39 @@ the next), or a `probeFrames` default lowered for 3D.
   JSON, or at least a note in the CLI output that
   `gameplay-test-screenshots/` was written (it must not be committed).
 
+### 6. No way to read or set an object variable
+
+Object variables drive a lot of game state, and the harness only half
+exposes them:
+
+- **Reading** works, but by hand: `snapshot.variables` is the raw
+  `getNetworkSyncData()` array, so every read is a
+  `variables.find(one => one.name === 'Level').value` with a null check. A
+  `getObjectVariable(idOrName, variableName)` (or a plain
+  `snapshot.variableValues` map next to the array) would remove that
+  boilerplate from every test that touches game state.
+- **Writing** is not possible at all: `setSceneVariable` and
+  `setGlobalVariable` exist, there is no `setObjectVariable`. In
+  `starting-clicker` the price of the upgrade lives in an object variable of
+  the button, so the only way to reach "the player can afford the upgrade"
+  was to actually click the clicker **20 times** (80 stepped frames). With a
+  `setObjectVariable` the test could have arranged the interesting state
+  directly, as `goToScene(..., {skipCreatingInstances: true})` + `spawn`
+  allows for everything else. This is the "jump into the middle of the game"
+  story, but for object driven state.
+
+### 7. Custom objects hide the state a test wants
+
+`ScoreCounter`, `PanelSpriteButton`, `PanelSpriteContinuousBar`,
+`CombinedTank`... are events based custom objects, and their useful state is
+spread over three different places: the object's own conditions/expressions
+(`state.Score`), their properties (`state.PropertyX`), and plain object
+variables (`variables`). Nothing in a project tells a test author which one
+holds what. `console.log(Object.keys(snapshot.state))` on a first run is the
+only practical way to find out — worth mentioning explicitly in the guide,
+next to the (excellent) "reading an unknown state throws with the list of
+available names" behaviour.
+
 ---
 
 ## What was complicated or surprising
@@ -262,6 +303,49 @@ coin test only timed out. Sizing every `stepUntil` to roughly twice what the
 working case needs turns those into clean failures — worth stating as a rule
 in the guide, since the natural instinct is to leave `maxFrames` generous.
 
+### Thresholds should come from the behavior, not from a measurement
+
+The first version of the platformer jump test asserted `jumpHeight > 150`,
+a number read off a run. It is both weaker and less portable than it looks:
+`starting-platformer-pixel` is the same game with `jumpSpeed` 360 instead of
+717, so the constant broke immediately. Reading the configuration out of the
+behavior state instead:
+
+```javascript
+const { JumpSpeed, Gravity } = player.behaviors.PlatformerObject.state;
+const expectedHeight = (JumpSpeed * JumpSpeed) / (2 * Gravity);
+harness.assert(jumpHeight > 0.8 * expectedHeight, '...');
+```
+
+turns "it moved a bit" into "it moved as far as it is configured to", and
+the same test file then works unchanged on both variants. The same trick
+works for `TopDownMovement` (`Acceleration` / `MaxSpeed` give the distance a
+key press should cover). **This is probably the single most useful thing to
+put in the guide**: the state exposes the configuration, not just the
+current values, so tests rarely need magic numbers.
+
+### The same game, two variants, two different behaviours
+
+The `-pixel` starters are the same games with different art — and different
+behavior settings. `starting-top-down-pixel` has `rotateObject: false` where
+`starting-top-down` has it `true`, so an assertion on the *object's* angle
+passes on one and fails on the other. Asserting on the behavior's own
+movement angle (`behaviors.TopDownMovement.state.Angle`) works on both, and
+is closer to what the test means anyway ("the player moves in the direction
+of the key"). General rule confirmed: prefer behavior state over object
+properties, even when the object property looks like the obvious signal.
+
+### Chained measurements are polluted by the game's own physics
+
+Measuring the four directions of `starting-top-down` in a row inside one
+scene failed: `SeparateFromObjects` pushes the player away from the plants it
+bumps into, so the second and third direction started from a nudged position
+with a sideways velocity. Restarting the scene before each measurement
+(`goToScene` costs about 3 frames in 2D) makes each one independent and
+deterministic. In 3D the same reset costs ~1.4 s of wall clock, so the same
+pattern is not affordable there — one more consequence of the timeout issue
+above.
+
 ### Smaller surprises
 
 - `getObjects('X')[0].behaviors.Y.state` throwing on an unknown name with
@@ -277,6 +361,16 @@ in the guide, since the natural instinct is to leave `maxFrames` generous.
 - In `starting-3d-driving` the car's `EngineSpeed` idles at 1000, not 0, so
   "the engine is spinning" is not a proof that the accelerator works; the
   test compares against the idle value it measured rather than against zero.
+- Clicking an events based button works exactly as expected with
+  `setMousePosition(x, y, layerName)` + press / step / release / step. Using
+  the snapshot's `centerX`/`centerY` (not `x`/`y`) matters: several of these
+  objects have a non centered origin.
+- A "restart the scene" mechanic (`starting-flappy-bird` restarts the run
+  when the bird touches a hazard) has no direct signal in the harness:
+  `getSceneName()` is unchanged and the `sceneReset` entry of the event log
+  is not readable from a test script. Observing that the player object is
+  back at its spawn position works, but a `getSceneRestartCount()` (or
+  exposing the event log to the script) would say what the test means.
 - `setObjectPosition` on a physics body works exactly as documented,
   including for the `PhysicsCar3D` bodies — repositioning the car and the
   tank a short run-up away from their target is what made those two tests
