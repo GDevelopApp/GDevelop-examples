@@ -22,6 +22,9 @@ grows as the batches progress.
 | `starting-endless-runner` | Running and jumping · Touching a hazard restarts the run |
 | `starting-twin-stick-shooter` | Aiming and firing with the mouse · Enemies take several hits to be destroyed |
 | `starting-vampire-survivor` | The player shoots the nearest enemy on its own · Being touched by an enemy ends the run |
+| `starting-2d-driving` | Driving and steering · Running into a bush pushes it away |
+| `starting-physics` | The ball falls and rests on the ground · Dragging the ball with the mouse |
+| `starting-physics-pixel` | The ball falls and rests on the ground · Dragging the ball with the mouse |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -369,6 +372,50 @@ bounding boxes touch, well before the centres meet. Assertions about
 reaching something should be written on the distance between the objects,
 not on their coordinates crossing.
 
+### `stepUntil` conditions make silent false greens very easy to write
+
+This one cost a real bug in a committed-looking test, and it is a trap
+anybody writing "wait until it settles" will fall into. The condition given
+to `stepUntil` is evaluated **without stepping a frame first**, so a
+condition that reads the same value twice, or compares against a variable it
+updates itself, is true immediately:
+
+```javascript
+// Silently passes without stepping a single frame:
+let restingY = getBall().centerY;
+const settled = await harness.stepUntil(() => {
+  const current = getBall().centerY;
+  const isStill = Math.abs(current - restingY) < 0.5;
+  restingY = current;      // updated by the condition itself
+  return isStill;
+}, { maxFrames: 400 });
+```
+
+The test still *passed*, and it was only noticed because fixing it changed
+the frame count. The working form keeps the state in `onFrame` (which does
+run after each stepped frame) and keeps the condition pure:
+
+```javascript
+let previousY = getBall().centerY;
+let stillFrames = 0;
+const settled = await harness.stepUntil(() => stillFrames >= 20, {
+  maxFrames: 400,
+  onFrame: () => {
+    const currentY = getBall().centerY;
+    if (Math.abs(currentY - previousY) < 0.5) stillFrames++;
+    else stillFrames = 0;
+    previousY = currentY;
+  },
+});
+```
+
+Two suggestions: say explicitly in the guide that **the condition must be
+pure and the state must live in `onFrame`**, and — since "wait until this
+object stops moving" is needed by every physics game — add a
+`stepUntilStable(objectName, { frames, tolerance, maxFrames })` to the
+harness. `stepUntil` already has `stuckDetection`, which is the same idea
+pointed at a different purpose.
+
 ### Smaller surprises
 
 - `getObjects('X')[0].behaviors.Y.state` throwing on an unknown name with
@@ -406,6 +453,13 @@ not on their coordinates crossing.
   same way here: move the player away from its spawn point, then wait for it
   to be back there. It works, but three different games needed the same
   workaround for the missing "the scene restarted" signal.
+- Picking "the object under the player" from a group of same-named instances
+  needs care: `starting-physics` has six `Ground` instances, four of which are
+  small angled ramps, and the obvious "the highest one near the ball" picked a
+  ramp 45px above the actual floor. Choosing the widest instance (the floor)
+  was both simpler and right. A game-agnostic "what is this object resting
+  on" would need engine support; picking by a distinctive property is the
+  practical answer.
 - `setObjectPosition` on a physics body works exactly as documented,
   including for the `PhysicsCar3D` bodies — repositioning the car and the
   tank a short run-up away from their target is what made those two tests
