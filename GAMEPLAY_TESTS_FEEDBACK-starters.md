@@ -31,6 +31,8 @@ grows as the batches progress.
 | `starting-point-and-click-pixel` | Clicking sends the player there · The player walks around obstacles |
 | `starting-2d-platformer-shooter` | Shooting in the direction the player faces · Shooting a target destroys it |
 | `starting-quiz` | Only the right answer moves on · Answering every question finishes the quiz |
+| `starting-draggable-tiles` | Dragging a piece onto a free cell · Dropping a piece on a taken cell sends it back |
+| `starting-tile-placement` | Picking a tile type · Placing a tile on the board |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -258,7 +260,19 @@ fields, and `flippedX` / `flippedY` belong next to them. (The error message
 listing the available names is genuinely great — it is what made this
 diagnosable in one run.)
 
-### 9. Custom objects hide the state a test wants
+### 9. No way to ask what is at a position
+
+`starting-tile-placement` only lets a tile be built on some cells: the
+events refuse the click when the placement indicator collides with the
+tilemap or with an already placed tile. A test cannot ask the same question —
+there is no `getObjectsAt(x, y)`, no collision query, and tilemap contents
+are not exposed at all — so the test has to **click candidate cells until one
+is accepted** and only then start asserting. It works (and the search is
+honest setup, clearly separated from the checks), but a
+`getObjectsAt(x, y, objectNames?)` would replace the scan with a statement of
+intent, and would help any game built on a grid, an inventory or a board.
+
+### 10. Custom objects hide the state a test wants
 
 `ScoreCounter`, `PanelSpriteButton`, `PanelSpriteContinuousBar`,
 `CombinedTank`... are events based custom objects, and their useful state is
@@ -545,6 +559,13 @@ where did it go" is not answerable today.
   `starting-quiz` tests read the game's own data (the questions and which
   answer is the right one) instead of hardcoding it. That test would have
   been meaningless written any other way.
+- The drag recipe in the guide (move to the centre, press, move in small
+  increments, release) works exactly as written for the `Draggable`
+  behavior — `starting-draggable-tiles` passed first try with it.
+- Games with a grid make for the sharpest assertions in this whole batch:
+  `dropped.x % 64 === 0` and "it went back to the cell it came from" are
+  exact, with no tolerance to tune. When a game states a rule that precisely,
+  the test should assert the rule and not an approximate position.
 - `setObjectPosition` on a physics body works exactly as documented,
   including for the `PhysicsCar3D` bodies — repositioning the car and the
   tank a short run-up away from their target is what made those two tests
