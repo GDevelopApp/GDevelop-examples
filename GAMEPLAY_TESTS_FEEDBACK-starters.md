@@ -29,6 +29,8 @@ grows as the batches progress.
 | `starting-beatemup` | Attacking hits the enemy · The player cannot walk while attacking |
 | `starting-point-and-click` | Clicking sends the player there · The player walks around obstacles |
 | `starting-point-and-click-pixel` | Clicking sends the player there · The player walks around obstacles |
+| `starting-2d-platformer-shooter` | Shooting in the direction the player faces · Shooting a target destroys it |
+| `starting-quiz` | Only the right answer moves on · Answering every question finishes the quiz |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -245,7 +247,18 @@ covered** (only its driving is). Points are used by a lot of games to mark
 muzzles, spawn positions and directions — `snapshot.points` (a name to
 `{x, y}` map) would unlock all of them.
 
-### 8. Custom objects hide the state a test wants
+### 8. The Flippable capability is not in the snapshot
+
+A side view character's facing direction is core state — in
+`starting-2d-platformer-shooter` the events literally branch on
+`FlippedX` to decide which way the bullet goes. A test cannot read it:
+`snapshot.state.FlippedX` throws with `Available: AnimationFrameCount,
+Sprite`. `animation`, `opacity` and `text` are all promoted to snapshot
+fields, and `flippedX` / `flippedY` belong next to them. (The error message
+listing the available names is genuinely great — it is what made this
+diagnosable in one run.)
+
+### 9. Custom objects hide the state a test wants
 
 `ScoreCounter`, `PanelSpriteButton`, `PanelSpriteContinuousBar`,
 `CombinedTank`... are events based custom objects, and their useful state is
@@ -449,6 +462,26 @@ there", assert on the trajectory or on the behavior's own state, not on a
 geometry test reconstructed from the snapshot. `has2dLineOfSight` exists but
 answers a different question (is the straight line blocked *now*).
 
+### Short lived objects cannot be measured over a window
+
+The natural way to check "which way did the bullet go" is to note its
+position, step a few frames, and look again. In
+`starting-2d-platformer-shooter` that failed: bullets are deleted the moment
+they touch a target, and the one fired to the left died after ~8 frames —
+before the measurement window closed. Worse, the helper returned `null` both
+when *nothing was fired* and when *the bullet was already gone*, so the
+failure message said "Pressing X fires a bullet after turning around", which
+is the opposite of what happened. It took a frame by frame
+`console.log` of the object count to see the bullet had been there all along.
+
+Two lessons. For the test author: prefer an **instantaneous** signal over a
+delta measured across a window — here the bullets have `RotateBullet`
+enabled, so `bullet.angle` (0 or 180) says the direction immediately and the
+test became both shorter and more precise. And never let one `null` mean two
+different things. For the harness: this is the same missing piece as the
+object creation signal above — "what was created during this window, and
+where did it go" is not answerable today.
+
 ### Smaller surprises
 
 - `getObjects('X')[0].behaviors.Y.state` throwing on an unknown name with
@@ -506,6 +539,12 @@ answers a different question (is the straight line blocked *now*).
   which replaced a distance threshold that was making a test fail for the
   wrong reason (the player was still walking the last few pixels). Another
   case of "the behavior state says what the test means".
+- Structure and array scene variables read back exactly as expected:
+  `getSceneVariable('QuestionList').children` is an array of entries that
+  each carry their `name`, `type` and `value`, which made the
+  `starting-quiz` tests read the game's own data (the questions and which
+  answer is the right one) instead of hardcoding it. That test would have
+  been meaningless written any other way.
 - `setObjectPosition` on a physics body works exactly as documented,
   including for the `PhysicsCar3D` bodies — repositioning the car and the
   tank a short run-up away from their target is what made those two tests
