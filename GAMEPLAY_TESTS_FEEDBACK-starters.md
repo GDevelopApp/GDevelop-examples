@@ -33,6 +33,8 @@ grows as the batches progress.
 | `starting-quiz` | Only the right answer moves on · Answering every question finishes the quiz |
 | `starting-draggable-tiles` | Dragging a piece onto a free cell · Dropping a piece on a taken cell sends it back |
 | `starting-tile-placement` | Picking a tile type · Placing a tile on the board |
+| `starting-card-game` | Drawing a card from the deck · Putting a card back in the deck |
+| `starting-rts-unit-selection` | Selecting a unit and ordering it to move · Selecting every unit at once |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -272,7 +274,24 @@ honest setup, clearly separated from the checks), but a
 `getObjectsAt(x, y, objectNames?)` would replace the scan with a statement of
 intent, and would help any game built on a grid, an inventory or a board.
 
-### 10. Custom objects hide the state a test wants
+### 10. Selection (and anything held by a free condition) is invisible
+
+In `starting-rts-unit-selection`, whether a unit is selected lives in
+`RTSUnitSelection::IsSelected`, a **free** condition of an extension — not an
+object condition — so it appears nowhere in the object snapshot. The
+"Selected" visual is an object *effect*, and whether an effect is enabled is
+not exposed either. The tests here work around it by checking selection
+through its consequence (the selected units accept a move order and the
+others do not), which is arguably a better test — but it only exists because
+ordering a move is an immediate, observable consequence. A selection with no
+such consequence would simply not be testable.
+
+Two things would close this: evaluating an extension's **free** conditions
+that take an object list (they are as much "state of this object" as the
+object conditions are), and putting the enabled effects of an object in the
+snapshot (`effects: { Selected: true }`).
+
+### 11. Custom objects hide the state a test wants
 
 `ScoreCounter`, `PanelSpriteButton`, `PanelSpriteContinuousBar`,
 `CombinedTank`... are events based custom objects, and their useful state is
@@ -566,6 +585,13 @@ where did it go" is not answerable today.
   `dropped.x % 64 === 0` and "it went back to the cell it came from" are
   exact, with no tolerance to tune. When a game states a rule that precisely,
   the test should assert the rule and not an approximate position.
+- When arranging a drop position, the size of the dragged object matters
+  more than it looks: `starting-card-game` uses 140x190 cards, so dropping
+  one on the placement area *nearest* the deck still left it overlapping the
+  deck, and the game put it straight back — the test then reported "the drawn
+  card is not on the table", which is true but misleading. Choosing the
+  placement area furthest from the deck fixed it. Snapshots carry `width` and
+  `height`: a test that positions things should use them.
 - `setObjectPosition` on a physics body works exactly as documented,
   including for the `PhysicsCar3D` bodies — repositioning the car and the
   tank a short run-up away from their target is what made those two tests
