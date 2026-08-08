@@ -35,6 +35,47 @@ If you know how to create _Pull Requests_, you can also clone this repository an
 
 To add a game to the homepage the game have to be listed in the `scripts/generate-database.js` file.
 
+### Gameplay tests
+
+A game can contain _gameplay tests_: scripts that play the game like a player
+would (pressing keys, stepping frames) and check what happens. They are stored
+in the game's `.json` file, in a top level `tests` array, and are written and
+run from GDevelop itself.
+
+The CI runs them with the latest Linux build of GDevelop, downloaded from the
+same S3 bucket GDevelop's own CI publishes to:
+
+- on `main`, every game that has gameplay tests is tested;
+- on a branch or Pull Request, only the games it modifies are tested.
+
+To run them yourself (needs `xvfb` and the runtime libraries of Electron on
+Linux):
+
+```bash
+npm install
+
+# Every game that has gameplay tests.
+node scripts/run-gameplay-tests.js
+
+# Only the games changed compared to `main`.
+node scripts/run-gameplay-tests.js --only-changed
+
+# One game in particular.
+node scripts/run-gameplay-tests.js --projects=examples/starting-platformer/starting-platformer.json
+
+# Just list what would be tested.
+node scripts/run-gameplay-tests.js --list
+```
+
+The other options are documented at the top of the script: choosing the
+GDevelop branch or version to test with, sharding the games across several
+machines, where the results and failure screenshots are written...
+
+The tests of every game can also be run on a branch, without waiting for it to
+land on `main`, by triggering a CircleCI pipeline with the
+`run-all-gameplay-tests` parameter set to `true`. The number of parallel
+containers used is the `all-gameplay-tests-parallelism` pipeline parameter.
+
 ## License
 
 All examples provided on this repository are MIT licensed, unless specified otherwise.
