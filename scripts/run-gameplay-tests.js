@@ -19,8 +19,10 @@
  *                              `circleci tests split`).
  *   --list                     Print the project files that would be tested,
  *                              one per line, and exit. Nothing is run.
- *   --shard-index=0            Test only a slice of the projects. Defaults to
- *   --shard-total=1            CIRCLE_NODE_INDEX / CIRCLE_NODE_TOTAL.
+ *   --shard-index=0            Test only one slice of the projects, for
+ *   --shard-total=1            splitting a run by hand. NOT used by the CI,
+ *                              which splits with `circleci tests split` (and
+ *                              balances by timing) - see the note below.
  *   --gdevelop-branch=master   Branch of GDevelop to take the build from.
  *   --gdevelop-version=5.6.277 Skip reading the version from the branch.
  *   --work-dir=...             Where GDevelop is downloaded and extracted
@@ -70,10 +72,15 @@ const junitPath = path.resolve(
     path.join(repositoryPath, 'gameplay-tests-results/results.xml')
 );
 const timeoutMs = Number(args['timeout-ms']) || 15 * 60 * 1000;
-const shardTotal =
-  Number(args['shard-total'] || process.env.CIRCLE_NODE_TOTAL) || 1;
-const shardIndex =
-  Number(args['shard-index'] || process.env.CIRCLE_NODE_INDEX) || 0;
+// Sharding only happens when it is asked for explicitly. It used to default
+// to CIRCLE_NODE_INDEX/CIRCLE_NODE_TOTAL, which quietly cut the run down
+// twice on CI: `--list` returned only this container's quarter of the games,
+// `circleci tests split` then split that quarter again, and the run sharded
+// what was left once more - so each of 4 containers tested a single game
+// instead of a quarter of them. The CI splits with `circleci tests split`,
+// which balances by recorded timings; this script just runs what it is given.
+const shardTotal = Number(args['shard-total']) || 1;
+const shardIndex = Number(args['shard-index']) || 0;
 
 /**
  * Print an informational message. With `--list`, stdout is reserved for the
