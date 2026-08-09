@@ -526,10 +526,22 @@ project run again immediately afterwards succeeds. Useful detail: it only
 ever hit the **first test of a batch**; in the run above, the second test of
 the same batch passed normally right after, so the library had finished
 loading by then. *(Reported as already known and being fixed separately; the
-tests here do not work around it.)* One data point for the fix:
-`starting-first-person` reproduces it **every time**, on whichever of its
-two tests runs first — so its first test is currently red for that reason
-alone, and both tests pass when they are not the first to run.
+tests here do not work around it.)* One data point that made it easy to
+reproduce: `starting-first-person` hit it **every time**, on whichever of its
+two tests ran first — its first test was red for that reason alone, and both
+tests passed whenever they were not the first to run.
+
+**Fixed — verified.** GDevelop master commit `ba74a65` ("Wait for the game to
+be fully booted before running a gameplay test") adds
+`RuntimeGame.isStartingUp()` and makes the runner wait on it before starting a
+test, so a run request that arrives mid-boot no longer creates scenes before
+the asynchronously loaded libraries are ready. I built that commit locally and
+ran `starting-first-person` four times in a row: **8/8 tests passed**, against
+a build without the fix that failed the first test on every single run. Nothing
+in the tests had to change. Worth keeping the reproducer in mind for any future
+regression: a Physics3D game whose *first* test is the one that boots the game
+is the case that breaks, and it is invisible in any game whose first test
+happens to run second.
 
 ### The result status can be misleading when a test's own step budget is too small
 
@@ -866,7 +878,9 @@ it.
 ## Suspected runtime bugs
 
 1. **`Jolt is not defined` race at first scene load** (above) — a real
-   runtime/boot ordering bug, not a test-harness one. Known/being fixed.
+   runtime/boot ordering bug, not a test-harness one. **Now fixed** by master
+   commit `ba74a65`, and verified here over four consecutive runs of
+   `starting-first-person`, the game that reproduced it every time.
 2. **`FirstPersonPointerMapper` pitches the player with `SetRotationY`.**
    The extension's own events carry `// TODO It's probably a bad idea to
    rotate the object around Y`. Whatever the right answer is, the harness's
