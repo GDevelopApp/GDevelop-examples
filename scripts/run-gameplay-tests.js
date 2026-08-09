@@ -51,6 +51,9 @@ const {
 
 const repositoryPath = path.resolve(__dirname, '..');
 
+/** The folder GDevelop writes the screenshots of a run into. */
+const SCREENSHOTS_DIRECTORY_NAME = 'gameplay-test-screenshots';
+
 const gdevelopBranch = args['gdevelop-branch'] || 'master';
 const gdevelopVersion = args['gdevelop-version'] || undefined;
 const baseRef = args['base-ref'] || 'origin/main';
@@ -196,7 +199,7 @@ const runProjectGameplayTests = async ({
   );
   const screenshotsPath = path.join(
     path.dirname(projectPath),
-    'gameplay-test-screenshots'
+    SCREENSHOTS_DIRECTORY_NAME
   );
   // Leftovers from a previous run would be mistaken for this run's results.
   shell.rm('-f', resultsPath);
@@ -220,6 +223,20 @@ const runProjectGameplayTests = async ({
     output
   );
 
+  // The screenshots a test took are written by GDevelop next to the results,
+  // in the game folder. Move them into this game's artifacts folder, next to
+  // the results file they belong to, so that CI stores both together.
+  const artifactsScreenshotsPath = path.join(
+    projectArtifactsPath,
+    SCREENSHOTS_DIRECTORY_NAME
+  );
+  // A previous attempt of the same game (a run retried after a timeout) would
+  // otherwise end up nested inside its own folder.
+  shell.rm('-rf', artifactsScreenshotsPath);
+  if (fs.existsSync(screenshotsPath)) {
+    shell.mv(screenshotsPath, artifactsScreenshotsPath);
+  }
+
   /** @type {GameplayTestResult[]} */
   let results = [];
   let runError;
@@ -229,10 +246,24 @@ const runProjectGameplayTests = async ({
     } catch (error) {
       runError = `The results file written by GDevelop could not be read: ${error}`;
     }
-    shell.mv(resultsPath, path.join(projectArtifactsPath, 'results.json'));
-  }
-  if (fs.existsSync(screenshotsPath)) {
-    shell.mv(screenshotsPath, projectArtifactsPath);
+    shell.rm('-f', resultsPath);
+    // GDevelop records where it wrote each screenshot as an absolute path in
+    // the game folder — where they no longer are. Point them at the file
+    // sitting next to the results instead, so the stored results are usable
+    // as they are (in the CI artifacts, or downloaded).
+    for (const result of results) {
+      for (const screenshot of result.screenshots || []) {
+        if (!screenshot.file) continue;
+        screenshot.file = path.posix.join(
+          SCREENSHOTS_DIRECTORY_NAME,
+          path.basename(screenshot.file)
+        );
+      }
+    }
+    fs.writeFileSync(
+      path.join(projectArtifactsPath, 'results.json'),
+      JSON.stringify(results, null, 2)
+    );
   }
   if (!runError && results.length === 0) {
     runError = timedOut

@@ -77,6 +77,12 @@ from one CI container to the next. So a game whose run failed **only** with
 wall-clock timeouts is run a second time, and the second run is the one that
 counts. A failed assertion is never retried — that is a real result.
 
+The CI keeps one folder of artifacts per game (under `gameplay-tests/`),
+holding its `results.json`, GDevelop's output, and the screenshots its tests
+took with `harness.takeScreenshot(...)` in a `gameplay-test-screenshots/`
+folder next to the results — which refer to them by a relative path, so a
+downloaded results file still points at the right images.
+
 The tests of every game can also be run on a branch, without waiting for it to
 land on `main`, by triggering a CircleCI pipeline with the
 `run-all-gameplay-tests` parameter set to `true`. The number of parallel
