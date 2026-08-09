@@ -37,6 +37,8 @@ grows as the batches progress.
 | `starting-rts-unit-selection` | Selecting a unit and ordering it to move · Selecting every unit at once |
 | `starting-top-down-rpg` | Talking to an NPC · Saying yes in the dialog |
 | `starting-first-person` | Walking and strafing with WASD · Jumping with Space |
+| `starting-first-person-horror` | Walking and strafing with WASD · The monster comes after the player |
+| `starting-first-person-shooter-horror` | Walking and strafing with WASD · Shooting leaves an impact |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -91,6 +93,16 @@ already pointing at the target before it is aimed.
   Shooting: aim down onto a target with mouse deltas, fire, then assert both
   that the impact effect lands on the target and that the target is knocked
   over.
+- **`starting-first-person-horror`** — Movement: the same WASD scheme (the
+  Player is set up identically to the FPS one), so the movement test is the
+  same test. Monster: the whole game is "something is chasing you", so the
+  monster is brought within reach and then the player is left completely
+  alone — anything that closes the gap is the monster deciding to come.
+- **`starting-first-person-shooter-horror`** — Movement: same again.
+  Shooting: clicking has to leave a mark on the world. The player is not
+  moved or aimed at all, it simply shoots straight ahead into the level, and
+  the test checks an impact effect appeared where there was none, in front
+  of the player.
 
 ---
 
@@ -137,6 +149,16 @@ Two things would fix this, and the first is cheap:
   Note that `result.performance.avgStepMs` being tiny while a test times out
   is itself confusing: the timeout message could mention how much of the
   budget went to rendering/yielding.
+
+An extra cost of the ceiling being this low: a passing test is not
+necessarily a *safe* one. The monster test of
+`starting-first-person-horror` first passed at 27.2 s — green, but three
+seconds from failing on a slightly busier machine — and had to be shortened
+from 70 to 40 stepped frames purely for headroom. There is no signal for
+this: the run says PASSED and nothing warns that a test is spending 90 % of
+its budget. Reporting the wall-clock time against the limit (or failing a
+test that comes within, say, 20 % of it) would catch these before they turn
+into CI flakes.
 
 ### 2. `getRelativePosition` / `lookTowardWithMouseDelta` measure from the object centre, not from the camera
 
@@ -546,6 +568,56 @@ test became both shorter and more precise. And never let one `null` mean two
 different things. For the harness: this is the same missing piece as the
 object creation signal above — "what was created during this window, and
 where did it go" is not answerable today.
+
+### Arrange by moving the *other* object, not the physics character
+
+`starting-first-person-horror` needs the monster and the player near each
+other, and the obvious way to arrange that is `setObjectPosition` on the
+player — it is the object the test is about. That went badly: the player is a
+Physics3D character, and dropping it at a spot the test picked from
+coordinates alone put it inside or above unknown terrain, after which the
+physics engine threw it around. The player moved 378, then 48, then 944 units
+in three consecutive runs *while no key was pressed*, which of course
+destroys any "did the monster close the gap" measurement.
+
+Moving the **monster** instead fixed it, and moving it *along the line
+between the two* rather than to an arbitrary offset kept it on ground both of
+them can stand on. The general rule that came out of this: when a test needs
+two objects near each other, reposition the one whose exact physics state the
+test does not depend on, and place it relative to the other one rather than
+at absolute coordinates. The test then also gets a free sanity check —
+`playerMoved < 20` asserts the player really was left alone, so a repeat of
+this failure mode shows up as an explicit failure instead of a wrong number.
+
+A harness-side fix would help here: there is no way to ask "is this position
+free / on the ground", and no way to place an object in a way the physics
+world accepts (`setObjectPosition` teleports the render position and lets the
+simulation catch up). A `placeObjectNear(objectId, otherId, distance)` that
+does the right thing for physics bodies would make this class of arrangement
+one line and remove the trial and error.
+
+### A "warm up" input that itself triggers game logic ruins before/after counts
+
+The FPS tests use a first click to take pointer lock before doing anything
+meaningful, so that habit was carried into
+`starting-first-person-shooter-horror`'s shooting test. It made the test fail
+in a confusing way: the count of impact particles went from 1 to 1. The dummy
+click *was itself a shot*, it created a particle, and that particle expired
+during the frames the test stepped before the real click — so the "before"
+count was not 0, the "after" count was not 2, and the assertion
+`after > before` was simply false while the game was working perfectly.
+
+Removing the dummy click entirely was the fix — shooting only reads the mouse
+button, pointer lock is irrelevant to it — and the test got stronger as a
+result: it can now assert `particlesBefore === 0`, which pins down that the
+one particle observed at the end is unambiguously the one the test's own
+click created. Two things generalise: a warm-up input is only safe if it is
+genuinely inert for the thing being measured (check what it triggers before
+adding one), and any before/after count over short-lived objects should
+assert the "before" value, not just the direction of the change. This is the
+third test in this batch of work where short-lived objects made a
+straightforward count unreliable — see also "Short lived objects cannot be
+measured over a window" above.
 
 ### Smaller surprises
 
