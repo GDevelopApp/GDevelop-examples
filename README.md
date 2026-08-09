@@ -83,6 +83,13 @@ took with `harness.takeScreenshot(...)` in a `gameplay-test-screenshots/`
 folder next to the results — which refer to them by a relative path, so a
 downloaded results file still points at the right images.
 
+A handful of tests end with a screenshot of what the game looks like once
+the thing they check has happened (the tank's target after the shell
+exploded on it, the inventory holding the seed that was harvested, the car
+past the finish line with the lap counter at 1...). They are a few kilobytes
+each and make a run readable at a glance, so they are worth adding to a test
+whose result is something you would want to look at.
+
 The tests of every game can also be run on a branch, without waiting for it to
 land on `main`, by triggering a CircleCI pipeline with the
 `run-all-gameplay-tests` parameter set to `true`. The number of parallel
