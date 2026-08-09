@@ -130,9 +130,12 @@ const getRestrictedProjectFiles = () => {
     );
     return null;
   }
-  if (changes.requiresFullRun) {
+  if (changes.filesRequiringAFullRun.length > 0) {
+    // A change to the runner or to the CI can break any game, so testing only
+    // the games whose project file changed would say nothing about it.
     log(
-      'ℹ️ The gameplay tests runner or the CI configuration changed: testing every game.'
+      `ℹ️ Testing every game: ${changes.filesRequiringAFullRun.join(', ')} ` +
+        'changed, and that affects how every game is tested.'
     );
     return null;
   }

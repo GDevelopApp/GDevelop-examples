@@ -35,7 +35,7 @@ const runGitCommand = (command) => {
  * the base branch in the meantime are not reported as changes.
  * @param {Object} options
  * @param {string} options.baseRef For example `origin/main`.
- * @returns {{ changedFiles: string[], requiresFullRun: boolean } | null} Null
+ * @returns {{ changedFiles: string[], filesRequiringAFullRun: string[] } | null} Null
  * when the changed files could not be determined (the caller should then
  * test everything rather than nothing).
  */
@@ -65,10 +65,10 @@ const findChangedFiles = ({ baseRef }) => {
   }
 
   const changedFiles = diffOutput.split('\n').filter(Boolean);
-  const requiresFullRun = changedFiles.some((changedFile) =>
+  const filesRequiringAFullRun = changedFiles.filter((changedFile) =>
     FILES_REQUIRING_A_FULL_RUN.includes(changedFile)
   );
-  return { changedFiles, requiresFullRun };
+  return { changedFiles, filesRequiringAFullRun };
 };
 
 /**
