@@ -54,6 +54,41 @@ of GDevelop published on S3 (see `scripts/run-gameplay-tests.js`).
 
 ---
 
+## Simplifying the tests against the improved harness
+
+After `4cc37b4`, fifteen games were adapted to the harness rather than around
+it. What each fix bought:
+
+| Harness fix | What it replaced in the tests |
+| --- | --- |
+| `setMousePosition` projects through the 3D camera (item 13) | ~40 lines per game of Newton-iterated cursor search, in 4 games. The twin-stick shooter aims diagonally again instead of only straight up/down, and the RTS is back to a plain scene-coordinate selection box. |
+| Custom object children in scene coordinates (item 11) | The parent-origin arithmetic in the RPG dialog test. |
+| `getObjectVariable` (item 6) | Hand-rolled `snapshot.variables.find(...)` readers in 7 games. The enemy tests now read health by instance id, so "destroyed" is simply the variable being gone — no more re-finding the snapshot every frame. |
+| `stepUntilObjectIsStable` | The 12-line "read, compare, count still frames" loop in both physics games — the exact shape that had produced a silent false green. |
+| `getEventLog()` / `sceneReset` | "The player is back within 5px of its spawn" in 5 restart tests. The assertion now says what it means: the game restarted the level. |
+
+Two things did *not* work out, and the tests were left as they were:
+
+- **`lookTowardWithMouseDelta` has a hardcoded 3° tolerance**
+  (`toleranceDegrees = 3`). It now measures the aim correctly — on the layer's
+  camera, so the right eye height and whatever rotation the game drives, which
+  was item 2 — and it reports `aimed: true` while still 1.3° off. At the range
+  of `starting-first-person-shooter`'s target that is a clean miss, and calling
+  it a second time steps zero frames because it already considers itself
+  aimed. Exposing `toleranceDegrees` as an option would make it usable for
+  "aim well enough to hit", which is what a shooting test needs.
+- **The yaw measured from the camera is 90° out**, at least in that game.
+  `getRelativePosition('Player', target, { fromCamera })` returns
+  `yawDiff: -90.04` at a moment when the player is demonstrably facing the
+  target — the original test hits it by correcting pitch alone. Driving that
+  yaw to zero turns the view away and the shot misses. The **pitch** from the
+  same call is exactly right: it reports `-3.31°`, the same value the test
+  used to compute by hand from `player.z + player.depth`. So it looks like a
+  90° offset between the camera's yaw convention and the direction-to-target,
+  rather than anything wrong with the measurement itself.
+
+---
+
 ## What was tested, and why
 
 The pattern chosen everywhere is **one control test + one consequence
@@ -555,8 +590,15 @@ is rotated in 3D. So on a 3D layer the harness places the cursor with the flat
 `setMousePosition` invert `convertCoords` (rather than duplicate the 2D
 transform) would fix every 3D game at once.
 
-**A workaround that works today**, and which the `starting-3d-draggable-tiles`
-tests use: `getRuntimeLayer(name)` hands over the real `gdjs.RuntimeLayer`, so
+**Fixed** in master commit `4cc37b4`: `setMousePosition` (and the touch
+helpers) now project through the layer's three.js camera when the camera is
+rotated in 3D. Every workaround below is gone from the tests — the four games
+that clicked or dragged through a 3D camera lost about forty lines each, the
+twin-stick shooter went back to aiming diagonally instead of only straight up
+and down, and the RTS went back to a plain scene-coordinate selection box.
+
+The workaround that was needed before, kept here because the technique is
+useful whenever a conversion is missing: `getRuntimeLayer(name)` hands over the real `gdjs.RuntimeLayer`, so
 a test can call the *correct* conversion itself and search for the screen
 position that maps to the scene point it wants — start at the middle of the
 screen, and step toward the target along the conversion's own slope
@@ -863,12 +905,20 @@ It took logging each unit's travelled distance to see that one had moved
 exactly 0 rather than "not far enough", which is what pointed at selection
 rather than at pathfinding.
 
-The fix is to think in the coordinates the player actually works in: the box
-the player drags is a rectangle *of the screen*. Converting each unit's
-position to screen coordinates first (with the search described in item 13)
-and taking the bounding box there selected all six. Worth a line in the guide:
-anything the player draws or points at is screen-space, and on a 3D layer that
-is a genuinely different space from the scene, not just a scaled one.
+The fix at the time was to convert each unit's position to screen coordinates
+(with the search described in item 13) and take the bounding box there, which
+selected all six.
+
+**Correction.** That worked, but the diagnosis was wrong, and item 13 being
+fixed proved it: this game builds its selection box from `CursorX()`/
+`CursorY()`, so the box *is* in scene coordinates. The sixth unit was missed
+for the same single reason as everything else on this list — `setMousePosition`
+put the cursor somewhere other than where it was asked to, so the corners of
+the box were wrong. With the conversion fixed, the test went back to the plain
+2D version (bounding box of the units' own positions, ± a margin) and selects
+all six. The lasting lesson is narrower than what I first wrote: when a test
+uses the cursor, suspect the cursor before inventing a theory about the game's
+coordinate spaces.
 
 ### A death that slows time down costs six times its `Wait` in frames
 
