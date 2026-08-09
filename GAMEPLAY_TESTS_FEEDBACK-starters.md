@@ -270,17 +270,37 @@ same machine, same dev build, same tests:
 | `starting-first-person` | Jumping with Space | 407 ms/frame | 350 ms/frame | 1.2× |
 
 2D is transformed — the platformer's coin test went from 22.3 s to 10.2 s. 3D
-barely moved, and the profiler says why: on `starting-3d-driving` the average
-step is **4.25 ms** while a frame costs **371 ms** of wall clock, so **367 ms
-per frame is still not stepping**. A frame is still being rendered essentially
-every time.
+barely moved *on that machine*, and the profiler says why: on
+`starting-3d-driving` the average step is **4.25 ms** while a frame costs
+**371 ms** of wall clock, so **367 ms per frame is still not stepping**. A
+frame is still being rendered essentially every time.
 
 The reason is that the cap bounds the *interval* between renders, and a single
-3D render already costs more than that interval. Once a render takes ~350 ms,
-`now - lastRender >= 250` is true again the instant it finishes, so no render
-is ever skipped and the cap does nothing. It only bites where a render is
-*cheaper* than 250 ms — which is exactly the 2D case, and exactly where the
-budget was least tight.
+3D render on that machine already costs more than that interval. Once a render
+takes ~350 ms, `now - lastRender >= 250` is true again the instant it
+finishes, so no render is ever skipped and the cap does nothing.
+
+**Correction, from real CI hardware.** The build published to S3 now has the
+cap, so the same 76 tests can be compared before and after on CircleCI, at
+identical frame counts. There, 3D *does* benefit — my sandbox simply renders
+more slowly than a CI container, which put it on the wrong side of the
+threshold:
+
+| | Speed-up on CI |
+| --- | --- |
+| Whole suite (76 tests, 661 s → 390 s) | **1.7×** |
+| Best 2D cases (`starting-endless-runner`, `starting-clicker`, …) | **3–7.5×** |
+| 3D and first-person games | **1.2–2.9×**, typically ~1.6× |
+| A few very short tests | 0.7–0.8× (slightly slower) |
+
+So the change is a clear win, and the analysis above still holds — it just
+describes a threshold rather than a wall. The benefit fades as a render
+approaches 250 ms and disappears once it exceeds it, which is exactly the
+heavy-3D end where the budget is tightest: on CI, `starting-3d-tank`'s and
+`starting-first-person-shooter`'s tests are still 250–300 ms per frame and
+gained the least (1.2–1.5×). The handful that got *slower* are short tests
+that hardly rendered anyway, where the per-frame `setTimeout` yield is now the
+cost.
 
 Two ways to make it work for 3D, in increasing order of effect:
 
@@ -475,6 +495,22 @@ Either make the children's `centerX`/`centerY` scene coordinates like every
 other snapshot (preferred — that is what the field is documented to be), or
 say clearly in the guide that children are in the parent's space and give
 this conversion.
+
+**Fixed** in master commit `4cc37b4`, the preferred way: children's positions
+are converted to the parent's coordinate space and they now report the
+parent's layer, so `setMousePosition(child.centerX, child.centerY,
+child.layer)` works and the conversion above is gone from the test.
+
+Worth noting how it surfaced, because it will happen again as the harness
+improves: the fix *broke* the test that had worked around the old behaviour.
+The workaround added the parent's origin to a child position that was now
+already in scene coordinates, so the click landed off the button and the
+assertion reported `2 NPCs left of 2` — a failure that says nothing about
+what changed. Nothing was wrong with either the engine or the test on its
+own. It is an argument for the harness treating the shape of a snapshot as an
+API with a version, or at least for these behaviour changes being called out
+in the release notes the examples repository pins against, since a test suite
+in a separate repository cannot see them coming.
 
 ### 12. Custom objects hide the state a test wants
 
