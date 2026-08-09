@@ -43,6 +43,8 @@ grows as the batches progress.
 | `starting-3d-twin-stick-shooter` | Aiming and firing with the mouse · Enemies take several hits to be destroyed |
 | `starting-3d-vampire-survivor` | The player shoots the nearest enemy on its own · Being touched by an enemy ends the run |
 | `starting-3d-car-racing` | Accelerating drives the car forward · Driving over the finish line counts a lap |
+| `starting-3d-endless-runner` | Running and jumping · Touching a hazard restarts the run |
+| `starting-3d-draggable-tiles` | Dragging a piece onto a free cell · Dropping a piece on a taken cell sends it back |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -127,6 +129,15 @@ already pointing at the target before it is aimed.
   short run-up before the finish line and driven over it — the lap counter
   has to go up and the next checkpoint has to become the first of the new
   lap.
+- **`starting-3d-endless-runner`** — Running and jumping: the player runs on
+  its own and Space is the only control, so the test checks it moves right
+  with nothing pressed and that a jump reaches the height its behavior is
+  configured for. Hazard: touching one has to end the run and restart the
+  scene.
+- **`starting-3d-draggable-tiles`** — Dragging a piece to a free cell and
+  seeing it snap onto the 64×64 grid, and dropping one on a cell that is
+  already taken and seeing it go back where it came from. The second is the
+  rule that makes the board a board rather than a pile of movable models.
 
 ---
 
@@ -399,14 +410,31 @@ else is off by up to 30°. The failure is silent: the mouse *is* placed
 somewhere, the game aims at it perfectly, and only an assertion on the
 resulting angle reveals that it is not the direction the test meant.
 
-I worked around it by only ever aiming straight up or straight down, which is
-enough to test "the player aims where the mouse points" but rules out, for
-example, checking a diagonal aim or putting the crosshair on a moving target.
-Two fixes would help: make the conversion go through the layer's actual camera
-(the renderer already has the projection matrix — this is the same class of
-bug as `getRelativePosition` measuring from the object centre, item 2), and,
-until then, give the harness a way to *read* the cursor's scene position so a
-test can at least tell where the mouse actually landed instead of assuming.
+The cause is in the engine, and the two halves of the round trip disagree by
+design. `setMousePosition` calls `layer.convertInverseCoords`, whose own
+comment says *"This method doesn't handle 3D rotations"*; the game reads the
+cursor back through `layer.convertCoords`, which says *"This method handles
+3D rotations"* and delegates to `renderer.transformTo3DWorld` when the camera
+is rotated in 3D. So on a 3D layer the harness places the cursor with the flat
+2D transform and the game interprets it with the perspective one. Making
+`setMousePosition` invert `convertCoords` (rather than duplicate the 2D
+transform) would fix every 3D game at once.
+
+**A workaround that works today**, and which the `starting-3d-draggable-tiles`
+tests use: `getRuntimeLayer(name)` hands over the real `gdjs.RuntimeLayer`, so
+a test can call the *correct* conversion itself and search for the screen
+position that maps to the scene point it wants — start at the middle of the
+screen, and step toward the target along the conversion's own slope
+(estimated with two extra samples). It converges in a handful of iterations,
+costs no frame, and round-tripped exactly in that game: a piece grabbed at its
+centre, dragged two cells over and dropped snapped precisely onto the cell it
+was aimed at. So the fix is cheap — the right transform is already reachable,
+`setMousePosition` just isn't using it.
+
+In `starting-3d-twin-stick-shooter` I had already worked around it the poorer
+way, by only ever aiming straight up or straight down. That is enough to test
+"the player aims where the mouse points" but rules out checking a diagonal
+aim, or keeping a crosshair on a moving target.
 
 ---
 
