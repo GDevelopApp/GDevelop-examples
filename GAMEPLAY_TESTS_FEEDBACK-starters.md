@@ -250,6 +250,50 @@ window** — the "walking" checks measure 15 frames rather than 22, with the
 bar dropped from 30 to 15 units, still five times the measured standing
 drift of under 3.
 
+#### Follow-up: the render cap landed, and it fixes 2D but not 3D
+
+Master commit `4cc37b4` adds `FAST_RUN_RENDER_INTERVAL_MS = 250` — in an
+unpaced run the game renders at most once every 250 ms instead of once per
+stepped frame — and reports each test's time against its budget
+(`95 frames, 4.0s / 30s budget`), which is the other thing asked for above.
+I built it locally and re-ran four games against the previous commit on the
+same machine, same dev build, same tests:
+
+| Game | Test | Before | After | Speed-up |
+| --- | --- | --- | --- | --- |
+| `starting-platformer` | Jumping with Space | 97 ms/frame | 34 ms/frame | **2.9×** |
+| `starting-platformer` | Collecting the coins | 93 ms/frame | 43 ms/frame | **2.2×** |
+| `starting-3D-platformer` | Collecting a coin | 468 ms/frame | 350 ms/frame | 1.3× |
+| `starting-3d-driving` | Accelerating | 462 ms/frame | 367 ms/frame | 1.3× |
+| `starting-3d-driving` | Running a cone over | 438 ms/frame | 371 ms/frame | 1.2× |
+| `starting-first-person` | Walking and strafing | 384 ms/frame | 328 ms/frame | 1.2× |
+| `starting-first-person` | Jumping with Space | 407 ms/frame | 350 ms/frame | 1.2× |
+
+2D is transformed — the platformer's coin test went from 22.3 s to 10.2 s. 3D
+barely moved, and the profiler says why: on `starting-3d-driving` the average
+step is **4.25 ms** while a frame costs **371 ms** of wall clock, so **367 ms
+per frame is still not stepping**. A frame is still being rendered essentially
+every time.
+
+The reason is that the cap bounds the *interval* between renders, and a single
+3D render already costs more than that interval. Once a render takes ~350 ms,
+`now - lastRender >= 250` is true again the instant it finishes, so no render
+is ever skipped and the cap does nothing. It only bites where a render is
+*cheaper* than 250 ms — which is exactly the 2D case, and exactly where the
+budget was least tight.
+
+Two ways to make it work for 3D, in increasing order of effect:
+
+- **Bound the duty cycle instead of the interval.** After a render that took
+  `R` ms, wait until roughly `4 R` ms of stepping have elapsed before the next
+  one. That caps rendering at a fixed *share* of the run (here ~20 %) whatever
+  a render costs, instead of assuming it costs less than 250 ms. On the 3D
+  numbers above that alone would be worth about 4×.
+- **Do not render at all in a CLI run**, except the forced render before a
+  screenshot. Nothing a test observes comes from the renderer, and at 4–15 ms
+  of stepping per frame the 3D starters would run 20–70× faster than today —
+  which would retire the whole 30 s problem rather than easing it.
+
 ### 2. `getRelativePosition` / `lookTowardWithMouseDelta` measure from the object centre, not from the camera
 
 This makes the FPS aiming helpers unusable on `starting-first-person-shooter`,
