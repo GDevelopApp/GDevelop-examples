@@ -198,14 +198,36 @@ Two things would fix this, and the first is cheap:
   budget went to rendering/yielding.
 
 An extra cost of the ceiling being this low: a passing test is not
-necessarily a *safe* one. The monster test of
-`starting-first-person-horror` first passed at 27.2 s — green, but three
-seconds from failing on a slightly busier machine — and had to be shortened
-from 70 to 40 stepped frames purely for headroom. There is no signal for
-this: the run says PASSED and nothing warns that a test is spending 90 % of
-its budget. Reporting the wall-clock time against the limit (or failing a
-test that comes within, say, 20 % of it) would catch these before they turn
-into CI flakes.
+necessarily a *safe* one, and this is not hypothetical — it turned a CI run
+red. `starting-3d-driving`'s cone test passed locally at 27.6 s and timed out
+at 30.1 s on CI, and the two next-slowest tests (26.1 s and 26.0 s) were one
+bad container away from the same fate. Nothing had warned about any of them:
+the local runs said PASSED.
+
+The distribution is the problem. Across the 78 tests of that CI run the
+median is about 4 s, but the slowest ten are all 3D scenes between 17 s and
+30 s, and the *same* test can take 19.8 s in one game and 26.0 s in another
+that only differs by scene weight. So the useful signal is not the absolute
+duration, it is the fraction of the budget used. Two cheap things would have
+caught all of this before the merge:
+
+- report the wall-clock time against the limit in the run output (`24.8s /
+  30s`), so a test at 80 % of its budget is visible without doing arithmetic;
+- optionally fail — or at least warn loudly — when a test finishes within,
+  say, 20 % of the ceiling, the same way a test suite warns about slow tests.
+
+I have since gone back over every test above 20 s and shortened it (the
+worst is now 18 s locally). Three techniques did all the work, and they are
+worth recommending in the guide because none of them weakens a test:
+**stop measuring as soon as the thing has happened** — `stepUntil(() =>
+displacement > 30)` instead of `stepFrames(15)` then checking, which turned
+the tank's target test from 26.1 s to 18.0 s and the FPS shooting test from
+20 s to 12.3 s; **shorten the run-up rather than the assertion** — the
+driving test now lines the car up 90px from the cone instead of 120px;
+and **lower a threshold to match a shorter window instead of keeping the
+window** — the "walking" checks measure 15 frames rather than 22, with the
+bar dropped from 30 to 15 units, still five times the measured standing
+drift of under 3.
 
 ### 2. `getRelativePosition` / `lookTowardWithMouseDelta` measure from the object centre, not from the camera
 
