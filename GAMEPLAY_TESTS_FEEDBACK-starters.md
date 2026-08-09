@@ -39,6 +39,8 @@ grows as the batches progress.
 | `starting-first-person` | Walking and strafing with WASD · Jumping with Space |
 | `starting-first-person-horror` | Walking and strafing with WASD · The monster comes after the player |
 | `starting-first-person-shooter-horror` | Walking and strafing with WASD · Shooting leaves an impact |
+| `starting-3d-shootemup` | The ship fires on its own · Enemies take several hits to be destroyed |
+| `starting-3d-twin-stick-shooter` | Aiming and firing with the mouse · Enemies take several hits to be destroyed |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -103,6 +105,16 @@ already pointing at the target before it is aimed.
   moved or aimed at all, it simply shoots straight ahead into the level, and
   the test checks an impact effect appeared where there was none, in front
   of the player.
+- **`starting-3d-shootemup`** — Same two tests as the 2D shoot'em up, which
+  is exactly the point: the game is a top-down shooter that happens to be
+  drawn in 3D, so the ship firing on its own, the bullets flying right and
+  the arrow keys moving the ship are the same contract, and an enemy put in
+  the line of fire has to lose its three points of health and be destroyed.
+- **`starting-3d-twin-stick-shooter`** — Aiming: the player turns toward the
+  mouse and fires while the button is held, and the bullets fly where it
+  aims. Enemies: same "several hits then destroyed" check, with the enemy
+  placed in the line of fire. Both aims are straight up or straight down
+  because of the 3D camera (see below).
 
 ---
 
@@ -353,6 +365,36 @@ holds what. `console.log(Object.keys(snapshot.state))` on a first run is the
 only practical way to find out — worth mentioning explicitly in the guide,
 next to the (excellent) "reading an unknown state throws with the list of
 available names" behaviour.
+
+### 13. `setMousePosition` is wrong on a layer drawn by a 3D camera
+
+`setMousePosition(sceneX, sceneY, layer)` converts scene coordinates to
+screen coordinates the 2D way, so on a scene rendered through a 3D
+perspective camera the cursor does not end up where the test asked. In
+`starting-3d-twin-stick-shooter` (a top-down game whose camera sits above and
+behind the player) the error is large and one-sided:
+
+| Aim asked for, relative to the player | Angle the player should turn to | Angle it turned to |
+| --- | --- | --- |
+| 300 right | 0° | **-29°** |
+| 300 up | -90° | -90° |
+| 300 right and 300 up | -45° | **-58°** |
+| 300 left | 180° | **-151°** |
+
+The vertical axis is exact — a point straight above the player projects to a
+point still straight above it, whatever the camera's tilt — and everything
+else is off by up to 30°. The failure is silent: the mouse *is* placed
+somewhere, the game aims at it perfectly, and only an assertion on the
+resulting angle reveals that it is not the direction the test meant.
+
+I worked around it by only ever aiming straight up or straight down, which is
+enough to test "the player aims where the mouse points" but rules out, for
+example, checking a diagonal aim or putting the crosshair on a moving target.
+Two fixes would help: make the conversion go through the layer's actual camera
+(the renderer already has the projection matrix — this is the same class of
+bug as `getRelativePosition` measuring from the object centre, item 2), and,
+until then, give the harness a way to *read* the cursor's scene position so a
+test can at least tell where the mouse actually landed instead of assuming.
 
 ---
 
