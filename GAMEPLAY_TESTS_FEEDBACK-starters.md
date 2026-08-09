@@ -41,6 +41,8 @@ grows as the batches progress.
 | `starting-first-person-shooter-horror` | Walking and strafing with WASD · Shooting leaves an impact |
 | `starting-3d-shootemup` | The ship fires on its own · Enemies take several hits to be destroyed |
 | `starting-3d-twin-stick-shooter` | Aiming and firing with the mouse · Enemies take several hits to be destroyed |
+| `starting-3d-vampire-survivor` | The player shoots the nearest enemy on its own · Being touched by an enemy ends the run |
+| `starting-3d-car-racing` | Accelerating drives the car forward · Driving over the finish line counts a lap |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -115,6 +117,16 @@ already pointing at the target before it is aimed.
   aims. Enemies: same "several hits then destroyed" check, with the enemy
   placed in the line of fire. Both aims are straight up or straight down
   because of the 3D camera (see below).
+- **`starting-3d-vampire-survivor`** — Auto-fire: the player shoots the
+  nearest enemy in range without any input, which is the whole premise of the
+  genre, so the test puts one enemy in range and checks nothing was fired
+  before that. Death: an enemy reaching the player has to end the run.
+- **`starting-3d-car-racing`** — Driving: the accelerator revs the engine and
+  drives the car along its heading, and it stays put otherwise. Lap: what
+  makes it a *race* rather than a driving game, so the car is lined up a
+  short run-up before the finish line and driven over it — the lap counter
+  has to go up and the next checkpoint has to become the first of the new
+  lap.
 
 ---
 
@@ -660,6 +672,24 @@ assert the "before" value, not just the direction of the change. This is the
 third test in this batch of work where short-lived objects made a
 straightforward count unreliable — see also "Short lived objects cannot be
 measured over a window" above.
+
+### A death that slows time down costs six times its `Wait` in frames
+
+Several starters end a run the same way: `ChangeTimeScale 0.15`, `Wait 0.15`,
+then restart the scene. A `Wait` counts in *scene* time, so at a time scale of
+0.15 that 0.15 second takes a full second of real time — about 60 stepped
+frames, not the 9 the number suggests. In `starting-3d-vampire-survivor` I
+sized the window from the `Wait` value and the test failed with the player
+still 62px from its starting point, which reads like "the death was not
+detected" rather than "the window was too short by a factor of six".
+
+Two things would help. The `Wait` and the time scale are both visible to the
+engine, so a `stepUntil` that times out could say how much *scene* time
+elapsed next to the frame count — a test author would immediately see the
+scene ran 0.09 s while they were expecting 0.6 s. And it is worth calling out
+in the guide, because "slow time down, wait, restart" is a very common
+starter pattern and every test that checks a game-over has to step through
+it.
 
 ### Smaller surprises
 
