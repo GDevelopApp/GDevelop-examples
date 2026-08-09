@@ -45,6 +45,8 @@ grows as the batches progress.
 | `starting-3d-car-racing` | Accelerating drives the car forward · Driving over the finish line counts a lap |
 | `starting-3d-endless-runner` | Running and jumping · Touching a hazard restarts the run |
 | `starting-3d-draggable-tiles` | Dragging a piece onto a free cell · Dropping a piece on a taken cell sends it back |
+| `starting-3d-tile-placement` | Picking a tile type · Placing a tile on the board |
+| `starting-3d-rts-unit-selection` | Selecting a unit and ordering it to move · Selecting every unit at once |
 
 Every test listed here passes, and each was run several times in a row to
 check for flakiness. They are also run on CI against the latest Linux build
@@ -138,6 +140,16 @@ already pointing at the target before it is aimed.
   seeing it snap onto the 64×64 grid, and dropping one on a cell that is
   already taken and seeing it go back where it came from. The second is the
   rule that makes the board a board rather than a pile of movable models.
+- **`starting-3d-tile-placement`** — Picking a tile type in the toolbar shows
+  what is about to be placed and picking it again stops placing (the toolbar
+  is a toggle, which is easy to break); then placing that tile on the board,
+  checking it lands on the cell the indicator was showing and that clicking
+  the same cell again does not stack a second one. A click on the board
+  *before* picking a type is included as the control that places nothing.
+- **`starting-3d-rts-unit-selection`** — A drag box selects one unit and a
+  click sends it walking while the others stay put; then a box over all the
+  units sends the whole group. Same two tests as the 2D version, but the
+  selection box had to be drawn in screen coordinates (see below).
 
 ---
 
@@ -700,6 +712,28 @@ assert the "before" value, not just the direction of the change. This is the
 third test in this batch of work where short-lived objects made a
 straightforward count unreliable — see also "Short lived objects cannot be
 measured over a window" above.
+
+### A drag box is a screen rectangle, and in 3D that is not a map rectangle
+
+`starting-3d-rts-unit-selection` selects units by dragging a box over them.
+The 2D version of the same game is tested by computing the box from the units'
+positions on the map, and porting that verbatim selected five of the six
+units: the sixth sat inside the rectangle on the map and outside the
+quadrilateral that rectangle becomes on screen once a 3D camera looks at the
+ground at an angle.
+
+The failure is a bad one to debug, because everything about it looks right —
+the box is drawn, five units light up, and the assertion just reports a count.
+It took logging each unit's travelled distance to see that one had moved
+exactly 0 rather than "not far enough", which is what pointed at selection
+rather than at pathfinding.
+
+The fix is to think in the coordinates the player actually works in: the box
+the player drags is a rectangle *of the screen*. Converting each unit's
+position to screen coordinates first (with the search described in item 13)
+and taking the bounding box there selected all six. Worth a line in the guide:
+anything the player draws or points at is screen-space, and on a 3D layer that
+is a genuinely different space from the scene, not just a scaled one.
 
 ### A death that slows time down costs six times its `Wait` in frames
 
