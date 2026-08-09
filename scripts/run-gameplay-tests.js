@@ -135,6 +135,37 @@ const getRestrictedProjectFiles = () => {
 };
 
 /**
+ * Whether anything went wrong in a game's run.
+ * @param {ProjectRunResult} projectRunResult
+ */
+const hasFailure = (projectRunResult) =>
+  !!projectRunResult.runError ||
+  projectRunResult.results.some((result) => result.status !== 'passed');
+
+/**
+ * The tests of a game that ran out of the wall-clock budget GDevelop gives
+ * a single test.
+ * @param {ProjectRunResult} projectRunResult
+ */
+const timedOutTestNames = (projectRunResult) =>
+  projectRunResult.results
+    .filter((result) => result.status === 'timeout')
+    .map((result) => result.testName);
+
+/**
+ * Whether a game's run failed, and failed *only* because tests ran out of
+ * wall clock — nothing was actually asserted wrong.
+ * @param {ProjectRunResult} projectRunResult
+ */
+const onlyFailedWithTimeouts = (projectRunResult) =>
+  hasFailure(projectRunResult) &&
+  !projectRunResult.runError &&
+  timedOutTestNames(projectRunResult).length > 0 &&
+  projectRunResult.results.every(
+    (result) => result.status === 'passed' || result.status === 'timeout'
+  );
+
+/**
  * Run the gameplay tests of a single game project.
  * @param {Object} options
  * @param {string} options.executablePath
@@ -327,13 +358,40 @@ const runGDevelopCli = ({ executablePath, cliArguments }) =>
   const projectRunResults = [];
   for (const project of projects) {
     shell.echo(`\n▶ ${project.relativePath}`);
-    projectRunResults.push(
-      await runProjectGameplayTests({
+    let projectRunResult = await runProjectGameplayTests({
+      executablePath,
+      relativePath: project.relativePath,
+      exampleSlug: project.exampleSlug,
+    });
+
+    // A test that ran out of wall clock is telling us about the machine, not
+    // about the game: a gameplay test cannot ask for more than the 30s
+    // GDevelop gives it, and the time a frame takes to render on a CI
+    // container has been measured to double from one run to the next (the
+    // same test, same number of frames stepped, 14s then 30s). So a run whose
+    // only failures are timeouts is given a second chance. A failed assertion
+    // is never retried: that is a real result, and retrying it would only
+    // hide a flaky test.
+    if (onlyFailedWithTimeouts(projectRunResult)) {
+      shell.echo(
+        `   ⏱️ Only wall-clock timeouts failed (${timedOutTestNames(
+          projectRunResult
+        ).join(', ')}). Running this game once more.`
+      );
+      const retryResult = await runProjectGameplayTests({
         executablePath,
         relativePath: project.relativePath,
         exampleSlug: project.exampleSlug,
-      })
-    );
+      });
+      if (!hasFailure(retryResult)) {
+        shell.echo(
+          '   ⏱️ The second run passed: keeping it, but this game is close to the time budget.'
+        );
+      }
+      projectRunResult = retryResult;
+    }
+
+    projectRunResults.push(projectRunResult);
   }
 
   writeJUnitReport({ projectRunResults, junitPath });

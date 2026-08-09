@@ -216,7 +216,28 @@ caught all of this before the merge:
 - optionally fail — or at least warn loudly — when a test finishes within,
   say, 20 % of the ceiling, the same way a test suite warns about slow tests.
 
-I have since gone back over every test above 20 s and shortened it (the
+**Shortening the tests is not enough on its own**, and the next CI run proved
+it. A different test timed out — `starting-3d-endless-runner`'s hazard test,
+which had passed at **14.0 s** in the previous run — and the numbers show it
+was not the test's fault and not a globally slow machine either: it stepped
+*68 frames in 30.3 s* where it had stepped *73 frames in 14.0 s*, while the
+run's overall median (7.2 s → 7.5 s) and total (723 s → 699 s) barely moved.
+The per-frame render cost simply doubled for that game, in that run, on the
+same `large` resource class.
+
+That is not something a test author can size for: with a 30 s ceiling and 3D
+frames at 200–450 ms, a 2× swing puts *any* test above ~15 s at risk, and
+15 s is roughly the floor for a 3D test that does anything at all. So the CI
+runner now **re-runs a game once when its run failed only with wall-clock
+timeouts**, and never when an assertion failed — a timeout says something
+about the machine, a failed assertion says something about the game. Both
+paths are verified: a forced timeout retried and went green with a warning,
+and a deliberately failing assertion failed immediately with no retry.
+
+This is a workaround for the missing `timeoutMs` field, not a substitute for
+it. A test that could declare the budget it needs would not need any of this.
+
+Alongside that, I went back over every test above 20 s and shortened it (the
 worst is now 18 s locally). Three techniques did all the work, and they are
 worth recommending in the guide because none of them weakens a test:
 **stop measuring as soon as the thing has happened** — `stepUntil(() =>
