@@ -3,6 +3,28 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.2
 
+parameters:
+  # Run the gameplay tests of *every* example, even on a branch. Set it when
+  # triggering a pipeline (CircleCI UI or API) to check the whole repository
+  # without waiting for the change to land on `main`.
+  run-all-gameplay-tests:
+    type: boolean
+    default: false
+  # Number of parallel containers used to run the gameplay tests of every
+  # example. Raise it as more examples get gameplay tests.
+  all-gameplay-tests-parallelism:
+    type: integer
+    default: 4
+  # Same, for a branch (which usually only changes one or two games).
+  changed-gameplay-tests-parallelism:
+    type: integer
+    default: 1
+  # Branch of the GDevelop repository whose latest build is used to run the
+  # gameplay tests.
+  gdevelop-branch:
+    type: string
+    default: master
+
 jobs:
   install:
     docker:
@@ -50,6 +72,115 @@ jobs:
       - aws-cli/setup
       - run: npm run deploy -- --cf-zoneid $CLOUDFLARE_ZONE_ID --cf-token $CLOUDFLARE_TOKEN
 
+  # Run the gameplay tests of the example games with a real GDevelop: the
+  # latest Linux build published on S3 by GDevelop's own CI is downloaded and
+  # used to open each game in CLI mode.
+  gameplay-tests:
+    parameters:
+      scope:
+        description: >
+          "all" tests every game of the repository that has gameplay tests.
+          "changed" only tests the games modified compared to `main`.
+        type: enum
+        enum: ['all', 'changed']
+        default: 'all'
+      parallelism:
+        description: Number of containers the games are split across.
+        type: integer
+        default: 1
+      resource-class:
+        description: >
+          The games are rendered in software (no GPU on CI), which is what
+          makes them slow: give them enough CPU.
+        type: string
+        default: large
+    parallelism: << parameters.parallelism >>
+    resource_class: << parameters.resource-class >>
+    docker:
+      # Same image as the job of the GDevelop repository that runs its
+      # portable Linux build headlessly.
+      - image: cimg/node:24.13.0
+    working_directory: ~/GDevelop-examples
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install the runtime dependencies of GDevelop
+          # Even in CLI mode, Electron needs these libraries and a display to
+          # start up on a headless machine.
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libnss3 \
+              libasound2t64 \
+              libgbm1 \
+              libgtk-3-0 \
+              libxss1 \
+              libatk-bridge2.0-0 \
+              libdrm2 \
+              libxkbcommon0 \
+              xvfb
+
+      - run:
+          name: Install the dependencies of the scripts
+          # Only the runtime dependencies are needed to run the games.
+          command: npm ci --omit=dev
+
+      - run:
+          name: List the games to test
+          command: |
+            if [ "<< parameters.scope >>" = "changed" ]; then
+              node scripts/run-gameplay-tests.js --list \
+                --only-changed --base-ref=origin/main > /tmp/games.txt
+            else
+              node scripts/run-gameplay-tests.js --list > /tmp/games.txt
+            fi
+            echo "Games with gameplay tests to run:"
+            cat /tmp/games.txt
+
+      - run:
+          name: Split the games across the parallel containers
+          # Balanced using the durations recorded by `store_test_results` on
+          # the previous runs (falls back to an even split the first time).
+          command: |
+            if [ -s /tmp/games.txt ]; then
+              circleci tests split --split-by=timings --timings-type=filename \
+                < /tmp/games.txt > /tmp/games-for-this-container.txt
+            else
+              : > /tmp/games-for-this-container.txt
+            fi
+            echo "Games for this container:"
+            cat /tmp/games-for-this-container.txt
+
+      - run:
+          name: Run the gameplay tests
+          # A single game can legitimately take a few minutes: the games are
+          # rendered in software on CI.
+          no_output_timeout: 30m
+          # The failure is reported by the last step of the job, so that the
+          # results and artifacts of a failing run are uploaded first (they
+          # are exactly what is needed to understand the failure).
+          command: |
+            set +e
+            node scripts/run-gameplay-tests.js \
+              --projects-file=/tmp/games-for-this-container.txt \
+              --gdevelop-branch=<< pipeline.parameters.gdevelop-branch >> \
+              --work-dir=/tmp/gdevelop-portable \
+              --artifacts-dir=/tmp/gameplay-tests-artifacts \
+              --junit-path=/tmp/gameplay-tests-results/results.xml
+            echo $? > /tmp/gameplay-tests-exit-code
+
+      - store_test_results:
+          path: /tmp/gameplay-tests-results
+      - store_artifacts:
+          path: /tmp/gameplay-tests-artifacts
+          destination: gameplay-tests
+
+      - run:
+          name: Report whether the gameplay tests passed
+          command: exit "$(cat /tmp/gameplay-tests-exit-code)"
+
 workflows:
   tests:
     jobs:
@@ -67,3 +198,29 @@ workflows:
           filters:
             branches:
               only: main
+
+  # On `main` (or when explicitly asked for): check that every gameplay test
+  # of the repository still passes.
+  all-gameplay-tests:
+    when:
+      or:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.run-all-gameplay-tests >>
+    jobs:
+      - gameplay-tests:
+          name: gameplay-tests-all
+          scope: 'all'
+          parallelism: << pipeline.parameters.all-gameplay-tests-parallelism >>
+
+  # On a branch / Pull Request: only check the games it modifies.
+  changed-gameplay-tests:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - not: << pipeline.parameters.run-all-gameplay-tests >>
+    jobs:
+      - gameplay-tests:
+          name: gameplay-tests-changed
+          scope: 'changed'
+          parallelism: << pipeline.parameters.changed-gameplay-tests-parallelism >>
