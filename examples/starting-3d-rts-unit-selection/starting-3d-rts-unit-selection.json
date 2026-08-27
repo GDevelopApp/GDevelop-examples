@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 274,
+    "build": 280,
     "major": 5,
     "minor": 6,
     "revision": 0
@@ -200,7 +200,14 @@
         "gameEditorMode": "embedded-game"
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "ControlType",
+          "persistentUuid": "72236269-d4a0-4899-a5f6-491837afd6ae",
+          "type": "string",
+          "value": "Keyboard"
+        }
+      ],
       "instances": [
         {
           "angle": -90,
@@ -602,6 +609,7 @@
         {
           "assetStoreId": "",
           "name": "SelectionTool_Hidden",
+          "persistentUuid": "61917cc0-5a59-473c-92b9-97c220af68b4",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "effects": [],
@@ -613,14 +621,14 @@
           "clearBetweenFrames": true,
           "antialiasing": "low",
           "fillColor": {
-            "r": 67,
-            "g": 65,
-            "b": 66
+            "r": 103,
+            "g": 92,
+            "b": 223
           },
           "outlineColor": {
-            "r": 90,
-            "g": 88,
-            "b": 88
+            "r": 103,
+            "g": 92,
+            "b": 223
           }
         },
         {
@@ -870,11 +878,13 @@
           "variables": [
             {
               "name": "SelectionStartX",
+              "persistentUuid": "1a3d3f47-dd1b-4b11-a3ca-a65a6393730b",
               "type": "number",
               "value": 0
             },
             {
               "name": "SelectionStartY",
+              "persistentUuid": "826ac7b6-2c18-4657-8256-fee2e836763e",
               "type": "number",
               "value": 0
             }
@@ -1005,125 +1015,601 @@
                 ""
               ]
             }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "MouseButtonFromTextPressed"
-              },
-              "parameters": [
-                "",
-                "\"Left\""
-              ]
-            },
-            {
-              "type": {
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": []
-            }
           ],
-          "actions": [
-            {
-              "type": {
-                "value": "ResetTimer"
-              },
-              "parameters": [
-                "",
-                "\"UnitSelection\""
-              ]
-            }
-          ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "Unit movement"
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "MouseButtonFromTextReleased"
-              },
-              "parameters": [
-                "",
-                "\"Left\""
-              ]
-            }
-          ],
-          "actions": [],
           "events": [
             {
-              "type": "BuiltinCommonInstructions::ForEach",
-              "object": "RTSUnit",
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Touchscreen Check"
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
-                    "value": "RTSUnitSelection::IsSelected"
+                    "value": "SystemInfo::HasTouchScreen"
                   },
                   "parameters": [
-                    "",
-                    "RTSUnit",
                     ""
                   ]
-                },
-                {
-                  "type": {
-                    "value": "CompareTimer"
-                  },
-                  "parameters": [
-                    "",
-                    "\"UnitSelection\"",
-                    "<",
-                    "0.2"
-                  ]
                 }
               ],
               "actions": [
                 {
                   "type": {
-                    "value": "PathfindingBehavior::SetDestination"
+                    "value": "SetStringVariable"
                   },
                   "parameters": [
-                    "RTSUnit",
-                    "Pathfinding",
-                    "",
-                    "CursorX() + RandomWithStep(-20*UnitCount,+20*UnitCount,40)",
-                    "CursorY() + RandomWithStep(-20*UnitCount,+20*UnitCount,40)"
+                    "ControlType",
+                    "=",
+                    "\"Touchscreen\""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "folded": true,
+          "name": "Touchscreen controls",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "ControlType",
+                    "=",
+                    "\"Touchscreen\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Left\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ResetTimer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"UnitSelection\""
+                      ]
+                    }
                   ]
                 },
                 {
-                  "type": {
-                    "value": "SetNumberVariable"
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
                   },
-                  "parameters": [
-                    "UnitCount",
-                    "+",
-                    "1"
+                  "comment": "Unit movement"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonFromTextReleased"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Left\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "RTSUnit",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "RTSUnitSelection::IsSelected"
+                          },
+                          "parameters": [
+                            "",
+                            "RTSUnit",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "CompareTimer"
+                          },
+                          "parameters": [
+                            "",
+                            "\"UnitSelection\"",
+                            "<",
+                            "0.2"
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PathfindingBehavior::SetDestination"
+                          },
+                          "parameters": [
+                            "RTSUnit",
+                            "Pathfinding",
+                            "",
+                            "CursorX() + RandomWithStep(-20*UnitCount,+20*UnitCount,40)",
+                            "CursorY() + RandomWithStep(-20*UnitCount,+20*UnitCount,40)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "UnitCount",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "name": "UnitCount",
+                      "type": "number",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Unit selection"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareTimer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"UnitSelection\"",
+                        ">=",
+                        "0.2"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "RTSUnitSelection::RTSUnitSelection"
+                      },
+                      "parameters": [
+                        "",
+                        "RTSUnit",
+                        "SelectionTool_Hidden",
+                        "",
+                        "CursorY()+2000",
+                        "Add",
+                        "Subtract",
+                        "Left",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Hide"
+                      },
+                      "parameters": [
+                        "SelectionTool_Hidden"
+                      ]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "SelectionTool_3DSprite",
+                            "CursorX()",
+                            "CursorY()",
+                            "\"Selection Draw Layer\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "Object3D",
+                            "=",
+                            "3"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberObjectVariable"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "SelectionStartX",
+                            "=",
+                            "SelectionTool_3DSprite.X()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberObjectVariable"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "SelectionStartY",
+                            "=",
+                            "SelectionTool_3DSprite.Y()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "MouseButtonFromTextPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "\"Left\""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "SetXY"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "=",
+                            "min(CursorX(), SelectionTool_3DSprite.SelectionStartX)",
+                            "=",
+                            "min(CursorY(), SelectionTool_3DSprite.SelectionStartY)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResizableCapability::ResizableBehavior::SetSize"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "Resizable",
+                            "abs(CursorX() - SelectionTool_3DSprite.SelectionStartX)",
+                            "abs(CursorY() - SelectionTool_3DSprite.SelectionStartY)"
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               ]
             }
           ],
-          "variables": [
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "folded": true,
+          "name": "Keyboard controls",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
-              "name": "UnitCount",
-              "type": "number",
-              "value": 0
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "StringVariable"
+                  },
+                  "parameters": [
+                    "ControlType",
+                    "=",
+                    "\"Keyboard\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Unit movement"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonFromTextReleased"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Right\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "RTSUnit",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "RTSUnitSelection::IsSelected"
+                          },
+                          "parameters": [
+                            "",
+                            "RTSUnit",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "PathfindingBehavior::SetDestination"
+                          },
+                          "parameters": [
+                            "RTSUnit",
+                            "Pathfinding",
+                            "",
+                            "CursorX() + RandomWithStep(-20*UnitCount,+20*UnitCount,40)",
+                            "CursorY() + RandomWithStep(-20*UnitCount,+20*UnitCount,40)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberVariable"
+                          },
+                          "parameters": [
+                            "UnitCount",
+                            "+",
+                            "1"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "variables": [
+                    {
+                      "name": "UnitCount",
+                      "type": "number",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Unit selection"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "RTSUnitSelection::RTSUnitSelection"
+                      },
+                      "parameters": [
+                        "",
+                        "RTSUnit",
+                        "SelectionTool_Hidden",
+                        "",
+                        "CursorY()+2000",
+                        "Add",
+                        "Subtract",
+                        "Left",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "MouseButtonFromTextPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Left\""
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "SelectionTool_3DSprite",
+                            "CursorX()",
+                            "CursorY()",
+                            "\"Selection Draw Layer\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "Object3D",
+                            "=",
+                            "3"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberObjectVariable"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "SelectionStartX",
+                            "=",
+                            "SelectionTool_3DSprite.X()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetNumberObjectVariable"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "SelectionStartY",
+                            "=",
+                            "SelectionTool_3DSprite.Y()"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Hide"
+                          },
+                          "parameters": [
+                            "SelectionTool_Hidden"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetXY"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "=",
+                            "min(CursorX(), SelectionTool_3DSprite.SelectionStartX)",
+                            "=",
+                            "min(CursorY(), SelectionTool_3DSprite.SelectionStartY)"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ResizableCapability::ResizableBehavior::SetSize"
+                          },
+                          "parameters": [
+                            "SelectionTool_3DSprite",
+                            "Resizable",
+                            "abs(CursorX() - SelectionTool_3DSprite.SelectionStartX)",
+                            "abs(CursorY() - SelectionTool_3DSprite.SelectionStartY)"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
-          ]
+          ],
+          "parameters": []
         },
         {
           "type": "BuiltinCommonInstructions::Comment",
@@ -1135,148 +1621,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Unit selection"
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "CompareTimer"
-              },
-              "parameters": [
-                "",
-                "\"UnitSelection\"",
-                ">=",
-                "0.2"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "RTSUnitSelection::RTSUnitSelection"
-              },
-              "parameters": [
-                "",
-                "RTSUnit",
-                "SelectionTool_Hidden",
-                "",
-                "CursorY()+2000",
-                "Add",
-                "Subtract",
-                "Left",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "Hide"
-              },
-              "parameters": [
-                "SelectionTool_Hidden"
-              ]
-            }
-          ],
-          "events": [
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Create"
-                  },
-                  "parameters": [
-                    "",
-                    "SelectionTool_3DSprite",
-                    "CursorX()",
-                    "CursorY()",
-                    "\"Selection Draw Layer\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::SetZ"
-                  },
-                  "parameters": [
-                    "SelectionTool_3DSprite",
-                    "Object3D",
-                    "=",
-                    "3"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetNumberObjectVariable"
-                  },
-                  "parameters": [
-                    "SelectionTool_3DSprite",
-                    "SelectionStartX",
-                    "=",
-                    "SelectionTool_3DSprite.X()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "SetNumberObjectVariable"
-                  },
-                  "parameters": [
-                    "SelectionTool_3DSprite",
-                    "SelectionStartY",
-                    "=",
-                    "SelectionTool_3DSprite.Y()"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "MouseButtonFromTextPressed"
-                  },
-                  "parameters": [
-                    "",
-                    "\"Left\""
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "SetXY"
-                  },
-                  "parameters": [
-                    "SelectionTool_3DSprite",
-                    "=",
-                    "min(CursorX(), SelectionTool_3DSprite.SelectionStartX)",
-                    "=",
-                    "min(CursorY(), SelectionTool_3DSprite.SelectionStartY)"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "ResizableCapability::ResizableBehavior::SetSize"
-                  },
-                  "parameters": [
-                    "SelectionTool_3DSprite",
-                    "Resizable",
-                    "abs(CursorX() - SelectionTool_3DSprite.SelectionStartX)",
-                    "abs(CursorY() - SelectionTool_3DSprite.SelectionStartY)"
-                  ]
-                }
-              ]
-            }
-          ]
+          "comment": "Delete selection box"
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -1548,9 +1893,9 @@
   "externalEvents": [],
   "tests": [
     {
+      "description": "A drag box selects one unit, and a click sends it walking there while the other units stay put.",
       "name": "Selecting a unit and ordering it to move",
       "type": "gameplay",
-      "description": "A drag box selects one unit, and a click sends it walking there while the other units stay put.",
       "source": [
         "// The core of the game: units are selected with a drag box, and a click",
         "// then orders the selected ones (and only those) to walk there.",
@@ -1667,9 +2012,9 @@
       ]
     },
     {
+      "description": "A drag box over all the units selects them, and one click sends the whole group walking.",
       "name": "Selecting every unit at once",
       "type": "gameplay",
-      "description": "A drag box over all the units selects them, and one click sends the whole group walking.",
       "source": [
         "// A drag box over several units selects them all, and one click sends the",
         "// whole group.",
