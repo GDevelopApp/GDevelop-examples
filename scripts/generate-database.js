@@ -2,6 +2,7 @@
 const shell = require('shelljs');
 const path = require('path');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const { constants } = require('fs');
 const crypto = require('crypto');
 const {
@@ -15,6 +16,15 @@ const allLicenses = require('./lib/licenses.json');
 const args = require('minimist')(process.argv.slice(2));
 const { loadSerializedProject } = require('./lib/LocalProjectOpener');
 const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
+const {
+  loadThemeSlotsVocabulary,
+  checkStarterThemeSlots,
+} = require('./lib/ThemeSlots');
+const {
+  applyThemeToStarter,
+  getThemedStarterFileName,
+} = require('./lib/StarterThemer');
+const { default: axios } = require('axios');
 
 /** @typedef {import('./lib/FileTreeParser.js').DreeWithMetadata} DreeWithMetadata */
 /** @typedef {import('./types').libGDevelop} libGDevelop */
@@ -672,6 +682,103 @@ const createPlatformExtensionsMap = (gd) => {
   return platformExtensionsMap;
 };
 
+// With `--staging`, the build is meant for the staging deployment (made from
+// any branch but `main`): it uses the themes of the staging assets, so a theme
+// and the starters re-skinned with it can be tried before anything is merged.
+const staging = args['staging'] !== undefined;
+const publicBaseUrl = staging
+  ? 'https://resources.gdevelop-app.com/staging'
+  : 'https://resources.gdevelop-app.com';
+
+// The themes are built and published by the assets repository.
+const THEMES_BASE_URL = `${publicBaseUrl}/assets-database/themes`;
+
+/**
+ * The published themes. No theme published yet is a valid answer (the file is
+ * then missing); any other failure aborts the build, as publishing an empty
+ * list would silently turn the themes off.
+ * @returns {Promise<Array<import('./lib/StarterThemer.js').Theme>>}
+ */
+const fetchThemes = async () => {
+  /** @type {Array<{id: string}>} */
+  let themeShortHeaders = [];
+  try {
+    themeShortHeaders = (await axios.get(`${THEMES_BASE_URL}/themes.json`))
+      .data;
+  } catch (error) {
+    const status = error.response && error.response.status;
+    if (status === 403 || status === 404) {
+      console.info('ℹ️ No theme is published yet: no themed starter to build.');
+      return [];
+    }
+    throw error;
+  }
+
+  return Promise.all(
+    themeShortHeaders.map(
+      async ({ id }) => (await axios.get(`${THEMES_BASE_URL}/${id}.json`)).data
+    )
+  );
+};
+
+/**
+ * Write, next to each 3D starter, a copy of it re-skinned with each theme
+ * (`<slug>.theme-<id>.json`). They sit in the starter's folder so the resources
+ * it refers to by a relative path still resolve, and are not examples of their
+ * own: only `themedStarters.json` lists them.
+ * @param {Object.<string, any>} themeSlotsByStarterSlug
+ * @param {Object.<string, string>} starterFilePathBySlug
+ * @returns {Promise<Array<{id: string, name: string, description: string, starters: Object.<string, string>}>>}
+ */
+const generateThemedStarters = async (
+  themeSlotsByStarterSlug,
+  starterFilePathBySlug
+) => {
+  const themes = await fetchThemes();
+  const themedStarters = [];
+
+  for (const theme of themes) {
+    // Starter slug -> URL of its copy re-skinned with the theme.
+    /** @type {Object.<string, string>} */
+    const starters = {};
+    for (const slug of Object.keys(themeSlotsByStarterSlug)) {
+      const starterFilePath = starterFilePathBySlug[slug];
+      const projectObject = JSON.parse(
+        await fs.readFile(starterFilePath, 'utf8')
+      );
+      const { changedObjectsCount, changedResourcesCount } =
+        applyThemeToStarter(
+          projectObject,
+          themeSlotsByStarterSlug[slug],
+          theme
+        );
+      if (!changedObjectsCount && !changedResourcesCount) continue;
+
+      const themedStarterFilePath = path.join(
+        path.dirname(starterFilePath),
+        getThemedStarterFileName(slug, theme.id)
+      );
+      await fs.writeFile(themedStarterFilePath, JSON.stringify(projectObject));
+      starters[slug] = `${publicBaseUrl}/examples/${normalizePathSeparators(
+        path.relative(examplesRootPath, themedStarterFilePath)
+      )}`;
+    }
+    console.info(
+      `ℹ️ Theme "${theme.id}": ${
+        Object.keys(starters).length
+      } themed starters written.`
+    );
+    themedStarters.push({
+      id: theme.id,
+      name: theme.name,
+      description: theme.description,
+      starters,
+    });
+  }
+
+  return themedStarters;
+};
+
 /**
  * Discover all examples and extract information from them.
  */
@@ -741,6 +848,55 @@ const createPlatformExtensionsMap = (gd) => {
     shell.exit(1);
   }
 
+  // Which objects of each 3D starter a theme re-skins. Checked against the
+  // starter itself so an unmapped object can never ship, then published in
+  // one file for the editor.
+  const themeSlotsVocabulary = await loadThemeSlotsVocabulary();
+  /** @type {Object.<string, any>} */
+  const themeSlotsByStarterSlug = {};
+  /** @type {Object.<string, string>} */
+  const starterFilePathBySlug = {};
+  /** @type {Error[]} */
+  const themeSlotsErrors = [];
+  for (const fileWithMetadata of allExampleFiles) {
+    const slug = path.basename(path.dirname(fileWithMetadata.path));
+    if (!slug.startsWith('starting-') || !fileWithMetadata.parsedContent) {
+      continue;
+    }
+    const themeSlotsPath = path.join(
+      path.dirname(fileWithMetadata.path),
+      'theme-slots.json'
+    );
+    const starterThemeSlots = fsSync.existsSync(themeSlotsPath)
+      ? JSON.parse(await fs.readFile(themeSlotsPath, 'utf8'))
+      : null;
+    themeSlotsErrors.push(
+      ...checkStarterThemeSlots(
+        themeSlotsVocabulary,
+        slug,
+        fileWithMetadata.parsedContent,
+        starterThemeSlots
+      )
+    );
+    if (starterThemeSlots) {
+      themeSlotsByStarterSlug[slug] = starterThemeSlots;
+      starterFilePathBySlug[slug] = fileWithMetadata.path;
+    }
+  }
+  if (themeSlotsErrors.length) {
+    console.error(
+      'There were errors while checking the starter theme slots:',
+      themeSlotsErrors
+    );
+    console.info('Aborting because of these errors.');
+    shell.exit(1);
+  }
+
+  const themedStarters = await generateThemedStarters(
+    themeSlotsByStarterSlug,
+    starterFilePathBySlug
+  );
+
   try {
     shell.mkdir('-p', databaseRootPath);
     shell.mkdir('-p', path.join(databaseRootPath, 'examples'));
@@ -758,6 +914,20 @@ const createPlatformExtensionsMap = (gd) => {
     await fs.writeFile(
       path.join(databaseRootPath, 'exampleShortHeaders.json'),
       JSON.stringify(exampleShortHeaders)
+    );
+
+    await fs.writeFile(
+      path.join(databaseRootPath, 'themedStarters.json'),
+      JSON.stringify({ version: 1, themes: themedStarters })
+    );
+
+    await fs.writeFile(
+      path.join(databaseRootPath, 'themeSlots.json'),
+      JSON.stringify({
+        version: themeSlotsVocabulary.version,
+        slots: themeSlotsVocabulary.slots,
+        starters: themeSlotsByStarterSlug,
+      })
     );
 
     await fs.writeFile(
