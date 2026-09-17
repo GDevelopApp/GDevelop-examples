@@ -5,8 +5,12 @@ const args = require('minimist')(process.argv.slice(2));
 
 const databasePath = path.join(__dirname, '../dist/database');
 const examplesPath = path.join(__dirname, '../dist/examples');
-const databaseDestination = `s3://resources.gdevelop-app.com/examples-database`;
-const examplesDestination = `s3://resources.gdevelop-app.com/examples`;
+// With `--staging`, deploy next to the live examples without touching them,
+// like the assets repository does. Made from any branch but `main`.
+const staging = args['staging'] !== undefined;
+const prefix = staging ? 'staging/' : '';
+const databaseDestination = `s3://resources.gdevelop-app.com/${prefix}examples-database`;
+const examplesDestination = `s3://resources.gdevelop-app.com/${prefix}examples`;
 
 if (!args['cf-zoneid'] || !args['cf-token']) {
   shell.echo(
@@ -60,8 +64,10 @@ axios
     {
       files: [
         // Update the "database"
-        'https://resources.gdevelop-app.com/examples-database/exampleShortHeaders.json',
-        'https://resources.gdevelop-app.com/examples-database/filters.json',
+        `https://resources.gdevelop-app.com/${prefix}examples-database/exampleShortHeaders.json`,
+        `https://resources.gdevelop-app.com/${prefix}examples-database/filters.json`,
+        `https://resources.gdevelop-app.com/${prefix}examples-database/themeSlots.json`,
+        `https://resources.gdevelop-app.com/${prefix}examples-database/themedStarters.json`,
       ],
     },
     {
