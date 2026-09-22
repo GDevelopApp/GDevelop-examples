@@ -8,6 +8,7 @@
  * @typedef {{
  *   kind: 'model' | 'texture',
  *   file: string,
+ *   resourceName: string,
  *   objectContent?: any,
  *   assetStoreId?: string,
  *   origin?: {name: string, identifier: string},
@@ -149,8 +150,8 @@ const getSizeRatio = (objectContent, themeContent) => {
  * its name, behaviors, variables, instances, origin and center; a cube face or
  * a skybox face points at the theme image.
  *
- * Resources are repointed in place, keeping their names, so nothing else in
- * the project has to be renamed.
+ * Each theme file becomes a resource named like in the asset store, and the
+ * resources of the starter that nothing uses anymore are removed.
  *
  * @param {any} projectObject
  * @param {StarterThemeSlots} starterThemeSlots
@@ -172,51 +173,55 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
   /** @type {Set<string>} */
   const missingSlots = new Set();
   /** @type {Set<string>} */
-  const changedResourceNames = new Set();
-  /** @type {Map<string, string>} */
-  const slotIdByResourceName = new Map();
+  const themeResourceNames = new Set();
+  /** @type {Set<string>} */
+  const replacedResourceNames = new Set();
   let changedObjectsCount = 0;
 
   /**
-   * Point the resource of that name at the theme file and return the name to
-   * reference. Objects sharing a resource but playing different slots each get
-   * their own copy, so one does not overwrite the other.
-   * @param {string} resourceName
+   * Add the resource of a slot to the project, configured like the resource it
+   * replaces, and return its name.
+   * @param {string} replacedResourceName
    * @param {string} slotId
    * @returns {string | null}
    */
-  const repointResource = (resourceName, slotId) => {
+  const useThemeResource = (replacedResourceName, slotId) => {
     const slot = theme.slots[slotId];
     if (!slot) {
       missingSlots.add(slotId);
       return null;
     }
-    const resource = resourceByName.get(resourceName);
-    if (!resource) return null;
+    const replacedResource = resourceByName.get(replacedResourceName);
+    if (!replacedResource) return null;
 
-    const alreadyAppliedSlotId = slotIdByResourceName.get(resourceName);
-    let themedResource = resource;
-    if (alreadyAppliedSlotId && alreadyAppliedSlotId !== slotId) {
-      const copyName = `${resourceName} (${slotId})`;
-      themedResource = resourceByName.get(copyName) || {
-        ...resource,
-        name: copyName,
-      };
-      if (!resourceByName.has(copyName)) {
-        resources.push(themedResource);
-        resourceByName.set(copyName, themedResource);
-      }
+    // A resource of the starter can already have that name: number the new one.
+    let name = slot.resourceName;
+    for (
+      let index = 2;
+      resourceByName.has(name) && resourceByName.get(name).file !== slot.file;
+      index++
+    ) {
+      name = `${slot.resourceName} ${index}`;
     }
 
-    themedResource.file = slot.file;
-    themedResource.origin = slot.origin || {
-      name: 'gdevelop-asset-store',
-      identifier: slot.file,
-    };
-    slotIdByResourceName.set(themedResource.name, slotId);
+    if (!resourceByName.has(name)) {
+      const themeResource = {
+        ...replacedResource,
+        name,
+        file: slot.file,
+        origin: slot.origin || {
+          name: 'gdevelop-asset-store',
+          identifier: slot.file,
+        },
+      };
+      resources.push(themeResource);
+      resourceByName.set(name, themeResource);
+    }
+
     appliedSlots.add(slotId);
-    changedResourceNames.add(themedResource.name);
-    return themedResource.name;
+    themeResourceNames.add(name);
+    replacedResourceNames.add(replacedResourceName);
+    return name;
   };
 
   Object.entries(starterThemeSlots.objects || {}).forEach(
@@ -232,7 +237,7 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
           missingSlots.add(mapping);
           return;
         }
-        const modelResourceName = repointResource(
+        const modelResourceName = useThemeResource(
           objectContent.modelResourceName,
           mapping
         );
@@ -242,7 +247,6 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
         const sizeRatio = getSizeRatio(objectContent, themeContent);
         object.content = {
           ...themeContent,
-          // Keep pointing at the project's own resource, now holding the theme model.
           modelResourceName,
           animations: mergeModel3DAnimations(
             objectContent.animations || [],
@@ -268,9 +272,9 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
           const faceProperty = cubeFaceProperties[face];
           const resourceName = objectContent[faceProperty];
           if (!slotId || !resourceName) return;
-          const themedResourceName = repointResource(resourceName, slotId);
-          if (!themedResourceName) return;
-          objectContent[faceProperty] = themedResourceName;
+          const themeResourceName = useThemeResource(resourceName, slotId);
+          if (!themeResourceName) return;
+          objectContent[faceProperty] = themeResourceName;
           changed = true;
         });
         if (changed) changedObjectsCount++;
@@ -285,22 +289,36 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
       Object.entries(parameters).forEach(([parameter, slotId]) => {
         const resourceName = effect.stringParameters[parameter];
         if (!resourceName) return;
-        const themedResourceName = repointResource(
+        const themeResourceName = useThemeResource(
           String(resourceName),
           slotId
         );
-        if (themedResourceName) {
-          effect.stringParameters[parameter] = themedResourceName;
+        if (themeResourceName) {
+          effect.stringParameters[parameter] = themeResourceName;
         }
       });
     }
+  );
+
+  // Remove the replaced resources, unless something else still refers to them.
+  const projectWithoutResources = JSON.stringify({
+    ...projectObject,
+    resources: undefined,
+  });
+  const unusedResourceNames = [...replacedResourceNames].filter(
+    (resourceName) =>
+      !themeResourceNames.has(resourceName) &&
+      !projectWithoutResources.includes(JSON.stringify(resourceName))
+  );
+  unusedResourceNames.forEach((resourceName) =>
+    resources.splice(resources.indexOf(resourceByName.get(resourceName)), 1)
   );
 
   return {
     appliedSlots: [...appliedSlots].sort(),
     missingSlots: [...missingSlots].sort(),
     changedObjectsCount,
-    changedResourcesCount: changedResourceNames.size,
+    changedResourcesCount: themeResourceNames.size,
   };
 };
 

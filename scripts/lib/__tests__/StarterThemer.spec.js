@@ -32,6 +32,7 @@ const makeStarterTheme = () => ({
     'character.player': {
       kind: 'model',
       file: 'https://asset-resources.gdevelop.io/public-resources/Henry.glb',
+      resourceName: 'Henry.glb',
       assetStoreId: 'abc123',
       objectContent: {
         modelResourceName: 'Henry.glb',
@@ -53,14 +54,17 @@ const makeStarterTheme = () => ({
     'env.ground': {
       kind: 'texture',
       file: 'https://asset-resources.gdevelop.io/public-resources/Sand.png',
+      resourceName: 'Sand.png',
     },
     'env.wall': {
       kind: 'texture',
       file: 'https://asset-resources.gdevelop.io/public-resources/Planks.png',
+      resourceName: 'Planks.png',
     },
     'sky.day.front': {
       kind: 'texture',
       file: 'https://asset-resources.gdevelop.io/public-resources/Tropical.png',
+      resourceName: 'Tropical.png',
       origin: { name: 'gdevelop-asset-store', identifier: 'tropical-front' },
     },
   },
@@ -87,7 +91,12 @@ const makeProjectContent = () => ({
         kind: 'model3D',
       },
       { name: 'unit_red.glb', file: 'assets/unit_red.glb', kind: 'model3D' },
-      { name: 'Ground.png', file: 'assets/Ground.png', kind: 'image' },
+      {
+        name: 'Ground.png',
+        file: 'assets/Ground.png',
+        kind: 'image',
+        smoothed: false,
+      },
       { name: 'Wall.png', file: 'assets/Wall.png', kind: 'image' },
       { name: 'Sky_Front.png', file: 'assets/Sky_Front.png', kind: 'image' },
       { name: 'Camera.png', file: 'assets/Camera.png', kind: 'image' },
@@ -166,6 +175,16 @@ const makeProjectContent = () => ({
   ],
 });
 
+/**
+ * @param {any} projectContent
+ * @param {string} name
+ * @returns {any}
+ */
+const getResource = (projectContent, name) =>
+  projectContent.resources.resources.find(
+    /** @param {any} resource */ (resource) => resource.name === name
+  );
+
 /** @param {any} projectContent */
 const applyPirateTheme = (projectContent) =>
   applyThemeToStarter(
@@ -175,43 +194,91 @@ const applyPirateTheme = (projectContent) =>
   );
 
 describe('applyThemeToStarter', () => {
-  it('repoints the resources of mapped objects at the theme files', () => {
+  it('adds the theme files as resources named like in the asset store', () => {
     const projectContent = makeProjectContent();
     applyPirateTheme(projectContent);
 
-    const resources = projectContent.resources.resources;
-    expect(resources[0].file).toBe(
-      'https://asset-resources.gdevelop.io/public-resources/Henry.glb'
-    );
-    expect(resources[2].file).toBe(
-      'https://asset-resources.gdevelop.io/public-resources/Sand.png'
-    );
-    expect(resources[4].file).toBe(
-      'https://asset-resources.gdevelop.io/public-resources/Tropical.png'
-    );
-    expect(resources[4].origin).toEqual({
+    expect(getResource(projectContent, 'Henry.glb')).toEqual({
+      name: 'Henry.glb',
+      file: 'https://asset-resources.gdevelop.io/public-resources/Henry.glb',
+      kind: 'model3D',
+      origin: {
+        name: 'gdevelop-asset-store',
+        identifier:
+          'https://asset-resources.gdevelop.io/public-resources/Henry.glb',
+      },
+    });
+    expect(getResource(projectContent, 'Tropical.png').origin).toEqual({
       name: 'gdevelop-asset-store',
       identifier: 'tropical-front',
     });
+  });
+
+  it('configures a theme resource like the resource it replaces', () => {
+    const projectContent = makeProjectContent();
+    applyPirateTheme(projectContent);
+
+    expect(getResource(projectContent, 'Sand.png').smoothed).toBe(false);
+  });
+
+  it('makes the objects and effects use the theme resources', () => {
+    const projectContent = makeProjectContent();
+    applyPirateTheme(projectContent);
+
+    const [player, , ground] = projectContent.layouts[0].objects;
+    expect(player.content.modelResourceName).toBe('Henry.glb');
+    expect(ground.content.frontFaceResourceName).toBe('Sand.png');
+    expect(
+      projectContent.layouts[0].layers[0].effects[0].stringParameters
+        .frontFaceResourceName
+    ).toBe('Tropical.png');
+  });
+
+  it('removes the resources that were replaced', () => {
+    const projectContent = makeProjectContent();
+    applyPirateTheme(projectContent);
+
+    expect(getResource(projectContent, 'unit_orange.glb')).toBeUndefined();
+    expect(getResource(projectContent, 'Ground.png')).toBeUndefined();
+  });
+
+  it('keeps a replaced resource that something else still uses', () => {
+    const projectContent = makeProjectContent();
+    // The camera helper, which is not themed, shows the ground image.
+    projectContent.layouts[0].objects[4].content.frontFaceResourceName =
+      'Ground.png';
+    applyPirateTheme(projectContent);
+
+    expect(getResource(projectContent, 'Ground.png').file).toBe(
+      'assets/Ground.png'
+    );
   });
 
   it('does not touch the resources of ignored or unmapped objects', () => {
     const projectContent = makeProjectContent();
     applyPirateTheme(projectContent);
 
-    expect(projectContent.resources.resources[5].file).toBe(
+    expect(getResource(projectContent, 'Camera.png').file).toBe(
       'assets/Camera.png'
     );
   });
 
-  it('keeps resource names so every reference follows', () => {
+  it('numbers a theme resource named like another resource of the starter', () => {
     const projectContent = makeProjectContent();
+    projectContent.resources.resources[5].name = 'Sand.png';
+    projectContent.layouts[0].objects[4].content.frontFaceResourceName =
+      'Sand.png';
     applyPirateTheme(projectContent);
 
-    expect(projectContent.resources.resources[2].name).toBe('Ground.png');
+    expect(getResource(projectContent, 'Sand.png').file).toBe(
+      'assets/Camera.png'
+    );
+    expect(getResource(projectContent, 'Sand.png 2').file).toBe(
+      'https://asset-resources.gdevelop.io/public-resources/Sand.png'
+    );
     expect(
       projectContent.layouts[0].objects[2].content.frontFaceResourceName
-    ).toBe('Ground.png');
+    ).toBe('Sand.png 2');
   });
 
   it('takes the theme model content while keeping the object identity', () => {
@@ -226,7 +293,6 @@ describe('applyThemeToStarter', () => {
     expect(player.variables).toEqual([{ name: 'Health', value: 3 }]);
     expect(player.assetStoreId).toBe('abc123');
     expect(player.content.materialType).toBe('StandardWithoutMetalness');
-    expect(player.content.modelResourceName).toBe('unit_orange.glb');
     expect(player.content.originLocation).toBe('ModelOrigin');
     expect(player.content.centerLocation).toBe('ModelOrigin');
   });
@@ -274,9 +340,9 @@ describe('applyThemeToStarter', () => {
     const projectContent = makeProjectContent();
     const result = applyPirateTheme(projectContent);
 
-    expect(projectContent.resources.resources[3].file).toBe(
-      'https://asset-resources.gdevelop.io/public-resources/Planks.png'
-    );
+    const crate = projectContent.layouts[0].objects[3];
+    expect(crate.content.frontFaceResourceName).toBe('Planks.png');
+    expect(crate.content.topFaceResourceName).toBe('Sand.png');
     expect(result.appliedSlots).toContain('env.wall');
   });
 
@@ -297,12 +363,12 @@ describe('applyThemeToStarter', () => {
     const result = applyPirateTheme(projectContent);
 
     expect(result.missingSlots).toEqual(['character.enemy']);
-    expect(projectContent.resources.resources[1].file).toBe(
+    expect(getResource(projectContent, 'unit_red.glb').file).toBe(
       'assets/unit_red.glb'
     );
   });
 
-  it('gives objects sharing a resource their own copy when they play different slots', () => {
+  it('gives objects sharing a resource the resource of their own slot', () => {
     const projectContent = makeProjectContent();
     // The enemy uses the same model file as the player.
     projectContent.layouts[0].objects[1].content.modelResourceName =
@@ -311,6 +377,7 @@ describe('applyThemeToStarter', () => {
     starterTheme.slots['character.enemy'] = {
       kind: 'model',
       file: 'https://asset-resources.gdevelop.io/public-resources/Skeleton.glb',
+      resourceName: 'Skeleton.glb',
       objectContent: {
         modelResourceName: 'Skeleton.glb',
         width: 100,
@@ -323,21 +390,9 @@ describe('applyThemeToStarter', () => {
     applyThemeToStarter(projectContent, makeStarterThemeSlots(), starterTheme);
 
     const [player, enemy] = projectContent.layouts[0].objects;
-    /** @type {Object.<string, any>} */
-    const resourceByName = {};
-    projectContent.resources.resources.forEach(
-      /** @param {any} resource */ (resource) => {
-        resourceByName[resource.name] = resource;
-      }
-    );
-    expect(player.content.modelResourceName).toBe('unit_orange.glb');
-    expect(resourceByName['unit_orange.glb'].file).toBe(
-      'https://asset-resources.gdevelop.io/public-resources/Henry.glb'
-    );
-    expect(enemy.content.modelResourceName).toBe(
-      'unit_orange.glb (character.enemy)'
-    );
-    expect(resourceByName['unit_orange.glb (character.enemy)'].file).toBe(
+    expect(player.content.modelResourceName).toBe('Henry.glb');
+    expect(enemy.content.modelResourceName).toBe('Skeleton.glb');
+    expect(getResource(projectContent, 'Skeleton.glb').file).toBe(
       'https://asset-resources.gdevelop.io/public-resources/Skeleton.glb'
     );
   });
@@ -365,6 +420,7 @@ describe('applyThemeToStarter', () => {
     secondTheme.slots['character.player'] = {
       kind: 'model',
       file: 'https://asset-resources.gdevelop.io/public-resources/Knight.glb',
+      resourceName: 'Knight.glb',
       objectContent: {
         modelResourceName: 'Knight.glb',
         width: 150,
@@ -373,15 +429,12 @@ describe('applyThemeToStarter', () => {
         animations: [{ name: 'Idle', source: 'Knight_Idle', loop: true }],
       },
     };
-    const result = applyThemeToStarter(
-      projectContent,
-      makeStarterThemeSlots(),
-      secondTheme
-    );
+    applyThemeToStarter(projectContent, makeStarterThemeSlots(), secondTheme);
 
-    expect(projectContent.resources.resources[0].file).toBe(
+    expect(getResource(projectContent, 'Knight.glb').file).toBe(
       'https://asset-resources.gdevelop.io/public-resources/Knight.glb'
     );
+    expect(getResource(projectContent, 'Henry.glb')).toBeUndefined();
     expect(
       projectContent.layouts[0].objects[0].content.animations[0].source
     ).toBe('Knight_Idle');
@@ -397,7 +450,7 @@ describe('applyThemeToStarter', () => {
 
     expect(result.changedObjectsCount).toBe(0);
     expect(result.changedResourcesCount).toBe(0);
-    expect(projectContent.resources.resources[0].file).toBe(
+    expect(getResource(projectContent, 'unit_orange.glb').file).toBe(
       'assets/unit_orange.glb'
     );
   });
