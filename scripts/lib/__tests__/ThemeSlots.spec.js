@@ -14,7 +14,7 @@ const vocabulary = {
     { id: 'character.player', kind: 'model', label: 'Player character' },
     { id: 'env.ground', kind: 'texture', label: 'Ground' },
     { id: 'env.wall', kind: 'texture', label: 'Wall' },
-    { id: 'sky.day.front', kind: 'texture', label: 'Day skybox, front' },
+    { id: 'sky.day', kind: 'skybox', label: 'Daytime sky' },
   ],
 };
 
@@ -58,7 +58,7 @@ const createFakeStarterThemeSlots = () => ({
     'object:TankConfiguration::CombinedTank/TankBase': 'character.player',
   },
   effects: {
-    'effect:Game Scene//SkyBox': { frontFaceResourceName: 'sky.day.front' },
+    'effect:Game Scene//SkyBox': 'sky.day',
   },
   ignoredObjects: ['scene:Game Scene/Camera'],
 });
@@ -194,9 +194,7 @@ describe('checkStarterThemeSlots', () => {
 
   it('reports a skybox mapping to an effect the starter does not have', () => {
     const starterThemeSlots = createFakeStarterThemeSlots();
-    starterThemeSlots.effects = {
-      'effect:Game Scene//Gone': { frontFaceResourceName: 'sky.day.front' },
-    };
+    starterThemeSlots.effects = { 'effect:Game Scene//Gone': 'sky.day' };
 
     const errors = checkStarterThemeSlots(
       vocabulary,
@@ -207,5 +205,22 @@ describe('checkStarterThemeSlots', () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toContain('"effect:Game Scene//Gone"');
+  });
+
+  it('requires a skybox to map to a skybox slot', () => {
+    const starterThemeSlots = createFakeStarterThemeSlots();
+    starterThemeSlots.effects = { 'effect:Game Scene//SkyBox': 'env.wall' };
+
+    const errors = checkStarterThemeSlots(
+      vocabulary,
+      'starting-3d-test',
+      createFakeProjectObject(),
+      starterThemeSlots
+    );
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toContain(
+      'a texture slot, but needs a skybox slot'
+    );
   });
 });
