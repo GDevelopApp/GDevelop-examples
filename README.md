@@ -35,6 +35,107 @@ If you know how to create _Pull Requests_, you can also clone this repository an
 
 To add a game to the homepage the game have to be listed in the `scripts/generate-database.js` file.
 
+### Theme slots
+
+A *theme* replaces the placeholder art of a 3D starter with a coherent set of
+assets, so a game created by the AI looks like the setting the user asked for.
+Themes and starters never refer to each other: both point at *slots*, roles
+such as `character.player` or `env.ground`.
+
+- `theme-slots.json`, at the root, is the list of slots. It is the vocabulary
+  shared by every starter and every theme.
+- `examples/<starter>/theme-slots.json` says which objects of that starter play
+  which slot:
+
+```json
+{
+  "version": 1,
+  "objects": {
+    "scene:Game Scene/Player": "character.player",
+    "scene:Game Scene/Ground": "env.ground",
+    "scene:Game Scene/Crate": { "top": "env.ground", "front": "env.wall" },
+    "object:TankConfiguration::CombinedTank/TankBase": "vehicle.tank.base"
+  },
+  "effects": {
+    "effect:Game Scene//SkyBox": { "frontFaceResourceName": "sky.day.front" }
+  },
+  "ignoredObjects": ["scene:Game Scene/Camera"]
+}
+```
+
+An object is referred to as `scene:<scene>/<object>`, `global/<object>`, or
+`object:<Extension>::<CustomObject>/<child>` for the children of a custom
+object. A 3D model maps to one model slot. A 3D cube maps either to one texture
+slot for all its faces, or to one slot per face. A skybox effect maps each of
+its texture parameters.
+
+**When you add a 3D starter, add its `theme-slots.json`.** The build refuses to
+publish a 3D starter without one, or one where a 3D model or cube is neither
+mapped nor listed in `ignoredObjects`, and it names the object:
+
+```
+Starter "starting-3d-sailing": the Scene3D::Model3DObject "scene:Game Scene/Boat"
+is neither mapped to a slot nor listed in ignoredObjects in theme-slots.json.
+```
+
+- **Reuse an existing slot whenever the object plays an existing role.** A new
+  starter's hero is `character.player`. Every theme then covers it already.
+- **Add a slot to the root `theme-slots.json` only for a genuinely new role.**
+  Every theme is missing it until someone fills it in the assets repository:
+  those objects keep their placeholder art in the meantime, which is not an
+  error.
+- **List in `ignoredObjects`** what is not meant to be seen as art: the camera
+  anchor cube, an invisible collision helper, the faceless player of a first
+  person game.
+
+Renaming or removing an object makes the build fail the same way on the entry
+that no longer matches: fix or delete the line it names. HUD sprites, fonts and
+sounds are not part of this.
+
+#### Themed starters
+
+The build uses these mappings to write, next to each 3D starter, a copy of it
+re-skinned with each theme published by the assets repository:
+
+```
+examples/starting-3d-tank/starting-3d-tank.json                # the starter
+examples/starting-3d-tank/starting-3d-tank.theme-pirate.json   # its pirate copy
+```
+
+When the AI picks a theme, GDevelop opens the copy instead of the starter, so
+the game shows the themed assets from the first frame. The copies live in the
+starter's folder because a starter refers to its images, sounds and fonts by a
+relative path. They are not examples of their own and are never listed:
+`themedStarters.json`, in the database, says which themes exist and which
+starters each one covers. It is also what the AI prompts read, so a theme is
+only offered once its copies are there.
+
+A theme only re-skins what it has an asset for. Anything else keeps the
+starter's placeholder art.
+
+The copies are rebuilt on every deploy of this repository, and every night by
+the `nightly-rebuild` workflow of the CircleCI configuration, which is how they
+catch up with a theme or an asset published by the assets repository. A new
+theme is therefore available the day after it is merged there (or right away,
+by pushing to `main` here or rerunning the last `main` pipeline in CircleCI).
+
+#### Trying a theme before merging
+
+Any branch but `main` is built with `--staging` and deployed next to the live
+examples, under `staging/examples` and `staging/examples-database`, like the
+assets repository does. A staging build uses the themes of the **staging**
+assets, so a theme pushed on a branch of the assets repository can be tried end
+to end without merging anything:
+
+1. push the theme on a branch of the assets repository (deployed to staging);
+2. push (or rerun the pipeline of) a branch here, so the starters re-skinned
+   with it are built and deployed to staging;
+3. push a branch of the AI prompts, whose dev prompts list the staging themes;
+4. in a development build of GDevelop, turn on "Show staging assets" in the
+   asset store, then create a game with the AI.
+
+Staging holds the result of the last branch that was pushed, whoever pushed it.
+
 ### Gameplay tests
 
 A game can contain _gameplay tests_: scripts that play the game like a player

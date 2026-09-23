@@ -21,6 +21,13 @@ jobs:
         run: |
           CHANGED_GAMES_LINKS=""
           for file in ${{ steps.changed-game-files.outputs.all_changed_files }}; do
+            # Only the game file of an example (`<folder>/<folder>.json` or
+            # `game.json`, like the build) - not the other JSON files it holds.
+            folder_name="$(basename "$(dirname "$file")")"
+            file_name="$(basename "$file")"
+            if [ "$file_name" != "$folder_name.json" ] && [ "$file_name" != "game.json" ]; then
+              continue
+            fi
             CHANGED_GAMES_LINKS+="* https://editor.gdevelop.io?project=https://raw.githubusercontent.com/GDevelopApp/GDevelop-examples/$(echo ${GITHUB_HEAD_REF})/$file
           "
           done
