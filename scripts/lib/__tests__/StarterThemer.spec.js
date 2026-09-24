@@ -18,7 +18,7 @@ const makeStarterThemeSlots = () => ({
     'object:TankConfiguration::CombinedTank/TankBase': 'character.player',
   },
   effects: {
-    'effect:Game Scene//SkyBox': { frontFaceResourceName: 'sky.day.front' },
+    'effect:Game Scene//SkyBox': 'sky.day',
   },
   ignoredObjects: ['scene:Game Scene/Camera'],
 });
@@ -61,11 +61,23 @@ const makeStarterTheme = () => ({
       file: 'https://asset-resources.gdevelop.io/public-resources/Planks.png',
       resourceName: 'Planks.png',
     },
-    'sky.day.front': {
-      kind: 'texture',
-      file: 'https://asset-resources.gdevelop.io/public-resources/Tropical.png',
-      resourceName: 'Tropical.png',
-      origin: { name: 'gdevelop-asset-store', identifier: 'tropical-front' },
+    'sky.day': {
+      kind: 'skybox',
+      assetStoreId: 'sky123',
+      faces: {
+        front: {
+          file: 'https://asset-resources.gdevelop.io/public-resources/Tropical_Front.png',
+          resourceName: 'Tropical_Front.png',
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier: 'tropical-front',
+          },
+        },
+        top: {
+          file: 'https://asset-resources.gdevelop.io/public-resources/Tropical_Top.png',
+          resourceName: 'Tropical_Top.png',
+        },
+      },
     },
   },
 });
@@ -99,6 +111,7 @@ const makeProjectContent = () => ({
       },
       { name: 'Wall.png', file: 'assets/Wall.png', kind: 'image' },
       { name: 'Sky_Front.png', file: 'assets/Sky_Front.png', kind: 'image' },
+      { name: 'Sky_Top.png', file: 'assets/Sky_Top.png', kind: 'image' },
       { name: 'Camera.png', file: 'assets/Camera.png', kind: 'image' },
     ],
   },
@@ -112,7 +125,10 @@ const makeProjectContent = () => ({
             {
               name: 'SkyBox',
               effectType: 'Scene3D::Skybox',
-              stringParameters: { frontFaceResourceName: 'Sky_Front.png' },
+              stringParameters: {
+                frontFaceResourceName: 'Sky_Front.png',
+                topFaceResourceName: 'Sky_Top.png',
+              },
             },
           ],
         },
@@ -208,7 +224,7 @@ describe('applyThemeToStarter', () => {
           'https://asset-resources.gdevelop.io/public-resources/Henry.glb',
       },
     });
-    expect(getResource(projectContent, 'Tropical.png').origin).toEqual({
+    expect(getResource(projectContent, 'Tropical_Front.png').origin).toEqual({
       name: 'gdevelop-asset-store',
       identifier: 'tropical-front',
     });
@@ -230,8 +246,12 @@ describe('applyThemeToStarter', () => {
     expect(ground.content.frontFaceResourceName).toBe('Sand.png');
     expect(
       projectContent.layouts[0].layers[0].effects[0].stringParameters
-        .frontFaceResourceName
-    ).toBe('Tropical.png');
+    ).toEqual({
+      frontFaceResourceName: 'Tropical_Front.png',
+      topFaceResourceName: 'Tropical_Top.png',
+    });
+    expect(getResource(projectContent, 'Sky_Front.png')).toBeUndefined();
+    expect(getResource(projectContent, 'Sky_Top.png')).toBeUndefined();
   });
 
   it('removes the resources that were replaced', () => {
@@ -265,7 +285,7 @@ describe('applyThemeToStarter', () => {
 
   it('numbers a theme resource named like another resource of the starter', () => {
     const projectContent = makeProjectContent();
-    projectContent.resources.resources[5].name = 'Sand.png';
+    projectContent.resources.resources[6].name = 'Sand.png';
     projectContent.layouts[0].objects[4].content.frontFaceResourceName =
       'Sand.png';
     applyPirateTheme(projectContent);

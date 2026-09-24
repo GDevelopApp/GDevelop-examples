@@ -6,8 +6,10 @@ const fs = require('fs').promises;
  * The vocabulary of slots a theme can fill, shared by every starter.
  * @typedef {{
  *   version: number,
- *   slots: Array<{id: string, kind: 'model' | 'texture', label: string}>,
+ *   slots: Array<{id: string, kind: ThemeSlotKind, label: string}>,
  * }} ThemeSlotsVocabulary
+ *
+ * @typedef {'model' | 'texture' | 'skybox'} ThemeSlotKind
  */
 
 /**
@@ -15,10 +17,11 @@ const fs = require('fs').promises;
  * re-skins, and as what. Object paths are `scene:<scene>/<object>`,
  * `global/<object>` or `object:<Extension>::<CustomObject>/<child>`. A cube
  * maps either to one texture slot for all six faces, or to one slot per face.
+ * A skybox effect (`effect:<scene>/<layer>/<effect>`) maps to one skybox slot.
  * @typedef {{
  *   version: number,
  *   objects: Object.<string, string | Object.<string, string>>,
- *   effects?: Object.<string, Object.<string, string>>,
+ *   effects?: Object.<string, string>,
  *   ignoredObjects?: Array<string>,
  * }} StarterThemeSlots
  */
@@ -133,7 +136,7 @@ const checkStarterThemeSlots = (
   const ignored = new Set(starterThemeSlots.ignoredObjects || []);
   const mappedEffects = starterThemeSlots.effects || {};
 
-  /** @param {string} where @param {string} slotId @param {'model'|'texture'} kind */
+  /** @param {string} where @param {string} slotId @param {ThemeSlotKind} kind */
   const checkSlot = (where, slotId, kind) => {
     const declaredKind = slotKindById.get(slotId);
     if (!declaredKind) {
@@ -207,7 +210,7 @@ const checkStarterThemeSlots = (
       );
     }
   });
-  Object.entries(mappedEffects).forEach(([effectPath, faces]) => {
+  Object.entries(mappedEffects).forEach(([effectPath, slotId]) => {
     if (!effectPaths.has(effectPath)) {
       errors.push(
         new Error(
@@ -216,13 +219,15 @@ const checkStarterThemeSlots = (
       );
       return;
     }
-    Object.entries(faces).forEach(([parameter, slotId]) =>
-      checkSlot(
-        `skybox "${effectPath}" parameter "${parameter}"`,
-        slotId,
-        'texture'
-      )
-    );
+    if (typeof slotId !== 'string') {
+      errors.push(
+        new Error(
+          `Starter "${slug}": the skybox "${effectPath}" must map to a single skybox slot.`
+        )
+      );
+      return;
+    }
+    checkSlot(`skybox "${effectPath}"`, slotId, 'skybox');
   });
 
   return errors;

@@ -4,14 +4,22 @@
 
 /**
  * A theme, as published by the assets repository: for each slot, the file to
- * use and, for a 3D model, the serialized content of the asset's object.
+ * use and, for a 3D model, the serialized content of the asset's object. A
+ * skybox slot has one file per face instead.
  * @typedef {{
- *   kind: 'model' | 'texture',
  *   file: string,
  *   resourceName: string,
+ *   origin?: {name: string, identifier: string},
+ * }} ThemeFile
+ *
+ * @typedef {ThemeFile & {
+ *   kind: 'model' | 'texture',
  *   objectContent?: any,
  *   assetStoreId?: string,
- *   origin?: {name: string, identifier: string},
+ * } | {
+ *   kind: 'skybox',
+ *   faces: Object.<string, ThemeFile>,
+ *   assetStoreId?: string,
  * }} ThemeSlot
  *
  * @typedef {{
@@ -147,8 +155,8 @@ const getSizeRatio = (objectContent, themeContent) => {
  * The starter's theme-slots.json says which of its objects play which slot.
  * Each such object gets the theme's asset for that slot: a 3D model takes the
  * theme model's dimensions, rotation, material and animations while keeping
- * its name, behaviors, variables, instances, origin and center; a cube face or
- * a skybox face points at the theme image.
+ * its name, behaviors, variables, instances, origin and center; a cube face
+ * points at the theme image; a skybox effect points at the six theme images.
  *
  * Each theme file becomes a resource named like in the asset store, and the
  * resources of the starter that nothing uses anymore are removed.
@@ -179,39 +187,36 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
   let changedObjectsCount = 0;
 
   /**
-   * Add the resource of a slot to the project, configured like the resource it
-   * replaces, and return its name.
+   * Add a file of a slot to the project as a resource configured like the
+   * resource it replaces, and return its name.
    * @param {string} replacedResourceName
    * @param {string} slotId
+   * @param {ThemeFile} themeFile
    * @returns {string | null}
    */
-  const useThemeResource = (replacedResourceName, slotId) => {
-    const slot = theme.slots[slotId];
-    if (!slot) {
-      missingSlots.add(slotId);
-      return null;
-    }
+  const useThemeResource = (replacedResourceName, slotId, themeFile) => {
     const replacedResource = resourceByName.get(replacedResourceName);
     if (!replacedResource) return null;
 
     // A resource of the starter can already have that name: number the new one.
-    let name = slot.resourceName;
+    let name = themeFile.resourceName;
     for (
       let index = 2;
-      resourceByName.has(name) && resourceByName.get(name).file !== slot.file;
+      resourceByName.has(name) &&
+      resourceByName.get(name).file !== themeFile.file;
       index++
     ) {
-      name = `${slot.resourceName} ${index}`;
+      name = `${themeFile.resourceName} ${index}`;
     }
 
     if (!resourceByName.has(name)) {
       const themeResource = {
         ...replacedResource,
         name,
-        file: slot.file,
-        origin: slot.origin || {
+        file: themeFile.file,
+        origin: themeFile.origin || {
           name: 'gdevelop-asset-store',
-          identifier: slot.file,
+          identifier: themeFile.file,
         },
       };
       resources.push(themeResource);
@@ -239,7 +244,8 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
         }
         const modelResourceName = useThemeResource(
           objectContent.modelResourceName,
-          mapping
+          mapping,
+          slot
         );
         if (!modelResourceName) return;
 
@@ -272,7 +278,16 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
           const faceProperty = cubeFaceProperties[face];
           const resourceName = objectContent[faceProperty];
           if (!slotId || !resourceName) return;
-          const themeResourceName = useThemeResource(resourceName, slotId);
+          const slot = theme.slots[slotId];
+          if (!slot || slot.kind !== 'texture') {
+            missingSlots.add(slotId);
+            return;
+          }
+          const themeResourceName = useThemeResource(
+            resourceName,
+            slotId,
+            slot
+          );
           if (!themeResourceName) return;
           objectContent[faceProperty] = themeResourceName;
           changed = true;
@@ -283,18 +298,25 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
   );
 
   Object.entries(starterThemeSlots.effects || {}).forEach(
-    ([effectPath, parameters]) => {
+    ([effectPath, slotId]) => {
       const effect = effectsByPath.get(effectPath);
       if (!effect || !effect.stringParameters) return;
-      Object.entries(parameters).forEach(([parameter, slotId]) => {
-        const resourceName = effect.stringParameters[parameter];
-        if (!resourceName) return;
+      const slot = theme.slots[slotId];
+      if (!slot || slot.kind !== 'skybox') {
+        missingSlots.add(slotId);
+        return;
+      }
+      Object.entries(cubeFaceProperties).forEach(([face, faceProperty]) => {
+        const resourceName = effect.stringParameters[faceProperty];
+        const themeFile = slot.faces[face];
+        if (!resourceName || !themeFile) return;
         const themeResourceName = useThemeResource(
           String(resourceName),
-          slotId
+          slotId,
+          themeFile
         );
         if (themeResourceName) {
-          effect.stringParameters[parameter] = themeResourceName;
+          effect.stringParameters[faceProperty] = themeResourceName;
         }
       });
     }

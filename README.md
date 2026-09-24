@@ -57,7 +57,7 @@ such as `character.player` or `env.ground`.
     "object:TankConfiguration::CombinedTank/TankBase": "vehicle.tank.base"
   },
   "effects": {
-    "effect:Game Scene//SkyBox": { "frontFaceResourceName": "sky.day.front" }
+    "effect:Game Scene//SkyBox": "sky.day"
   },
   "ignoredObjects": ["scene:Game Scene/Camera"]
 }
@@ -66,8 +66,9 @@ such as `character.player` or `env.ground`.
 An object is referred to as `scene:<scene>/<object>`, `global/<object>`, or
 `object:<Extension>::<CustomObject>/<child>` for the children of a custom
 object. A 3D model maps to one model slot. A 3D cube maps either to one texture
-slot for all its faces, or to one slot per face. A skybox effect maps each of
-its texture parameters.
+slot for all its faces, or to one slot per face. A skybox effect, referred to
+as `effect:<scene>/<layer>/<effect>`, maps to one skybox slot: the theme's
+skybox replaces its six faces.
 
 **When you add a 3D starter, add its `theme-slots.json`.** The build refuses to
 publish a 3D starter without one, or one where a 3D model or cube is neither
