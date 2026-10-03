@@ -423,7 +423,7 @@
                   "name": "Difficulty",
                   "persistentUuid": "a1341813-0a96-4e05-9568-e454a1bd7bfe",
                   "type": "number",
-                  "value": 2
+                  "value": -1
                 },
                 {
                   "name": "Position",
@@ -4244,7 +4244,7 @@
                           },
                           "parameters": [
                             "Creatures.One.Position",
-                            "-",
+                            "+",
                             "2"
                           ]
                         }
@@ -4326,48 +4326,48 @@
                           ]
                         }
                       ]
-                    },
+                    }
+                  ]
+                },
+                {
+                  "folded": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Hide"
+                      },
+                      "parameters": [
+                        "Creature_One"
+                      ]
+                    }
+                  ],
+                  "events": [
                     {
                       "folded": true,
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
+                      "conditions": [
                         {
                           "type": {
-                            "value": "Hide"
+                            "value": "NumberObjectVariable"
                           },
                           "parameters": [
-                            "Creature_One"
+                            "Creature_One",
+                            "PositionNumber",
+                            "=",
+                            "Creatures.One.Position"
                           ]
                         }
                       ],
-                      "events": [
+                      "actions": [
                         {
-                          "folded": true,
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "NumberObjectVariable"
-                              },
-                              "parameters": [
-                                "Creature_One",
-                                "PositionNumber",
-                                "=",
-                                "Creatures.One.Position"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Show"
-                              },
-                              "parameters": [
-                                "Creature_One",
-                                ""
-                              ]
-                            }
+                          "type": {
+                            "value": "Show"
+                          },
+                          "parameters": [
+                            "Creature_One",
+                            ""
                           ]
                         }
                       ]
@@ -4515,7 +4515,7 @@
                           },
                           "parameters": [
                             "Creatures.Two.Position",
-                            "-",
+                            "+",
                             "2"
                           ]
                         }
@@ -4597,48 +4597,48 @@
                           ]
                         }
                       ]
-                    },
+                    }
+                  ]
+                },
+                {
+                  "folded": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Hide"
+                      },
+                      "parameters": [
+                        "Creature_Two"
+                      ]
+                    }
+                  ],
+                  "events": [
                     {
                       "folded": true,
                       "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
+                      "conditions": [
                         {
                           "type": {
-                            "value": "Hide"
+                            "value": "NumberObjectVariable"
                           },
                           "parameters": [
-                            "Creature_Two"
+                            "Creature_Two",
+                            "PositionNumber",
+                            "=",
+                            "Creatures.Two.Position"
                           ]
                         }
                       ],
-                      "events": [
+                      "actions": [
                         {
-                          "folded": true,
-                          "type": "BuiltinCommonInstructions::Standard",
-                          "conditions": [
-                            {
-                              "type": {
-                                "value": "NumberObjectVariable"
-                              },
-                              "parameters": [
-                                "Creature_Two",
-                                "PositionNumber",
-                                "=",
-                                "Creatures.Two.Position"
-                              ]
-                            }
-                          ],
-                          "actions": [
-                            {
-                              "type": {
-                                "value": "Show"
-                              },
-                              "parameters": [
-                                "Creature_Two",
-                                ""
-                              ]
-                            }
+                          "type": {
+                            "value": "Show"
+                          },
+                          "parameters": [
+                            "Creature_Two",
+                            ""
                           ]
                         }
                       ]
@@ -4797,7 +4797,6 @@
           "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
-              "folded": true,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [],
               "actions": [],
@@ -4944,7 +4943,7 @@
                       "parameters": [
                         "RemainingPower",
                         "-",
-                        "100 * TimeDelta() / 90"
+                        "PowerUsage * (100 * TimeDelta() / 90)"
                       ]
                     },
                     {
@@ -5359,143 +5358,68 @@
   "externalEvents": [],
   "tests": [
     {
-      "description": "\"w\" walks the player toward what it faces and \"d\" strafes it sideways, without turning it.",
-      "name": "Walking and strafing with WASD",
+      "description": "Hovering CameraBar opens the CameraView layer, and hovering it again (after leaving) closes it.",
+      "lastRunAt": 1791040701194,
+      "lastRunDurationMs": 1475,
+      "lastRunFramesExecuted": 18,
+      "lastRunStatus": "passed",
+      "name": "Hovering the camera bar toggles the camera view",
       "type": "gameplay",
       "source": [
-        "// First person movement: \"w\" walks toward what the player faces, \"d\"",
-        "// strafes to its right (Shooter3DKeyboardMapper, camera relative).",
         "await harness.goToScene('Game Scene');",
-        "harness.watch('Player');",
-        "",
-        "const getPlayer = () => harness.getObjects('Player')[0];",
-        "const characterState = () => getPlayer().behaviors.PhysicsCharacter3D.state;",
-        "",
-        "await harness.stepFrames(4);",
-        "harness.assert(characterState().IsOnFloor === true, 'The player stands on the ground.');",
-        "",
-        "const start = getPlayer();",
-        "const facingRadians = (start.angle * Math.PI) / 180;",
-        "",
-        "// Nothing pressed: the player stays where it is.",
         "await harness.stepFrames(5);",
-        "const idle = getPlayer();",
-        "const drift = Math.hypot(idle.centerX - start.centerX, idle.centerY - start.centerY);",
-        "harness.assert(",
-        "  drift < 3,",
-        "  'The player stands still while no key is pressed (drifted ' + drift.toFixed(2) + ').'",
-        ");",
-        "",
-        "// Walk forward.",
-        "harness.setKeyPressed('w', true);",
-        "await harness.stepFrames(15);",
-        "harness.setKeyPressed('w', false);",
-        "await harness.stepFrames(2);",
-        "",
-        "const afterWalk = getPlayer();",
-        "const walkX = afterWalk.centerX - idle.centerX;",
-        "const walkY = afterWalk.centerY - idle.centerY;",
-        "const walked = Math.hypot(walkX, walkY);",
-        "const forward = walkX * Math.cos(facingRadians) + walkY * Math.sin(facingRadians);",
-        "console.log(",
-        "  'walked=' + Math.round(walked) + ' forward=' + Math.round(forward) +",
-        "  ' facing=' + Math.round(start.angle)",
-        ");",
-        "harness.assert(",
-        "  walked > 15,",
-        "  'Holding \"w\" walks the player (moved ' + Math.round(walked) + ' units).'",
-        ");",
-        "harness.assert(",
-        "  forward > 0.9 * walked,",
-        "  'The player walks toward what it is facing, not sideways or backwards.'",
-        ");",
-        "",
-        "// Strafe right.",
-        "const beforeStrafe = getPlayer();",
-        "harness.setKeyPressed('d', true);",
-        "await harness.stepFrames(14);",
-        "harness.setKeyPressed('d', false);",
-        "await harness.stepFrames(2);",
-        "const afterStrafe = getPlayer();",
-        "const strafeX = afterStrafe.centerX - beforeStrafe.centerX;",
-        "const strafeY = afterStrafe.centerY - beforeStrafe.centerY;",
-        "const strafed = Math.hypot(strafeX, strafeY);",
-        "// The player's right hand side, in scene coordinates.",
-        "const sideways = -strafeX * Math.sin(facingRadians) + strafeY * Math.cos(facingRadians);",
-        "console.log('strafed=' + Math.round(strafed) + ' sideways=' + Math.round(sideways));",
-        "harness.assert(",
-        "  strafed > 15,",
-        "  'Holding \"d\" moves the player (moved ' + Math.round(strafed) + ' units).'",
-        ");",
-        "harness.assert(",
-        "  Math.abs(sideways) > 0.9 * strafed,",
-        "  'Holding \"d\" strafes sideways instead of walking forward (' +",
-        "    Math.round(sideways) + ' of ' + Math.round(strafed) + ' units sideways).'",
-        ");",
-        "harness.assert(",
-        "  Math.abs(afterStrafe.angle - start.angle) < 1,",
-        "  'Strafing does not turn the player around.'",
-        ");"
+        "const bar = harness.getObjects('CameraBar')[0];",
+        "harness.assert(!!bar, 'CameraBar exists');",
+        "const layer = () => harness.getRuntimeLayer('CameraView');",
+        "harness.assert(!!layer(), 'CameraView layer exists');",
+        "harness.setMousePosition(640, 100, 'PlayerView');",
+        "await harness.stepFrames(3);",
+        "const before = layer().isVisible();",
+        "console.log('CameraView visible before hover: ' + before);",
+        "harness.setMousePosition(bar.centerX, bar.centerY, 'PlayerView');",
+        "await harness.stepFrames(3);",
+        "const afterHover = layer().isVisible();",
+        "await harness.takeScreenshot('after first hover');",
+        "harness.assert(afterHover !== before, 'Hovering CameraBar toggled the CameraView layer visibility (' + before + ' -> ' + afterHover + ')');",
+        "harness.setMousePosition(640, 100, 'PlayerView');",
+        "await harness.stepFrames(3);",
+        "harness.setMousePosition(bar.centerX, bar.centerY, 'PlayerView');",
+        "await harness.stepFrames(3);",
+        "const afterSecond = layer().isVisible();",
+        "await harness.takeScreenshot('after second hover');",
+        "harness.assert(afterSecond === before, 'Hovering again toggled the CameraView layer back (' + afterHover + ' -> ' + afterSecond + ')');"
       ]
     },
     {
-      "description": "Pressing Space makes the character jump off the ground, as high as its behavior is configured to.",
-      "name": "Jumping with Space",
+      "description": "RemainingPower decreases over time, the percentage text updates, and drains faster while the camera view is open.",
+      "lastRunAt": 1791040748531,
+      "lastRunDurationMs": 4020,
+      "lastRunFramesExecuted": 612,
+      "lastRunStatus": "passed",
+      "name": "Power drains over time and drains faster with camera open",
       "type": "gameplay",
       "source": [
-        "// Space must make the first person character jump off the ground, as high",
-        "// as its behavior is configured to.",
         "await harness.goToScene('Game Scene');",
-        "harness.watch('Player');",
-        "",
-        "const getPlayer = () => harness.getObjects('Player')[0];",
-        "const characterState = () => getPlayer().behaviors.PhysicsCharacter3D.state;",
-        "",
-        "const landed = await harness.stepUntil(() => characterState().IsOnFloor === true, {",
-        "  maxFrames: 200,",
-        "});",
-        "harness.assert(landed, 'The player stands on the ground.');",
-        "const groundZ = getPlayer().z;",
-        "",
-        "// Nothing pressed: the player stays on the ground.",
-        "await harness.stepFrames(8);",
-        "harness.assert(",
-        "  Math.abs(getPlayer().z - groundZ) < 1 && characterState().IsOnFloor === true,",
-        "  'The player stays on the ground while no key is pressed.'",
-        ");",
-        "",
-        "// The height a jump should reach, from the configured jump height.",
-        "const { JumpSpeed, Gravity } = characterState();",
-        "const expectedHeight = (JumpSpeed * JumpSpeed) / (2 * Gravity);",
-        "",
-        "harness.setKeyPressed('Space', true);",
-        "await harness.stepFrames(15);",
-        "harness.setKeyPressed('Space', false);",
-        "",
-        "let highestZ = groundZ;",
-        "let sawJumping = false;",
-        "let leftTheFloor = false;",
-        "await harness.stepFrames(25, {",
-        "  onFrame: () => {",
-        "    const state = characterState();",
-        "    highestZ = Math.max(highestZ, getPlayer().z);",
-        "    if (state.IsJumping === true) sawJumping = true;",
-        "    if (state.IsOnFloor === false) leftTheFloor = true;",
-        "  },",
-        "});",
-        "const jumpHeight = highestZ - groundZ;",
-        "console.log(",
-        "  'jumpHeight=' + Math.round(jumpHeight) + ' expected=' + Math.round(expectedHeight)",
-        ");",
-        "",
-        "harness.assert(sawJumping, 'The character reports it is jumping after pressing Space.');",
-        "harness.assert(leftTheFloor, 'The player leaves the floor when jumping.');",
-        "harness.assert(",
-        "  jumpHeight > 0.5 * expectedHeight,",
-        "  'The player jumps as high as its jump speed and gravity say it should (rose ' +",
-        "    Math.round(jumpHeight) + ' units, expected at least ' +",
-        "    Math.round(0.5 * expectedHeight) + ').'",
-        ");"
+        "await harness.stepFrames(5);",
+        "const getPower = () => harness.getSceneVariable('RemainingPower').value;",
+        "const start = getPower();",
+        "await harness.stepFrames(300);",
+        "const idleDrain = start - getPower();",
+        "console.log('Idle drain over 5s: ' + idleDrain);",
+        "harness.assert(idleDrain > 0, 'Power decreased over time');",
+        "const text = harness.getObjects('UIText_PowerleftValue')[0];",
+        "harness.assert(!!text && String(text.text).includes('%'), 'Power percentage text displayed: ' + (text && text.text));",
+        "const bar = harness.getObjects('CameraBar')[0];",
+        "harness.setMousePosition(640, 100, 'PlayerView');",
+        "await harness.stepFrames(3);",
+        "harness.setMousePosition(bar.centerX, bar.centerY, 'PlayerView');",
+        "await harness.stepFrames(3);",
+        "harness.assert(harness.getRuntimeLayer('CameraView').isVisible(), 'Camera view is open');",
+        "const p1 = getPower();",
+        "await harness.stepFrames(300);",
+        "const camDrain = p1 - getPower();",
+        "console.log('Camera drain over 5s: ' + camDrain);",
+        "harness.assert(camDrain > idleDrain * 1.5, 'Power drains faster with camera open (' + camDrain + ' vs ' + idleDrain + ')');"
       ]
     }
   ],
