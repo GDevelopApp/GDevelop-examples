@@ -196,11 +196,22 @@ const sortedStarterSlugs = new Set([
 ]);
 
 const sortedStartingPointConfigs = [
+  // The first 7 are shown on the "Create a new game" dialog of the editor,
+  // in this order (the others are behind "See all").
   {
     slug: 'starting-platformer',
     pixelArtSlug: 'starting-platformer-pixel',
     title: 'Platformer',
   },
+  { slug: 'starting-3d-grand-theft-auto', title: '3D GTA' },
+  {
+    slug: 'starting-fnaf-five-nights-at-freddys',
+    title: '3D FNAF',
+  },
+  { slug: 'starting-first-person-shooter', title: '3D FPS' },
+  { slug: 'starting-vampire-survivor', title: 'Vampire Survivor' },
+  { slug: 'starting-top-down-rpg', title: 'Top-down RPG' },
+  { slug: 'starting-3D-platformer', title: '3D Platformer' },
   {
     slug: 'starting-top-down',
     pixelArtSlug: 'starting-top-down-pixel',
@@ -211,7 +222,6 @@ const sortedStartingPointConfigs = [
     pixelArtSlug: 'starting-physics-pixel',
     title: 'Physics',
   },
-  { slug: 'starting-3D-platformer', title: '3D Platformer' },
   { slug: 'starting-first-person', title: '3D First Person' },
   { slug: 'starting-3d-driving', title: '3D Driving' },
   {
