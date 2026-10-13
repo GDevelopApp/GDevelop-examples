@@ -9,7 +9,7 @@ const fs = require('fs').promises;
  *   slots: Array<{id: string, kind: ThemeSlotKind, label: string}>,
  * }} ThemeSlotsVocabulary
  *
- * @typedef {'model' | 'texture' | 'skybox'} ThemeSlotKind
+ * @typedef {'model' | 'texture' | 'material' | 'skybox' | 'color'} ThemeSlotKind
  */
 
 /**
@@ -18,12 +18,19 @@ const fs = require('fs').promises;
  * `global/<object>` or `object:<Extension>::<CustomObject>/<child>`. A cube
  * maps either to one texture slot for all six faces, or to one slot per face.
  * A skybox effect (`effect:<scene>/<layer>/<effect>`) maps to one skybox slot.
+ *
+ * A custom object (like a 3D terrain) maps its properties: an image resource
+ * to a texture slot, a color to a color slot, or an image resource to a
+ * material slot along with the property taking the normal map of the material
+ * (`{"slot": "terrain.ground", "normalMap": "Layer1NormalMap"}`).
  * @typedef {{
  *   version: number,
- *   objects: Object.<string, string | Object.<string, string>>,
+ *   objects: Object.<string, string | Object.<string, string | MaterialMapping>>,
  *   effects?: Object.<string, string>,
  *   ignoredObjects?: Array<string>,
  * }} StarterThemeSlots
+ *
+ * @typedef {{slot: string, normalMap: string}} MaterialMapping
  */
 
 const vocabularyPath = path.join(__dirname, '../../theme-slots.json');
@@ -42,23 +49,70 @@ const cubeFaceProperties = [
 ];
 
 /**
- * Every object of a project a theme could re-skin, with the path a mapping
- * refers to it by, plus every skybox effect.
+ * The properties of each custom object type of a project, by type.
  * @param {any} projectObject
- * @returns {{objects: Array<{path: string, type: string}>, effects: Array<string>, is3D: boolean}}
+ * @returns {Map<string, Map<string, string>>}
+ */
+const getCustomObjectPropertyTypes = (projectObject) => {
+  /** @type {Map<string, Map<string, string>>} */
+  const propertyTypesByObjectType = new Map();
+  (projectObject.eventsFunctionsExtensions || []).forEach(
+    /** @param {any} extension */ (extension) =>
+      (extension.eventsBasedObjects || []).forEach(
+        /** @param {any} eventsBasedObject */ (eventsBasedObject) =>
+          propertyTypesByObjectType.set(
+            `${extension.name}::${eventsBasedObject.name}`,
+            new Map(
+              (eventsBasedObject.propertyDescriptors || []).map(
+                /** @param {any} property */ (property) => [
+                  property.name,
+                  property.type,
+                ]
+              )
+            )
+          )
+      )
+  );
+  return propertyTypesByObjectType;
+};
+
+/**
+ * Every object of a project a theme could re-skin, with the path a mapping
+ * refers to it by, plus every skybox effect. Custom objects are listed apart:
+ * a starter maps those of their properties it wants themed, if any.
+ * @param {any} projectObject
+ * @returns {{
+ *   objects: Array<{path: string, type: string}>,
+ *   customObjects: Array<{path: string, type: string, propertyTypes: Map<string, string>}>,
+ *   effects: Array<string>,
+ *   is3D: boolean,
+ * }}
  */
 const getThemeableObjects = (projectObject) => {
   /** @type {Array<{path: string, type: string}>} */
   const objects = [];
+  /** @type {Array<{path: string, type: string, propertyTypes: Map<string, string>}>} */
+  const customObjects = [];
   /** @type {Array<string>} */
   const effects = [];
   const themeableTypes = ['Scene3D::Model3DObject', 'Scene3D::Cube3DObject'];
+  const propertyTypesByObjectType = getCustomObjectPropertyTypes(projectObject);
 
   /** @param {string} prefix @param {Array<any>} list */
   const collect = (prefix, list) =>
     (list || []).forEach((object) => {
+      const objectPath = `${prefix}/${object.name}`;
       if (themeableTypes.includes(object.type)) {
-        objects.push({ path: `${prefix}/${object.name}`, type: object.type });
+        objects.push({ path: objectPath, type: object.type });
+        return;
+      }
+      const propertyTypes = propertyTypesByObjectType.get(object.type);
+      if (propertyTypes) {
+        customObjects.push({
+          path: objectPath,
+          type: object.type,
+          propertyTypes,
+        });
       }
     });
 
@@ -91,7 +145,12 @@ const getThemeableObjects = (projectObject) => {
       )
   );
 
-  return { objects, effects, is3D: objects.length > 0 || effects.length > 0 };
+  return {
+    objects,
+    customObjects,
+    effects,
+    is3D: objects.length > 0 || effects.length > 0,
+  };
 };
 
 /**
@@ -113,7 +172,8 @@ const checkStarterThemeSlots = (
 ) => {
   /** @type {Error[]} */
   const errors = [];
-  const { objects, effects, is3D } = getThemeableObjects(projectObject);
+  const { objects, customObjects, effects, is3D } =
+    getThemeableObjects(projectObject);
   if (!is3D) return errors;
 
   if (!starterThemeSlots) {
@@ -130,6 +190,9 @@ const checkStarterThemeSlots = (
   );
   const typeByPath = new Map(
     objects.map((object) => [object.path, object.type])
+  );
+  const customObjectByPath = new Map(
+    customObjects.map((customObject) => [customObject.path, customObject])
   );
   const effectPaths = new Set(effects);
   const mapped = starterThemeSlots.objects || {};
@@ -179,7 +242,10 @@ const checkStarterThemeSlots = (
       checkSlot(`"${objectPath}"`, mapping, 'texture');
     } else {
       Object.entries(mapping).forEach(([face, slotId]) => {
-        if (!cubeFaceProperties.some((property) => property.startsWith(face))) {
+        if (
+          typeof slotId !== 'string' ||
+          !cubeFaceProperties.some((property) => property.startsWith(face))
+        ) {
           errors.push(
             new Error(
               `Starter "${slug}": "${objectPath}" maps the unknown cube face "${face}".`
@@ -192,8 +258,66 @@ const checkStarterThemeSlots = (
     }
   });
 
+  /**
+   * @param {string} objectPath
+   * @param {Map<string, string>} propertyTypes
+   * @param {string} property
+   * @param {string} expectedType
+   * @returns {boolean}
+   */
+  const checkProperty = (objectPath, propertyTypes, property, expectedType) => {
+    const propertyType = propertyTypes.get(property);
+    if (propertyType === expectedType) return true;
+    errors.push(
+      new Error(
+        propertyType
+          ? `Starter "${slug}": "${objectPath}" maps its property "${property}", a ${propertyType}, but only resources and colors can be themed.`
+          : `Starter "${slug}": "${objectPath}" maps the property "${property}", which its object does not have.`
+      )
+    );
+    return false;
+  };
+
+  customObjects.forEach(({ path: objectPath, propertyTypes }) => {
+    const mapping = mapped[objectPath];
+    if (mapping === undefined) return;
+    if (typeof mapping === 'string') {
+      errors.push(
+        new Error(
+          `Starter "${slug}": "${objectPath}" is a custom object and must map its properties to slots.`
+        )
+      );
+      return;
+    }
+    Object.entries(mapping).forEach(([property, propertyMapping]) => {
+      const where = `"${objectPath}" property "${property}"`;
+      if (typeof propertyMapping !== 'string') {
+        if (
+          checkProperty(objectPath, propertyTypes, property, 'Resource') &&
+          checkProperty(
+            objectPath,
+            propertyTypes,
+            propertyMapping.normalMap,
+            'Resource'
+          )
+        ) {
+          checkSlot(where, propertyMapping.slot, 'material');
+        }
+        return;
+      }
+      const propertyType = propertyTypes.get(property);
+      if (propertyType === 'Color') {
+        checkSlot(where, propertyMapping, 'color');
+      } else if (
+        checkProperty(objectPath, propertyTypes, property, 'Resource')
+      ) {
+        checkSlot(where, propertyMapping, 'texture');
+      }
+    });
+  });
+
   Object.keys(mapped).forEach((objectPath) => {
-    if (!typeByPath.has(objectPath)) {
+    if (!typeByPath.has(objectPath) && !customObjectByPath.has(objectPath)) {
       errors.push(
         new Error(
           `Starter "${slug}": theme-slots.json maps "${objectPath}", which is not a 3D object of the starter anymore.`

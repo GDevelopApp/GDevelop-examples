@@ -12,10 +12,18 @@
  *   origin?: {name: string, identifier: string},
  * }} ThemeFile
  *
+ * A material slot is a texture with, if the theme has one, its normal map. A
+ * color slot is a color, like "52;104;36".
  * @typedef {ThemeFile & {
  *   kind: 'model' | 'texture',
  *   objectContent?: any,
  *   assetStoreId?: string,
+ * } | ThemeFile & {
+ *   kind: 'material',
+ *   normalMap?: ThemeFile,
+ * } | {
+ *   kind: 'color',
+ *   color: string,
  * } | {
  *   kind: 'skybox',
  *   faces: Object.<string, ThemeFile>,
@@ -156,7 +164,9 @@ const getSizeRatio = (objectContent, themeContent) => {
  * Each such object gets the theme's asset for that slot: a 3D model takes the
  * theme model's dimensions, rotation, material and animations while keeping
  * its name, behaviors, variables, instances, origin and center; a cube face
- * points at the theme image; a skybox effect points at the six theme images.
+ * points at the theme image; a skybox effect points at the six theme images;
+ * a property of a custom object points at the theme image (and the normal map
+ * of a material) or takes the theme color.
  *
  * Each theme file becomes a resource named like in the asset store, and the
  * resources of the starter that nothing uses anymore are removed.
@@ -188,14 +198,23 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
 
   /**
    * Add a file of a slot to the project as a resource configured like the
-   * resource it replaces, and return its name.
+   * resource it replaces, and return its name. Without a resource to replace
+   * (an empty property of a custom object), it is configured like
+   * `defaultResource`, if given.
    * @param {string} replacedResourceName
    * @param {string} slotId
    * @param {ThemeFile} themeFile
+   * @param {any=} defaultResource
    * @returns {string | null}
    */
-  const useThemeResource = (replacedResourceName, slotId, themeFile) => {
-    const replacedResource = resourceByName.get(replacedResourceName);
+  const useThemeResource = (
+    replacedResourceName,
+    slotId,
+    themeFile,
+    defaultResource
+  ) => {
+    const replacedResource =
+      resourceByName.get(replacedResourceName) || defaultResource;
     if (!replacedResource) return null;
 
     // A resource of the starter can already have that name: number the new one.
@@ -225,8 +244,73 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
 
     appliedSlots.add(slotId);
     themeResourceNames.add(name);
-    replacedResourceNames.add(replacedResourceName);
+    if (replacedResourceName) replacedResourceNames.add(replacedResourceName);
     return name;
+  };
+
+  /**
+   * Theme the properties of a custom object: an image resource takes the
+   * texture of a texture or material slot, along with the normal map of the
+   * material if the starter maps one; a color takes the color of a color slot.
+   * @param {any} objectContent
+   * @param {Object.<string, string | import('./ThemeSlots.js').MaterialMapping>} mapping
+   * @returns {boolean} Whether a property changed.
+   */
+  const themeCustomObjectProperties = (objectContent, mapping) => {
+    let changed = false;
+    Object.entries(mapping).forEach(([property, propertyMapping]) => {
+      const slotId =
+        typeof propertyMapping === 'string'
+          ? propertyMapping
+          : propertyMapping.slot;
+      const slot = theme.slots[slotId];
+      if (
+        slot &&
+        slot.kind === 'color' &&
+        typeof propertyMapping === 'string'
+      ) {
+        objectContent[property] = slot.color;
+        appliedSlots.add(slotId);
+        changed = true;
+        return;
+      }
+      if (!slot || (slot.kind !== 'texture' && slot.kind !== 'material')) {
+        missingSlots.add(slotId);
+        return;
+      }
+
+      const themeTextureResourceName = useThemeResource(
+        String(objectContent[property] || ''),
+        slotId,
+        slot,
+        { kind: 'image', metadata: '', smoothed: true, userAdded: false }
+      );
+      if (!themeTextureResourceName) return;
+      objectContent[property] = themeTextureResourceName;
+      changed = true;
+      if (typeof propertyMapping === 'string') return;
+
+      const normalMapProperty = propertyMapping.normalMap;
+      const normalMapResourceName = String(
+        objectContent[normalMapProperty] || ''
+      );
+      if (slot.kind === 'material' && slot.normalMap) {
+        objectContent[normalMapProperty] =
+          useThemeResource(
+            normalMapResourceName,
+            slotId,
+            slot.normalMap,
+            resourceByName.get(themeTextureResourceName)
+          ) || '';
+      } else {
+        // The bumps of another texture would not match the theme texture.
+        objectContent[normalMapProperty] = '';
+        if (normalMapResourceName) {
+          replacedResourceNames.add(normalMapResourceName);
+        }
+      }
+    });
+    return changed;
   };
 
   Object.entries(starterThemeSlots.objects || {}).forEach(
@@ -274,12 +358,14 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
       if (object.type === 'Scene3D::Cube3DObject') {
         let changed = false;
         Object.keys(cubeFaceProperties).forEach((face) => {
-          const slotId = typeof mapping === 'string' ? mapping : mapping[face];
+          const faceMapping =
+            typeof mapping === 'string' ? mapping : mapping[face];
+          const slotId = typeof faceMapping === 'string' ? faceMapping : null;
           const faceProperty = cubeFaceProperties[face];
           const resourceName = objectContent[faceProperty];
           if (!slotId || !resourceName) return;
           const slot = theme.slots[slotId];
-          if (!slot || slot.kind !== 'texture') {
+          if (!slot || (slot.kind !== 'texture' && slot.kind !== 'material')) {
             missingSlots.add(slotId);
             return;
           }
@@ -293,6 +379,14 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
           changed = true;
         });
         if (changed) changedObjectsCount++;
+        return;
+      }
+
+      if (
+        typeof mapping !== 'string' &&
+        themeCustomObjectProperties(objectContent, mapping)
+      ) {
+        changedObjectsCount++;
       }
     }
   );

@@ -70,6 +70,28 @@ slot for all its faces, or to one slot per face. A skybox effect, referred to
 as `effect:<scene>/<layer>/<effect>`, maps to one skybox slot: the theme's
 skybox replaces its six faces.
 
+A custom object, like the 3D terrain, maps some of its properties. An image
+property maps to a texture slot, a color property to a color slot, and the
+texture of a terrain layer to a *material* slot, a texture with its normal map,
+along with the property that takes the normal map:
+
+```json
+"scene:Game Scene/Terrain": {
+  "Layer1Texture": { "slot": "terrain.ground", "normalMap": "Layer1NormalMap" },
+  "Layer2Texture": { "slot": "terrain.road", "normalMap": "Layer2NormalMap" }
+},
+"scene:Game Scene/Grass": {
+  "BaseColor": "terrain.grass.base",
+  "TipColor": "terrain.grass.tip"
+}
+```
+
+A theme whose material has no normal map empties the normal map property: the
+bumps of the starter's texture would not match the theme's. Custom objects
+don't have to be mapped, but the children of a custom object that are 3D models
+or cubes do (list the placeholders of the terrain and the grass in
+`ignoredObjects`).
+
 **When you add a 3D starter, add its `theme-slots.json`.** The build refuses to
 publish a 3D starter without one, or one where a 3D model or cube is neither
 mapped nor listed in `ignoredObjects`, and it names the object:

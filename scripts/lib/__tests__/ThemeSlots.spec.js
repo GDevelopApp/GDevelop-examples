@@ -15,6 +15,8 @@ const vocabulary = {
     { id: 'env.ground', kind: 'texture', label: 'Ground' },
     { id: 'env.wall', kind: 'texture', label: 'Wall' },
     { id: 'sky.day', kind: 'skybox', label: 'Daytime sky' },
+    { id: 'terrain.ground', kind: 'material', label: 'Terrain ground' },
+    { id: 'terrain.grass.tip', kind: 'color', label: 'Grass tip color' },
   ],
 };
 
@@ -62,6 +64,42 @@ const createFakeStarterThemeSlots = () => ({
   },
   ignoredObjects: ['scene:Game Scene/Camera'],
 });
+
+/** @returns {any} */
+const createFakeTerrainProjectObject = () => {
+  /** @type {any} */
+  const projectObject = createFakeProjectObject();
+  projectObject.layouts[0].objects.push({
+    name: 'Terrain',
+    type: 'Terrain3D::Terrain3D',
+  });
+  projectObject.eventsFunctionsExtensions.push({
+    name: 'Terrain3D',
+    eventsBasedObjects: [
+      {
+        name: 'Terrain3D',
+        objects: [],
+        propertyDescriptors: [
+          { name: 'Layer1Texture', type: 'Resource' },
+          { name: 'Layer1NormalMap', type: 'Resource' },
+          { name: 'Layer1Color', type: 'Color' },
+          { name: 'TextureSize', type: 'Number' },
+        ],
+      },
+    ],
+  });
+  return projectObject;
+};
+
+/**
+ * @param {StarterThemeSlots['objects'][string]} terrainMapping
+ * @returns {StarterThemeSlots}
+ */
+const createFakeTerrainThemeSlots = (terrainMapping) => {
+  const starterThemeSlots = createFakeStarterThemeSlots();
+  starterThemeSlots.objects['scene:Game Scene/Terrain'] = terrainMapping;
+  return starterThemeSlots;
+};
 
 describe('getThemeableObjects', () => {
   it('lists the 3D objects of scenes and custom objects, and the skyboxes', () => {
@@ -222,5 +260,81 @@ describe('checkStarterThemeSlots', () => {
     expect(errors[0].message).toContain(
       'a texture slot, but needs a skybox slot'
     );
+  });
+
+  it('accepts a custom object mapping its resources and colors', () => {
+    expect(
+      checkStarterThemeSlots(
+        vocabulary,
+        'starting-3d-test',
+        createFakeTerrainProjectObject(),
+        createFakeTerrainThemeSlots({
+          Layer1Texture: {
+            slot: 'terrain.ground',
+            normalMap: 'Layer1NormalMap',
+          },
+          Layer1Color: 'terrain.grass.tip',
+        })
+      )
+    ).toEqual([]);
+  });
+
+  it('does not require custom objects to be mapped', () => {
+    expect(
+      checkStarterThemeSlots(
+        vocabulary,
+        'starting-3d-test',
+        createFakeTerrainProjectObject(),
+        createFakeStarterThemeSlots()
+      )
+    ).toEqual([]);
+  });
+
+  it('reports a custom object property that does not exist or cannot be themed', () => {
+    const errors = checkStarterThemeSlots(
+      vocabulary,
+      'starting-3d-test',
+      createFakeTerrainProjectObject(),
+      createFakeTerrainThemeSlots({
+        Layer9Texture: 'env.ground',
+        TextureSize: 'env.ground',
+        Layer1Texture: { slot: 'terrain.ground', normalMap: 'Missing' },
+      })
+    );
+
+    expect(errors.map((error) => error.message)).toEqual([
+      'Starter "starting-3d-test": "scene:Game Scene/Terrain" maps the property "Layer9Texture", which its object does not have.',
+      'Starter "starting-3d-test": "scene:Game Scene/Terrain" maps its property "TextureSize", a Number, but only resources and colors can be themed.',
+      'Starter "starting-3d-test": "scene:Game Scene/Terrain" maps the property "Missing", which its object does not have.',
+    ]);
+  });
+
+  it('requires a material slot for a texture with its normal map', () => {
+    const errors = checkStarterThemeSlots(
+      vocabulary,
+      'starting-3d-test',
+      createFakeTerrainProjectObject(),
+      createFakeTerrainThemeSlots({
+        Layer1Texture: { slot: 'env.ground', normalMap: 'Layer1NormalMap' },
+        Layer1Color: 'env.ground',
+      })
+    );
+
+    expect(errors.map((error) => error.message)).toEqual([
+      'Starter "starting-3d-test": "scene:Game Scene/Terrain" property "Layer1Texture" maps to "env.ground", a texture slot, but needs a material slot.',
+      'Starter "starting-3d-test": "scene:Game Scene/Terrain" property "Layer1Color" maps to "env.ground", a texture slot, but needs a color slot.',
+    ]);
+  });
+
+  it('requires a custom object to map its properties', () => {
+    const errors = checkStarterThemeSlots(
+      vocabulary,
+      'starting-3d-test',
+      createFakeTerrainProjectObject(),
+      createFakeTerrainThemeSlots('terrain.ground')
+    );
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toContain('must map its properties to slots');
   });
 });
