@@ -1,5 +1,7 @@
-# 3D Island Terrain
+An island made with the **3D terrain** extension: a mountain, a cliff and beaches sculpted from a relief, textured layers of grass, dirt, rock and sand with normal maps lit by a low sun, a dirt path painted with events, **terrain grass** swaying in the wind and pushed aside by the player, trees, and the **3D water** around it. Ambient occlusion, a light depth of field and a light bloom finish the look.
 
-A 3D island made with a terrain that can be sculpted and painted in the editor, surrounded by water, with grass swaying in the wind and a character walking on the hills.
+Select the terrain in the scene editor to sculpt it (raise, lower, smooth, flatten) and paint its layers. Its shape is also described by its "Edits" property: a list of brush strokes that can be read and changed. The character walks on the slopes thanks to the 3D physics behavior of the terrain. A flat terrain painted with sand is the sea floor.
 
-The assets are CC0: ground textures from ambientCG, trees from the "Ultimate Nature" pack by Quaternius and a water normal map made from "Seamless looping waves heightmaps" by zookeeper.
+The sand is wet near the water thanks to the "Wet shore" of the terrain, and the meadow has dry patches and a puddle on the path: the ground can be tinted with a color and made wet (darker and shiny) with the "Tint" and "Wetness" brushes, the "tint" and "wetness" strokes of the "Edits" property, or events. The grass takes the tint of the ground it grows on.
+
+The assets are CC0: the textures and normal maps of the grass (Grass004), dirt (Ground106), rock (Rock058) and sand (Ground080) are from ambientCG, the trees and bushes are from the "Ultimate Nature" pack by Quaternius, and the ripples of the water use a normal map made from "Seamless looping waves heightmaps" by zookeeper (OpenGameArt).

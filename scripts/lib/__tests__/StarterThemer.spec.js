@@ -476,6 +476,252 @@ describe('applyThemeToStarter', () => {
   });
 });
 
+/** @returns {StarterThemeSlots} */
+const makeTerrainThemeSlots = () => ({
+  version: 1,
+  objects: {
+    'scene:Game Scene/Terrain': {
+      Layer1Texture: { slot: 'terrain.ground', normalMap: 'Layer1NormalMap' },
+      Layer2Texture: { slot: 'terrain.road', normalMap: 'Layer2NormalMap' },
+      Layer3Texture: { slot: 'terrain.rock', normalMap: 'Layer3NormalMap' },
+    },
+    'scene:Game Scene/Grass': {
+      BaseColor: 'terrain.grass.base',
+      TipColor: 'terrain.grass.tip',
+    },
+  },
+});
+
+/** @returns {Theme} */
+const makeTerrainTheme = () => ({
+  id: 'winter',
+  name: 'Winter',
+  description: 'Snowy mountains.',
+  slots: {
+    'terrain.ground': {
+      kind: 'material',
+      file: 'https://asset-resources.gdevelop.io/public-resources/Snow_Color.jpg',
+      resourceName: 'Snow_Color.jpg',
+      normalMap: {
+        file: 'https://asset-resources.gdevelop.io/public-resources/Snow_Normal.jpg',
+        resourceName: 'Snow_Normal.jpg',
+      },
+    },
+    'terrain.road': {
+      kind: 'material',
+      file: 'https://asset-resources.gdevelop.io/public-resources/Ice.jpg',
+      resourceName: 'Ice.jpg',
+    },
+    'terrain.grass.base': { kind: 'color', color: '120;130;140' },
+    'terrain.grass.tip': { kind: 'color', color: '230;235;240' },
+  },
+});
+
+/** @returns {any} */
+const makeTerrainProjectContent = () => ({
+  resources: {
+    resources: [
+      { name: 'Grass.jpg', file: 'assets/Grass.jpg', kind: 'image' },
+      {
+        name: 'GrassNormal.jpg',
+        file: 'assets/GrassNormal.jpg',
+        kind: 'image',
+        smoothed: true,
+      },
+      { name: 'Asphalt.jpg', file: 'assets/Asphalt.jpg', kind: 'image' },
+      {
+        name: 'AsphaltNormal.jpg',
+        file: 'assets/AsphaltNormal.jpg',
+        kind: 'image',
+      },
+    ],
+  },
+  layouts: [
+    {
+      name: 'Game Scene',
+      layers: [],
+      objects: [
+        {
+          name: 'Terrain',
+          type: 'Terrain3D::Terrain3D',
+          content: {
+            Layer1Texture: 'Grass.jpg',
+            Layer1NormalMap: '',
+            Layer2Texture: 'Asphalt.jpg',
+            Layer2NormalMap: 'AsphaltNormal.jpg',
+            Layer3Texture: '',
+            Layer3NormalMap: '',
+          },
+        },
+        {
+          name: 'Grass',
+          type: 'Terrain3D::TerrainGrass',
+          content: { BaseColor: '40;62;22', TipColor: '112;130;52' },
+        },
+      ],
+    },
+  ],
+});
+
+describe('applyThemeToStarter on custom objects', () => {
+  /** @param {any} projectContent */
+  const applyWinterTheme = (projectContent) =>
+    applyThemeToStarter(
+      projectContent,
+      makeTerrainThemeSlots(),
+      makeTerrainTheme()
+    );
+
+  it('gives a terrain layer the texture and the normal map of a material', () => {
+    const projectContent = makeTerrainProjectContent();
+    applyWinterTheme(projectContent);
+
+    const terrainContent = projectContent.layouts[0].objects[0].content;
+    expect(terrainContent.Layer1Texture).toBe('Snow_Color.jpg');
+    expect(terrainContent.Layer1NormalMap).toBe('Snow_Normal.jpg');
+    expect(getResource(projectContent, 'Snow_Normal.jpg')).toEqual({
+      name: 'Snow_Normal.jpg',
+      file: 'https://asset-resources.gdevelop.io/public-resources/Snow_Normal.jpg',
+      kind: 'image',
+      origin: {
+        name: 'gdevelop-asset-store',
+        identifier:
+          'https://asset-resources.gdevelop.io/public-resources/Snow_Normal.jpg',
+      },
+    });
+    expect(getResource(projectContent, 'Grass.jpg')).toBeUndefined();
+  });
+
+  it('removes the normal map of a layer whose material has none', () => {
+    const projectContent = makeTerrainProjectContent();
+    applyWinterTheme(projectContent);
+
+    const terrainContent = projectContent.layouts[0].objects[0].content;
+    expect(terrainContent.Layer2Texture).toBe('Ice.jpg');
+    expect(terrainContent.Layer2NormalMap).toBe('');
+    expect(getResource(projectContent, 'AsphaltNormal.jpg')).toBeUndefined();
+  });
+
+  it('leaves a layer untouched when the theme does not fill its slot', () => {
+    const projectContent = makeTerrainProjectContent();
+    const result = applyWinterTheme(projectContent);
+
+    const terrainContent = projectContent.layouts[0].objects[0].content;
+    expect(terrainContent.Layer3Texture).toBe('');
+    expect(result.missingSlots).toEqual(['terrain.rock']);
+  });
+
+  it('gives a color property the color of a color slot', () => {
+    const projectContent = makeTerrainProjectContent();
+    const result = applyWinterTheme(projectContent);
+
+    expect(projectContent.layouts[0].objects[1].content).toEqual({
+      BaseColor: '120;130;140',
+      TipColor: '230;235;240',
+    });
+    expect(result.appliedSlots).toEqual([
+      'terrain.grass.base',
+      'terrain.grass.tip',
+      'terrain.ground',
+      'terrain.road',
+    ]);
+    expect(result.changedObjectsCount).toBe(2);
+  });
+
+  it('fills a layer that had no texture', () => {
+    const projectContent = makeTerrainProjectContent();
+    applyThemeToStarter(projectContent, makeTerrainThemeSlots(), {
+      ...makeTerrainTheme(),
+      slots: { 'terrain.rock': makeTerrainTheme().slots['terrain.ground'] },
+    });
+
+    const terrainContent = projectContent.layouts[0].objects[0].content;
+    expect(terrainContent.Layer3Texture).toBe('Snow_Color.jpg');
+    expect(terrainContent.Layer3NormalMap).toBe('Snow_Normal.jpg');
+    expect(getResource(projectContent, 'Snow_Color.jpg').kind).toBe('image');
+  });
+
+  it('gives a layer a texture without its normal map', () => {
+    const projectContent = makeTerrainProjectContent();
+    applyThemeToStarter(projectContent, makeTerrainThemeSlots(), {
+      ...makeTerrainTheme(),
+      slots: {
+        'terrain.road': {
+          kind: 'texture',
+          file: 'https://asset-resources.gdevelop.io/public-resources/Sand.png',
+          resourceName: 'Sand.png',
+        },
+      },
+    });
+
+    const terrainContent = projectContent.layouts[0].objects[0].content;
+    expect(terrainContent.Layer2Texture).toBe('Sand.png');
+    expect(terrainContent.Layer2NormalMap).toBe('');
+  });
+
+  it('gives scattered models the model of a model slot, keeping their size', () => {
+    /** @type {any} */
+    const projectContent = {
+      resources: {
+        resources: [
+          { name: 'Pine.glb', file: 'assets/Pine.glb', kind: 'model3D' },
+        ],
+      },
+      layouts: [
+        {
+          name: 'Game Scene',
+          layers: [],
+          objects: [
+            {
+              name: 'Forest',
+              type: 'Terrain3D::ScatteredModels',
+              content: { Model: 'Pine.glb', Size: 300 },
+            },
+          ],
+        },
+      ],
+    };
+    const result = applyThemeToStarter(
+      projectContent,
+      {
+        version: 1,
+        objects: { 'scene:Game Scene/Forest': { Model: 'nature.tree' } },
+      },
+      {
+        ...makeTerrainTheme(),
+        slots: {
+          'nature.tree': {
+            kind: 'model',
+            file: 'https://asset-resources.gdevelop.io/public-resources/Palm.glb',
+            resourceName: 'Palm.glb',
+            objectContent: { modelResourceName: 'Palm.glb', rotationX: 90 },
+          },
+        },
+      }
+    );
+
+    expect(projectContent.layouts[0].objects[0].content).toEqual({
+      Model: 'Palm.glb',
+      Size: 300,
+    });
+    expect(getResource(projectContent, 'Palm.glb').kind).toBe('model3D');
+    expect(getResource(projectContent, 'Pine.glb')).toBeUndefined();
+    expect(result.appliedSlots).toEqual(['nature.tree']);
+  });
+
+  it('gives a cube face the texture of a material', () => {
+    const projectContent = makeProjectContent();
+    applyThemeToStarter(projectContent, makeStarterThemeSlots(), {
+      ...makeStarterTheme(),
+      slots: { 'env.ground': makeTerrainTheme().slots['terrain.ground'] },
+    });
+
+    expect(
+      projectContent.layouts[0].objects[2].content.topFaceResourceName
+    ).toBe('Snow_Color.jpg');
+  });
+});
+
 describe('getThemedStarterFileName', () => {
   it('names the themed copy after the starter, to sit next to it', () => {
     expect(getThemedStarterFileName('starting-3d-tank', 'pirate')).toBe(
