@@ -5092,23 +5092,24 @@
     {
       "author": "",
       "category": "Camera",
-      "dimension": "",
+      "dimension": "3D",
       "extensionNamespace": "",
       "fullName": "Third person camera",
-      "gdevelopVersion": "",
+      "gdevelopVersion": ">=5.5.269",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI3LDEwIDEsMTMgNywxNiAxMywxMyAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjEsMTMgMSwyMCA3LDIzIDEzLDIwIDEzLDEzICIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjciIHkxPSIxNiIgeDI9IjciIHkyPSIyMyIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjMxIiB5MT0iMTYiIHgyPSIyMSIgeTI9IjgiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyMSIgeTE9IjI0IiB4Mj0iMzEiIHkyPSIxNiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyLjcsMjIuNkMyMCwyMS43LDE4LDE5LjEsMTgsMTZjMC0zLjEsMi01LjcsNC43LTYuNiIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5LjgsMTEuM2MxLjQsMS4xLDIuMiwyLjgsMi4yLDQuN2MwLDEuOS0wLjksMy42LTIuMiw0LjciLz4NCjwvc3ZnPg0K",
       "name": "ThirdPersonCamera",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/Line Hero Pack/Master/SVG/Virtual Reality/94e95d2c318e1f3dc7151a351024e13c574e1e44669c6696aa107d60230073f6_Virtual Reality_3d_vision_eye_vr.svg",
-      "shortDescription": "Move the camera  to look at an object from a given distance.",
-      "version": "1.5.0",
+      "shortDescription": "Third-person camera orbiting an object at configurable distance, elevation, and rotation.",
+      "version": "1.9.0",
       "description": [
         "Move the camera  to look at an object from a given distance with a rotation and an elevation angles.",
         "",
         "It can be useful for:",
-        "- Third person camera",
-        "- Isometric-like point of view",
-        ""
+        "- 3D platformer games ([open the project online](https://editor.gdevelop.io/?project=example://3d-platformer))",
+        "- 3D racing games ([open the project online](https://editor.gdevelop.io/?project=example://3d-car-coin-hunt))",
+        "- Orbit camera controls ([open the project online](https://editor.gdevelop.io/?project=example://3d-tile-based-city-builder))",
+        "- Isometric-like point of view ([open the project online](https://editor.gdevelop.io/?project=example://3d-road-crosser))"
       ],
       "origin": {
         "identifier": "ThirdPersonCamera",
@@ -5125,6 +5126,76 @@
       "globalVariables": [],
       "sceneVariables": [],
       "eventsFunctions": [
+        {
+          "description": "Define helper classes JavaScript code.",
+          "fullName": "Define helper classes",
+          "functionType": "Action",
+          "name": "DefineHelperClasses",
+          "private": true,
+          "sentence": "Define helper classes JavaScript code",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "//@ts-ignore",
+                "if (gdjs.__thirdPersonCameraExtension) {",
+                "    //@ts-ignore",
+                "    return;",
+                "}",
+                "",
+                "/**",
+                " * It can be built the follow:",
+                " * ",
+                " * `objectDefaultRotation.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI/2);`",
+                " * ",
+                " * `objectDefaultRotation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI/2));`",
+                " * ",
+                " */",
+                "const objectDefaultRotation = new THREE.Quaternion(0.5, -0.5, -0.5, 0.5);",
+                "const targetQuaternion = new THREE.Quaternion();",
+                "const yAxis = new THREE.Vector3(0, 1, 0);",
+                "const zAxis = new THREE.Vector3(0, 0, 1);",
+                "const quaternion = new THREE.Quaternion();",
+                "const objectRotation = new THREE.Euler();",
+                "",
+                "/**",
+                " * @param object {gdjs.RuntimeObject}",
+                " * @param ratio {number}",
+                " * @param elevationAngleOffset {number}",
+                " */",
+                "function slerpCamera(object, ratio, rotationAngleOffset, elevationAngleOffset) {",
+                "    const layer = object.getInstanceContainer().getLayer(object.getLayer());",
+                "    const threeCamera = layer.getRenderer().getThreeCamera();",
+                "    const threeObject = object.get3DRendererObject();",
+                "",
+                "    objectRotation.copy(threeObject.rotation);",
+                "    objectRotation.z = -objectRotation.z;",
+                "    objectRotation.x = -objectRotation.x;",
+                "    targetQuaternion.setFromEuler(objectRotation);",
+                "    targetQuaternion.multiply(quaternion.setFromAxisAngle(zAxis, -gdjs.toRad(rotationAngleOffset)));",
+                "    targetQuaternion.multiply(quaternion.setFromAxisAngle(yAxis, gdjs.toRad(elevationAngleOffset)));",
+                "    targetQuaternion.multiply(objectDefaultRotation);",
+                "",
+                "    threeCamera.quaternion.slerp(targetQuaternion, ratio);",
+                "",
+                "    // The layer angle takes over the 3D camera Z rotation.",
+                "    layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));",
+                "}",
+                "",
+                "//@ts-ignore",
+                "gdjs.__thirdPersonCameraExtension = {",
+                "    slerpCamera,",
+                "};",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
         {
           "description": "Move the camera to look at a position from a distance.",
           "fullName": "Look at a position from a distance (deprecated)",
@@ -5637,6 +5708,9 @@
         "folderName": "__ROOT",
         "children": [
           {
+            "functionName": "DefineHelperClasses"
+          },
+          {
             "functionName": "LookFromDistanceAtPosition"
           },
           {
@@ -5670,6 +5744,7 @@
           "name": "ThirdPersonCamera",
           "objectType": "",
           "previewIconUrl": "",
+          "quickCustomizationVisibility": "hidden",
           "eventsFunctions": [
             {
               "fullName": "",
@@ -5677,6 +5752,21 @@
               "name": "onCreated",
               "sentence": "",
               "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::DefineHelperClasses"
+                      },
+                      "parameters": [
+                        "",
+                        ""
+                      ]
+                    }
+                  ]
+                },
                 {
                   "type": "BuiltinCommonInstructions::Comment",
                   "color": {
@@ -5702,6 +5792,18 @@
                         "Behavior",
                         "=",
                         "RotationHalfwayDuration",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetElevationHalfwayDuration"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "ElevationHalfwayDuration",
                         ""
                       ]
                     },
@@ -5746,46 +5848,44 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::PropertyHasJustBeenCreated"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "HasJustBeenCreated",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyHasJustBeenCreated"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "HasJustBeenCreated",
+                        "False",
                         ""
                       ]
                     },
                     {
                       "type": {
-                        "value": "SetCameraAngle"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "",
+                        "CameraZ",
                         "=",
-                        "Object.Angle() + 90",
-                        "Object.Layer()",
-                        "0"
+                        "Object.Object3D::CenterZ()"
                       ]
                     },
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyCameraZ"
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::JumpToTargetedRotation"
                       },
                       "parameters": [
                         "Object",
                         "Behavior",
-                        "=",
-                        "Object.Object3D::CenterZ()"
+                        ""
                       ]
                     }
                   ]
@@ -5796,11 +5896,12 @@
                     {
                       "type": {
                         "inverted": true,
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::PropertyIsCalledManually"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "IsCalledManually",
+                        "True",
+                        ""
                       ]
                     }
                   ],
@@ -5868,11 +5969,11 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyIsCalledManually"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "IsCalledManually",
+                        "False",
                         ""
                       ]
                     },
@@ -5925,29 +6026,146 @@
                   "comment": "At each frame, the camera must catchup the target by a given ratio (speed)\ncameraX(t) - targetX = (cameraX(t - 1) - targetX) * (1 - speed)\n\nThe frame rate must not impact on the catch-up speed, we don't want a speed in ratio per frame but a speed ratio per second, like this:\ncameraX(t) - targetX = (cameraX(t - 1s) - targetX) * (1 - speed)\n\nOk, but we still need to process each frame, we can use a exponent for this:\ncameraX(t) - targetX = (cameraX(t - timeDelta) - targetX) * (1 - speed)^timeDelta\ncameraX(t) = targetX + (cameraX(t - timeDelta) - targetX) * exp(timeDelta * ln((1 - speed)))\n\npow is probably more efficient than precalculated log if the speed is changed continuously but this might be rare enough."
                 },
                 {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Z translation",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "StringVariable"
+                      },
+                      "parameters": [
+                        "RotationMode",
+                        "=",
+                        "\"ZYX\""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsRotatingWithObject",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::Slerp"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "1 - exp(TimeDelta() * RotationLogSpeed)",
+                        "RotationAngleOffset",
+                        "ElevationAngleOffset",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ThirdPersonCamera::ThirdPersonCamera::MoveToObject"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "OffsetY",
+                        "OffsetX",
+                        "OffsetZ",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterX"
+                      },
+                      "parameters": [
+                        "",
+                        "-",
+                        "Distance * Scene3D::CameraForwardX(Object.Layer())",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterY"
+                      },
+                      "parameters": [
+                        "",
+                        "-",
+                        "Distance * Scene3D::CameraForwardY(Object.Layer())",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::SetCameraZ"
+                      },
+                      "parameters": [
+                        "",
+                        "-",
+                        "Distance * Scene3D::CameraForwardZ(Object.Layer())",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::Or"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
+                          },
+                          "parameters": [
+                            "RotationMode",
+                            "!=",
+                            "\"ZYX\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "IsRotatingWithObject",
+                            "False",
+                            ""
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [],
                   "events": [
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [],
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Z translation",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
                       "events": [
                         {
                           "type": "BuiltinCommonInstructions::Standard",
                           "conditions": [
                             {
                               "type": {
-                                "value": "ThirdPersonCamera::ThirdPersonCamera::PropertyCameraZ"
+                                "value": "NumberVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "CameraZ",
                                 "<",
                                 "Object.Behavior::FreeAreaZMin()"
                               ]
@@ -5956,11 +6174,10 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyCameraZ"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "CameraZ",
                                 "=",
                                 "Object.Behavior::FreeAreaZMin() + (CameraZ - Object.Behavior::FreeAreaZMin()) * exp(TimeDelta() * TranslationZLogSpeed)"
                               ]
@@ -5972,11 +6189,10 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "ThirdPersonCamera::ThirdPersonCamera::PropertyCameraZ"
+                                "value": "NumberVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "CameraZ",
                                 ">",
                                 "Object.Behavior::FreeAreaZMax()"
                               ]
@@ -5985,100 +6201,159 @@
                           "actions": [
                             {
                               "type": {
-                                "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyCameraZ"
+                                "value": "SetNumberVariable"
                               },
                               "parameters": [
-                                "Object",
-                                "Behavior",
+                                "CameraZ",
                                 "=",
                                 "Object.Behavior::FreeAreaZMax() + (CameraZ - Object.Behavior::FreeAreaZMax()) * exp(TimeDelta() * TranslationZLogSpeed)"
                               ]
                             }
                           ]
                         }
-                      ]
-                    }
-                  ],
-                  "parameters": []
-                },
-                {
-                  "colorB": 228,
-                  "colorG": 176,
-                  "colorR": 74,
-                  "creationTime": 0,
-                  "name": "Z rotation",
-                  "source": "",
-                  "type": "BuiltinCommonInstructions::Group",
-                  "events": [
-                    {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "value": "ThirdPersonCamera::ThirdPersonCamera::PropertyIsRotatingWithObject"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior"
-                          ]
-                        }
                       ],
-                      "actions": [
-                        {
-                          "type": {
-                            "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyTargetedRotationAngle"
-                          },
-                          "parameters": [
-                            "Object",
-                            "Behavior",
-                            "=",
-                            "Object.Angle()"
-                          ]
-                        }
-                      ]
+                      "parameters": []
                     },
                     {
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [],
-                      "actions": [
+                      "colorB": 228,
+                      "colorG": 176,
+                      "colorR": 74,
+                      "creationTime": 0,
+                      "name": "Z rotation",
+                      "source": "",
+                      "type": "BuiltinCommonInstructions::Group",
+                      "events": [
                         {
-                          "type": {
-                            "value": "SetNumberVariable"
-                          },
-                          "parameters": [
-                            "CameraAngle",
-                            "=",
-                            "TargetedRotationAngle + 90 + RotationAngleOffset + AngleDifference(CameraAngle(Object.Layer()), TargetedRotationAngle + 90 + RotationAngleOffset) * exp(TimeDelta() * RotationLogSpeed)"
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BooleanVariable"
+                              },
+                              "parameters": [
+                                "IsRotatingWithObject",
+                                "True",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TargetedRotationAngle",
+                                "=",
+                                "Object.Angle()"
+                              ]
+                            }
                           ]
                         },
                         {
-                          "type": {
-                            "value": "ThirdPersonCamera::LookFromDistanceAtPosition3D"
-                          },
-                          "parameters": [
-                            "",
-                            "Object.CenterX() + ThirdPersonCamera::RotatedX(CameraAngle, OffsetX, -OffsetY)",
-                            "Object.CenterY() + ThirdPersonCamera::RotatedY(CameraAngle, OffsetX, -OffsetY)",
-                            "CameraZ + OffsetZ",
-                            "Distance",
-                            "CameraAngle",
-                            "Object.Object3D::RotationY() + ElevationAngleOffset",
-                            "",
-                            ""
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "value": "BuiltinCommonInstructions::Or"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "value": "StringVariable"
+                                  },
+                                  "parameters": [
+                                    "RotationMode",
+                                    "!=",
+                                    "\"Z\""
+                                  ]
+                                },
+                                {
+                                  "type": {
+                                    "value": "BooleanVariable"
+                                  },
+                                  "parameters": [
+                                    "IsElevatingWithObject",
+                                    "True",
+                                    ""
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TargetedElevationAngle",
+                                "=",
+                                "Object.Object3D::RotationY()"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "CameraRotationAngle",
+                                "=",
+                                "TargetedRotationAngle + 90 + RotationAngleOffset + AngleDifference(CameraAngle(Object.Layer()), TargetedRotationAngle + 90 + RotationAngleOffset) * exp(TimeDelta() * RotationLogSpeed)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "CameraElevationAngle",
+                                "=",
+                                "TargetedElevationAngle + ElevationAngleOffset + AngleDifference(90 - Scene3D::CameraRotationX(Object.Layer()), TargetedElevationAngle + ElevationAngleOffset) * exp(TimeDelta() * ElevationLogSpeed)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ThirdPersonCamera::LookFromDistanceAtPosition3D"
+                              },
+                              "parameters": [
+                                "",
+                                "Object.CenterX() + ThirdPersonCamera::RotatedX(CameraRotationAngle, OffsetX, -OffsetY)",
+                                "Object.CenterY() + ThirdPersonCamera::RotatedY(CameraRotationAngle, OffsetX, -OffsetY)",
+                                "CameraZ + OffsetZ",
+                                "Distance",
+                                "CameraRotationAngle",
+                                "CameraElevationAngle",
+                                "Object.Layer()",
+                                ""
+                              ]
+                            }
+                          ],
+                          "variables": [
+                            {
+                              "folded": true,
+                              "name": "CameraRotationAngle",
+                              "type": "number",
+                              "value": 0
+                            },
+                            {
+                              "name": "CameraElevationAngle",
+                              "type": "number",
+                              "value": 0
+                            }
                           ]
                         }
                       ],
-                      "variables": [
-                        {
-                          "folded": true,
-                          "name": "CameraAngle",
-                          "type": "number",
-                          "value": 0
-                        }
-                      ]
+                      "parameters": []
                     }
-                  ],
-                  "parameters": []
+                  ]
                 }
               ],
               "parameters": [
@@ -6097,11 +6372,144 @@
               "objectGroups": []
             },
             {
+              "fullName": "Lerp camera",
+              "functionType": "Action",
+              "name": "Slerp",
+              "private": true,
+              "sentence": "Lerp the camera rotation to _PARAM0_ with a ratio of _PARAM2_ with rotation offset _PARAM3_° and elevation offset _PARAM4_°",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.RuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const ratio = eventsFunctionContext.getArgument(\"Ratio\");",
+                    "const rotationAngleOffset = eventsFunctionContext.getArgument(\"NewRotationAngleOffset\");",
+                    "const elevationAngleOffset = eventsFunctionContext.getArgument(\"NewElevationAngleOffset\");",
+                    "",
+                    "gdjs.__thirdPersonCameraExtension.slerpCamera(object, ratio, rotationAngleOffset, elevationAngleOffset);",
+                    ""
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
+                  "type": "behavior"
+                },
+                {
+                  "description": "Ratio",
+                  "name": "Ratio",
+                  "type": "expression"
+                },
+                {
+                  "description": "Rotation angle offset",
+                  "name": "NewRotationAngleOffset",
+                  "type": "expression"
+                },
+                {
+                  "description": "Elevation angle offset",
+                  "name": "NewElevationAngleOffset",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Move to object",
+              "functionType": "Action",
+              "name": "MoveToObject",
+              "private": true,
+              "sentence": "Change the camera position to _PARAM0_ with offset _PARAM2_, _PARAM3_, _PARAM4_ ",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetCameraCenterX"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "Object.CenterX() + LocalOffsetX * Object.Object3D::ForwardX() + LocalOffsetY * Object.Object3D::RightX() + LocalOffsetZ * Object.Object3D::UpX()",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetCameraCenterY"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "Object.CenterY() + LocalOffsetX * Object.Object3D::ForwardY() + LocalOffsetY * Object.Object3D::RightY() + LocalOffsetZ * Object.Object3D::UpY()",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Scene3D::SetCameraZ"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "Object.Object3D::CenterZ() + LocalOffsetX * Object.Object3D::ForwardZ() + LocalOffsetY * Object.Object3D::RightZ() + LocalOffsetZ * Object.Object3D::UpZ()",
+                        "Object.Layer()",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
+                  "type": "behavior"
+                },
+                {
+                  "description": "X offset",
+                  "name": "LocalOffsetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "Y offset",
+                  "name": "LocalOffsetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "Z offset",
+                  "name": "LocalOffsetZ",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
               "description": "Rotate the camera all the way to the targeted angle.",
               "fullName": "Rotate the camera all the way",
               "functionType": "Action",
               "name": "JumpToTargetedRotation",
-              "private": true,
               "sentence": "Rotate the camera all the way to the targeted angle of _PARAM0_",
               "events": [
                 {
@@ -6109,24 +6517,51 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::PropertyIsRotatingWithObject"
+                        "value": "BooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior"
+                        "IsRotatingWithObject",
+                        "True",
+                        ""
                       ]
                     }
                   ],
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyTargetedRotationAngle"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "TargetedRotationAngle",
                         "=",
                         "Object.Angle()"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "BooleanVariable"
+                      },
+                      "parameters": [
+                        "IsElevatingWithObject",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TargetedElevationAngle",
+                        "=",
+                        "Object.Object3D::RotationY()"
                       ]
                     }
                   ]
@@ -6341,22 +6776,123 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyRotationHalfwayDuration"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "RotationHalfwayDuration",
                         "=",
                         "Value"
                       ]
                     },
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyRotationLogSpeed"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "RotationLogSpeed",
+                        "=",
+                        "log(0.5) / Value"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "the halfway  time for elevation rotation of the object.",
+              "fullName": "Halfway  time for elevation rotation",
+              "functionType": "ExpressionAndCondition",
+              "group": "Third person camera configuration",
+              "name": "ElevationHalfwayDuration",
+              "sentence": "the halfway  time for elevation rotation",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "ElevationHalfwayDuration"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "ThirdPersonCamera::ThirdPersonCamera",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "ElevationHalfwayDuration",
+              "group": "Third person camera configuration",
+              "name": "SetElevationHalfwayDuration",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "ln((1 - speed)) = ln(1 / 2) / halfwatTime"
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ElevationHalfwayDuration",
+                        "=",
+                        "Value"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ElevationLogSpeed",
                         "=",
                         "log(0.5) / Value"
                       ]
@@ -6446,22 +6982,20 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyTranslationZHalfwayDuration"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "TranslationZHalfwayDuration",
                         "=",
                         "Value"
                       ]
                     },
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyTranslationZLogSpeed"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "TranslationZLogSpeed",
                         "=",
                         "log(0.5) / Value"
                       ]
@@ -6623,11 +7157,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyFollowFreeAreaZMax"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "FollowFreeAreaZMax",
                         "=",
                         "Value"
                       ]
@@ -6705,11 +7238,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyFollowFreeAreaZMin"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "FollowFreeAreaZMin",
                         "=",
                         "Value"
                       ]
@@ -6787,11 +7319,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyDistance"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "Distance",
                         "=",
                         "Value"
                       ]
@@ -6869,11 +7400,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyOffsetX"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "OffsetX",
                         "=",
                         "Value"
                       ]
@@ -6951,11 +7481,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyOffsetY"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "OffsetY",
                         "=",
                         "Value"
                       ]
@@ -7033,11 +7562,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyOffsetZ"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "OffsetZ",
                         "=",
                         "Value"
                       ]
@@ -7115,11 +7643,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyRotationAngleOffset"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "RotationAngleOffset",
                         "=",
                         "Value"
                       ]
@@ -7197,11 +7724,10 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyElevationAngleOffset"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "ElevationAngleOffset",
                         "=",
                         "Value"
                       ]
@@ -7279,22 +7805,21 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyTargetedRotationAngle"
+                        "value": "SetNumberVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "TargetedRotationAngle",
                         "=",
                         "Value"
                       ]
                     },
                     {
                       "type": {
-                        "value": "ThirdPersonCamera::ThirdPersonCamera::SetPropertyIsRotatingWithObject"
+                        "value": "SetBooleanVariable"
                       },
                       "parameters": [
-                        "Object",
-                        "Behavior",
+                        "IsRotatingWithObject",
+                        "False",
                         ""
                       ]
                     }
@@ -7333,6 +7858,12 @@
                 "functionName": "DoMoveCameraCloser"
               },
               {
+                "functionName": "Slerp"
+              },
+              {
+                "functionName": "MoveToObject"
+              },
+              {
                 "functionName": "JumpToTargetedRotation"
               },
               {
@@ -7349,6 +7880,12 @@
                   },
                   {
                     "functionName": "SetRotationHalfwayDuration"
+                  },
+                  {
+                    "functionName": "ElevationHalfwayDuration"
+                  },
+                  {
+                    "functionName": "SetElevationHalfwayDuration"
                   },
                   {
                     "functionName": "TranslationZHalfwayDuration"
@@ -7440,16 +7977,29 @@
               "value": "0.125",
               "type": "Number",
               "unit": "Second",
-              "label": "Halfway  time for rotation",
+              "label": "Halfway time for rotation",
               "group": "Catch-up speed",
+              "quickCustomizationVisibility": "hidden",
               "name": "RotationHalfwayDuration"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Second",
+              "label": "Halfway time for elevation rotation",
+              "description": "Only used by Z and ZY rotation modes",
+              "group": "Catch-up speed",
+              "quickCustomizationVisibility": "hidden",
+              "name": "ElevationHalfwayDuration"
             },
             {
               "value": "0.125",
               "type": "Number",
               "unit": "Second",
               "label": "Halfway time on Z axis",
+              "description": "Only used by Z and ZY rotation modes",
               "group": "Catch-up speed",
+              "quickCustomizationVisibility": "hidden",
               "name": "TranslationZHalfwayDuration"
             },
             {
@@ -7490,6 +8040,7 @@
               "unit": "DegreeAngle",
               "label": "Rotation angle offset",
               "group": "Position",
+              "advanced": true,
               "name": "RotationAngleOffset"
             },
             {
@@ -7507,6 +8058,7 @@
               "label": "Follow free area top border on Z axis",
               "group": "Position",
               "advanced": true,
+              "quickCustomizationVisibility": "hidden",
               "name": "FollowFreeAreaZMax"
             },
             {
@@ -7516,6 +8068,7 @@
               "label": "Follow free area bottom border on Z axis",
               "group": "Position",
               "advanced": true,
+              "quickCustomizationVisibility": "hidden",
               "name": "FollowFreeAreaZMin"
             },
             {
@@ -7524,6 +8077,13 @@
               "label": "",
               "hidden": true,
               "name": "RotationLogSpeed"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "",
+              "hidden": true,
+              "name": "ElevationLogSpeed"
             },
             {
               "value": "",
@@ -7558,16 +8118,77 @@
               "value": "true",
               "type": "Boolean",
               "label": "Automatically rotate the camera with the object",
+              "quickCustomizationVisibility": "hidden",
               "name": "IsRotatingWithObject"
+            },
+            {
+              "value": "false",
+              "type": "Boolean",
+              "label": "Automatically rotate the camera with the object (elevation)",
+              "description": "Best left unchecked, use the rotation mode instead",
+              "deprecated": true,
+              "quickCustomizationVisibility": "hidden",
+              "name": "IsElevatingWithObject"
+            },
+            {
+              "value": "Z",
+              "type": "Choice",
+              "label": "Rotation mode",
+              "choices": [
+                {
+                  "label": "Horizontal rotation (good for characters)",
+                  "value": "Z"
+                },
+                {
+                  "label": "Vertical and horizontal rotations (good for cars)",
+                  "value": "ZY"
+                },
+                {
+                  "label": "All rotations (good for spaceships)",
+                  "value": "ZYX"
+                }
+              ],
+              "name": "RotationMode"
             },
             {
               "value": "0",
               "type": "Number",
               "unit": "DegreeAngle",
               "label": "Targeted camera rotation angle",
-              "description": "When this angle is set, the camera follow this value instead of the object angle.",
               "hidden": true,
               "name": "TargetedRotationAngle"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "DegreeAngle",
+              "label": "Targeted camera rotation angle",
+              "hidden": true,
+              "name": "TargetedElevationAngle"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Forward X",
+              "hidden": true,
+              "name": "ForwardX"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Forward Y",
+              "hidden": true,
+              "name": "ForwardY"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Forward Z",
+              "hidden": true,
+              "name": "ForwardZ"
             }
           ],
           "propertiesFolderStructure": {
@@ -7581,6 +8202,9 @@
                 "children": [
                   {
                     "propertyName": "RotationHalfwayDuration"
+                  },
+                  {
+                    "propertyName": "ElevationHalfwayDuration"
                   },
                   {
                     "propertyName": "TranslationZHalfwayDuration"
@@ -7620,6 +8244,9 @@
                 "propertyName": "RotationLogSpeed"
               },
               {
+                "propertyName": "ElevationLogSpeed"
+              },
+              {
                 "propertyName": "TranslationZLogSpeed"
               },
               {
@@ -7635,7 +8262,25 @@
                 "propertyName": "IsRotatingWithObject"
               },
               {
+                "propertyName": "IsElevatingWithObject"
+              },
+              {
+                "propertyName": "RotationMode"
+              },
+              {
                 "propertyName": "TargetedRotationAngle"
+              },
+              {
+                "propertyName": "TargetedElevationAngle"
+              },
+              {
+                "propertyName": "ForwardX"
+              },
+              {
+                "propertyName": "ForwardY"
+              },
+              {
+                "propertyName": "ForwardZ"
               }
             ]
           }
@@ -7646,16 +8291,15 @@
     {
       "author": "",
       "category": "General",
-      "dimension": "",
       "extensionNamespace": "",
       "fullName": "3D collision",
-      "gdevelopVersion": "",
+      "gdevelopVersion": ">=5.5.222",
       "helpPath": "",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZlY3Rvci1pbnRlcnNlY3Rpb24iIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMy4xNCwxQTIuMTQsMi4xNCAwIDAsMCAxLDMuMTRWNUgzVjNINVYxSDMuMTRNNywxVjNIMTBWMUg3TTEyLDFWM0gxNFY1SDE2VjMuMTRDMTYsMS45NiAxNS4wNCwxIDEzLjg2LDFIMTJNMSw3VjEwSDNWN0gxTTksN0M3Ljg5LDcgNyw3Ljg5IDcsOUM3LDExLjMzIDcsMTYgNywxNkM3LDE2IDExLjU3LDE2IDEzLjg2LDE2QTIuMTQsMi4xNCAwIDAsMCAxNiwxMy44NkMxNiwxMS41NyAxNiw3IDE2LDdDMTYsNyAxMS4zMyw3IDksN00xOCw3VjlIMjBWMTFIMjJWOUMyMiw3Ljg5IDIxLjExLDcgMjAsN0gxOE05LDlIMTRWMTRIOVY5TTEsMTJWMTMuODZDMSwxNS4wNCAxLjk2LDE2IDMuMTQsMTZINVYxNEgzVjEySDFNMjAsMTNWMTZIMjJWMTNIMjBNNywxOFYyMEM3LDIxLjExIDcuODksMjIgOSwyMkgxMVYyMEg5VjE4SDdNMjAsMThWMjBIMThWMjJIMjBDMjEuMTEsMjIgMjIsMjEuMTEgMjIsMjBWMThIMjBNMTMsMjBWMjJIMTZWMjBIMTNaIiAvPjwvc3ZnPg==",
       "name": "Collision3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/7a5696a515bf40813692e118147568392a854f65f5b50750c9b9aaa967aba7df_vector-intersection.svg",
       "shortDescription": "Check collision and distance between 3D objects.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "description": "Check collision and distance between 3D objects and separate them from each other.",
       "origin": {
         "identifier": "Collision3D",
@@ -8210,7 +8854,7 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "\r",
-                "const otherObjects = eventsFunctionContext.getObjectsLists(\"OtherObject\");\r",
+                "const otherObjects = eventsFunctionContext.getObjects(\"OtherObject\");\r",
                 "\r",
                 "if (objects.length > 0 && otherObjects.length > 0) {\r",
                 "    eventsFunctionContext.returnValue = gdjs._collision3DExtension.getDistanceToObject(\r",
@@ -8254,7 +8898,7 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "\r",
-                "const otherObjects = eventsFunctionContext.getObjectsLists(\"OtherObject\");\r",
+                "const otherObjects = eventsFunctionContext.getObjects(\"OtherObject\");\r",
                 "\r",
                 "if (objects.length > 0 && otherObjects.length > 0) {\r",
                 "    eventsFunctionContext.returnValue = gdjs._collision3DExtension.getSqDistanceToObject(\r",
@@ -8555,56 +9199,6 @@
           "objectGroups": []
         }
       ],
-      "eventsFunctionsFolderStructure": {
-        "folderName": "__ROOT",
-        "children": [
-          {
-            "functionName": "DefineHelperClasses"
-          },
-          {
-            "functionName": "onFirstSceneLoaded"
-          },
-          {
-            "folderName": "Position",
-            "children": [
-              {
-                "functionName": "AreWithinDistance"
-              },
-              {
-                "functionName": "Distance"
-              },
-              {
-                "functionName": "SqDistance"
-              },
-              {
-                "functionName": "DistanceToPosition"
-              },
-              {
-                "functionName": "SqDistanceToPosition"
-              },
-              {
-                "functionName": "SeparateFromObjects"
-              }
-            ]
-          },
-          {
-            "folderName": "Objects",
-            "children": [
-              {
-                "functionName": "PickNearest"
-              }
-            ]
-          },
-          {
-            "folderName": "Collision",
-            "children": [
-              {
-                "functionName": "AreInCollision"
-              }
-            ]
-          }
-        ]
-      },
       "eventsBasedBehaviors": [],
       "eventsBasedObjects": []
     },
@@ -8619,8 +9213,8 @@
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMTYiIGN5PSIxNiIgcj0iMTMiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjI4LjQsMTIgMjAsMTIgMjAsMy42ICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMjAsMjguNCAyMCwyMCAyOC40LDIwICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMy42LDIwIDEyLDIwIDEyLDI4LjQgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIxMiwzLjYgMTIsMTIgMy42LDEyICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxNiw2IDE2LjcsNyAxNS4zLDcgIi8+DQo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjE2LDI2IDE1LjMsMjUgMTYuNywyNSAiLz4NCjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNiwxNiA3LDE1LjMgNywxNi43ICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIyNiwxNiAyNSwxNi43IDI1LDE1LjMgIi8+DQo8L3N2Zz4NCg==",
       "name": "SpriteMultitouchJoystick",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_controller_joystick_arrows_direction.svg",
-      "shortDescription": "Joysticks or buttons for touchscreens.",
-      "version": "1.9.0",
+      "shortDescription": "On-screen multitouch joystick and buttons.",
+      "version": "1.9.2",
       "description": [
         "Multitouch joysticks are objects showing a joystick on the screen, useful for mobile. They work like a physical gamepad:",
         "- 4 or 8 directions",
@@ -14413,7 +15007,7 @@
                       "parameters": [
                         "Object",
                         "PhysicsCar3D",
-                        "SpriteMultitouchJoystick::StickForceX(ControllerIdentifier, \"Primary\")"
+                        "SpriteMultitouchJoystick::StickForceX(ControllerIdentifier, SteerJoystickIdentifier)"
                       ]
                     }
                   ]
@@ -14443,7 +15037,7 @@
                       "parameters": [
                         "Object",
                         "PhysicsCar3D",
-                        "-SpriteMultitouchJoystick::StickForceY(ControllerIdentifier, \"Secondary\")"
+                        "-SpriteMultitouchJoystick::StickForceY(ControllerIdentifier, SpeedJoystickIdentifier)"
                       ]
                     }
                   ]
@@ -15194,6 +15788,7 @@
           "areaMinX": 0,
           "areaMinY": 0,
           "areaMinZ": 0,
+          "assetStoreTag": "multitouch joysticks",
           "defaultName": "Joystick",
           "description": "Joystick for touchscreens.",
           "fullName": "Multitouch Joystick",
@@ -16627,15 +17222,13 @@
                 "propertyName": "ShouldBeHiddenWhenReleased"
               }
             ]
-          },
-          "variants": []
+          }
         }
       ]
     },
     {
       "author": "PANDAKO-GitHub",
       "category": "Input",
-      "dimension": "",
       "extensionNamespace": "",
       "fullName": "Mouse Pointer Lock",
       "gdevelopVersion": ">=5.5.222",
@@ -16643,8 +17236,8 @@
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMTksMTkgMjQsMTkgMjQsMjQgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSI2LDIzIDExLDIzIDExLDE4ICIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI0LDE5LjRjLTAuNywwLjgtMS40LDEuNi0yLjIsMi40Yy03LDctMTUuMywxMC4yLTE4LjUsN3MtMC4xLTExLjUsNy0xOC41czE1LjMtMTAuMiwxOC41LTcNCgljMS40LDEuNCwxLjYsMy42LDAuOCw2LjMiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMSwyMi41Yy0wLjMtMC4yLTAuNS0wLjUtMC44LTAuOGMtNy03LTEwLjItMTUuMy03LTE4LjVzMTEuNS0wLjEsMTguNSw3czEwLjIsMTUuMyw3LDE4LjUNCgljLTEuNywxLjctNC44LDEuNi04LjQsMC4xIi8+DQo8L3N2Zz4NCg==",
       "name": "MousePointerLock",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
-      "shortDescription": "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
-      "version": "0.3.0",
+      "shortDescription": "Lock and hide mouse pointer for unlimited movement (e.g., FPS mouse look).",
+      "version": "0.3.1",
       "description": [
         "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
         "",
@@ -17096,7 +17689,7 @@
           "functionType": "Condition",
           "name": "isEmulatingPointerLock",
           "private": true,
-          "sentence": "The mouse pointer is lock is emulated",
+          "sentence": "The mouse pointer lock is emulated",
           "events": [
             {
               "type": "BuiltinCommonInstructions::Standard",
@@ -17413,68 +18006,12 @@
           "objectGroups": []
         }
       ],
-      "eventsFunctionsFolderStructure": {
-        "folderName": "__ROOT",
-        "children": [
-          {
-            "functionName": "onFirstSceneLoaded"
-          },
-          {
-            "functionName": "onScenePostEvents"
-          },
-          {
-            "functionName": "RequestPointerLock"
-          },
-          {
-            "functionName": "ExitPointerLock"
-          },
-          {
-            "functionName": "isPointerLocked"
-          },
-          {
-            "functionName": "isPointerActuallyLocked"
-          },
-          {
-            "functionName": "isEmulatingPointerLock"
-          },
-          {
-            "functionName": "IsMoving"
-          },
-          {
-            "functionName": "MovementX"
-          },
-          {
-            "functionName": "SetMovementX"
-          },
-          {
-            "functionName": "MovementY"
-          },
-          {
-            "functionName": "SetMovementY"
-          },
-          {
-            "functionName": "TouchX"
-          },
-          {
-            "functionName": "TouchY"
-          },
-          {
-            "functionName": "TouchSpeedFactor"
-          },
-          {
-            "functionName": "SetTouchSpeedFactor"
-          }
-        ]
-      },
       "eventsBasedBehaviors": [
         {
           "description": "Control camera rotations with a mouse.",
           "fullName": "First person camera mouse mapper",
-          "helpPath": "",
-          "iconUrl": "",
           "name": "FirstPersonPointerMapper",
           "objectType": "",
-          "previewIconUrl": "",
           "eventsFunctions": [
             {
               "fullName": "",
@@ -17749,7 +18286,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "HorizontalSpeed",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetHorizontalSpeed",
               "sentence": "",
               "events": [
@@ -17830,7 +18366,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalSpeed",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalSpeed",
               "sentence": "",
               "events": [
@@ -17911,7 +18446,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalAngleMin",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalAngleMin",
               "sentence": "",
               "events": [
@@ -17992,7 +18526,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalAngleMax",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalAngleMax",
               "sentence": "",
               "events": [
@@ -18073,7 +18606,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "OffsetZ",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetOffsetZ",
               "sentence": "",
               "events": [
@@ -18110,57 +18642,6 @@
               "objectGroups": []
             }
           ],
-          "eventsFunctionsFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "functionName": "doStepPreEvents"
-              },
-              {
-                "folderName": "Layers and cameras",
-                "children": [
-                  {
-                    "functionName": "LookFromObjectEyes"
-                  }
-                ]
-              },
-              {
-                "folderName": "First person camera mouse mapper configuration",
-                "children": [
-                  {
-                    "functionName": "HorizontalSpeed"
-                  },
-                  {
-                    "functionName": "SetHorizontalSpeed"
-                  },
-                  {
-                    "functionName": "VerticalSpeed"
-                  },
-                  {
-                    "functionName": "SetVerticalSpeed"
-                  },
-                  {
-                    "functionName": "VerticalAngleMin"
-                  },
-                  {
-                    "functionName": "SetVerticalAngleMin"
-                  },
-                  {
-                    "functionName": "VerticalAngleMax"
-                  },
-                  {
-                    "functionName": "SetVerticalAngleMax"
-                  },
-                  {
-                    "functionName": "OffsetZ"
-                  },
-                  {
-                    "functionName": "SetOffsetZ"
-                  }
-                ]
-              }
-            ]
-          },
           "propertyDescriptors": [
             {
               "value": "",
@@ -18214,32 +18695,7 @@
               "name": "ShouldLock"
             }
           ],
-          "propertiesFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "propertyName": "Object3D"
-              },
-              {
-                "propertyName": "HorizontalSpeed"
-              },
-              {
-                "propertyName": "VerticalSpeed"
-              },
-              {
-                "propertyName": "VerticalAngleMin"
-              },
-              {
-                "propertyName": "VerticalAngleMax"
-              },
-              {
-                "propertyName": "OffsetZ"
-              },
-              {
-                "propertyName": "ShouldLock"
-              }
-            ]
-          }
+          "sharedPropertyDescriptors": []
         }
       ],
       "eventsBasedObjects": []
@@ -33552,6 +34008,7 @@
           "areaMinY": 0,
           "areaMinZ": 0,
           "defaultName": "Terrain",
+          "assetStoreTag": "3d terrains",
           "description": "A ground with hills, mountains or valleys that can be sculpted and painted in the scene editor, or changed with events. Add the 3D physics behavior to it to make objects walk or roll on it.",
           "fullName": "3D terrain",
           "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXRlcnJhaW4iIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTQsNkwxMC4yNSwxMUwxMy4xLDE0LjhMMTEuNSwxNkM5LjgxLDEzLjc1IDcsMTAgNywxMEwxLDE4SDIzTDE0LDZaIiAvPjwvc3ZnPg==",
