@@ -71,7 +71,8 @@ as `effect:<scene>/<layer>/<effect>`, maps to one skybox slot: the theme's
 skybox replaces its six faces.
 
 A custom object, like the 3D terrain, maps some of its properties. An image
-property maps to a texture slot, a color property to a color slot, and the
+property maps to a texture slot, a 3D model property (like the model of
+scattered models) to a model slot, a color property to a color slot, and the
 texture of a terrain layer to a *material* slot, a texture with its normal map,
 along with the property that takes the normal map:
 
@@ -83,14 +84,19 @@ along with the property that takes the normal map:
 "scene:Game Scene/Grass": {
   "BaseColor": "terrain.grass.base",
   "TipColor": "terrain.grass.tip"
+},
+"scene:Game Scene/PineForest": {
+  "Model": "nature.tree"
 }
 ```
 
 A theme whose material has no normal map empties the normal map property: the
-bumps of the starter's texture would not match the theme's. Custom objects
-don't have to be mapped, but the children of a custom object that are 3D models
-or cubes do (list the placeholders of the terrain and the grass in
-`ignoredObjects`).
+bumps of the starter's texture would not match the theme's. A theme model keeps
+the other properties of the object, like the size of the scattered copies.
+Custom objects don't have to be mapped, except those drawing a 3D model (like
+scattered models), which are mapped or listed in `ignoredObjects` like 3D
+models. The children of a custom object that are 3D models or cubes are mapped
+too (list the placeholders of the terrain and the grass in `ignoredObjects`).
 
 **When you add a 3D starter, add its `theme-slots.json`.** The build refuses to
 publish a 3D starter without one, or one where a 3D model or cube is neither

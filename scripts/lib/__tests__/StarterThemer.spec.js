@@ -659,6 +659,56 @@ describe('applyThemeToStarter on custom objects', () => {
     expect(terrainContent.Layer2NormalMap).toBe('');
   });
 
+  it('gives scattered models the model of a model slot, keeping their size', () => {
+    /** @type {any} */
+    const projectContent = {
+      resources: {
+        resources: [
+          { name: 'Pine.glb', file: 'assets/Pine.glb', kind: 'model3D' },
+        ],
+      },
+      layouts: [
+        {
+          name: 'Game Scene',
+          layers: [],
+          objects: [
+            {
+              name: 'Forest',
+              type: 'Terrain3D::ScatteredModels',
+              content: { Model: 'Pine.glb', Size: 300 },
+            },
+          ],
+        },
+      ],
+    };
+    const result = applyThemeToStarter(
+      projectContent,
+      {
+        version: 1,
+        objects: { 'scene:Game Scene/Forest': { Model: 'nature.tree' } },
+      },
+      {
+        ...makeTerrainTheme(),
+        slots: {
+          'nature.tree': {
+            kind: 'model',
+            file: 'https://asset-resources.gdevelop.io/public-resources/Palm.glb',
+            resourceName: 'Palm.glb',
+            objectContent: { modelResourceName: 'Palm.glb', rotationX: 90 },
+          },
+        },
+      }
+    );
+
+    expect(projectContent.layouts[0].objects[0].content).toEqual({
+      Model: 'Palm.glb',
+      Size: 300,
+    });
+    expect(getResource(projectContent, 'Palm.glb').kind).toBe('model3D');
+    expect(getResource(projectContent, 'Pine.glb')).toBeUndefined();
+    expect(result.appliedSlots).toEqual(['nature.tree']);
+  });
+
   it('gives a cube face the texture of a material', () => {
     const projectContent = makeProjectContent();
     applyThemeToStarter(projectContent, makeStarterThemeSlots(), {

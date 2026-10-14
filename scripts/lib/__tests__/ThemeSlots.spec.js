@@ -12,6 +12,7 @@ const vocabulary = {
   version: 1,
   slots: [
     { id: 'character.player', kind: 'model', label: 'Player character' },
+    { id: 'nature.tree', kind: 'model', label: 'Tree' },
     { id: 'env.ground', kind: 'texture', label: 'Ground' },
     { id: 'env.wall', kind: 'texture', label: 'Wall' },
     { id: 'sky.day', kind: 'skybox', label: 'Daytime sky' },
@@ -84,6 +85,30 @@ const createFakeTerrainProjectObject = () => {
           { name: 'Layer1NormalMap', type: 'Resource' },
           { name: 'Layer1Color', type: 'Color' },
           { name: 'TextureSize', type: 'Number' },
+        ],
+      },
+    ],
+  });
+  return projectObject;
+};
+
+/** @returns {any} */
+const createFakeForestProjectObject = () => {
+  /** @type {any} */
+  const projectObject = createFakeProjectObject();
+  projectObject.layouts[0].objects.push({
+    name: 'Forest',
+    type: 'Terrain3D::ScatteredModels',
+  });
+  projectObject.eventsFunctionsExtensions.push({
+    name: 'Terrain3D',
+    eventsBasedObjects: [
+      {
+        name: 'ScatteredModels',
+        objects: [],
+        propertyDescriptors: [
+          { name: 'Model', type: 'Resource', extraInformation: ['model3D'] },
+          { name: 'Size', type: 'Number' },
         ],
       },
     ],
@@ -324,6 +349,63 @@ describe('checkStarterThemeSlots', () => {
       'Starter "starting-3d-test": "scene:Game Scene/Terrain" property "Layer1Texture" maps to "env.ground", a texture slot, but needs a material slot.',
       'Starter "starting-3d-test": "scene:Game Scene/Terrain" property "Layer1Color" maps to "env.ground", a texture slot, but needs a color slot.',
     ]);
+  });
+
+  it('accepts a custom object mapping its 3D model to a model slot', () => {
+    const starterThemeSlots = createFakeStarterThemeSlots();
+    starterThemeSlots.objects['scene:Game Scene/Forest'] = {
+      Model: 'nature.tree',
+    };
+
+    expect(
+      checkStarterThemeSlots(
+        vocabulary,
+        'starting-3d-test',
+        createFakeForestProjectObject(),
+        starterThemeSlots
+      )
+    ).toEqual([]);
+  });
+
+  it('requires a model slot for the 3D model of a custom object', () => {
+    const starterThemeSlots = createFakeStarterThemeSlots();
+    starterThemeSlots.objects['scene:Game Scene/Forest'] = {
+      Model: 'env.ground',
+    };
+
+    const errors = checkStarterThemeSlots(
+      vocabulary,
+      'starting-3d-test',
+      createFakeForestProjectObject(),
+      starterThemeSlots
+    );
+
+    expect(errors.map((error) => error.message)).toEqual([
+      'Starter "starting-3d-test": "scene:Game Scene/Forest" property "Model" maps to "env.ground", a texture slot, but needs a model slot.',
+    ]);
+  });
+
+  it('requires a custom object drawing a 3D model to be mapped or ignored', () => {
+    const errors = checkStarterThemeSlots(
+      vocabulary,
+      'starting-3d-test',
+      createFakeForestProjectObject(),
+      createFakeStarterThemeSlots()
+    );
+    const starterThemeSlots = createFakeStarterThemeSlots();
+    (starterThemeSlots.ignoredObjects || []).push('scene:Game Scene/Forest');
+
+    expect(errors.map((error) => error.message)).toEqual([
+      'Starter "starting-3d-test": the Terrain3D::ScatteredModels "scene:Game Scene/Forest" draws a 3D model but is neither mapped to slots nor listed in ignoredObjects in theme-slots.json.',
+    ]);
+    expect(
+      checkStarterThemeSlots(
+        vocabulary,
+        'starting-3d-test',
+        createFakeForestProjectObject(),
+        starterThemeSlots
+      )
+    ).toEqual([]);
   });
 
   it('requires a custom object to map its properties', () => {

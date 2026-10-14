@@ -166,7 +166,7 @@ const getSizeRatio = (objectContent, themeContent) => {
  * its name, behaviors, variables, instances, origin and center; a cube face
  * points at the theme image; a skybox effect points at the six theme images;
  * a property of a custom object points at the theme image (and the normal map
- * of a material) or takes the theme color.
+ * of a material) or model, or takes the theme color.
  *
  * Each theme file becomes a resource named like in the asset store, and the
  * resources of the starter that nothing uses anymore are removed.
@@ -251,7 +251,8 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
   /**
    * Theme the properties of a custom object: an image resource takes the
    * texture of a texture or material slot, along with the normal map of the
-   * material if the starter maps one; a color takes the color of a color slot.
+   * material if the starter maps one; a 3D model resource takes the model of
+   * a model slot; a color takes the color of a color slot.
    * @param {any} objectContent
    * @param {Object.<string, string | import('./ThemeSlots.js').MaterialMapping>} mapping
    * @returns {boolean} Whether a property changed.
@@ -271,6 +272,24 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
       ) {
         objectContent[property] = slot.color;
         appliedSlots.add(slotId);
+        changed = true;
+        return;
+      }
+      if (
+        slot &&
+        slot.kind === 'model' &&
+        typeof propertyMapping === 'string'
+      ) {
+        // The custom object keeps its own settings for the model (like the
+        // size of scattered copies): only the model changes.
+        const themeModelResourceName = useThemeResource(
+          String(objectContent[property] || ''),
+          slotId,
+          slot,
+          { kind: 'model3D', metadata: '', userAdded: false }
+        );
+        if (!themeModelResourceName) return;
+        objectContent[property] = themeModelResourceName;
         changed = true;
         return;
       }

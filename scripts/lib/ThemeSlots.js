@@ -49,12 +49,18 @@ const cubeFaceProperties = [
 ];
 
 /**
+ * The type of a property of a custom object, and for a resource, its kind
+ * (like "image" or "model3D").
+ * @typedef {{type: string, resourceKind: string}} PropertyType
+ */
+
+/**
  * The properties of each custom object type of a project, by type.
  * @param {any} projectObject
- * @returns {Map<string, Map<string, string>>}
+ * @returns {Map<string, Map<string, PropertyType>>}
  */
 const getCustomObjectPropertyTypes = (projectObject) => {
-  /** @type {Map<string, Map<string, string>>} */
+  /** @type {Map<string, Map<string, PropertyType>>} */
   const propertyTypesByObjectType = new Map();
   (projectObject.eventsFunctionsExtensions || []).forEach(
     /** @param {any} extension */ (extension) =>
@@ -66,7 +72,13 @@ const getCustomObjectPropertyTypes = (projectObject) => {
               (eventsBasedObject.propertyDescriptors || []).map(
                 /** @param {any} property */ (property) => [
                   property.name,
-                  property.type,
+                  {
+                    type: property.type,
+                    resourceKind:
+                      property.type === 'Resource'
+                        ? (property.extraInformation || [])[0] || ''
+                        : '',
+                  },
                 ]
               )
             )
@@ -83,7 +95,7 @@ const getCustomObjectPropertyTypes = (projectObject) => {
  * @param {any} projectObject
  * @returns {{
  *   objects: Array<{path: string, type: string}>,
- *   customObjects: Array<{path: string, type: string, propertyTypes: Map<string, string>}>,
+ *   customObjects: Array<{path: string, type: string, propertyTypes: Map<string, PropertyType>}>,
  *   effects: Array<string>,
  *   is3D: boolean,
  * }}
@@ -91,7 +103,7 @@ const getCustomObjectPropertyTypes = (projectObject) => {
 const getThemeableObjects = (projectObject) => {
   /** @type {Array<{path: string, type: string}>} */
   const objects = [];
-  /** @type {Array<{path: string, type: string, propertyTypes: Map<string, string>}>} */
+  /** @type {Array<{path: string, type: string, propertyTypes: Map<string, PropertyType>}>} */
   const customObjects = [];
   /** @type {Array<string>} */
   const effects = [];
@@ -260,27 +272,42 @@ const checkStarterThemeSlots = (
 
   /**
    * @param {string} objectPath
-   * @param {Map<string, string>} propertyTypes
+   * @param {Map<string, PropertyType>} propertyTypes
    * @param {string} property
    * @param {string} expectedType
    * @returns {boolean}
    */
   const checkProperty = (objectPath, propertyTypes, property, expectedType) => {
     const propertyType = propertyTypes.get(property);
-    if (propertyType === expectedType) return true;
+    if (propertyType && propertyType.type === expectedType) return true;
     errors.push(
       new Error(
         propertyType
-          ? `Starter "${slug}": "${objectPath}" maps its property "${property}", a ${propertyType}, but only resources and colors can be themed.`
+          ? `Starter "${slug}": "${objectPath}" maps its property "${property}", a ${propertyType.type}, but only resources and colors can be themed.`
           : `Starter "${slug}": "${objectPath}" maps the property "${property}", which its object does not have.`
       )
     );
     return false;
   };
 
-  customObjects.forEach(({ path: objectPath, propertyTypes }) => {
+  customObjects.forEach(({ path: objectPath, type, propertyTypes }) => {
+    if (ignored.has(objectPath)) return;
     const mapping = mapped[objectPath];
-    if (mapping === undefined) return;
+    if (mapping === undefined) {
+      // Like 3D model objects, the models drawn by a custom object (like
+      // scattered trees) must follow the theme or be explicitly kept.
+      const hasModel = [...propertyTypes.values()].some(
+        (propertyType) => propertyType.resourceKind === 'model3D'
+      );
+      if (hasModel) {
+        errors.push(
+          new Error(
+            `Starter "${slug}": the ${type} "${objectPath}" draws a 3D model but is neither mapped to slots nor listed in ignoredObjects in theme-slots.json.`
+          )
+        );
+      }
+      return;
+    }
     if (typeof mapping === 'string') {
       errors.push(
         new Error(
@@ -306,12 +333,18 @@ const checkStarterThemeSlots = (
         return;
       }
       const propertyType = propertyTypes.get(property);
-      if (propertyType === 'Color') {
+      if (propertyType && propertyType.type === 'Color') {
         checkSlot(where, propertyMapping, 'color');
       } else if (
         checkProperty(objectPath, propertyTypes, property, 'Resource')
       ) {
-        checkSlot(where, propertyMapping, 'texture');
+        checkSlot(
+          where,
+          propertyMapping,
+          propertyType && propertyType.resourceKind === 'model3D'
+            ? 'model'
+            : 'texture'
+        );
       }
     });
   });
@@ -326,7 +359,7 @@ const checkStarterThemeSlots = (
     }
   });
   ignored.forEach((objectPath) => {
-    if (!typeByPath.has(objectPath)) {
+    if (!typeByPath.has(objectPath) && !customObjectByPath.has(objectPath)) {
       errors.push(
         new Error(
           `Starter "${slug}": theme-slots.json ignores "${objectPath}", which is not a 3D object of the starter anymore.`
