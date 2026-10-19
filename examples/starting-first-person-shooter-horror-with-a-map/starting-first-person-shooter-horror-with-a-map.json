@@ -2378,14 +2378,14 @@
               "massCenterOffsetY": 0,
               "massCenterOffsetZ": 0,
               "massOverride": 0,
-              "density": 40,
+              "density": 4000,
               "friction": 1,
               "restitution": 0.1,
               "linearDamping": 0.1,
               "angularDamping": 0.1,
-              "gravityScale": 1,
+              "gravityScale": 0,
               "layers": 17,
-              "masks": 17
+              "masks": 16
             }
           ],
           "content": {
@@ -3793,43 +3793,6 @@
           ]
         },
         {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "The monster instances are moved by the navmesh: their physics body is only activated when they are shot, to push them at the impact."
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "SceneJustBegins"
-              },
-              "parameters": [
-                ""
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "ActivateBehavior"
-              },
-              "parameters": [
-                "Monster",
-                "Physics3D",
-                ""
-              ]
-            }
-          ]
-        },
-        {
           "colorB": 228,
           "colorG": 176,
           "colorR": 74,
@@ -3993,6 +3956,18 @@
                   ],
                   "events": [
                     {
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "While it walks, the navmesh moves the monster: its physics body has no gravity and doesn't collide with the static objects (mask 1), only with the player and the other dynamic objects, and it is heavy, so that the player can't push it. When it is shot, it gets its density, the gravity and the collisions back (its body is created again, by deactivating and activating the behavior), to be thrown by the impulse."
+                    },
+                    {
                       "folded": true,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
@@ -4021,11 +3996,34 @@
                         },
                         {
                           "type": {
-                            "value": "ActivateBehavior"
+                            "value": "Physics3D::Physics3DBehavior::SetDensity"
                           },
                           "parameters": [
                             "Monster",
                             "Physics3D",
+                            "=",
+                            "40"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetGravityScale"
+                          },
+                          "parameters": [
+                            "Monster",
+                            "Physics3D",
+                            "=",
+                            "1"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::EnableMask"
+                          },
+                          "parameters": [
+                            "Monster",
+                            "Physics3D",
+                            "1",
                             "yes"
                           ]
                         },
@@ -4037,6 +4035,26 @@
                             "Monster",
                             "Physics3D",
                             ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ActivateBehavior"
+                          },
+                          "parameters": [
+                            "Monster",
+                            "Physics3D",
+                            ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ActivateBehavior"
+                          },
+                          "parameters": [
+                            "Monster",
+                            "Physics3D",
+                            "yes"
                           ]
                         },
                         {
@@ -4527,7 +4545,7 @@
             },
             {
               "folded": true,
-              "type": "BuiltinCommonInstructions::ForEach",
+              "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
                   "type": {
@@ -4542,22 +4560,14 @@
                 },
                 {
                   "type": {
-                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                    "value": "Physics3D::CollisionStarted"
                   },
                   "parameters": [
-                    "DistanceBetweenPositions(Player.CenterX(), Player.CenterY(), Monster.CenterX(), Monster.CenterY())",
-                    "<",
-                    "(Player.Width() + Monster.Width()) / 2 + 4"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "BuiltinCommonInstructions::CompareNumbers"
-                  },
-                  "parameters": [
-                    "abs(Player.Object3D::CenterZ() - Monster.Object3D::CenterZ())",
-                    "<",
-                    "(Player.Object3D::Depth() + Monster.Object3D::Depth()) / 2"
+                    "Player",
+                    "Physics3D",
+                    "Monster",
+                    "Physics3D",
+                    ""
                   ]
                 }
               ],
@@ -4572,9 +4582,7 @@
                     ""
                   ]
                 }
-              ],
-              "object": "Monster",
-              "events": []
+              ]
             },
             {
               "folded": true,
@@ -4653,16 +4661,6 @@
                         "Monster",
                         "SpawnXPosition",
                         "SpawnYPosition",
-                        ""
-                      ]
-                    },
-                    {
-                      "type": {
-                        "value": "ActivateBehavior"
-                      },
-                      "parameters": [
-                        "Monster",
-                        "Physics3D",
                         ""
                       ]
                     },
@@ -5630,7 +5628,7 @@
     },
     {
       "name": "A shot monster is pushed away by the impact",
-      "description": "Puts a monster in front of the player and shoots it: its physics body is activated and the impulse at the impact throws it back, tumbling.",
+      "description": "Puts a monster in front of the player and shoots it: the impulse at the impact throws it back, tumbling.",
       "type": "gameplay",
       "source": [
         "await harness.goToScene('Game Scene');",
@@ -5658,7 +5656,7 @@
         "harness.setMousePositionScreen(harness.getGameResolutionWidth() / 2, harness.getGameResolutionHeight() / 2);",
         "await harness.stepFrames(3, DT);",
         "const runtimeMonster = harness.getRuntimeObject(monster.id);",
-        "harness.assert(!runtimeMonster.getBehavior('Physics3D').activated(), 'A walking monster has no physics body (the navmesh moves it).');",
+        "harness.assert(runtimeMonster.getBehavior('Physics3D').getGravityScale() === 0, 'A walking monster has no gravity (the navmesh moves it).');",
         "const distanceToPlayer = () => Math.hypot(runtimeMonster.getCenterXInScene() - player.centerX, runtimeMonster.getCenterYInScene() - player.centerY);",
         "const startDistance = distanceToPlayer();",
         "harness.setMouseButtonPressed(true);",
