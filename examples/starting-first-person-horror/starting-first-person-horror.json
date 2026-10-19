@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 274,
+    "build": 283,
     "major": 5,
     "minor": 6,
     "revision": 0
@@ -261,10 +261,10 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.47893418845355384,
+        "zoomFactor": 0.4633111824514261,
         "windowMask": false,
         "selectedLayer": "",
-        "gameEditorMode": "instances-editor"
+        "gameEditorMode": "embedded-game"
       },
       "objectsGroups": [
         {
@@ -938,7 +938,8 @@
             "bottomFaceResourceRepeat": false,
             "materialType": "StandardWithoutMetalness",
             "isCastingShadow": true,
-            "isReceivingShadow": true
+            "isReceivingShadow": true,
+            "tileScale": 0.2
           }
         },
         {
@@ -1005,7 +1006,8 @@
             "bottomFaceResourceRepeat": true,
             "materialType": "StandardWithoutMetalness",
             "isCastingShadow": true,
-            "isReceivingShadow": true
+            "isReceivingShadow": true,
+            "tileScale": 0.2
           }
         },
         {
@@ -1078,7 +1080,8 @@
             "bottomFaceResourceRepeat": true,
             "materialType": "StandardWithoutMetalness",
             "isCastingShadow": true,
-            "isReceivingShadow": true
+            "isReceivingShadow": true,
+            "tileScale": 0.2
           }
         },
         {
@@ -1568,10 +1571,10 @@
           "effects": [],
           "behaviors": [],
           "content": {
-            "Intensity": 2.5,
+            "Intensity": 9,
             "ConeLength": 4000,
             "ConeAngle": 22,
-            "Decay": 10,
+            "Decay": 1,
             "Smoothing": 0.15,
             "ShadowBias": 0.0001
           }
@@ -2568,6 +2571,7 @@
                 "frontFaceResourceName": "assets/DarkSkybox_Front.png",
                 "leftFaceResourceName": "assets/DarkSkybox_Left.png",
                 "rightFaceResourceName": "assets/DarkSkybox_Right.png",
+                "top": "Z+",
                 "topFaceResourceName": "assets/DarkSkybox_Top.png"
               },
               "booleanParameters": {}
@@ -2680,9 +2684,9 @@
   "externalEvents": [],
   "tests": [
     {
+      "description": "\"w\" walks the player toward what it faces and \"d\" strafes it sideways, without turning it.",
       "name": "Walking and strafing with WASD",
       "type": "gameplay",
-      "description": "\"w\" walks the player toward what it faces and \"d\" strafes it sideways, without turning it.",
       "source": [
         "// First person movement: \"w\" walks toward what the player faces, \"d\"",
         "// strafes to its right (Shooter3DKeyboardMapper, camera relative).",
@@ -2760,9 +2764,9 @@
       ]
     },
     {
+      "description": "Once the player is within its reach, the monster stops patrolling and closes in on them.",
       "name": "The monster comes after the player",
       "type": "gameplay",
-      "description": "Once the player is within its reach, the monster stops patrolling and closes in on them.",
       "source": [
         "// The monster hunts the player down: once the player is close enough, it",
         "// comes after them.",
@@ -17705,7 +17709,7 @@
       "name": "Light3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/f237ae4e3b857c556846c7b2c0b132556fd4bcdeff217034b4d9c97dc1aab1d6_lightbulb-on-outline.svg",
       "shortDescription": "A collection of light object for 3D.",
-      "version": "1.0.3",
+      "version": "2.0.0",
       "description": "A collection of light object for 3D.",
       "origin": {
         "identifier": "Light3D",
@@ -17718,10 +17722,62 @@
       "authorIds": [
         "IWykYNRvhCZBN3vEgKEbBPOR3Oc2"
       ],
+      "changelog": [
+        {
+          "version": "2.0.0",
+          "breaking": "- Point and spot lights now fade with the distance like they do with the 3D renderer of recent GDevelop versions (Three.js r185), including on previous GDevelop versions. Lights made for a previous version of the extension need a higher intensity (and possibly a lower decay) to look the same."
+        }
+      ],
       "dependencies": [],
       "globalVariables": [],
       "sceneVariables": [],
       "eventsFunctions": [
+        {
+          "fullName": "",
+          "functionType": "Action",
+          "name": "onFirstSceneLoaded",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "// Before Three.js r165, GDevelop rendered with \"legacy lights\": point and spot",
+                "// lights faded linearly up to their range and every light color was",
+                "// multiplied by PI. Recent GDevelop versions use the physically based falloff",
+                "// of Three.js r185 instead, which is what the light properties are tuned for.",
+                "// Use the same falloff with older GDevelop versions so that lights look the",
+                "// same with every version:",
+                "// - distances are divided by 100 because recent GDevelop versions render 3D",
+                "//   with a default world scale of 100 pixels per unit, while older versions",
+                "//   work in pixels,",
+                "// - the attenuation is divided by PI as the legacy light colors are multiplied by PI.",
+                "// It must be patched before any shader using lights is compiled, as Three.js",
+                "// caches compiled shaders.",
+                "const lightsParsBegin = THREE.ShaderChunk.lights_pars_begin;",
+                "if (!lightsParsBegin.includes('#if defined ( LEGACY_LIGHTS )')) {",
+                "    return;",
+                "}",
+                "THREE.ShaderChunk.lights_pars_begin = lightsParsBegin.replace(",
+                "    /#if defined \\( LEGACY_LIGHTS \\)[\\s\\S]*?#else/,",
+                "    [",
+                "        '#if defined ( LEGACY_LIGHTS )',",
+                "        '\\t\\tfloat distanceFalloff = 1.0 / max( pow( lightDistance * 0.01, decayExponent ), 0.01 );',",
+                "        '\\t\\tif ( cutoffDistance > 0.0 ) {',",
+                "        '\\t\\t\\tdistanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );',",
+                "        '\\t\\t}',",
+                "        '\\t\\treturn distanceFalloff * RECIPROCAL_PI;',",
+                "        '\\t#else',",
+                "    ].join('\\n')",
+                ");"
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [],
+          "objectGroups": []
+        },
         {
           "description": "Define spot light helper classes JavaScript code.",
           "fullName": "Define spot light helper classes",
@@ -18129,7 +18185,9 @@
                 "     * @param value {number}",
                 "     */",
                 "    setRange(value) {",
-                "        this.pointLight.distance = value;",
+                "        const runtimeScene = this.object.getRuntimeScene();",
+                "        const inverseWorldScale = runtimeScene.getRenderer3DInverseWorldScale ? runtimeScene.getRenderer3DInverseWorldScale() : 1;",
+                "        this.pointLight.distance = value * inverseWorldScale;",
                 "    }",
                 "",
                 "    /**",
@@ -18291,7 +18349,11 @@
                 "        spotLight.castShadow = false;",
                 "        spotLight.visible = false;",
                 "",
-                "        if (!object.isHidden()) {",
+                "        // Instances hidden at start stay visible in the editor, but their light must not shine.",
+                "        const isHiddenAtStartInEditor =",
+                "            !!editor && !!editor.isInstanceHiddenAtStart && editor.isInstanceHiddenAtStart(object);",
+                "",
+                "        if (!object.isHidden() && !isHiddenAtStartInEditor) {",
                 "            let isSelected = false;",
                 "            if (editor) {",
                 "                const selectedObject = editor._selection.getLastSelectedObject();",
@@ -18532,6 +18594,17 @@
                 "     * @param sortDistance {number} The squared distance to the camera.",
                 "     */",
                 "    insertByDistance(object, sortDistance) {",
+                "        // A render can happen without a game step in between (the editor",
+                "        // and the gameplay test harness render a paused game), so a light",
+                "        // can be offered again before the lists were cleared. Keep it once,",
+                "        // or the duplicates would evict the other lights - but apply its",
+                "        // state again, as the renderer reset it before offering the light.",
+                "        for (const pair of this.objects) {",
+                "            if (pair.object === object) {",
+                "                this.onInsertion(object);",
+                "                return;",
+                "            }",
+                "        }",
                 "        let insertionIndex = 0;",
                 "        for (let index = this.objects.length - 1; index >= 0; index--) {",
                 "            if (sortDistance >= this.objects[index].sortDistance) {",
@@ -18910,6 +18983,9 @@
       "eventsFunctionsFolderStructure": {
         "folderName": "__ROOT",
         "children": [
+          {
+            "functionName": "onFirstSceneLoaded"
+          },
           {
             "functionName": "DefineHelperClasses"
           },
