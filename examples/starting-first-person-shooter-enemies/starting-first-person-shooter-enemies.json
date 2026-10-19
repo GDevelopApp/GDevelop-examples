@@ -1573,7 +1573,7 @@
               "name": "Physics3D",
               "type": "Physics3D::Physics3DBehavior",
               "object3D": "Object3D",
-              "bodyType": "Kinematic",
+              "bodyType": "Dynamic",
               "bullet": false,
               "fixedRotation": true,
               "shape": "Capsule",
@@ -2042,6 +2042,43 @@
           ]
         },
         {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "The enemy instances are moved by the navmesh: their physics body is only activated when they are shot, to push them at the impact."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneJustBegins"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ActivateBehavior"
+              },
+              "parameters": [
+                "Enemy",
+                "Physics3D",
+                ""
+              ]
+            }
+          ]
+        },
+        {
           "colorB": 228,
           "colorG": 176,
           "colorR": 74,
@@ -2250,7 +2287,32 @@
                           "parameters": [
                             "Enemy",
                             "Physics3D",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetFixedRotation"
+                          },
+                          "parameters": [
+                            "Enemy",
+                            "Physics3D",
                             ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::ApplyImpulse"
+                          },
+                          "parameters": [
+                            "Enemy",
+                            "Physics3D",
+                            "25 * sign(Enemy.CenterX() - Raycaster3D::IntersectionX())",
+                            "25 * sign(Enemy.CenterY() - Raycaster3D::IntersectionY())",
+                            "25 * sign(Enemy.Object3D::CenterZ() - Raycaster3D::IntersectionZ())",
+                            "Raycaster3D::IntersectionX()",
+                            "Raycaster3D::IntersectionY()",
+                            "Raycaster3D::IntersectionZ()"
                           ]
                         },
                         {
@@ -2782,7 +2844,7 @@
             },
             {
               "folded": true,
-              "type": "BuiltinCommonInstructions::Standard",
+              "type": "BuiltinCommonInstructions::ForEach",
               "conditions": [
                 {
                   "type": {
@@ -2797,14 +2859,22 @@
                 },
                 {
                   "type": {
-                    "value": "Physics3D::CollisionStarted"
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
                   },
                   "parameters": [
-                    "Player",
-                    "Physics3D",
-                    "Enemy",
-                    "Physics3D",
-                    ""
+                    "DistanceBetweenPositions(Player.CenterX(), Player.CenterY(), Enemy.CenterX(), Enemy.CenterY())",
+                    "<",
+                    "(Player.Width() + Enemy.Width()) / 2 + 4"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "abs(Player.Object3D::CenterZ() - Enemy.Object3D::CenterZ())",
+                    "<",
+                    "(Player.Object3D::Depth() + Enemy.Object3D::Depth()) / 2"
                   ]
                 }
               ],
@@ -2819,70 +2889,9 @@
                     ""
                   ]
                 }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "A shot enemy falls over before disappearing."
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "StringObjectVariable"
-                  },
-                  "parameters": [
-                    "Enemy",
-                    "State",
-                    "=",
-                    "\"Dying\""
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::RotationY"
-                  },
-                  "parameters": [
-                    "Enemy",
-                    "Object3D",
-                    "<",
-                    "90"
-                  ]
-                }
               ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::SetRotationY"
-                  },
-                  "parameters": [
-                    "Enemy",
-                    "Object3D",
-                    "+",
-                    "180 * TimeDelta()"
-                  ]
-                },
-                {
-                  "type": {
-                    "value": "Scene3D::Base3DBehavior::SetZ"
-                  },
-                  "parameters": [
-                    "Enemy",
-                    "Object3D",
-                    "-",
-                    "(Enemy.Object3D::Depth() - Enemy.Width()) * TimeDelta()"
-                  ]
-                }
-              ]
+              "object": "Enemy",
+              "events": []
             }
           ],
           "parameters": []
@@ -3656,6 +3665,52 @@
         "harness.assert(harness.getObjects('Player').length===1,'Player remains in the scene after killing the enemy');",
         "await harness.takeScreenshot('Enemy removed');",
         "harness.releaseAllInputs();"
+      ]
+    },
+    {
+      "name": "A shot enemy is pushed away by the impact",
+      "description": "Puts an enemy in front of the player and shoots it: its physics body is activated and the impulse at the impact throws it back, tumbling.",
+      "type": "gameplay",
+      "source": [
+        "await harness.goToScene('Game Scene');",
+        "// Faster in the software renderer used to run tests (grass is thousands of blades, trees are drawn in batches it is slow with).",
+        "harness.setGameResolutionSize(160, 90);",
+        "for (const name of [\"MobileControls\",\"UI\",\"Crosshair Layer\"]) {",
+        "  if (!harness.getCurrentRuntimeScene().hasLayer(name)) continue;",
+        "  const layer = harness.getCurrentRuntimeScene().getLayer(name);",
+        "  layer.setCameraX(640);",
+        "  layer.setCameraY(360);",
+        "  layer.setCameraZoom(160 / 1280);",
+        "}",
+        "harness.getCurrentRuntimeScene().getLayer('').setEffectBooleanParameter('3D Global Light', 'isCastingShadow', false);",
+        "harness.setTimeoutMs(60000);",
+        "const DT = { dtMs: 50 };",
+        "await harness.stepFrames(4, DT);",
+        "const player = harness.getObjects('Player')[0];",
+        "const [monster, ...otherMonsters] = harness.getObjects('Enemy');",
+        "for (const other of otherMonsters) harness.removeObject(other.id);",
+        "// The player looks toward -Y: the enemy stands in front of the crosshair.",
+        "const monsterX = player.centerX;",
+        "const monsterY = player.centerY - 250;",
+        "harness.setObjectPosition(monster.id, monsterX, monsterY, 0);",
+        "harness.setMousePositionScreen(harness.getGameResolutionWidth() / 2, harness.getGameResolutionHeight() / 2);",
+        "await harness.stepFrames(3, DT);",
+        "const runtimeMonster = harness.getRuntimeObject(monster.id);",
+        "harness.assert(!runtimeMonster.getBehavior('Physics3D').activated(), 'A walking enemy has no physics body (the navmesh moves it).');",
+        "const distanceToPlayer = () => Math.hypot(runtimeMonster.getCenterXInScene() - player.centerX, runtimeMonster.getCenterYInScene() - player.centerY);",
+        "const startDistance = distanceToPlayer();",
+        "harness.setMouseButtonPressed(true);",
+        "await harness.stepFrames(1, DT);",
+        "harness.setMouseButtonPressed(false);",
+        "let mostTipped = 0;",
+        "for (let frame = 0; frame < 12; frame++) {",
+        "  await harness.stepFrames(1, DT);",
+        "  mostTipped = Math.max(mostTipped, Math.abs(runtimeMonster.getRotationX()) + Math.abs(runtimeMonster.getRotationY()));",
+        "}",
+        "console.log('distance to the player: ' + startDistance.toFixed(0) + ' -> ' + distanceToPlayer().toFixed(0) + ', most tipped: ' + mostTipped.toFixed(0));",
+        "harness.assert(runtimeMonster.getVariables().get('State').getAsString() === 'Dying', 'The enemy was shot.');",
+        "harness.assert(distanceToPlayer() > startDistance + 60, 'The enemy was thrown back (' + startDistance.toFixed(0) + ' -> ' + distanceToPlayer().toFixed(0) + ').');",
+        "harness.assert(mostTipped > 30, 'The enemy tumbles (' + mostTipped.toFixed(0) + ' degrees).');"
       ]
     },
     {
