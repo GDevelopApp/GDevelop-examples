@@ -2363,7 +2363,7 @@
               "name": "Physics3D",
               "type": "Physics3D::Physics3DBehavior",
               "object3D": "Object3D",
-              "bodyType": "Kinematic",
+              "bodyType": "Dynamic",
               "bullet": false,
               "fixedRotation": true,
               "shape": "Capsule",
@@ -3793,6 +3793,43 @@
           ]
         },
         {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "The monster instances are moved by the navmesh: their physics body is only activated when they are shot, to push them at the impact."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "SceneJustBegins"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ActivateBehavior"
+              },
+              "parameters": [
+                "Monster",
+                "Physics3D",
+                ""
+              ]
+            }
+          ]
+        },
+        {
           "colorB": 228,
           "colorG": 176,
           "colorR": 74,
@@ -3988,8 +4025,33 @@
                           },
                           "parameters": [
                             "Monster",
-                            "NavMeshCharacter",
+                            "Physics3D",
+                            "yes"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::SetFixedRotation"
+                          },
+                          "parameters": [
+                            "Monster",
+                            "Physics3D",
                             ""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Physics3D::Physics3DBehavior::ApplyImpulse"
+                          },
+                          "parameters": [
+                            "Monster",
+                            "Physics3D",
+                            "25 * sign(Monster.CenterX() - Raycaster3D::IntersectionX())",
+                            "25 * sign(Monster.CenterY() - Raycaster3D::IntersectionY())",
+                            "25 * sign(Monster.Object3D::CenterZ() - Raycaster3D::IntersectionZ())",
+                            "Raycaster3D::IntersectionX()",
+                            "Raycaster3D::IntersectionY()",
+                            "Raycaster3D::IntersectionZ()"
                           ]
                         },
                         {
@@ -3998,7 +4060,7 @@
                           },
                           "parameters": [
                             "Monster",
-                            "Physics3D",
+                            "NavMeshCharacter",
                             ""
                           ]
                         },
@@ -4465,7 +4527,7 @@
             },
             {
               "folded": true,
-              "type": "BuiltinCommonInstructions::Standard",
+              "type": "BuiltinCommonInstructions::ForEach",
               "conditions": [
                 {
                   "type": {
@@ -4480,14 +4542,22 @@
                 },
                 {
                   "type": {
-                    "value": "Physics3D::CollisionStarted"
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
                   },
                   "parameters": [
-                    "Player",
-                    "Physics3D",
-                    "Monster",
-                    "Physics3D",
-                    ""
+                    "DistanceBetweenPositions(Player.CenterX(), Player.CenterY(), Monster.CenterX(), Monster.CenterY())",
+                    "<",
+                    "(Player.Width() + Monster.Width()) / 2 + 4"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::CompareNumbers"
+                  },
+                  "parameters": [
+                    "abs(Player.Object3D::CenterZ() - Monster.Object3D::CenterZ())",
+                    "<",
+                    "(Player.Object3D::Depth() + Monster.Object3D::Depth()) / 2"
                   ]
                 }
               ],
@@ -4502,7 +4572,9 @@
                     ""
                   ]
                 }
-              ]
+              ],
+              "object": "Monster",
+              "events": []
             },
             {
               "folded": true,
@@ -4581,6 +4653,16 @@
                         "Monster",
                         "SpawnXPosition",
                         "SpawnYPosition",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "ActivateBehavior"
+                      },
+                      "parameters": [
+                        "Monster",
+                        "Physics3D",
                         ""
                       ]
                     },
@@ -5093,69 +5175,6 @@
             }
           ],
           "parameters": []
-        },
-        {
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "A shot monster falls over before disappearing."
-        },
-        {
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "value": "StringObjectVariable"
-              },
-              "parameters": [
-                "Monster",
-                "State",
-                "=",
-                "\"Dying\""
-              ]
-            },
-            {
-              "type": {
-                "value": "Scene3D::Base3DBehavior::RotationY"
-              },
-              "parameters": [
-                "Monster",
-                "Object3D",
-                "<",
-                "90"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "value": "Scene3D::Base3DBehavior::SetRotationY"
-              },
-              "parameters": [
-                "Monster",
-                "Object3D",
-                "+",
-                "180 * TimeDelta()"
-              ]
-            },
-            {
-              "type": {
-                "value": "Scene3D::Base3DBehavior::SetZ"
-              },
-              "parameters": [
-                "Monster",
-                "Object3D",
-                "-",
-                "(Monster.Object3D::Depth() - Monster.Width()) * TimeDelta()"
-              ]
-            }
-          ]
         }
       ],
       "layers": [
@@ -5610,8 +5629,8 @@
       ]
     },
     {
-      "name": "A shot monster falls over",
-      "description": "Puts a monster in front of the player and shoots it: it stops and falls over.",
+      "name": "A shot monster is pushed away by the impact",
+      "description": "Puts a monster in front of the player and shoots it: its physics body is activated and the impulse at the impact throws it back, tumbling.",
       "type": "gameplay",
       "source": [
         "await harness.goToScene('Game Scene');",
@@ -5628,26 +5647,32 @@
         "for (const object of harness.getCurrentRuntimeScene().getAdhocListOfAllInstances()) if (object.type === 'Terrain3D::ScatteredModels') object.hide(true);",
         "harness.setTimeoutMs(60000);",
         "const DT = { dtMs: 50 };",
-        "const terrain = harness.getRuntimeObject(harness.getObjects('Terrain')[0].id).__terrain3D;",
-        "await harness.stepFrames(10, DT);",
+        "await harness.stepFrames(4, DT);",
         "const player = harness.getObjects('Player')[0];",
         "const [monster, ...otherMonsters] = harness.getObjects('Monster');",
         "for (const other of otherMonsters) harness.removeObject(other.id);",
         "// The player looks toward -Y: the monster stands in front of the crosshair.",
+        "const monsterX = player.centerX;",
         "const monsterY = player.centerY - 250;",
-        "harness.setObjectPosition(monster.id, player.centerX, monsterY, terrain.getHeightAt(player.centerX, monsterY));",
+        "harness.setObjectPosition(monster.id, monsterX, monsterY, harness.getRuntimeObject(harness.getObjects('Terrain')[0].id).__terrain3D.getHeightAt(monsterX, monsterY));",
         "harness.setMousePositionScreen(harness.getGameResolutionWidth() / 2, harness.getGameResolutionHeight() / 2);",
-        "await harness.stepFrames(3);",
-        "harness.watch('HitParticle');",
+        "await harness.stepFrames(3, DT);",
+        "const runtimeMonster = harness.getRuntimeObject(monster.id);",
+        "harness.assert(!runtimeMonster.getBehavior('Physics3D').activated(), 'A walking monster has no physics body (the navmesh moves it).');",
+        "const distanceToPlayer = () => Math.hypot(runtimeMonster.getCenterXInScene() - player.centerX, runtimeMonster.getCenterYInScene() - player.centerY);",
+        "const startDistance = distanceToPlayer();",
         "harness.setMouseButtonPressed(true);",
-        "await harness.stepFrames(2);",
+        "await harness.stepFrames(1, DT);",
         "harness.setMouseButtonPressed(false);",
-        "const getMonster = () => harness.getObjects('Monster').find((one) => one.id === monster.id);",
-        "const isDying = () => getMonster() && getMonster().variables.find((variable) => variable.name === 'State').value === 'Dying';",
-        "const shot = await harness.stepUntil(isDying, { maxFrames: 10, ...DT });",
-        "harness.assert(shot, 'The monster was shot.');",
-        "const hasFallen = await harness.stepUntil(() => harness.getRuntimeObject(monster.id).getRotationY() > 60, { maxFrames: 40, ...DT });",
-        "harness.assert(hasFallen, 'The monster falls over (rotation ' + harness.getRuntimeObject(monster.id).getRotationY().toFixed(0) + ').');"
+        "let mostTipped = 0;",
+        "for (let frame = 0; frame < 12; frame++) {",
+        "  await harness.stepFrames(1, DT);",
+        "  mostTipped = Math.max(mostTipped, Math.abs(runtimeMonster.getRotationX()) + Math.abs(runtimeMonster.getRotationY()));",
+        "}",
+        "console.log('distance to the player: ' + startDistance.toFixed(0) + ' -> ' + distanceToPlayer().toFixed(0) + ', most tipped: ' + mostTipped.toFixed(0));",
+        "harness.assert(runtimeMonster.getVariables().get('State').getAsString() === 'Dying', 'The monster was shot.');",
+        "harness.assert(distanceToPlayer() > startDistance + 60, 'The monster was thrown back (' + startDistance.toFixed(0) + ' -> ' + distanceToPlayer().toFixed(0) + ').');",
+        "harness.assert(mostTipped > 30, 'The monster tumbles (' + mostTipped.toFixed(0) + ' degrees).');"
       ]
     },
     {
