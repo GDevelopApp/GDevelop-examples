@@ -2363,7 +2363,7 @@
               "name": "Physics3D",
               "type": "Physics3D::Physics3DBehavior",
               "object3D": "Object3D",
-              "bodyType": "Dynamic",
+              "bodyType": "Kinematic",
               "bullet": false,
               "fixedRotation": true,
               "shape": "Capsule",
@@ -2378,14 +2378,14 @@
               "massCenterOffsetY": 0,
               "massCenterOffsetZ": 0,
               "massOverride": 0,
-              "density": 4000,
+              "density": 40,
               "friction": 1,
               "restitution": 0.1,
               "linearDamping": 0.1,
               "angularDamping": 0.1,
-              "gravityScale": 0,
+              "gravityScale": 1,
               "layers": 17,
-              "masks": 16
+              "masks": 17
             }
           ],
           "content": {
@@ -3965,7 +3965,7 @@
                         "textG": 0,
                         "textR": 0
                       },
-                      "comment": "While it walks, the navmesh moves the monster: its physics body has no gravity and doesn't collide with the static objects (mask 1), only with the player and the other dynamic objects, and it is heavy, so that the player can't push it. When it is shot, it gets its density, the gravity and the collisions back (its body is created again, by deactivating and activating the behavior), to be thrown by the impulse."
+                      "comment": "While it walks, the navmesh moves the monster: its physics body is kinematic, so the player bumps into it without pushing it. When it is shot, it becomes dynamic, to be thrown by the impulse at the impact and to fall."
                     },
                     {
                       "folded": true,
@@ -3996,35 +3996,12 @@
                         },
                         {
                           "type": {
-                            "value": "Physics3D::Physics3DBehavior::SetDensity"
+                            "value": "Physics3D::Physics3DBehavior::SetBodyType"
                           },
                           "parameters": [
                             "Monster",
                             "Physics3D",
-                            "=",
-                            "40"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Physics3D::Physics3DBehavior::SetGravityScale"
-                          },
-                          "parameters": [
-                            "Monster",
-                            "Physics3D",
-                            "=",
-                            "1"
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "Physics3D::Physics3DBehavior::EnableMask"
-                          },
-                          "parameters": [
-                            "Monster",
-                            "Physics3D",
-                            "1",
-                            "yes"
+                            "\"Dynamic\""
                           ]
                         },
                         {
@@ -4035,26 +4012,6 @@
                             "Monster",
                             "Physics3D",
                             ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ActivateBehavior"
-                          },
-                          "parameters": [
-                            "Monster",
-                            "Physics3D",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "value": "ActivateBehavior"
-                          },
-                          "parameters": [
-                            "Monster",
-                            "Physics3D",
-                            "yes"
                           ]
                         },
                         {
@@ -5656,7 +5613,7 @@
         "harness.setMousePositionScreen(harness.getGameResolutionWidth() / 2, harness.getGameResolutionHeight() / 2);",
         "await harness.stepFrames(3, DT);",
         "const runtimeMonster = harness.getRuntimeObject(monster.id);",
-        "harness.assert(runtimeMonster.getBehavior('Physics3D').getGravityScale() === 0, 'A walking monster has no gravity (the navmesh moves it).');",
+        "harness.assert(runtimeMonster.getBehavior('Physics3D').isKinematic(), 'A walking monster is kinematic (the navmesh moves it).');",
         "const distanceToPlayer = () => Math.hypot(runtimeMonster.getCenterXInScene() - player.centerX, runtimeMonster.getCenterYInScene() - player.centerY);",
         "const startDistance = distanceToPlayer();",
         "harness.setMouseButtonPressed(true);",
@@ -5669,6 +5626,7 @@
         "}",
         "console.log('distance to the player: ' + startDistance.toFixed(0) + ' -> ' + distanceToPlayer().toFixed(0) + ', most tipped: ' + mostTipped.toFixed(0));",
         "harness.assert(runtimeMonster.getVariables().get('State').getAsString() === 'Dying', 'The monster was shot.');",
+        "harness.assert(runtimeMonster.getBehavior('Physics3D').isDynamic(), 'The shot monster is dynamic.');",
         "harness.assert(distanceToPlayer() > startDistance + 60, 'The monster was thrown back (' + startDistance.toFixed(0) + ' -> ' + distanceToPlayer().toFixed(0) + ').');",
         "harness.assert(mostTipped > 30, 'The monster tumbles (' + mostTipped.toFixed(0) + ' degrees).');"
       ]
