@@ -16,6 +16,7 @@ const allLicenses = require('./lib/licenses.json');
 const args = require('minimist')(process.argv.slice(2));
 const { loadSerializedProject } = require('./lib/LocalProjectOpener');
 const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
+const { getExampleGDevelopVersion } = require('./lib/ExampleGDevelopVersion');
 const {
   loadThemeSlotsVocabulary,
   checkStarterThemeSlots,
@@ -527,11 +528,12 @@ const extractExamples = async (
           ),
           license: fileWithMetadata.license,
           projectFileUrl: getResourceUrl(fileWithMetadata.path),
-          gdevelopVersion: usedExtensions
-            .map((exampleUsedExtension) => exampleUsedExtension.name)
-            .includes('Physics3D')
-            ? '>=5.5.220'
-            : '', //TODO: set to the GDevelop version used to author the example?
+          gdevelopVersion: getExampleGDevelopVersion(
+            projectObject,
+            usedExtensions.map(
+              (exampleUsedExtension) => exampleUsedExtension.name
+            )
+          ),
         };
 
         return example;
