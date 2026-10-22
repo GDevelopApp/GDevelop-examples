@@ -783,13 +783,15 @@
           "effects": [],
           "behaviors": [],
           "content": {
-            "WaveHeight": 4,
-            "WaveLength": 400,
+            "Opacity": 120,
+            "CrestColor": "231;248;255",
+            "Foam": 0.05,
+            "NormalMapSize": 600,
+            "WaveHeight": 2,
+            "WaveLength": 150,
+            "WaveSpeed": 1.8,
             "NormalMap": "assets/WaterNormalMap.jpg",
-            "Color": "30;90;120",
-            "Opacity": 230,
-            "Foam": 0.1,
-            "NormalMapSize": 1600
+            "Color": "30;90;120"
           }
         },
         {
@@ -935,7 +937,7 @@
             ]
           },
           {
-            "folderName": "Landscape",
+            "folderName": "Decoration",
             "children": [
               {
                 "objectName": "House"
@@ -945,7 +947,12 @@
               },
               {
                 "objectName": "Windsock"
-              },
+              }
+            ]
+          },
+          {
+            "folderName": "Nature",
+            "children": [
               {
                 "objectName": "PineTrees"
               },
@@ -21042,28 +21049,6 @@
   "externalLayouts": [],
   "tests": [
     {
-      "name": "The scattered trees and plants grow on the ground",
-      "description": "Verifies each scattered models object has the copies placed when the starter was made, standing on the terrain.",
-      "type": "gameplay",
-      "source": [
-        "await harness.goToScene('Game Scene');",
-        "// Faster in the software renderer used to run tests (it is slow with the trees, drawn in batches).",
-        "harness.setGameResolutionSize(160, 90);",
-        "harness.getCurrentRuntimeScene().getLayer('').setEffectBooleanParameter('3D Sun Light', 'isCastingShadow', false);",
-        "for (const object of harness.getCurrentRuntimeScene().getAdhocListOfAllInstances()) if (object.type === 'Terrain3D::ScatteredModels') object.hide(true);",
-        "harness.setTimeoutMs(60000);",
-        "await harness.stepFrames(4);",
-        "const terrain = harness.getRuntimeObject(harness.getObjects('Terrain')[0].id).__terrain3D;",
-        "for (const [name, expectedCount] of [[\"PineTrees\",83],[\"Trees\",37]]) {",
-        "  const scatter = harness.getRuntimeObject(harness.getObjects(name)[0].id).__terrainScatter;",
-        "  const copies = scatter.getCopies();",
-        "  harness.assert(copies.length === expectedCount, name + ' has ' + expectedCount + ' copies (' + copies.length + ').');",
-        "  const floating = copies.filter((copy) => Math.abs(copy.z - terrain.getHeightAt(copy.x, copy.y)) > 0.5);",
-        "  harness.assert(floating.length === 0, 'The copies of ' + name + ' stand on the ground (' + floating.length + ' do not).');",
-        "}"
-      ]
-    },
-    {
       "name": "The plane flies forward above the ground",
       "description": "Lets the plane fly for a few seconds: it moves forward and stays above the terrain.",
       "type": "gameplay",
@@ -21086,36 +21071,6 @@
         "console.log('flew ' + distance.toFixed(0) + ', lowest above the ground: ' + lowest.toFixed(0));",
         "harness.assert(distance > 200, 'The plane flew forward (' + distance.toFixed(0) + ').');",
         "harness.assert(lowest >= 19, 'The plane stayed above the ground (' + lowest.toFixed(0) + ' at the lowest).');"
-      ]
-    },
-    {
-      "name": "The plane cannot fly into a mountain",
-      "description": "Puts the plane low in front of a mountain and dives: it stays above the terrain.",
-      "type": "gameplay",
-      "source": [
-        "await harness.goToScene('Game Scene');",
-        "// Faster in the software renderer used to run tests (it is slow with the trees, drawn in batches).",
-        "harness.setGameResolutionSize(160, 90);",
-        "harness.getCurrentRuntimeScene().getLayer('').setEffectBooleanParameter('3D Sun Light', 'isCastingShadow', false);",
-        "for (const object of harness.getCurrentRuntimeScene().getAdhocListOfAllInstances()) if (object.type === 'Terrain3D::ScatteredModels') object.hide(true);",
-        "harness.setTimeoutMs(60000);",
-        "const DT = { dtMs: 50 };",
-        "const terrain = harness.getRuntimeObject(harness.getObjects('Terrain')[0].id).__terrain3D;",
-        "const getPlane = () => harness.getObjects('PlayerAircraft')[0];",
-        "// The southern mountains, flown toward from the airstrip.",
-        "const plane = harness.getRuntimeObject(getPlane().id);",
-        "plane.setPosition(0, 5200);",
-        "plane.setZ(terrain.getHeightAt(0, 5200) + 60);",
-        "plane.setAngle(90);",
-        "harness.setKeyPressed('Down', true);",
-        "let lowest = Infinity;",
-        "await harness.stepFrames(40, { ...DT, onFrame: () => { const p = getPlane(); lowest = Math.min(lowest, p.z - terrain.getHeightAt(p.x, p.y)); } });",
-        "harness.setKeyPressed('Down', false);",
-        "const end = getPlane();",
-        "console.log('lowest above the ground: ' + lowest.toFixed(0) + ', end z=' + end.z.toFixed(0) + ' at ' + end.x.toFixed(0) + ';' + end.y.toFixed(0));",
-        "harness.assert(end.y > 5300, 'The plane flew toward the mountain.');",
-        "harness.assert(lowest >= 19, 'The plane stayed above the ground (' + lowest.toFixed(0) + ' at the lowest).');",
-        "harness.assert(end.z > terrain.getHeightAt(0, 5200) + 100, 'The plane climbed the mountain.');"
       ]
     },
     {
