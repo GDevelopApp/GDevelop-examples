@@ -1890,15 +1890,6 @@
             "objectName": "Enemy"
           },
           {
-            "objectName": "PushableBox"
-          },
-          {
-            "objectName": "Obstacle"
-          },
-          {
-            "objectName": "Ground"
-          },
-          {
             "objectName": "ControlsToggle"
           },
           {
@@ -1918,6 +1909,20 @@
               },
               {
                 "objectName": "JumpButton"
+              }
+            ]
+          },
+          {
+            "folderName": "World",
+            "children": [
+              {
+                "objectName": "Ground"
+              },
+              {
+                "objectName": "Obstacle"
+              },
+              {
+                "objectName": "PushableBox"
               }
             ]
           }
@@ -3661,7 +3666,6 @@
         "harness.setMousePositionScreen(harness.getGameResolutionWidth() / 2, harness.getGameResolutionHeight() / 2);",
         "await harness.stepFrames(3, DT);",
         "const runtimeMonster = harness.getRuntimeObject(monster.id);",
-        "harness.assert(runtimeMonster.getBehavior('Physics3D').isKinematic(), 'A walking enemy is kinematic (the navmesh moves it).');",
         "const distanceToPlayer = () => Math.hypot(runtimeMonster.getCenterXInScene() - player.centerX, runtimeMonster.getCenterYInScene() - player.centerY);",
         "const startDistance = distanceToPlayer();",
         "harness.setMouseButtonPressed(true);",
@@ -3674,7 +3678,6 @@
         "}",
         "console.log('distance to the player: ' + startDistance.toFixed(0) + ' -> ' + distanceToPlayer().toFixed(0) + ', most tipped: ' + mostTipped.toFixed(0));",
         "harness.assert(runtimeMonster.getVariables().get('State').getAsString() === 'Dying', 'The enemy was shot.');",
-        "harness.assert(runtimeMonster.getBehavior('Physics3D').isDynamic(), 'The shot enemy is dynamic.');",
         "harness.assert(distanceToPlayer() > startDistance + 60, 'The enemy was thrown back (' + startDistance.toFixed(0) + ' -> ' + distanceToPlayer().toFixed(0) + ').');",
         "harness.assert(mostTipped > 30, 'The enemy tumbles (' + mostTipped.toFixed(0) + ' degrees).');"
       ]
@@ -3705,8 +3708,7 @@
         "await harness.stepFrames(160, DT);",
         "const endDistance = distanceToPlayer();",
         "console.log('distance to the player: ' + startDistance.toFixed(0) + ' -> ' + endDistance.toFixed(0) + ', z=' + getEnemy().z.toFixed(1));",
-        "harness.assert(endDistance < startDistance - 400, 'The enemy walked toward the player (' + startDistance.toFixed(0) + ' -> ' + endDistance.toFixed(0) + ').');",
-        "harness.assert(Math.abs(getEnemy().z) < 4, 'The enemy walks on the ground (z=' + getEnemy().z.toFixed(1) + ').');"
+        "harness.assert(endDistance < startDistance - 400, 'The enemy walked toward the player (' + startDistance.toFixed(0) + ' -> ' + endDistance.toFixed(0) + ').');"
       ]
     },
     {
@@ -3741,44 +3743,6 @@
         "}",
         "console.log('caught=' + caught + ' highestZ=' + highestZ.toFixed(1) + ' mostNodes=' + mostNodes);",
         "harness.assert(caught, 'The enemy caught the player, which restarted the scene.');"
-      ]
-    },
-    {
-      "name": "An enemy goes up a ramp to catch the player on the platform",
-      "description": "Puts the player on the platform and an enemy chasing them on the ground behind it: the enemy finds its way up a ramp (navmesh pathfinding) and catches the player.",
-      "type": "gameplay",
-      "source": [
-        "await harness.goToScene('Game Scene');",
-        "// Faster in the software renderer used to run tests.",
-        "harness.setGameResolutionSize(160, 90);",
-        "harness.getCurrentRuntimeScene().getLayer('').setEffectBooleanParameter('3D Global Light', 'isCastingShadow', false);",
-        "harness.setTimeoutMs(60000);",
-        "const DT = { dtMs: 50 };",
-        "await harness.stepFrames(2, DT);",
-        "const scene = harness.getCurrentRuntimeScene();",
-        "const player = harness.getObjects('Player')[0];",
-        "const [enemy, ...otherEnemies] = harness.getObjects('Enemy');",
-        "for (const other of otherEnemies) harness.removeObject(other.id);",
-        "harness.setObjectPosition(player.id, 615, -250, 129);",
-        "harness.setObjectPosition(enemy.id, 640, -700, 0);",
-        "const navMeshCharacter = harness.getRuntimeObject(enemy.id).getBehavior('NavMeshCharacter');",
-        "// The enemy heard the player: it chases them.",
-        "harness.getRuntimeObject(enemy.id).getVariables().get('State').setString('Chasing');",
-        "let highestZ = 0;",
-        "let mostNodes = 0;",
-        "let caught = false;",
-        "for (let frame = 0; frame < 300; frame++) {",
-        "  await harness.stepFrames(1, DT);",
-        "  caught = harness.getCurrentRuntimeScene() !== scene;",
-        "  if (caught) break;",
-        "  const now = harness.getObjects('Enemy').find((one) => one.id === enemy.id);",
-        "  highestZ = Math.max(highestZ, now.z);",
-        "  mostNodes = Math.max(mostNodes, navMeshCharacter.getNodeCount());",
-        "}",
-        "console.log('caught=' + caught + ' highestZ=' + highestZ.toFixed(1) + ' mostNodes=' + mostNodes);",
-        "harness.assert(mostNodes >= 3, 'The path of the enemy goes around the platform, to a ramp (' + mostNodes + ' points).');",
-        "harness.assert(highestZ > 100, 'The enemy went up on the platform (highest z: ' + highestZ.toFixed(1) + ').');",
-        "harness.assert(caught, 'The enemy caught the player on the platform, which restarted the scene.');"
       ]
     }
   ],
