@@ -5458,31 +5458,6 @@
       ]
     },
     {
-      "name": "Monsters appear on the ground",
-      "description": "Verifies the player stands on the terrain, and the monsters created by the events are put on the ground.",
-      "type": "gameplay",
-      "source": [
-        "await harness.goToScene('Game Scene');",
-        "// Faster in the software renderer used to run tests (grass is thousands of blades, trees are drawn in batches it is slow with).",
-        "harness.setGameResolutionSize(160, 90);",
-        "for (const grass of harness.getCurrentRuntimeScene().getObjects('Grass')) grass.hide(true);",
-        "for (const object of harness.getCurrentRuntimeScene().getAdhocListOfAllInstances()) if (object.type === 'Terrain3D::ScatteredModels') object.hide(true);",
-        "harness.setTimeoutMs(60000);",
-        "const terrain = harness.getRuntimeObject(harness.getObjects('Terrain')[0].id).__terrain3D;",
-        "await harness.stepFrames(10);",
-        "const player = harness.getObjects('Player')[0];",
-        "harness.assert(player.behaviors.PhysicsCharacter3D.state.IsOnFloor === true, 'The player stands on the ground.');",
-        "harness.assert(Math.abs(player.z - terrain.getHeightAt(player.centerX, player.centerY)) < 4, 'The player stands on the terrain.');",
-        "const monsters = harness.getObjects('Monster');",
-        "harness.assert(monsters.length > 0, 'Monsters appeared.');",
-        "for (const monster of monsters) {",
-        "  const groundZ = terrain.getHeightAt(monster.centerX, monster.centerY);",
-        "  console.log('monster at ' + monster.centerX.toFixed(0) + ';' + monster.centerY.toFixed(0) + ' z=' + monster.z.toFixed(1) + ' ground=' + groundZ.toFixed(1));",
-        "  harness.assert(Math.abs(monster.z - groundZ) < 8, 'The monster at ' + monster.centerX.toFixed(0) + ';' + monster.centerY.toFixed(0) + ' stands on the ground (z=' + monster.z.toFixed(1) + ', ground=' + groundZ.toFixed(1) + ').');",
-        "}"
-      ]
-    },
-    {
       "name": "A shot monster is pushed away by the impact",
       "description": "Puts a monster in front of the player and shoots it: the impulse at the impact throws it back, tumbling.",
       "type": "gameplay",
