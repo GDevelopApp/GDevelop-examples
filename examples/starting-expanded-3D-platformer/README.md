@@ -1,4 +1,4 @@
-# 3D Platformer with a map
+# 3D Platformer Expanded
 
 A 3D physics-based platformer in a valley made with a 3D terrain: dirt paths winding up hills, platforms on their tops, coins to collect along the way and a pond. The player controls a character that can move forward, backward, left, and right, as well as jump and fall. The player can push a 3D physics box, jump on and collide with static boxes, and collect coin objects. A third-person camera follows behind the player, but can also be manually controlled by the player. The game supports both keyboard and mouse controls as well as mobile touch controls.
 

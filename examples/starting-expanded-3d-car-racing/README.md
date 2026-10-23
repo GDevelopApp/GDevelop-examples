@@ -1,4 +1,4 @@
-# 3D Racing with a map
+# 3D Racing Expanded
 
 A 3D racing game with a third-person camera, on a race track made with a 3D terrain: a start straight with grandstands and pits, a climb up a hill, hairpins and a descent through the valley. The player drives the car with keyboard or mobile controls, passes the checkpoints in order and completes laps, with a lap counter and a timer.
 
