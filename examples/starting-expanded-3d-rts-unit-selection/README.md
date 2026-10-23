@@ -1,0 +1,3 @@
+# Top-down RTS (unit selection) Expanded
+
+A 3D angled top-down RTS-style game in a valley made with a 3D terrain, with hills, a shallow stream, forests, farms and a town. The player can click to select individual units or click and drag to select multiple units, then give them a waypoint to move to: the units use navmesh pathfinding to walk around buildings, trees and steep hills, without bumping into each other. The map is bigger than the screen: the arrow keys (or WASD), or dragging with two fingers on touch screens, move the camera. Unit selection and waypoints work with either mouse or touch screen controls.

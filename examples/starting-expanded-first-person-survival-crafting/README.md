@@ -1,0 +1,3 @@
+# 3D First Person Survival Crafting Expanded
+
+A 3D physics-based first-person survival crafting game in an open forest on hills made with a 3D terrain, around a camp in a clearing. The player can look around, walk, jump and fall. Trees and boulders can be clicked to harvest resources, and objects can be picked up, stored in an inventory and placed back onto the ground using raycasting. The inventory uses UI icons to display its contents and select the item to use. This setup works well for any game where the player gathers resources and crafts things with them. The game supports both keyboard/mouse controls and mobile touch controls.
