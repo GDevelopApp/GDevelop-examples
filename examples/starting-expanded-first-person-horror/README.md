@@ -1,4 +1,4 @@
-# 3D First-Person Horror Game with a map
+# 3D First-Person Horror Game Expanded
 
 A 3D physics-based first-person game set in a dark, fog-filled forest made with a 3D terrain, to create a horror atmosphere: a cabin in a clearing, paths winding between dead trees and pines over mounds and hollows. The player can look around and turn using the camera, as well as jump and fall within the environment, and only sees what the flashlight lights.
 

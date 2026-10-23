@@ -1,4 +1,4 @@
-# 3D FPS Horror game with Gun with a map
+# 3D FPS Horror game with Gun Expanded
 
 A 3D physics-based first-person game set in a dark, fog-filled place made with a 3D terrain, to create a horror atmosphere: a graveyard with crypts at the top of a hill, surrounded by a dead forest on rolling hills. The player can look around and turn using the camera, as well as jump and fall within the environment.
 

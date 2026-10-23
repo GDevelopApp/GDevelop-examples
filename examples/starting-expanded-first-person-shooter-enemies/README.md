@@ -1,4 +1,4 @@
-# 3D FPS with enemies with a map
+# 3D FPS with enemies Expanded
 
 A 3D physics-based first-person shooter in a canyon made with a 3D terrain: cover on uneven ground, crates, a container and a ramp up to a plateau, and enemies looking for the player. The player can look around and turn using the camera, as well as jump and fall within the environment.
 
