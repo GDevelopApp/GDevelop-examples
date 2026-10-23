@@ -1,0 +1,3 @@
+# 3D FPS game with Enemies
+
+A 3D physics-based first-person shooter, where the player can look around, walk, jump and fall, on a ground with a platform reached by ramps and pushable physics boxes. The player holds a 3D gun: firing uses raycasting to detect where the bullet hits, with a 3D particle effect at the impact, a sound and a screen shake. Enemies patrol using navmesh pathfinding, chase the player when they see them (raycasting), and are thrown back and killed when shot. If an enemy catches the player, the game resets. This setup works well for any action game where the player shoots and kills enemies. The game supports both keyboard/mouse controls and mobile touch controls.
