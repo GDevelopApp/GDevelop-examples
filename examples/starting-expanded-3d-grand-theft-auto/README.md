@@ -1,5 +1,3 @@
 # 3D GTA Expanded
 
-A 3D open world where you can walk, jump, get into a car and drive through a town, farms, forests and a tunnel through a hill, using keyboard or mobile controls. The map is a 3D terrain that can be sculpted and painted in the editor.
-
-The assets are CC0: the City Kits by Kenney, the "Ultimate Nature" pack by Quaternius and ground textures from ambientCG.
+A 3D open world made with a 3D terrain, where the player can walk, jump, get into a car and drive through a town, farms, forests and a tunnel through a hill, using keyboard or mobile controls. The cars use physics-based movement and can smash into other cars and obstacles. A starting point for open-world driving and action games inspired by Grand Theft Auto.
