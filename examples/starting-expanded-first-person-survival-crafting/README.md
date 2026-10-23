@@ -1,4 +1,4 @@
-# 3D First Person Survival Crafting with a map
+# 3D First Person Survival Crafting Expanded
 
 A 3D physics-based first-person game in an open forest on hills made with a 3D terrain, around a camp in a clearing. The player can look around and turn using the camera, as well as jump and fall within the environment, and walks up and down the slopes. Solid trees and boulders that the player can't pass through are spread in the forest, with bushes, fallen logs and stumps, and a 3D box with rocks and logs is placed in the camp. The player can pick up objects and store them in an inventory, then place objects back onto the ground or the terrain using raycasting to determine the placement location. Harvestable trees and boulders can be clicked to add resources to the inventory. The inventory uses UI icons to display the contents of the inventory, as well as allow the player to select which item to use and choose which slot a picked-up object will occupy.
 

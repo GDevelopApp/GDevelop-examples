@@ -1,4 +1,4 @@
-# 3D Flight Simulator with a map
+# 3D Flight Simulator Expanded
 
 A 3D flight game over a big landscape made with a 3D terrain: mountains with snowy tops, valleys, a lake, forests and farms. The plane is represented by a 3D model and cannot fly into the ground: it is kept above the terrain wherever it flies, and inside the map. The player controls the plane’s tilt (left/right), pitch (forward/backward), and speed using keyboard or mobile touch controls. A third-person camera follows the plane, following its angle and pitch automatically, to properly follow the player movement.
 

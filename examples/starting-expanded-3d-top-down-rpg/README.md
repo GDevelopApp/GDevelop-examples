@@ -1,4 +1,4 @@
-# 3D RPG with a map
+# 3D RPG Expanded
 
 A 3D top-down RPG-style game with an angled down camera view, in a village by a river made with a 3D terrain, with paths between hills, forests and a bridge to cross the river. The player can move left, right, up, or down, walks up and down the slopes, but cannot walk through buildings, trees or into the river. When near an NPC, the player can press an action button to open a dialog box with text and two choice buttons. The camera follows the player along the X and Y axis without changing depth. The player character can be controlled with keyboard or touch screen controls.
 
