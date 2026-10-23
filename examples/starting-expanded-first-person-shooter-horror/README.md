@@ -1,0 +1,3 @@
+# 3D FPS Horror game with Gun Expanded
+
+A 3D physics-based first-person shooter with a horror atmosphere, in a dark, foggy place made with a 3D terrain: a graveyard with crypts on top of a hill, surrounded by a dead forest. The player can look around, walk, jump and fall, and holds a 3D gun: firing uses raycasting to detect where the bullet hits, with a 3D particle effect at the impact, a sound and a screen shake. Monsters appear in the forest and roam it using navmesh pathfinding, chase the player when they see them (raycasting), and are thrown back and killed when shot. If a monster catches the player, the game resets. The game supports both keyboard/mouse controls and mobile touch controls.

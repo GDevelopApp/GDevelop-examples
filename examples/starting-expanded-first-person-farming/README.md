@@ -1,0 +1,3 @@
+# 3D First Person Farming Expanded
+
+A 3D physics-based first-person farming game in a valley made with a 3D terrain: a farm with a barn, a silo, a windmill and fields of dirt plots, a pond, and hills and woods around. The player can look around, walk, jump and fall. Seed bags can be clicked to add seeds to the inventory, seeds can be placed on unoccupied dirt plots to grow crops, and fully grown crops can be picked up. Objects can be stored in the inventory and placed back onto the ground using raycasting. The inventory uses UI icons to display its contents and select the item to use. The game supports both keyboard/mouse controls and mobile touch controls.

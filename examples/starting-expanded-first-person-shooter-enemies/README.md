@@ -1,0 +1,3 @@
+# 3D FPS with enemies Expanded
+
+A 3D physics-based first-person shooter in a canyon made with a 3D terrain: cover on uneven ground, crates, a container and a ramp up to a plateau. The player can look around, walk, jump and fall, and holds a 3D gun: firing uses raycasting to detect where the bullet hits, with a 3D particle effect at the impact, a sound and a screen shake. Enemies patrol the canyon using navmesh pathfinding, chase the player when they see them (raycasting), and are thrown back and killed when shot. If an enemy catches the player, the game resets. The game supports both keyboard/mouse controls and mobile touch controls.

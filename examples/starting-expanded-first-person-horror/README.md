@@ -1,0 +1,3 @@
+# 3D First-Person Horror Game Expanded
+
+A 3D physics-based first-person horror game in a dark, foggy forest made with a 3D terrain: a cabin in a clearing, dead trees and pines on mounds and hollows. The player can look around, walk, jump and fall, and only sees what the flashlight lights. A monster roams the forest using navmesh pathfinding to find its way around the trees and the cabin. It uses raycasting to check if the player is in its line of sight, then chases the player, and the game resets if it catches them. The player cannot fight back. The game supports both keyboard/mouse controls and mobile touch controls.
