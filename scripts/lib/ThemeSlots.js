@@ -3,10 +3,11 @@ const path = require('path');
 const fs = require('fs').promises;
 
 /**
- * The vocabulary of slots a theme can fill, shared by every starter.
+ * The vocabulary of slots a theme can fill, shared by every starter. The
+ * description of a slot is what the authors of themes read to choose its asset.
  * @typedef {{
  *   version: number,
- *   slots: Array<{id: string, kind: ThemeSlotKind, label: string}>,
+ *   slots: Array<{id: string, kind: ThemeSlotKind, label: string, description: string}>,
  * }} ThemeSlotsVocabulary
  *
  * @typedef {'model' | 'texture' | 'material' | 'skybox' | 'color'} ThemeSlotKind
