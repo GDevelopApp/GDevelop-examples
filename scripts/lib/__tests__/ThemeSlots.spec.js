@@ -11,13 +11,48 @@ const {
 const vocabulary = {
   version: 1,
   slots: [
-    { id: 'character.player', kind: 'model', label: 'Player character' },
-    { id: 'nature.tree', kind: 'model', label: 'Tree' },
-    { id: 'env.ground', kind: 'texture', label: 'Ground' },
-    { id: 'env.wall', kind: 'texture', label: 'Wall' },
-    { id: 'sky.day', kind: 'skybox', label: 'Daytime sky' },
-    { id: 'terrain.ground', kind: 'material', label: 'Terrain ground' },
-    { id: 'terrain.grass.tip', kind: 'color', label: 'Grass tip color' },
+    {
+      id: 'character.player',
+      kind: 'model',
+      label: 'Player character',
+      description: 'The character the player controls.',
+    },
+    {
+      id: 'nature.tree',
+      kind: 'model',
+      label: 'Tree',
+      description: 'The trees.',
+    },
+    {
+      id: 'env.ground',
+      kind: 'texture',
+      label: 'Ground',
+      description: 'The texture of the ground.',
+    },
+    {
+      id: 'env.wall',
+      kind: 'texture',
+      label: 'Wall',
+      description: 'The texture of the walls.',
+    },
+    {
+      id: 'sky.day',
+      kind: 'skybox',
+      label: 'Daytime sky',
+      description: 'The sky.',
+    },
+    {
+      id: 'terrain.ground',
+      kind: 'material',
+      label: 'Terrain ground',
+      description: 'The main ground of a terrain.',
+    },
+    {
+      id: 'terrain.grass.tip',
+      kind: 'color',
+      label: 'Grass tip color',
+      description: 'The color of the grass blades at their tip.',
+    },
   ],
 };
 
