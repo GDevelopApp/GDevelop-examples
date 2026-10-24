@@ -112,7 +112,12 @@ is neither mapped to a slot nor listed in ignoredObjects in theme-slots.json.
 - **Add a slot to the root `theme-slots.json` only for a genuinely new role.**
   Every theme is missing it until someone fills it in the assets repository:
   those objects keep their placeholder art in the meantime, which is not an
-  error.
+  error. Give it a `description` saying what its objects do in the starters
+  and what fits it: the authors of themes choose its asset from it (the gun of
+  the FPS starters must shoot, a crop must grow from the soil).
+- **Map an object only to a slot whose description fits what it does.** A seed
+  planted in a plot is not a small rock: every theme would show a rock (or a
+  bone, or a wheel) instead. List it in `ignoredObjects` if no slot fits.
 - **List in `ignoredObjects`** what is not meant to be seen as art: the camera
   anchor cube, an invisible collision helper, the faceless player of a first
   person game.
