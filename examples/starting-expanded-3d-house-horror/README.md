@@ -1,3 +1,3 @@
-# 3D Horror House Escape
+# 3D Horror House Escape Expanded
 
 A 3D physics-based first-person horror game in a dark two-story house: a living room, a kitchen, a study and a storage room downstairs, bedrooms and a dressing room upstairs, linked by a staircase, and a fenced yard outside. The player only sees what the flashlight lights, and must find the key hidden in the house, unlock the front door and escape through the gate of the yard. A monster roams both floors using navmesh pathfinding, climbing the stairs and finding its way through the rooms; it uses raycasting to check if the player is in its line of sight, then chases them, and the game resets if it catches the player. The player cannot fight back. The game supports both keyboard/mouse controls and mobile touch controls.
