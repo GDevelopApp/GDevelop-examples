@@ -1870,8 +1870,8 @@
               "parameters": [
                 "",
                 "Bullet",
-                "PlayerTank.CenterX() + XFromAngleAndDistance(PlayerTank.Angle() + PlayerTank.TopRotation(), PlayerTank.CannonWidth())",
-                "PlayerTank.CenterY() + YFromAngleAndDistance(PlayerTank.Angle() + PlayerTank.TopRotation(), PlayerTank.CannonWidth())",
+                "PlayerTank.MuzzleX()",
+                "PlayerTank.MuzzleY()",
                 ""
               ]
             },
@@ -1883,7 +1883,17 @@
                 "Bullet",
                 "Object3D",
                 "=",
-                "(PlayerTank.Object3D::CenterZ()) + sin(ToRad(-1 * PlayerTank.CannonAngle() - PlayerTank.Object3D::RotationY() * cos(ToRad(PlayerTank.TopRotation())) - PlayerTank.Object3D::RotationX() * sin(ToRad(PlayerTank.TopRotation())))) * PlayerTank.CannonWidth()"
+                "PlayerTank.MuzzleZ()"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetAngle"
+              },
+              "parameters": [
+                "Bullet",
+                "=",
+                "ToDeg(atan2(PlayerTank.AimDirectionY(), PlayerTank.AimDirectionX()))"
               ]
             },
             {
@@ -1894,17 +1904,7 @@
                 "Bullet",
                 "Object3D",
                 "=",
-                "(PlayerTank.CannonAngle() + PlayerTank.Object3D::RotationY() * cos(ToRad(PlayerTank.TopRotation())) - PlayerTank.Object3D::RotationX() * sin(ToRad(PlayerTank.TopRotation())))"
-              ]
-            },
-            {
-              "type": {
-                "value": "SetAngle"
-              },
-              "parameters": [
-                "Bullet",
-                "=",
-                "PlayerTank.TopRotation() + PlayerTank.Angle()"
+                "-ToDeg(asin(clamp(PlayerTank.AimDirectionZ(), -1, 1)))"
               ]
             },
             {
@@ -1932,15 +1932,14 @@
             },
             {
               "type": {
-                "value": "Physics3D::Physics3DBehavior::ApplyImpulseTowardPosition"
+                "value": "Physics3D::Physics3DBehavior::ApplyImpulseAtCenter"
               },
               "parameters": [
                 "Bullet",
                 "Physics3D",
-                "15",
-                "Bullet.X() + XFromAngleAndDistance(PlayerTank.Angle() + PlayerTank.TopRotation(), 20)",
-                "Bullet.Y() + YFromAngleAndDistance(PlayerTank.Angle() + PlayerTank.TopRotation(), 20)",
-                "Bullet.Object3D::Z() + sin(ToRad(-1 * Bullet.Object3D::RotationY())) * 10"
+                "15 * PlayerTank.AimDirectionX()",
+                "15 * PlayerTank.AimDirectionY()",
+                "15 * PlayerTank.AimDirectionZ()"
               ]
             },
             {
@@ -2501,13 +2500,7 @@
       "authorIds": [],
       "dependencies": [],
       "globalVariables": [],
-      "sceneVariables": [
-        {
-          "name": "CannonWidth",
-          "type": "number",
-          "value": 0
-        }
-      ],
+      "sceneVariables": [],
       "eventsFunctions": [],
       "eventsFunctionsFolderStructure": {
         "folderName": "__ROOT"
@@ -2827,10 +2820,10 @@
               "objectGroups": []
             },
             {
-              "description": "Return the distance between the end of the cannon and the center of the TankTop object",
-              "fullName": "Return CannonWidth",
+              "description": "Return the X position of the end of the cannon, in the scene.",
+              "fullName": "Muzzle position (X)",
               "functionType": "Expression",
-              "name": "CannonWidth",
+              "name": "MuzzleX",
               "sentence": "",
               "events": [
                 {
@@ -2839,19 +2832,185 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "TankConfiguration::TankTop::CannonInfo"
+                        "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "TankTop_Combined",
-                        ""
+                        "Object.ToParentX(TankTop_Combined.MuzzleX(), TankTop_Combined.MuzzleY(), TankTop_Combined.MuzzleZ())"
                       ]
-                    },
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::CombinedTank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the Y position of the end of the cannon, in the scene.",
+              "fullName": "Muzzle position (Y)",
+              "functionType": "Expression",
+              "name": "MuzzleY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
                     {
                       "type": {
                         "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "CannonWidth"
+                        "Object.ToParentY(TankTop_Combined.MuzzleX(), TankTop_Combined.MuzzleY(), TankTop_Combined.MuzzleZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::CombinedTank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the Z position of the end of the cannon, in the scene.",
+              "fullName": "Muzzle position (Z)",
+              "functionType": "Expression",
+              "name": "MuzzleZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentZ(TankTop_Combined.MuzzleX(), TankTop_Combined.MuzzleY(), TankTop_Combined.MuzzleZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::CombinedTank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the X of the direction the cannon points at (a unit vector), in the scene.",
+              "fullName": "Aim direction (X)",
+              "functionType": "Expression",
+              "name": "AimDirectionX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentDirectionX(TankTop_Combined.AimDirectionX(), TankTop_Combined.AimDirectionY(), TankTop_Combined.AimDirectionZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::CombinedTank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the Y of the direction the cannon points at (a unit vector), in the scene.",
+              "fullName": "Aim direction (Y)",
+              "functionType": "Expression",
+              "name": "AimDirectionY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentDirectionY(TankTop_Combined.AimDirectionX(), TankTop_Combined.AimDirectionY(), TankTop_Combined.AimDirectionZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::CombinedTank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the Z of the direction the cannon points at (a unit vector), in the scene.",
+              "fullName": "Aim direction (Z)",
+              "functionType": "Expression",
+              "name": "AimDirectionZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentDirectionZ(TankTop_Combined.AimDirectionX(), TankTop_Combined.AimDirectionY(), TankTop_Combined.AimDirectionZ())"
                       ]
                     }
                   ]
@@ -2892,7 +3051,22 @@
                 ]
               },
               {
-                "functionName": "CannonWidth"
+                "functionName": "MuzzleX"
+              },
+              {
+                "functionName": "MuzzleY"
+              },
+              {
+                "functionName": "MuzzleZ"
+              },
+              {
+                "functionName": "AimDirectionX"
+              },
+              {
+                "functionName": "AimDirectionY"
+              },
+              {
+                "functionName": "AimDirectionZ"
               }
             ]
           },
@@ -3127,11 +3301,11 @@
               "objectGroups": []
             },
             {
-              "description": "Record variables related to the TankCannon object",
-              "fullName": "Record TankCannon information",
-              "functionType": "Action",
-              "name": "CannonInfo",
-              "sentence": "Record information for the TankCannon of _PARAM0_",
+              "description": "Return the X position of the end of the cannon, in the tank containing the tank top.",
+              "fullName": "Muzzle position (X)",
+              "functionType": "Expression",
+              "name": "MuzzleX",
+              "sentence": "",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -3139,17 +3313,193 @@
                   "actions": [
                     {
                       "type": {
-                        "value": "SetNumberVariable"
+                        "value": "SetReturnNumber"
                       },
                       "parameters": [
-                        "CannonWidth",
-                        "=",
-                        "TankCanon.Width() + TankTop.Width()/2"
+                        "Object.ToParentX(TankCanon.X() + TankCanon.Object3D::ForwardX() * TankCanon.Width(), TankCanon.Y() + TankCanon.Object3D::ForwardY() * TankCanon.Width(), TankCanon.Object3D::Z() + TankCanon.Object3D::ForwardZ() * TankCanon.Width())"
                       ]
                     }
                   ]
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::TankTop",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the Y position of the end of the cannon, in the tank containing the tank top.",
+              "fullName": "Muzzle position (Y)",
+              "functionType": "Expression",
+              "name": "MuzzleY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(TankCanon.X() + TankCanon.Object3D::ForwardX() * TankCanon.Width(), TankCanon.Y() + TankCanon.Object3D::ForwardY() * TankCanon.Width(), TankCanon.Object3D::Z() + TankCanon.Object3D::ForwardZ() * TankCanon.Width())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::TankTop",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the Z position of the end of the cannon, in the tank containing the tank top.",
+              "fullName": "Muzzle position (Z)",
+              "functionType": "Expression",
+              "name": "MuzzleZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentZ(TankCanon.X() + TankCanon.Object3D::ForwardX() * TankCanon.Width(), TankCanon.Y() + TankCanon.Object3D::ForwardY() * TankCanon.Width(), TankCanon.Object3D::Z() + TankCanon.Object3D::ForwardZ() * TankCanon.Width())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::TankTop",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the X of the direction the cannon points at (a unit vector), in the tank containing the tank top.",
+              "fullName": "Aim direction (X)",
+              "functionType": "Expression",
+              "name": "AimDirectionX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentDirectionX(TankCanon.Object3D::ForwardX(), TankCanon.Object3D::ForwardY(), TankCanon.Object3D::ForwardZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::TankTop",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the Y of the direction the cannon points at (a unit vector), in the tank containing the tank top.",
+              "fullName": "Aim direction (Y)",
+              "functionType": "Expression",
+              "name": "AimDirectionY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentDirectionY(TankCanon.Object3D::ForwardX(), TankCanon.Object3D::ForwardY(), TankCanon.Object3D::ForwardZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankConfiguration::TankTop",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Return the Z of the direction the cannon points at (a unit vector), in the tank containing the tank top.",
+              "fullName": "Aim direction (Z)",
+              "functionType": "Expression",
+              "name": "AimDirectionZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentDirectionZ(TankCanon.Object3D::ForwardX(), TankCanon.Object3D::ForwardY(), TankCanon.Object3D::ForwardZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
@@ -3168,7 +3518,22 @@
                 "functionName": "Elevation"
               },
               {
-                "functionName": "CannonInfo"
+                "functionName": "MuzzleX"
+              },
+              {
+                "functionName": "MuzzleY"
+              },
+              {
+                "functionName": "MuzzleZ"
+              },
+              {
+                "functionName": "AimDirectionX"
+              },
+              {
+                "functionName": "AimDirectionY"
+              },
+              {
+                "functionName": "AimDirectionZ"
               }
             ]
           },

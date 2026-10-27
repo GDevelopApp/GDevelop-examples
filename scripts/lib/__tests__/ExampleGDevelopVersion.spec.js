@@ -22,11 +22,12 @@ const createFakeEvent = (actions, subEvents = []) => ({
 });
 
 /**
- * @param {{ sceneEvents?: Array<*>, extensionFunctionEvents?: Array<*> }} events
+ * @param {{ sceneEvents?: Array<*>, extensionFunctionEvents?: Array<*>, customObjectFunctionEvents?: Array<*> }} events
  */
 const createFakeProjectObject = ({
   sceneEvents = [],
   extensionFunctionEvents = [],
+  customObjectFunctionEvents = [],
 }) => ({
   layouts: [{ name: 'Game Scene', objects: [], events: sceneEvents }],
   externalEvents: [],
@@ -35,6 +36,14 @@ const createFakeProjectObject = ({
       name: 'MyExtension',
       eventsFunctions: [
         { name: 'MyFunction', events: extensionFunctionEvents },
+      ],
+      eventsBasedObjects: [
+        {
+          name: 'MyTank',
+          eventsFunctions: [
+            { name: 'MuzzleX', events: customObjectFunctionEvents },
+          ],
+        },
       ],
     },
   ],
@@ -48,6 +57,9 @@ const applyImpulseAction = createFakeInstruction(
   'Physics3D::Physics3DBehavior::ApplyImpulse',
   ['Enemy', 'Physics3D', '0', '0', '0']
 );
+const returnMuzzleXAction = createFakeInstruction('SetReturnNumber', [
+  'Object.ToParentX(Cannon.X() + Cannon.Width(), Cannon.Y(), Cannon.Object3D::Z())',
+]);
 
 describe('getExampleGDevelopVersion', () => {
   it('needs a GDevelop with the "Body type" action when a sub-event of a scene uses it', () => {
@@ -80,6 +92,37 @@ describe('getExampleGDevelopVersion', () => {
     expect(getExampleGDevelopVersion(projectObject, ['Physics3D'])).toBe(
       '>=5.5.220'
     );
+  });
+
+  it('needs a GDevelop with the conversions of custom objects when a custom object uses them', () => {
+    const projectObject = createFakeProjectObject({
+      customObjectFunctionEvents: [createFakeEvent([returnMuzzleXAction])],
+    });
+
+    expect(getExampleGDevelopVersion(projectObject, [])).toBe('>=5.6.286');
+  });
+
+  it('needs the most recent GDevelop of all the features used', () => {
+    const projectObject = createFakeProjectObject({
+      sceneEvents: [createFakeEvent([setBodyTypeAction])],
+      customObjectFunctionEvents: [createFakeEvent([returnMuzzleXAction])],
+    });
+
+    expect(getExampleGDevelopVersion(projectObject, ['Physics3D'])).toBe(
+      '>=5.6.286'
+    );
+  });
+
+  it('does not take a function of another object named like a conversion for one', () => {
+    const projectObject = createFakeProjectObject({
+      sceneEvents: [
+        createFakeEvent([
+          createFakeInstruction('SetX', ['Bullet', '=', 'Ship.ToParentX()']),
+        ]),
+      ],
+    });
+
+    expect(getExampleGDevelopVersion(projectObject, [])).toBe('');
   });
 
   it('accepts any GDevelop for the other examples', () => {
