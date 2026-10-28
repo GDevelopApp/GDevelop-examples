@@ -102,6 +102,37 @@ describe('getExampleGDevelopVersion', () => {
     expect(getExampleGDevelopVersion(projectObject, [])).toBe('>=5.6.286');
   });
 
+  it('needs a GDevelop with the 3D distances when a condition or an expression uses them', () => {
+    const conditionProjectObject = createFakeProjectObject({
+      sceneEvents: [
+        {
+          ...createFakeEvent([]),
+          conditions: [
+            createFakeInstruction('Distance3D', ['Player', 'Key', '120', '']),
+          ],
+        },
+      ],
+    });
+    const expressionProjectObject = createFakeProjectObject({
+      sceneEvents: [
+        createFakeEvent([
+          createFakeInstruction('SetNumberVariable', [
+            'Range',
+            '=',
+            'Player.Object3D::Distance3D(Key)',
+          ]),
+        ]),
+      ],
+    });
+
+    expect(getExampleGDevelopVersion(conditionProjectObject, [])).toBe(
+      '>=5.6.286'
+    );
+    expect(getExampleGDevelopVersion(expressionProjectObject, [])).toBe(
+      '>=5.6.286'
+    );
+  });
+
   it('needs the most recent GDevelop of all the features used', () => {
     const projectObject = createFakeProjectObject({
       sceneEvents: [createFakeEvent([setBodyTypeAction])],

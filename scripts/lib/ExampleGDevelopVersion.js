@@ -8,6 +8,9 @@
 const gdevelopVersionsByInstructionType = {
   // The "Body type" action of the 3D physics.
   'Physics3D::Physics3DBehavior::SetBodyType': '>=5.6.285',
+  // The conditions comparing objects in 3D.
+  Distance3D: '>=5.6.286',
+  IsTurnedTowardObject3D: '>=5.6.286',
 };
 
 /**
@@ -22,6 +25,12 @@ const gdevelopVersionsByExpression = [
     // used by the events of the custom object.
     expressionPattern:
       /\bObject\.(?:To|From)Parent(?:X|Y|Z|Angle|DirectionX|DirectionY|DirectionZ)\(/,
+    gdevelopVersion: '>=5.6.286',
+  },
+  {
+    // The distances in 3D.
+    expressionPattern:
+      /::Distance3D\(|::DistanceToPosition3D\(|\bDistanceBetweenPositions3D\(/,
     gdevelopVersion: '>=5.6.286',
   },
 ];
