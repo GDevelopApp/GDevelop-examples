@@ -4720,6 +4720,51 @@
           "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Start with touch controls on touchscreens."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneJustBegins"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SystemInfo::HasTouchScreen"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SpriteToggleSwitch::SpriteToggleSwitch::SetChecked"
+                  },
+                  "parameters": [
+                    "ControlsToggle",
+                    "yes",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -5950,18 +5995,11 @@
                           "conditions": [
                             {
                               "type": {
-                                "value": "MouseButtonFromTextPressed"
+                                "value": "HasAnyTouchOrMouseStarted"
                               },
                               "parameters": [
-                                "",
-                                "\"Left\""
+                                ""
                               ]
-                            },
-                            {
-                              "type": {
-                                "value": "BuiltinCommonInstructions::Once"
-                              },
-                              "parameters": []
                             }
                           ],
                           "actions": [],
@@ -5979,17 +6017,6 @@
                                     "",
                                     "Walk_Joystick",
                                     "\"Left\"",
-                                    ""
-                                  ]
-                                },
-                                {
-                                  "type": {
-                                    "inverted": true,
-                                    "value": "SpriteMultitouchJoystick::MultitouchButton::IsPressed"
-                                  },
-                                  "parameters": [
-                                    "JumpButton",
-                                    "MultitouchButton",
                                     ""
                                   ]
                                 },
@@ -22040,7 +22067,6 @@
     {
       "author": "PANDAKO-GitHub",
       "category": "Input",
-      "dimension": "",
       "extensionNamespace": "",
       "fullName": "Mouse Pointer Lock",
       "gdevelopVersion": ">=5.5.222",
@@ -22049,7 +22075,7 @@
       "name": "MousePointerLock",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
       "shortDescription": "Lock and hide mouse pointer for unlimited movement (e.g., FPS mouse look).",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "description": [
         "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
         "",
@@ -22097,7 +22123,7 @@
         {
           "name": "TouchSpeedFactor",
           "type": "number",
-          "value": 4
+          "value": 2
         }
       ],
       "eventsFunctions": [
@@ -22345,16 +22371,46 @@
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": [
-                "const { handler } = gdjs._MousePointerLockExtension;\r",
-                "\r",
-                "handler.requestPointerLock();\r",
-                ""
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Fingers are followed instead of locking the pointer, because mobile browsers give tiny pointer movements."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    "<",
+                    "2"
+                  ]
+                }
               ],
-              "parameterObjects": "",
-              "useStrict": true,
-              "eventsSheetExpanded": false
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const { handler } = gdjs._MousePointerLockExtension;\r",
+                    "\r",
+                    "handler.requestPointerLock();\r",
+                    ""
+                  ],
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ]
             }
           ],
           "parameters": [],
@@ -22524,6 +22580,31 @@
                     "TouchId",
                     ">=",
                     "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    ">=",
+                    "2"
                   ]
                 }
               ],
@@ -22818,68 +22899,12 @@
           "objectGroups": []
         }
       ],
-      "eventsFunctionsFolderStructure": {
-        "folderName": "__ROOT",
-        "children": [
-          {
-            "functionName": "onFirstSceneLoaded"
-          },
-          {
-            "functionName": "onScenePostEvents"
-          },
-          {
-            "functionName": "RequestPointerLock"
-          },
-          {
-            "functionName": "ExitPointerLock"
-          },
-          {
-            "functionName": "isPointerLocked"
-          },
-          {
-            "functionName": "isPointerActuallyLocked"
-          },
-          {
-            "functionName": "isEmulatingPointerLock"
-          },
-          {
-            "functionName": "IsMoving"
-          },
-          {
-            "functionName": "MovementX"
-          },
-          {
-            "functionName": "SetMovementX"
-          },
-          {
-            "functionName": "MovementY"
-          },
-          {
-            "functionName": "SetMovementY"
-          },
-          {
-            "functionName": "TouchX"
-          },
-          {
-            "functionName": "TouchY"
-          },
-          {
-            "functionName": "TouchSpeedFactor"
-          },
-          {
-            "functionName": "SetTouchSpeedFactor"
-          }
-        ]
-      },
       "eventsBasedBehaviors": [
         {
           "description": "Control camera rotations with a mouse.",
           "fullName": "First person camera mouse mapper",
-          "helpPath": "",
-          "iconUrl": "",
           "name": "FirstPersonPointerMapper",
           "objectType": "",
-          "previewIconUrl": "",
           "eventsFunctions": [
             {
               "fullName": "",
@@ -22898,6 +22923,18 @@
                     "textR": 0
                   },
                   "comment": "TODO It's probably a bad idea to rotate the object around Y."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Both rotations are relative to the screen height because the field of view is vertical. This way, the speed doesn't change with the screen ratio."
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -22920,7 +22957,7 @@
                       "parameters": [
                         "Object",
                         "+",
-                        "MousePointerLock::MovementX() * HorizontalSpeed / SceneWindowWidth()"
+                        "MousePointerLock::MovementX() * HorizontalSpeed / (SceneWindowHeight() * 16 / 9)"
                       ]
                     },
                     {
@@ -23154,7 +23191,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "HorizontalSpeed",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetHorizontalSpeed",
               "sentence": "",
               "events": [
@@ -23235,7 +23271,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalSpeed",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalSpeed",
               "sentence": "",
               "events": [
@@ -23316,7 +23351,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalAngleMin",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalAngleMin",
               "sentence": "",
               "events": [
@@ -23397,7 +23431,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalAngleMax",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalAngleMax",
               "sentence": "",
               "events": [
@@ -23478,7 +23511,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "OffsetZ",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetOffsetZ",
               "sentence": "",
               "events": [
@@ -23515,57 +23547,6 @@
               "objectGroups": []
             }
           ],
-          "eventsFunctionsFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "functionName": "doStepPreEvents"
-              },
-              {
-                "folderName": "Layers and cameras",
-                "children": [
-                  {
-                    "functionName": "LookFromObjectEyes"
-                  }
-                ]
-              },
-              {
-                "folderName": "First person camera mouse mapper configuration",
-                "children": [
-                  {
-                    "functionName": "HorizontalSpeed"
-                  },
-                  {
-                    "functionName": "SetHorizontalSpeed"
-                  },
-                  {
-                    "functionName": "VerticalSpeed"
-                  },
-                  {
-                    "functionName": "SetVerticalSpeed"
-                  },
-                  {
-                    "functionName": "VerticalAngleMin"
-                  },
-                  {
-                    "functionName": "SetVerticalAngleMin"
-                  },
-                  {
-                    "functionName": "VerticalAngleMax"
-                  },
-                  {
-                    "functionName": "SetVerticalAngleMax"
-                  },
-                  {
-                    "functionName": "OffsetZ"
-                  },
-                  {
-                    "functionName": "SetOffsetZ"
-                  }
-                ]
-              }
-            ]
-          },
           "propertyDescriptors": [
             {
               "value": "",
@@ -23619,32 +23600,7 @@
               "name": "ShouldLock"
             }
           ],
-          "propertiesFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "propertyName": "Object3D"
-              },
-              {
-                "propertyName": "HorizontalSpeed"
-              },
-              {
-                "propertyName": "VerticalSpeed"
-              },
-              {
-                "propertyName": "VerticalAngleMin"
-              },
-              {
-                "propertyName": "VerticalAngleMax"
-              },
-              {
-                "propertyName": "OffsetZ"
-              },
-              {
-                "propertyName": "ShouldLock"
-              }
-            ]
-          }
+          "sharedPropertyDescriptors": []
         }
       ],
       "eventsBasedObjects": []
