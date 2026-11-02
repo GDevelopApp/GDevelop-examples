@@ -19919,7 +19919,6 @@
     {
       "author": "PANDAKO-GitHub",
       "category": "Input",
-      "dimension": "",
       "extensionNamespace": "",
       "fullName": "Mouse Pointer Lock",
       "gdevelopVersion": ">=5.5.222",
@@ -19927,8 +19926,8 @@
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMTksMTkgMjQsMTkgMjQsMjQgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSI2LDIzIDExLDIzIDExLDE4ICIvPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI0LDE5LjRjLTAuNywwLjgtMS40LDEuNi0yLjIsMi40Yy03LDctMTUuMywxMC4yLTE4LjUsN3MtMC4xLTExLjUsNy0xOC41czE1LjMtMTAuMiwxOC41LTcNCgljMS40LDEuNCwxLjYsMy42LDAuOCw2LjMiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMSwyMi41Yy0wLjMtMC4yLTAuNS0wLjUtMC44LTAuOGMtNy03LTEwLjItMTUuMy03LTE4LjVzMTEuNS0wLjEsMTguNSw3czEwLjIsMTUuMyw3LDE4LjUNCgljLTEuNywxLjctNC44LDEuNi04LjQsMC4xIi8+DQo8L3N2Zz4NCg==",
       "name": "MousePointerLock",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
-      "shortDescription": "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
-      "version": "0.3.0",
+      "shortDescription": "Lock and hide mouse pointer for unlimited movement (e.g., FPS mouse look).",
+      "version": "0.3.2",
       "description": [
         "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
         "",
@@ -19976,7 +19975,7 @@
         {
           "name": "TouchSpeedFactor",
           "type": "number",
-          "value": 4
+          "value": 2
         }
       ],
       "eventsFunctions": [
@@ -20224,16 +20223,46 @@
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": [
-                "const { handler } = gdjs._MousePointerLockExtension;\r",
-                "\r",
-                "handler.requestPointerLock();\r",
-                ""
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Fingers are followed instead of locking the pointer, because mobile browsers give tiny pointer movements."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    "<",
+                    "2"
+                  ]
+                }
               ],
-              "parameterObjects": "",
-              "useStrict": true,
-              "eventsSheetExpanded": false
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const { handler } = gdjs._MousePointerLockExtension;\r",
+                    "\r",
+                    "handler.requestPointerLock();\r",
+                    ""
+                  ],
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ]
             }
           ],
           "parameters": [],
@@ -20403,6 +20432,31 @@
                     "TouchId",
                     ">=",
                     "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    ">=",
+                    "2"
                   ]
                 }
               ],
@@ -20697,68 +20751,12 @@
           "objectGroups": []
         }
       ],
-      "eventsFunctionsFolderStructure": {
-        "folderName": "__ROOT",
-        "children": [
-          {
-            "functionName": "onFirstSceneLoaded"
-          },
-          {
-            "functionName": "onScenePostEvents"
-          },
-          {
-            "functionName": "RequestPointerLock"
-          },
-          {
-            "functionName": "ExitPointerLock"
-          },
-          {
-            "functionName": "isPointerLocked"
-          },
-          {
-            "functionName": "isPointerActuallyLocked"
-          },
-          {
-            "functionName": "isEmulatingPointerLock"
-          },
-          {
-            "functionName": "IsMoving"
-          },
-          {
-            "functionName": "MovementX"
-          },
-          {
-            "functionName": "SetMovementX"
-          },
-          {
-            "functionName": "MovementY"
-          },
-          {
-            "functionName": "SetMovementY"
-          },
-          {
-            "functionName": "TouchX"
-          },
-          {
-            "functionName": "TouchY"
-          },
-          {
-            "functionName": "TouchSpeedFactor"
-          },
-          {
-            "functionName": "SetTouchSpeedFactor"
-          }
-        ]
-      },
       "eventsBasedBehaviors": [
         {
           "description": "Control camera rotations with a mouse.",
           "fullName": "First person camera mouse mapper",
-          "helpPath": "",
-          "iconUrl": "",
           "name": "FirstPersonPointerMapper",
           "objectType": "",
-          "previewIconUrl": "",
           "eventsFunctions": [
             {
               "fullName": "",
@@ -20777,6 +20775,18 @@
                     "textR": 0
                   },
                   "comment": "TODO It's probably a bad idea to rotate the object around Y."
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Both rotations are relative to the screen height because the field of view is vertical. This way, the speed doesn't change with the screen ratio."
                 },
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -20799,7 +20809,7 @@
                       "parameters": [
                         "Object",
                         "+",
-                        "MousePointerLock::MovementX() * HorizontalSpeed / SceneWindowWidth()"
+                        "MousePointerLock::MovementX() * HorizontalSpeed / (SceneWindowHeight() * 16 / 9)"
                       ]
                     },
                     {
@@ -21033,7 +21043,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "HorizontalSpeed",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetHorizontalSpeed",
               "sentence": "",
               "events": [
@@ -21114,7 +21123,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalSpeed",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalSpeed",
               "sentence": "",
               "events": [
@@ -21195,7 +21203,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalAngleMin",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalAngleMin",
               "sentence": "",
               "events": [
@@ -21276,7 +21283,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "VerticalAngleMax",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetVerticalAngleMax",
               "sentence": "",
               "events": [
@@ -21357,7 +21363,6 @@
               "fullName": "",
               "functionType": "ActionWithOperator",
               "getterName": "OffsetZ",
-              "group": "First person camera mouse mapper configuration",
               "name": "SetOffsetZ",
               "sentence": "",
               "events": [
@@ -21394,57 +21399,6 @@
               "objectGroups": []
             }
           ],
-          "eventsFunctionsFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "functionName": "doStepPreEvents"
-              },
-              {
-                "folderName": "Layers and cameras",
-                "children": [
-                  {
-                    "functionName": "LookFromObjectEyes"
-                  }
-                ]
-              },
-              {
-                "folderName": "First person camera mouse mapper configuration",
-                "children": [
-                  {
-                    "functionName": "HorizontalSpeed"
-                  },
-                  {
-                    "functionName": "SetHorizontalSpeed"
-                  },
-                  {
-                    "functionName": "VerticalSpeed"
-                  },
-                  {
-                    "functionName": "SetVerticalSpeed"
-                  },
-                  {
-                    "functionName": "VerticalAngleMin"
-                  },
-                  {
-                    "functionName": "SetVerticalAngleMin"
-                  },
-                  {
-                    "functionName": "VerticalAngleMax"
-                  },
-                  {
-                    "functionName": "SetVerticalAngleMax"
-                  },
-                  {
-                    "functionName": "OffsetZ"
-                  },
-                  {
-                    "functionName": "SetOffsetZ"
-                  }
-                ]
-              }
-            ]
-          },
           "propertyDescriptors": [
             {
               "value": "",
@@ -21498,32 +21452,7 @@
               "name": "ShouldLock"
             }
           ],
-          "propertiesFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "propertyName": "Object3D"
-              },
-              {
-                "propertyName": "HorizontalSpeed"
-              },
-              {
-                "propertyName": "VerticalSpeed"
-              },
-              {
-                "propertyName": "VerticalAngleMin"
-              },
-              {
-                "propertyName": "VerticalAngleMax"
-              },
-              {
-                "propertyName": "OffsetZ"
-              },
-              {
-                "propertyName": "ShouldLock"
-              }
-            ]
-          }
+          "sharedPropertyDescriptors": []
         }
       ],
       "eventsBasedObjects": []
