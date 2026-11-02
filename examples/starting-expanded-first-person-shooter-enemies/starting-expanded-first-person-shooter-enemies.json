@@ -496,6 +496,30 @@
           "persistentUuid": "f1651ed6-c467-4174-a82a-ab153372b2c5",
           "type": "string",
           "value": "Keyboard"
+        },
+        {
+          "name": "TapTouchId",
+          "persistentUuid": "bc4856a7-5c77-49ba-98c1-d01e6cfb9863",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "TapStartX",
+          "persistentUuid": "30e1c901-cac6-4261-b144-023e3c30d658",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "TapStartY",
+          "persistentUuid": "f30830c0-5c21-40d3-b7ec-b21e3c9139ee",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "TapShot",
+          "persistentUuid": "059bff17-882a-4cd5-9b93-89789610eb28",
+          "type": "boolean",
+          "value": false
         }
       ],
       "instances": [
@@ -3303,6 +3327,125 @@
           "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Keep shooting while the button is held, even when the finger drags away from it to aim."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneJustBegins"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ResetTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"ShootCooldown\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "A quick tap anywhere outside the buttons also shoots. Dragging only aims."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "HasTouchEnded"
+                  },
+                  "parameters": [
+                    "",
+                    "TapTouchId"
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "CompareTimer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"TapTouch\"",
+                        "<",
+                        "0.25"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::CompareNumbers"
+                      },
+                      "parameters": [
+                        "DistanceBetweenPositions(TapStartX, TapStartY, TouchX(TapTouchId, \"MobileControls\", 0), TouchY(TapTouchId, \"MobileControls\", 0))",
+                        "<",
+                        "30"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetBooleanVariable"
+                      },
+                      "parameters": [
+                        "TapShot",
+                        "True",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "TapTouchId",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -3369,11 +3512,57 @@
                         },
                         {
                           "type": {
-                            "value": "ButtonStates::ButtonFSM::IsPressed"
+                            "value": "BuiltinCommonInstructions::Or"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "value": "ButtonStates::ButtonFSM::IsPressed"
+                              },
+                              "parameters": [
+                                "ShootButton",
+                                "ButtonFSM",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ButtonStates::ButtonFSM::IsPressedOutside"
+                              },
+                              "parameters": [
+                                "ShootButton",
+                                "ButtonFSM",
+                                ""
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "BuiltinCommonInstructions::And"
+                      },
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "value": "StringVariable"
                           },
                           "parameters": [
-                            "ShootButton",
-                            "ButtonFSM",
+                            "ControlKind",
+                            "=",
+                            "\"Touch\""
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "TapShot",
+                            "True",
                             ""
                           ]
                         }
@@ -3383,12 +3572,26 @@
                 },
                 {
                   "type": {
-                    "value": "BuiltinCommonInstructions::Once"
+                    "value": "CompareTimer"
                   },
-                  "parameters": []
+                  "parameters": [
+                    "",
+                    "\"ShootCooldown\"",
+                    ">=",
+                    "0.2"
+                  ]
                 }
               ],
               "actions": [
+                {
+                  "type": {
+                    "value": "ResetTimer"
+                  },
+                  "parameters": [
+                    "",
+                    "\"ShootCooldown\""
+                  ]
+                },
                 {
                   "type": {
                     "value": "PlaySound"
@@ -3560,6 +3763,22 @@
                         }
                       ]
                     }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "TapShot",
+                    "False",
+                    ""
                   ]
                 }
               ]
@@ -4135,6 +4354,51 @@
           "type": "BuiltinCommonInstructions::Group",
           "events": [
             {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Start with touch controls on touchscreens."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneJustBegins"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SystemInfo::HasTouchScreen"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SpriteToggleSwitch::SpriteToggleSwitch::SetChecked"
+                  },
+                  "parameters": [
+                    "ControlsToggle",
+                    "yes",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
@@ -4385,18 +4649,11 @@
                   "conditions": [
                     {
                       "type": {
-                        "value": "MouseButtonFromTextPressed"
+                        "value": "HasAnyTouchOrMouseStarted"
                       },
                       "parameters": [
-                        "",
-                        "\"Left\""
+                        ""
                       ]
-                    },
-                    {
-                      "type": {
-                        "value": "BuiltinCommonInstructions::Once"
-                      },
-                      "parameters": []
                     }
                   ],
                   "actions": [],
@@ -4416,28 +4673,6 @@
                             "\"Left\"",
                             ""
                           ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "SpriteMultitouchJoystick::MultitouchButton::IsPressed"
-                          },
-                          "parameters": [
-                            "JumpButton",
-                            "MultitouchButton",
-                            ""
-                          ]
-                        },
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "ButtonStates::ButtonFSM::IsPressed"
-                          },
-                          "parameters": [
-                            "ShootButton",
-                            "ButtonFSM",
-                            ""
-                          ]
                         }
                       ],
                       "actions": [
@@ -4448,6 +4683,76 @@
                           "parameters": [
                             "",
                             ""
+                          ]
+                        }
+                      ],
+                      "events": [
+                        {
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "SpriteMultitouchJoystick::MultitouchButton::IsPressed"
+                              },
+                              "parameters": [
+                                "JumpButton",
+                                "MultitouchButton",
+                                ""
+                              ]
+                            },
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "ButtonStates::ButtonFSM::IsPressed"
+                              },
+                              "parameters": [
+                                "ShootButton",
+                                "ButtonFSM",
+                                ""
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TapTouchId",
+                                "=",
+                                "StartedTouchOrMouseId(0)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TapStartX",
+                                "=",
+                                "TouchX(TapTouchId, \"MobileControls\", 0)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "SetNumberVariable"
+                              },
+                              "parameters": [
+                                "TapStartY",
+                                "=",
+                                "TouchY(TapTouchId, \"MobileControls\", 0)"
+                              ]
+                            },
+                            {
+                              "type": {
+                                "value": "ResetTimer"
+                              },
+                              "parameters": [
+                                "",
+                                "\"TapTouch\""
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -14047,7 +14352,7 @@
       "name": "MousePointerLock",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_360_rotate_vr_movement.svg",
       "shortDescription": "Lock and hide mouse pointer for unlimited movement (e.g., FPS mouse look).",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "description": [
         "This behavior removes the limit on the distance the mouse can move and hides the cursor.",
         "",
@@ -14095,7 +14400,7 @@
         {
           "name": "TouchSpeedFactor",
           "type": "number",
-          "value": 4
+          "value": 2
         }
       ],
       "eventsFunctions": [
@@ -14343,16 +14648,46 @@
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": [
-                "const { handler } = gdjs._MousePointerLockExtension;\r",
-                "\r",
-                "handler.requestPointerLock();\r",
-                ""
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Fingers are followed instead of locking the pointer, because mobile browsers give tiny pointer movements."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    "<",
+                    "2"
+                  ]
+                }
               ],
-              "parameterObjects": "",
-              "useStrict": true,
-              "eventsSheetExpanded": false
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const { handler } = gdjs._MousePointerLockExtension;\r",
+                    "\r",
+                    "handler.requestPointerLock();\r",
+                    ""
+                  ],
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ]
             }
           ],
           "parameters": [],
@@ -14522,6 +14857,31 @@
                     "TouchId",
                     ">=",
                     "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "TouchId",
+                    ">=",
+                    "2"
                   ]
                 }
               ],
@@ -14842,6 +15202,18 @@
                   "comment": "TODO It's probably a bad idea to rotate the object around Y."
                 },
                 {
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Both rotations are relative to the screen height because the field of view is vertical. This way, the speed doesn't change with the screen ratio."
+                },
+                {
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
@@ -14862,7 +15234,7 @@
                       "parameters": [
                         "Object",
                         "+",
-                        "MousePointerLock::MovementX() * HorizontalSpeed / SceneWindowWidth()"
+                        "MousePointerLock::MovementX() * HorizontalSpeed / (SceneWindowHeight() * 16 / 9)"
                       ]
                     },
                     {

@@ -33,12 +33,38 @@ jobs:
       - checkout
       - run: npm install
       - run: git clone git@github.com:4ian/GDevelop.git --depth 1
-      - run: cd GDevelop/newIDE/app && npm install
+      - run:
+          name: Generate the cache key of GDevelop dependencies
+          # Computed before the install, which can rewrite the lock files.
+          command: cat GDevelop/newIDE/app/package-lock.json GDevelop/GDJS/package-lock.json | shasum -a 256 > gdevelop-dependencies-checksum.txt
+      - restore_cache:
+          keys:
+            - gdevelop-dependencies-v1-{{ checksum "gdevelop-dependencies-checksum.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - gdevelop-dependencies-v1-
+      - run: cd GDevelop/newIDE/app && npm install --no-audit --no-fund
+      - save_cache:
+          paths:
+            - GDevelop/newIDE/app/node_modules
+            - GDevelop/GDJS/node_modules
+          key: gdevelop-dependencies-v1-{{ checksum "gdevelop-dependencies-checksum.txt" }}
       - persist_to_workspace:
           root: .
           paths:
             - node_modules # For npm install.
-            - GDevelop/newIDE/app # As we have a dependency on GDevelop sources.
+            # What scripts/lib/GDevelopCoreLoader.js loads from GDevelop (not the
+            # whole newIDE/app: its node_modules are more than 1GB, long to persist
+            # and to attach in every job).
+            # Without it, the files of GDevelop would take the "type" of the
+            # package.json of this repository.
+            - GDevelop/newIDE/app/package.json
+            - GDevelop/newIDE/app/public/libGD.js
+            - GDevelop/newIDE/app/public/libGD.wasm
+            - GDevelop/newIDE/app/resources/GDJS
+            - GDevelop/newIDE/app/src
+            # The packages required by newIDE/app/src/JsExtensionsLoader.
+            - GDevelop/newIDE/app/node_modules/lodash
+            - GDevelop/newIDE/app/node_modules/node-require-function
   tests:
     docker:
       - image: cimg/node:20.13.1
@@ -77,6 +103,11 @@ jobs:
       - attach_workspace:
           at: .
       - aws-cli/setup
+      - run:
+          # The deploy uploads more than a thousand small files: the default of
+          # 10 concurrent requests makes it take minutes.
+          name: Upload more files in parallel
+          command: aws configure set default.s3.max_concurrent_requests 64
       - run: npm run deploy -- --cf-zoneid $CLOUDFLARE_ZONE_ID --cf-token $CLOUDFLARE_TOKEN
   deploy-staging:
     docker:
@@ -94,6 +125,11 @@ jobs:
       - attach_workspace:
           at: .
       - aws-cli/setup
+      - run:
+          # The deploy uploads more than a thousand small files: the default of
+          # 10 concurrent requests makes it take minutes.
+          name: Upload more files in parallel
+          command: aws configure set default.s3.max_concurrent_requests 64
       - run: npm run deploy -- --staging --cf-zoneid $CLOUDFLARE_ZONE_ID --cf-token $CLOUDFLARE_TOKEN
 
   # Run the gameplay tests of the example games with a real GDevelop: the
