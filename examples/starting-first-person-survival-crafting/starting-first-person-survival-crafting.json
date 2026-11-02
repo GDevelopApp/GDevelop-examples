@@ -351,6 +351,9 @@
           "objects": [
             {
               "name": "Obstacle"
+            },
+            {
+              "name": "Terrain"
             }
           ]
         },
@@ -4872,6 +4875,52 @@
         "// A picture of what the game looks like once this has happened, kept with",
         "// the test results.",
         "await harness.takeScreenshot('the inventory holding the log that was harvested');"
+      ]
+    },
+    {
+      "description": "Holding a log and looking down at the ground: the log is shown on the terrain, where the ray from the camera hits it.",
+      "name": "A held item is shown on the ground where the player looks",
+      "type": "gameplay",
+      "source": [
+        "// Held items are shown, then placed, where the ray from the center of the",
+        "// camera hits the ground (the \"RaycastSurface\" group, which the terrain is part of).",
+        "await harness.goToScene('Game Scene');",
+        "harness.setGameResolutionSize(160, 90);",
+        "harness.setTimeoutMs(60000);",
+        "await harness.stepFrames(6);",
+        "",
+        "// Arrange: a log in the selected inventory slot, as if it was harvested.",
+        "// The obstacles are taken out of the level, so that the ray can only hit the terrain.",
+        "for (const object of harness.getObjects('Obstacle')) harness.removeObject(object.id);",
+        "harness.setSceneVariable('Inventory[0].Name', 'Log');",
+        "harness.setSceneVariable('Inventory[0].Quantity', 1);",
+        "harness.setSceneVariable('SelectedSlot', 0);",
+        "harness.setSceneVariable('UpdateInventoryDisplay', true);",
+        "await harness.stepFrames(2);",
+        "// The level can have other logs lying around: the held one is the one marked as held.",
+        "const getHeldItem = () =>",
+        "  harness.getObjects('Log').find((object) => {",
+        "    const held = harness.getObjectVariable(object.id, 'Held');",
+        "    return !!held && held.value === true;",
+        "  });",
+        "harness.assert(!!getHeldItem(), 'The log of the selected slot is held.');",
+        "",
+        "// Look down at the ground in front of the player.",
+        "harness.getRuntimeObject(harness.getObjects('Player')[0].id).setRotationY(40);",
+        "await harness.stepFrames(2);",
+        "const heldItem = getHeldItem();",
+        "const terrain = harness.getRuntimeObject(harness.getObjects('Terrain')[0].id).__terrain3D;",
+        "const groundZ = terrain.getHeightAt(heldItem.x, heldItem.y);",
+        "console.log(",
+        "  'heldItem=' + Math.round(heldItem.x) + ';' + Math.round(heldItem.y) + ';' + heldItem.z.toFixed(1) +",
+        "    ' hidden=' + heldItem.hidden + ' groundZ=' + groundZ.toFixed(1)",
+        ");",
+        "harness.assert(!heldItem.hidden, 'The held log is shown where the player looks at the ground.');",
+        "harness.assert(",
+        "  Math.abs(heldItem.z - groundZ) < 3,",
+        "  'The held log is on the terrain (at Z ' + heldItem.z.toFixed(1) + ', the ground being at ' + groundZ.toFixed(1) + ').'",
+        ");",
+        "await harness.takeScreenshot('the held log shown on the ground');"
       ]
     }
   ],
