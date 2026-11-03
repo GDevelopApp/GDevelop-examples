@@ -11,7 +11,7 @@
 The language is the scene variable `Commentator.Language`: `"fr"` plays `voice/fr/`, anything else (empty by default) plays `voice/default/` (English). The browser language is not read (no JavaScript).
 
 ## Commentator processing
-Every file in `default/` and `fr/` has a broadcast commentator treatment (ffmpeg: band 180 Hz-6 kHz, +6 dB at 2.8 kHz, -3 dB at 350 Hz, compressor 6:1, soft clip, short echo, loudnorm -14 LUFS). `fr/` is also pitched up 6 % before it (`asetrate=44100*1.06,aresample=44100,atempo=0.9434`, same duration). The untreated recordings are kept in `_originals/<lang>/` (not declared as resources): re-apply the treatment from there, never on an already treated file.
+Every file in `default/` and `fr/` has a broadcast commentator treatment (ffmpeg: band 180 Hz-6 kHz, +6 dB at 2.8 kHz, -3 dB at 350 Hz, compressor 6:1, soft clip, short echo, loudnorm -14 LUFS). `fr/` is also pitched up 6 % before it (`asetrate=44100*1.06,aresample=44100,atempo=0.9434`, same duration). The untreated recordings are kept outside the game folder, in `Sources/voice/_originals/<lang>/` at the project root (`Sources/voice/fr/_originals/` is the voice-dubber backup of `fr/`): re-apply the treatment from there, never on an already treated file. Encode the result as mono MP3 80 kbps, 44.1 kHz (`VOICE_MP3` in `tools/audio_encoding.py`, applied by `tools/optimize_sounds.py`).
 
 ## When each line plays (external events `Commentator`)
 | Line | Moment |
