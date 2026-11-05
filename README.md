@@ -254,6 +254,10 @@ node scripts/check-rendering-screenshots.js --update
 When a screenshot differs, an image of the differences (in magenta) is written
 next to it, in the artifacts of the job (under `rendering-screenshots/`).
 
+Texts are drawn with the font settings of the system, which differ from one
+machine to another: hide the layers showing texts in these screenshots
+(`hideLayers: ['UI']`).
+
 ## License
 
 All examples provided on this repository are MIT licensed, unless specified otherwise.
