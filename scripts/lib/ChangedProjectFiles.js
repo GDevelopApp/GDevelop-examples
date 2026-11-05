@@ -16,6 +16,7 @@ const FILES_REQUIRING_A_FULL_RUN = [
   'scripts/lib/GDevelopPortableBuild.js',
   'scripts/lib/GameplayTestsJUnitReport.js',
   'scripts/lib/GameplayTestsProjectFinder.js',
+  'scripts/lib/GameplayTestsRunner.js',
 ];
 
 /**

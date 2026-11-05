@@ -230,6 +230,34 @@ land on `main`, by triggering a CircleCI pipeline with the
 `run-all-gameplay-tests` parameter set to `true`. The number of parallel
 containers used is the `all-gameplay-tests-parallelism` pipeline parameter.
 
+### Rendering screenshots
+
+A few games have a _rendering test_: a gameplay test named `Rendering: ...`
+taking PNG screenshots (`harness.takeScreenshot(label, { width: 640, format: 'png' })`).
+The `rendering-screenshots` CI job runs them with the latest build of GDevelop
+and compares each screenshot with the expected image,
+`rendering-screenshots/<example>/<label>.png`. The games are drawn in software,
+which draws the same pixels from one run to the next: an image that differs
+when the game did not change is an early warning that the rendering of
+GDevelop changed. The job runs on `main`, every night, and on the branches
+changing these games, their images or the scripts.
+
+```bash
+# Compare the screenshots with the expected images.
+node scripts/check-rendering-screenshots.js
+
+# After a change of the rendering made on purpose (in GDevelop or in a game),
+# write the screenshots as the expected images, and check them in the diff.
+node scripts/check-rendering-screenshots.js --update
+```
+
+When a screenshot differs, an image of the differences (in magenta) is written
+next to it, in the artifacts of the job (under `rendering-screenshots/`).
+
+Texts are drawn with the font settings of the system, which differ from one
+machine to another: hide the layers showing texts in these screenshots
+(`hideLayers: ['UI']`).
+
 ## License
 
 All examples provided on this repository are MIT licensed, unless specified otherwise.
