@@ -35562,7 +35562,7 @@
       "name": "Terrain3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/10e0a26c0d500830dfe23b94138beb0ef61607ba62bca05a5aa5c849777f1b06_terrain.svg",
       "shortDescription": "A ground with hills and valleys that can be sculpted and painted in the editor, with collisions.",
-      "version": "0.2.0",
+      "version": "0.3.1",
       "description": [
         "A 3D terrain object for open worlds, adventure or racing games: hills, mountains, islands or valleys, with painted layers of grass, dirt, rock or sand.",
         "",
@@ -35598,6 +35598,12 @@
         "cave"
       ],
       "authorIds": [],
+      "changelog": [
+        {
+          "version": "0.3.1",
+          "breaking": "- Scattered models now put the origin of their 3D model on the ground (\"Point put on the ground\" property), instead of the center of its base. Copies of models whose origin is elsewhere, like some trees of the asset store, can move a bit. Set \"Point put on the ground\" to \"Center of the model base\" to keep their previous placement."
+        }
+      ],
       "dependencies": [],
       "globalVariables": [],
       "sceneVariables": [],
@@ -39002,7 +39008,7 @@
               ],
               "parameterObjects": "",
               "useStrict": true,
-              "eventsSheetExpanded": false
+              "eventsSheetExpanded": true
             }
           ],
           "parameters": [],
@@ -39245,18 +39251,39 @@
                 "};",
                 "",
                 "/**",
+                " * The parts of a model and its size, per unit of height, around the point",
+                " * of the model put on the ground (its anchor).",
+                " * @typedef {{",
+                " *   parts: Array<{geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[]}>,",
+                " *   width: number,",
+                " *   depth: number,",
+                " *   bottom: number,",
+                " *   top: number,",
+                " *   reach: number,",
+                " * }} ModelParts",
+                " * `bottom` and `top` are the Z of the model base and top from the anchor.",
+                " * `reach` is the farthest distance of the model from the anchor on X and Y,",
+                " * whatever the rotation of the copy.",
+                " */",
+                "",
+                "/** @type {ModelParts} */",
+                "const emptyModelParts = { parts: [], width: 0, depth: 0, bottom: 0, top: 1, reach: 0, sourceHeight: 1 };",
+                "",
+                "/**",
                 " * The parts of a model, ready to be drawn with instancing: each glTF",
-                " * primitive with its material. Geometries are moved so that the model base",
-                " * is at the origin, its height is 1 and it stands along Z (like 3D model",
-                " * objects with a 90° rotation around X).",
+                " * primitive with its material. Geometries are moved so that the anchor is at",
+                " * the origin, the model height is 1 and it stands along Z (like 3D model",
+                " * objects with a 90° rotation around X, for models standing on Y).",
                 " * @param {THREE.Object3D} modelScene",
                 " * @param {object} uniforms Uniforms added to the materials.",
-                " * @returns {{parts: Array<{geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[]}>, width: number, depth: number}}",
+                " * @param {{isStandingOnZ: boolean, isAnchoredAtOrigin: boolean}} options",
+                " * The anchor is the origin of the model, or else the center of its base.",
+                " * @returns {ModelParts}",
                 " */",
-                "const createModelParts = (modelScene, uniforms) => {",
+                "const createModelParts = (modelScene, uniforms, { isStandingOnZ, isAnchoredAtOrigin }) => {",
                 "    modelScene.updateMatrixWorld(true);",
                 "    const rootInverse = modelScene.matrixWorld.clone().invert();",
-                "    const standUp = new THREE.Matrix4().makeRotationX(Math.PI / 2);",
+                "    const standUp = isStandingOnZ ? new THREE.Matrix4() : new THREE.Matrix4().makeRotationX(Math.PI / 2);",
                 "    /** @type {Array<{mesh: THREE.Mesh, matrix: THREE.Matrix4}>} */",
                 "    const meshes = [];",
                 "    const box = new THREE.Box3();",
@@ -39267,19 +39294,22 @@
                 "        box.union(node.geometry.boundingBox.clone().applyMatrix4(matrix));",
                 "        meshes.push({ mesh: node, matrix });",
                 "    });",
-                "    if (box.isEmpty()) return { parts: [], width: 0, depth: 0 };",
+                "    if (box.isEmpty()) return emptyModelParts;",
                 "",
                 "    const height = Math.max(box.max.z - box.min.z, 0.000001);",
                 "    // The Y axis of the scene goes down: the model is flipped, like 3D model objects.",
                 "    const normalization = new THREE.Matrix4()",
                 "        .makeScale(1 / height, -1 / height, 1 / height)",
                 "        .multiply(",
-                "            new THREE.Matrix4().makeTranslation(",
-                "                -(box.min.x + box.max.x) / 2,",
-                "                -(box.min.y + box.max.y) / 2,",
-                "                -box.min.z",
-                "            )",
+                "            isAnchoredAtOrigin",
+                "                ? new THREE.Matrix4()",
+                "                : new THREE.Matrix4().makeTranslation(",
+                "                    -(box.min.x + box.max.x) / 2,",
+                "                    -(box.min.y + box.max.y) / 2,",
+                "                    -box.min.z",
+                "                )",
                 "        );",
+                "    const normalizedBox = box.clone().applyMatrix4(normalization);",
                 "    const parts = meshes.map(({ mesh, matrix }) => {",
                 "        let geometry = mesh.geometry.clone();",
                 "        if (!geometry.index) {",
@@ -39308,17 +39338,26 @@
                 "        const material = Array.isArray(mesh.material) ? mesh.material.map(patchMaterial) : patchMaterial(mesh.material);",
                 "        return { geometry, material };",
                 "    });",
+                "    // The sizes are relative to a height of 1, except sourceHeight which is in the model file units.",
                 "    return {",
                 "        parts,",
+                "        sourceHeight: height,",
                 "        width: (box.max.x - box.min.x) / height,",
                 "        depth: (box.max.y - box.min.y) / height,",
+                "        bottom: normalizedBox.min.z,",
+                "        top: normalizedBox.max.z,",
+                "        reach: Math.hypot(",
+                "            Math.max(-normalizedBox.min.x, normalizedBox.max.x),",
+                "            Math.max(-normalizedBox.min.y, normalizedBox.max.y)",
+                "        ),",
                 "    };",
                 "};",
                 "",
                 "/**",
-                " * A copy of the model: its base position in the scene, its scale (the",
-                " * height of the copy) and the key of its cell in the grid of copies.",
-                " * @typedef {{x: number, y: number, z: number, angle: number, height: number, key: number}} Copy",
+                " * A copy of the model: the position of its anchor in the scene (on the ground), its scale",
+                " * factor (1 = the model at its original size) and rendered height in pixels, and the key",
+                " * of its cell in the grid of copies.",
+                " * @typedef {{x: number, y: number, z: number, angle: number, height: number, scale: number, key: number}} Copy",
                 " */",
                 "",
                 "/**",
@@ -39345,8 +39384,11 @@
                 "            scatterDrawDistance: { value: 1 },",
                 "        };",
                 "        /** @type {{parts: Array<{geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[]}>, width: number, depth: number}} */",
-                "        this.model = { parts: [], width: 0, depth: 0 };",
+                "        /** @type {ModelParts} */",
+                "        this.model = emptyModelParts;",
                 "        this.modelResourceName = '';",
+                "        /** The properties the model was loaded from (see `_getModelKey`). */",
+                "        this.modelKey = '';",
                 "        this.loadingModelResourceName = '';",
                 "        /**",
                 "         * Copies removed by events (for example, cut trees), by key.",
@@ -39440,11 +39482,16 @@
                 "        return this.paintData;",
                 "    }",
                 "",
-                "    updateFromProperties() {",
+                "    _getModelKey() {",
                 "        const { object } = this;",
-                "        const modelResourceName = object._getModel();",
-                "        if (modelResourceName !== this.modelResourceName) {",
-                "            this.modelResourceName = modelResourceName;",
+                "        return object._getModel() + '|' + object._getModelUpAxis() + '|' + object._getModelAnchor();",
+                "    }",
+                "",
+                "    updateFromProperties() {",
+                "        const modelKey = this._getModelKey();",
+                "        if (modelKey !== this.modelKey) {",
+                "            this.modelKey = modelKey;",
+                "            this.modelResourceName = this.object._getModel();",
                 "            this._loadModel();",
                 "        }",
                 "        this.placement.placeAgain();",
@@ -39457,7 +39504,8 @@
                 "                material.dispose();",
                 "            }",
                 "        }",
-                "        this.model = { parts: [], width: 0, depth: 0 };",
+                "        /** @type {ModelParts} */",
+                "        this.model = emptyModelParts;",
                 "    }",
                 "",
                 "    _loadModel() {",
@@ -39485,14 +39533,17 @@
                 "                .catch(() => {});",
                 "            return;",
                 "        }",
-                "        this.model = createModelParts(gltf.scene, this.uniforms);",
+                "        this.model = createModelParts(gltf.scene, this.uniforms, {",
+                "            isStandingOnZ: this.object._getModelUpAxis() === 'Z',",
+                "            isAnchoredAtOrigin: this.object._getModelAnchor() === 'ModelOrigin',",
+                "        });",
                 "    }",
                 "",
                 "    _getPlacementKey() {",
                 "        const { object } = this;",
                 "        return [",
                 "            object.getX(), object.getY(), object.getZ(), object.getWidth(), object.getHeight(), object.getDepth(),",
-                "            object._getDensity(), object._getSize(), object._getMinScale(), object._getMaxScale(),",
+                "            object._getDensity(), object._getSize(), object._getScaleFactor(), object._getMinScale(), object._getMaxScale(),",
                 "            object._getRandomRotation(), object._getRandomTint(), object._getGroundLayer(), object._getMaxSlope(),",
                 "            object._getMinGroundZ(), object._getMaxGroundZ(), object._getSeed(), object._getDrawDistance(),",
                 "            object._getCastShadow(), object._getReceiveShadow(), this.model.parts.length,",
@@ -39540,9 +39591,14 @@
                 "        const { ground, z } = findHighestGround(grounds, sceneX, sceneY, this._groundAtCopy);",
                 "        const groundZ = ground ? z : object.getZ();",
                 "        if (groundZ < object._getMinGroundZ() || groundZ > object._getMaxGroundZ()) return null;",
-                "        const copyHeight =",
-                "            Math.max(object._getSize(), 0) *",
-                "            (object._getMinScale() + (object._getMaxScale() - object._getMinScale()) * scaleFactor);",
+                "        const randomScale = object._getMinScale() + (object._getMaxScale() - object._getMinScale()) * scaleFactor;",
+                "        const sourceHeightInPixels = this.model.sourceHeight * 100;",
+                "        // Objects made before \"Scale factor of a copy\" (store prefabs included) scale their fixed",
+                "        // height (deprecated \"Size\" property) instead of the model height: they look the same at 100%.",
+                "        const legacyHeight = object._getSize();",
+                "        const baseHeight = legacyHeight > 0 ? legacyHeight : sourceHeightInPixels;",
+                "        const copyHeight = (Math.max(object._getScaleFactor(), 0) / 100) * randomScale * baseHeight;",
+                "        const copyScale = copyHeight / sourceHeightInPixels;",
                 "        if (ground) {",
                 "            if (ground.getSlopeAt(sceneX, sceneY) > object._getMaxSlope()) return null;",
                 "            const groundLayer = parseInt(object._getGroundLayer(), 10) || 0;",
@@ -39561,6 +39617,7 @@
                 "            z: groundZ,",
                 "            angle: object._getRandomRotation() ? angle : 0,",
                 "            height: copyHeight,",
+                "            scale: copyScale,",
                 "            key,",
                 "        };",
                 "    }",
@@ -39673,9 +39730,9 @@
                 "                this._color.setRGB(1, 1, 1).lerp(this._tint, createRandom(copy.key + 1)());",
                 "                this._color.toArray(colors, index * 3);",
                 "            }",
-                "            const reach = (copy.height * Math.max(this.model.width, this.model.depth)) / 2;",
-                "            min.min(this._chunkPosition.set(copy.x - reach, copy.y - reach, copy.z));",
-                "            max.max(this._chunkPosition.set(copy.x + reach, copy.y + reach, copy.z + copy.height));",
+                "            const reach = copy.height * this.model.reach;",
+                "            min.min(this._chunkPosition.set(copy.x - reach, copy.y - reach, copy.z + copy.height * this.model.bottom));",
+                "            max.max(this._chunkPosition.set(copy.x + reach, copy.y + reach, copy.z + copy.height * this.model.top));",
                 "        });",
                 "        const instanceMatrix = new THREE.InstancedBufferAttribute(matrices, 16);",
                 "        const instanceColor = colors ? new THREE.InstancedBufferAttribute(colors, 3) : null;",
@@ -39730,12 +39787,12 @@
                 "        ray.origin.multiply(scale).add(this._chunkPosition.set(object.getX(), object.getY(), object.getZ()));",
                 "        ray.direction.multiply(scale);",
                 "",
-                "        const reachPerHeight = Math.max(this.model.width, this.model.depth) / 2;",
+                "        const { reach: reachPerHeight, bottom, top } = this.model;",
                 "        const instanceMatrices = chunk.meshes[0].instanceMatrix.array;",
                 "        chunk.copies.forEach((copy, index) => {",
                 "            const reach = copy.height * reachPerHeight;",
-                "            this._raycastBox.min.set(copy.x - reach, copy.y - reach, copy.z);",
-                "            this._raycastBox.max.set(copy.x + reach, copy.y + reach, copy.z + copy.height);",
+                "            this._raycastBox.min.set(copy.x - reach, copy.y - reach, copy.z + copy.height * bottom);",
+                "            this._raycastBox.max.set(copy.x + reach, copy.y + reach, copy.z + copy.height * top);",
                 "            if (!ray.intersectsBox(this._raycastBox)) return;",
                 "            this._raycastMesh.matrixWorld.fromArray(instanceMatrices, index * 16).premultiply(group.matrixWorld);",
                 "            for (const mesh of chunk.meshes) {",
@@ -39909,8 +39966,11 @@
                 "        const depth = object.getDepth() || 1;",
                 "        let indexOffset = 0;",
                 "        copies.forEach((copy, copyIndex) => {",
-                "            const radius = (Math.max(object._getTrunkDiameter(), 0) / 2) * (copy.height / Math.max(object._getSize(), 1));",
-                "            const top = copy.z + copy.height * 0.8;",
+                "            const legacyHeight = object._getSize();",
+                "            const trunkScale = legacyHeight > 0 ? copy.height / legacyHeight : copy.scale;",
+                "            const radius = (Math.max(object._getTrunkDiameter(), 0) / 2) * trunkScale;",
+                "            // Up to 80% of the model height, at least a bit above the ground.",
+                "            const top = copy.z + copy.height * Math.max(this.model.bottom + 0.8, 0.1);",
                 "            const firstVertex = copyIndex * verticesPerCopy;",
                 "            const setVertex = (vertex, x, y, z) => {",
                 "                positions[vertex * 3] = (x - object.getX()) / width;",
@@ -40207,10 +40267,245 @@
               ],
               "parameterObjects": "",
               "useStrict": true,
-              "eventsSheetExpanded": false
+              "eventsSheetExpanded": true
             }
           ],
           "parameters": [],
+          "objectGroups": []
+        },
+        {
+          "description": "Create an object at the position, angle and scale of the copy of scattered models nearest to a position, and optionally erase that copy. The created object stays picked, so you apply actions to it right after.",
+          "fullName": "Replace the nearest copy with an object",
+          "functionType": "Action",
+          "name": "ReplaceNearestCopyWithObject",
+          "sentence": "Replace the copy of _PARAM1_ nearest to _PARAM5_; _PARAM6_ with _PARAM2_ (erase the copy: _PARAM7_)",
+          "events": [
+            {
+              "aiGeneratedEventId": "01M6WAPE2W8KS8P2871Y641HST",
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyX",
+                    "=",
+                    "ScatterObject.NearestCopyX(X, Y)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyY",
+                    "=",
+                    "ScatterObject.NearestCopyY(X, Y)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyZ",
+                    "=",
+                    "ScatterObject.NearestCopyZ(CopyX, CopyY)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyAngle",
+                    "=",
+                    "ScatterObject.NearestCopyAngle(CopyX, CopyY)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyScale",
+                    "=",
+                    "ScatterObject.NearestCopyScale(CopyX, CopyY)"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CopyScale",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "EraseTheCopy",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Terrain3D::ScatteredModels::EraseCopies"
+                          },
+                          "parameters": [
+                            "ScatterObject",
+                            "CopyX",
+                            "CopyY",
+                            "1",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "ObjectToCreate",
+                            "CopyX",
+                            "CopyY",
+                            "ScatterObject.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "ObjectToCreate",
+                            "Object3DBehavior",
+                            "=",
+                            "CopyZ"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "ObjectToCreate",
+                            "=",
+                            "CopyAngle"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ScalableCapability::ScalableBehavior::SetValue"
+                          },
+                          "parameters": [
+                            "ObjectToCreate",
+                            "ScaleBehavior",
+                            "=",
+                            "CopyScale"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "name": "CopyX",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "CopyY",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "CopyZ",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "CopyAngle",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "CopyScale",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Scattered models",
+              "name": "ScatterObject",
+              "supplementaryInformation": "Terrain3D::ScatteredModels",
+              "type": "objectList"
+            },
+            {
+              "description": "Object to create",
+              "name": "ObjectToCreate",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "3D behavior",
+              "name": "Object3DBehavior",
+              "supplementaryInformation": "Scene3D::Base3DBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Scale behavior",
+              "name": "ScaleBehavior",
+              "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "X position",
+              "name": "X",
+              "type": "expression"
+            },
+            {
+              "description": "Y position",
+              "name": "Y",
+              "type": "expression"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "Erase the copy",
+              "name": "EraseTheCopy",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
           "objectGroups": []
         }
       ],
@@ -40225,6 +40520,9 @@
           },
           {
             "functionName": "DefineScatterHelperClasses"
+          },
+          {
+            "functionName": "ReplaceNearestCopyWithObject"
           }
         ]
       },
@@ -42613,6 +42911,7 @@
             {
               "assetStoreId": "",
               "name": "AreaPlaceholder",
+              "persistentUuid": "06ba5ea9-2e29-4867-90ba-dd3268867171",
               "type": "Scene3D::Cube3DObject",
               "variables": [],
               "effects": [],
@@ -42706,7 +43005,23 @@
               "initialVariables": []
             }
           ],
-          "editionSettings": {},
+          "editionSettings": {
+            "grid": false,
+            "gridType": "rectangular",
+            "gridWidth": 32,
+            "gridHeight": 32,
+            "gridDepth": 32,
+            "gridOffsetX": 0,
+            "gridOffsetY": 0,
+            "gridOffsetZ": 0,
+            "gridColor": 10401023,
+            "gridAlpha": 0.8,
+            "snap": false,
+            "zoomFactor": 0.35,
+            "windowMask": false,
+            "selectedLayer": "",
+            "gameEditorMode": "instances-editor"
+          },
           "eventsFunctions": [
             {
               "fullName": "",
@@ -43099,7 +43414,7 @@
                   ],
                   "parameterObjects": "Object",
                   "useStrict": true,
-                  "eventsSheetExpanded": false
+                  "eventsSheetExpanded": true
                 }
               ],
               "expressionType": {
@@ -43142,6 +43457,100 @@
                     "const y = eventsFunctionContext.getArgument(\"Y\");",
                     "const copy = object.__terrainScatter.findNearestCopy(x, y);",
                     "eventsFunctionContext.returnValue = copy ? Math.hypot(copy.x - x, copy.y - y) : Number.MAX_VALUE;"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
+                },
+                {
+                  "description": "X position",
+                  "name": "X",
+                  "type": "expression"
+                },
+                {
+                  "description": "Y position",
+                  "name": "Y",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The angle (in degrees, around the Z axis) of the copy nearest to a position (0 when there is no copy).",
+              "fullName": "Angle of the nearest copy",
+              "functionType": "Expression",
+              "group": "Copies",
+              "name": "NearestCopyAngle",
+              "sentence": "",
+              "events": [
+                {
+                  "aiGeneratedEventId": "01M6W13A1GCBRR93J2V6ZPRBYZ",
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.CustomRuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const x = eventsFunctionContext.getArgument(\"X\");",
+                    "const y = eventsFunctionContext.getArgument(\"Y\");",
+                    "const copy = object.__terrainScatter.findNearestCopy(x, y);",
+                    "eventsFunctionContext.returnValue = copy ? (copy.angle * 180) / Math.PI : 0;"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
+                },
+                {
+                  "description": "X position",
+                  "name": "X",
+                  "type": "expression"
+                },
+                {
+                  "description": "Y position",
+                  "name": "Y",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The scale factor of the copy nearest to a position (1 = the model at its original size, 0 when there is no copy).",
+              "fullName": "Scale of the nearest copy",
+              "functionType": "Expression",
+              "group": "Copies",
+              "name": "NearestCopyScale",
+              "sentence": "",
+              "events": [
+                {
+                  "aiGeneratedEventId": "01M6W15Y2Y5KXQHWMS0ZX3RSMT",
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.CustomRuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const x = eventsFunctionContext.getArgument(\"X\");",
+                    "const y = eventsFunctionContext.getArgument(\"Y\");",
+                    "const copy = object.__terrainScatter.findNearestCopy(x, y);",
+                    "eventsFunctionContext.returnValue = copy ? copy.scale : 0;"
                   ],
                   "parameterObjects": "Object",
                   "useStrict": true,
@@ -43215,6 +43624,12 @@
                   },
                   {
                     "functionName": "NearestCopyDistance"
+                  },
+                  {
+                    "functionName": "NearestCopyAngle"
+                  },
+                  {
+                    "functionName": "NearestCopyScale"
                   }
                 ]
               }
@@ -43225,7 +43640,7 @@
               "value": "",
               "type": "Resource",
               "label": "3D model",
-              "description": "The model copied everywhere (a .glb file). Models standing on the Y axis, like most models of the asset store, are stood up along Z.",
+              "description": "The model copied everywhere (a .glb file).",
               "group": "Model",
               "extraInformation": [
                 "model3D"
@@ -43234,12 +43649,58 @@
               "name": "Model"
             },
             {
-              "value": "300",
+              "value": "Y",
+              "type": "Choice",
+              "label": "Model up axis",
+              "description": "The axis the model stands on in the file. Most models of the asset store stand on Y, they are stood up along Z.",
+              "group": "Model",
+              "choices": [
+                {
+                  "label": "Y (like most models)",
+                  "value": "Y"
+                },
+                {
+                  "label": "Z (like the scene)",
+                  "value": "Z"
+                }
+              ],
+              "name": "ModelUpAxis"
+            },
+            {
+              "value": "ModelOrigin",
+              "type": "Choice",
+              "label": "Point put on the ground",
+              "description": "The point of the model put on the ground, also at the center of the trunk collision. Use the origin of the model when the trunk is not at the center of the model (asymmetric canopy, leaning tree), or to sink the base of copies in the ground on slopes.",
+              "group": "Model",
+              "choices": [
+                {
+                  "label": "Center of the model base",
+                  "value": "BaseCenter"
+                },
+                {
+                  "label": "Origin of the model",
+                  "value": "ModelOrigin"
+                }
+              ],
+              "name": "ModelAnchor"
+            },
+            {
+              "value": "100",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Scale factor of a copy",
+              "description": "The size of a copy, in percent of the original model size (100 = the model at its original size, like a 3D model object with a scale of 1). For objects made before this property, like the ones of the asset store, it is a percent of their former height of a copy. Copies keep the proportions of the model.",
+              "group": "Model",
+              "name": "ScaleFactor"
+            },
+            {
+              "value": "0",
               "type": "Number",
               "unit": "Pixel",
               "label": "Height of a copy",
-              "description": "Copies keep the proportions of the model.",
+              "description": "Kept for objects made before \"Scale factor of a copy\": when greater than 0, copies have this height, multiplied by the scale factor.",
               "group": "Model",
+              "deprecated": true,
               "name": "Size"
             },
             {
@@ -43377,7 +43838,7 @@
               "type": "Number",
               "unit": "Pixel",
               "label": "Trunk diameter",
-              "description": "The diameter of the collision shape of a copy at the height given in \"Height of a copy\" (it is scaled with the copy).",
+              "description": "The diameter of the collision shape of a copy at the scale given in \"Scale factor of a copy\" (it is scaled with the copy).",
               "group": "Collisions",
               "name": "TrunkDiameter"
             },
@@ -43432,7 +43893,13 @@
                     "propertyName": "Model"
                   },
                   {
-                    "propertyName": "Size"
+                    "propertyName": "ModelUpAxis"
+                  },
+                  {
+                    "propertyName": "ModelAnchor"
+                  },
+                  {
+                    "propertyName": "ScaleFactor"
                   },
                   {
                     "propertyName": "MinScale"
@@ -43445,6 +43912,9 @@
                   },
                   {
                     "propertyName": "RandomTint"
+                  },
+                  {
+                    "propertyName": "Size"
                   }
                 ]
               },

@@ -37709,7 +37709,7 @@
       "name": "Terrain3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/10e0a26c0d500830dfe23b94138beb0ef61607ba62bca05a5aa5c849777f1b06_terrain.svg",
       "shortDescription": "A ground with hills and valleys that can be sculpted and painted in the editor, with collisions.",
-      "version": "0.1.0",
+      "version": "0.3.1",
       "description": [
         "A 3D terrain object for open worlds, adventure or racing games: hills, mountains, islands or valleys, with painted layers of grass, dirt, rock or sand.",
         "",
@@ -37745,14 +37745,22 @@
         "cave"
       ],
       "authorIds": [],
+      "changelog": [
+        {
+          "version": "0.3.1",
+          "breaking": "- Scattered models now put the origin of their 3D model on the ground (\"Point put on the ground\" property), instead of the center of its base. Copies of models whose origin is elsewhere, like some trees of the asset store, can move a bit. Set \"Point put on the ground\" to \"Center of the model base\" to keep their previous placement."
+        }
+      ],
       "dependencies": [],
       "globalVariables": [],
       "sceneVariables": [],
       "eventsFunctions": [
         {
+          "description": "Define helper classes JavaScript code.",
           "fullName": "Define helper classes",
           "functionType": "Action",
           "name": "DefineHelperClasses",
+          "private": true,
           "sentence": "Define helper classes JavaScript code",
           "events": [
             {
@@ -38807,8 +38815,17 @@
                 "vTerrainLocalXY = position.xy;",
                 "vTerrainLocalZ = position.z;",
                 "vTerrainWorldXY = (modelMatrix * vec4(transformed, 1.0)).xy * terrainWorldScale;",
-                "vTerrainUp = normalize(transpose(inverse(mat3(modelMatrix))) * objectNormal).z;",
+                "// The world normal, from the camera space normal (computed by Three.js with a",
+                "// matrix inverted on the CPU), instead of inverting a matrix for each vertex.",
+                "vTerrainUp = inverseTransformDirection(transformedNormal, viewMatrix).z;",
                 "`;",
+                "/** @param {(layer: number) => string} getLayerCode */",
+                "const forEachLayerCode = (getLayerCode) => [0, 1, 2, 3].map(getLayerCode).join('\\n');",
+                "",
+                "// Noise is read from a texture of random values, repeated every",
+                "// NOISE_MAP_SIZE units of noise: 1 texture read instead of 16 hashes.",
+                "const NOISE_MAP_SIZE = 256;",
+                "",
                 "const fragmentShaderDeclarations = `",
                 "uniform sampler2D terrainSplatMap;",
                 "uniform vec2 terrainSplatUvScaleAndOffset;",
@@ -38817,11 +38834,11 @@
                 "uniform sampler2D terrainLayerMap1;",
                 "uniform sampler2D terrainLayerMap2;",
                 "uniform sampler2D terrainLayerMap3;",
+                "uniform vec3 terrainLayerAverageColors[4];",
                 "uniform sampler2D terrainLayerNormalMap0;",
                 "uniform sampler2D terrainLayerNormalMap1;",
                 "uniform sampler2D terrainLayerNormalMap2;",
                 "uniform sampler2D terrainLayerNormalMap3;",
-                "uniform float terrainHasNormalMaps;",
                 "uniform float terrainNormalMapStrength;",
                 "uniform float terrainTextureSize;",
                 "uniform float terrainHeightBlending;",
@@ -38830,15 +38847,13 @@
                 "uniform vec2 terrainCliffCosines;",
                 "uniform vec4 terrainBrush;",
                 "uniform sampler2D terrainColorMap;",
+                "uniform sampler2D terrainNoiseMap;",
                 "uniform vec3 terrainWetShore;",
                 "varying vec2 vTerrainLocalXY;",
                 "varying float vTerrainLocalZ;",
                 "varying vec2 vTerrainWorldXY;",
                 "varying float vTerrainUp;",
                 "",
-                "float terrainHash(vec2 p) {",
-                "  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);",
-                "}",
                 "// The rotation of the copies of textures used to make repetition less visible.",
                 "const mat2 terrainCopyRotation = mat2(0.8, -0.6, 0.6, 0.8);",
                 "/** A bump of a normal map (from -1 to 1), mixed with its rotated copy in patches. */",
@@ -38850,15 +38865,16 @@
                 "  copyBump.xy = transpose(terrainCopyRotation) * copyBump.xy;",
                 "  return mix(bump, copyBump, patches);",
                 "}",
-                "float terrainNoise(vec2 p) {",
+                "/**",
+                " * 4 independent value noises (one by channel), from 0 to 1, smoothly varying",
+                " * between random values at integer positions.",
+                " */",
+                "vec4 terrainNoise(vec2 p) {",
                 "  vec2 i = floor(p);",
-                "  vec2 f = fract(p);",
-                "  vec2 u = f * f * (3.0 - 2.0 * f);",
-                "  return mix(",
-                "    mix(terrainHash(i), terrainHash(i + vec2(1.0, 0.0)), u.x),",
-                "    mix(terrainHash(i + vec2(0.0, 1.0)), terrainHash(i + vec2(1.0, 1.0)), u.x),",
-                "    u.y",
-                "  );",
+                "  vec2 f = p - i;",
+                "  // The read position is moved so that the linear interpolation of the",
+                "  // texture between 2 random values becomes a smooth one.",
+                "  return texture2D(terrainNoiseMap, (i + f * f * (3.0 - 2.0 * f) + 0.5) / ${NOISE_MAP_SIZE}.0);",
                 "}",
                 "`;",
                 "// Holes are samples without any painted layer: the interpolated sum of the",
@@ -38876,15 +38892,11 @@
                 "varying vec2 vTerrainLocalXY;",
                 "`;",
                 "",
+                "// Layers without texture, normal map, height blending or texture variation",
+                "// are compiled out (see TerrainRenderer.updateMaterial).",
                 "const fragmentShaderCode = holeShaderCode + `",
                 "// Borders between layers are made irregular and sharper, to look painted.",
-                "vec2 terrainNoisePosition = vTerrainWorldXY / 24.0;",
-                "vec4 terrainJitter = vec4(",
-                "  terrainNoise(terrainNoisePosition),",
-                "  terrainNoise(terrainNoisePosition + 19.1),",
-                "  terrainNoise(terrainNoisePosition + 37.7),",
-                "  terrainNoise(terrainNoisePosition + 53.3)",
-                ");",
+                "vec4 terrainJitter = terrainNoise(vTerrainWorldXY / 24.0);",
                 "// Layer weights are in a texture, so that painted details stay the same",
                 "// whatever the level of detail of the ground.",
                 "vec2 terrainSplatUv = vTerrainLocalXY * terrainSplatUvScaleAndOffset.x + terrainSplatUvScaleAndOffset.y;",
@@ -38895,48 +38907,61 @@
                 "terrainWeights = mix(terrainWeights, terrainCliffLayer, terrainCliff * dot(terrainCliffLayer, vec4(1.0)));",
                 "",
                 "vec2 terrainUv = vTerrainWorldXY / terrainTextureSize;",
-                "vec3 terrainTexture0 = texture2D(terrainLayerMap0, terrainUv).rgb;",
-                "vec3 terrainTexture1 = texture2D(terrainLayerMap1, terrainUv).rgb;",
-                "vec3 terrainTexture2 = texture2D(terrainLayerMap2, terrainUv).rgb;",
-                "vec3 terrainTexture3 = texture2D(terrainLayerMap3, terrainUv).rgb;",
+                "${forEachLayerCode(",
+                "    (layer) => `#ifdef TERRAIN_LAYER_MAP_${layer}",
+                "vec3 terrainTexture${layer} = texture2D(terrainLayerMap${layer}, terrainUv).rgb;",
+                "#else",
+                "vec3 terrainTexture${layer} = vec3(1.0);",
+                "#endif`",
+                ")}",
                 "",
                 "// Less visible repetition: in irregular patches, textures are replaced by a",
                 "// rotated and shifted copy of themselves, and colors slowly vary.",
                 "float terrainPatches = 0.0;",
                 "vec2 terrainUv2 = terrainUv;",
                 "float terrainColorVariation = 1.0;",
-                "if (terrainTextureVariation > 0.0) {",
-                "  // Up to half of the ground is covered by the copies, each patch showing",
-                "  // only one of them (mixing them would make them blurry).",
-                "  float terrainPatchThreshold = 1.0 - 0.5 * terrainTextureVariation;",
-                "  terrainPatches = smoothstep(terrainPatchThreshold - 0.05, terrainPatchThreshold + 0.05, terrainNoise(terrainUv * 0.23 + 7.3));",
-                "  terrainUv2 = terrainCopyRotation * terrainUv + vec2(0.31, 0.73);",
-                "  terrainTexture0 = mix(terrainTexture0, texture2D(terrainLayerMap0, terrainUv2).rgb, terrainPatches);",
-                "  terrainTexture1 = mix(terrainTexture1, texture2D(terrainLayerMap1, terrainUv2).rgb, terrainPatches);",
-                "  terrainTexture2 = mix(terrainTexture2, texture2D(terrainLayerMap2, terrainUv2).rgb, terrainPatches);",
-                "  terrainTexture3 = mix(terrainTexture3, texture2D(terrainLayerMap3, terrainUv2).rgb, terrainPatches);",
-                "  terrainColorVariation += terrainTextureVariation * 0.3 *",
-                "    (terrainNoise(terrainUv * 0.11) + 0.5 * terrainNoise(terrainUv * 0.37 + 3.1) - 0.75);",
-                "}",
+                "#ifdef TERRAIN_TEXTURE_VARIATION",
+                "// Up to half of the ground is covered by the copies, each patch showing",
+                "// only one of them (mixing them would make them blurry).",
+                "float terrainPatchThreshold = 1.0 - 0.5 * terrainTextureVariation;",
+                "terrainPatches = smoothstep(terrainPatchThreshold - 0.05, terrainPatchThreshold + 0.05, terrainNoise(terrainUv * 0.23 + 7.3).x);",
+                "terrainUv2 = terrainCopyRotation * terrainUv + vec2(0.31, 0.73);",
+                "${forEachLayerCode(",
+                "    (layer) => `#ifdef TERRAIN_LAYER_MAP_${layer}",
+                "terrainTexture${layer} = mix(terrainTexture${layer}, texture2D(terrainLayerMap${layer}, terrainUv2).rgb, terrainPatches);",
+                "#endif`",
+                ")}",
+                "terrainColorVariation += terrainTextureVariation * 0.3 *",
+                "  (terrainNoise(terrainUv * 0.11).y + 0.5 * terrainNoise(terrainUv * 0.37 + 3.1).z - 0.75);",
+                "#endif",
                 "",
                 "// Height-based blending: the brightness of a texture, compared to its",
                 "// average, is used as its height. Where layers meet, the high parts (stones,",
                 "// tufts) cover the low parts (sand, gaps) instead of fading into each other.",
-                "if (terrainHeightBlending > 0.0) {",
-                "  const vec3 terrainLuminance = vec3(0.299, 0.587, 0.114);",
-                "  vec4 terrainHeights = vec4(",
-                "    dot(terrainTexture0 - textureLod(terrainLayerMap0, vec2(0.5), 16.0).rgb, terrainLuminance),",
-                "    dot(terrainTexture1 - textureLod(terrainLayerMap1, vec2(0.5), 16.0).rgb, terrainLuminance),",
-                "    dot(terrainTexture2 - textureLod(terrainLayerMap2, vec2(0.5), 16.0).rgb, terrainLuminance),",
-                "    dot(terrainTexture3 - textureLod(terrainLayerMap3, vec2(0.5), 16.0).rgb, terrainLuminance)",
-                "  );",
-                "  vec4 terrainHeightWeights = terrainWeights + terrainHeights;",
-                "  float terrainTop = max(max(terrainHeightWeights.x, terrainHeightWeights.y), max(terrainHeightWeights.z, terrainHeightWeights.w));",
-                "  // Only painted layers (and the cliff layer) can show.",
-                "  vec4 terrainHeightBlend = max(terrainHeightWeights - terrainTop + 0.1, 0.0) * step(0.004, terrainWeights);",
-                "  terrainHeightBlend /= max(dot(terrainHeightBlend, vec4(1.0)), 0.00001);",
-                "  terrainWeights = mix(terrainWeights, terrainHeightBlend, terrainHeightBlending);",
-                "}",
+                "#ifdef TERRAIN_HEIGHT_BLENDING",
+                "// Averages are computed once on the CPU, or read from the smallest mipmap",
+                "// when the image can't be read by the CPU.",
+                "${forEachLayerCode(",
+                "    (layer) => `#ifdef TERRAIN_LAYER_MIPMAP_AVERAGE_${layer}",
+                "vec3 terrainAverage${layer} = textureLod(terrainLayerMap${layer}, vec2(0.5), 16.0).rgb;",
+                "#else",
+                "vec3 terrainAverage${layer} = terrainLayerAverageColors[${layer}];",
+                "#endif`",
+                ")}",
+                "const vec3 terrainLuminance = vec3(0.299, 0.587, 0.114);",
+                "vec4 terrainHeights = vec4(",
+                "  dot(terrainTexture0 - terrainAverage0, terrainLuminance),",
+                "  dot(terrainTexture1 - terrainAverage1, terrainLuminance),",
+                "  dot(terrainTexture2 - terrainAverage2, terrainLuminance),",
+                "  dot(terrainTexture3 - terrainAverage3, terrainLuminance)",
+                ");",
+                "vec4 terrainHeightWeights = terrainWeights + terrainHeights;",
+                "float terrainTop = max(max(terrainHeightWeights.x, terrainHeightWeights.y), max(terrainHeightWeights.z, terrainHeightWeights.w));",
+                "// Only painted layers (and the cliff layer) can show.",
+                "vec4 terrainHeightBlend = max(terrainHeightWeights - terrainTop + 0.1, 0.0) * step(0.004, terrainWeights);",
+                "terrainHeightBlend /= max(dot(terrainHeightBlend, vec4(1.0)), 0.00001);",
+                "terrainWeights = mix(terrainWeights, terrainHeightBlend, terrainHeightBlending);",
+                "#endif",
                 "",
                 "vec3 terrainColor = terrainColorVariation * (",
                 "  terrainWeights.x * terrainLayerColors[0] * terrainTexture0 +",
@@ -38968,26 +38993,30 @@
                 "`;",
                 "",
                 "const fragmentShaderNormalCode = `",
-                "if (terrainHasNormalMaps > 0.5) {",
-                "  vec3 terrainMapNormal =",
-                "    terrainWeights.x * terrainSampleNormal(terrainLayerNormalMap0, terrainUv, terrainUv2, terrainPatches) +",
-                "    terrainWeights.y * terrainSampleNormal(terrainLayerNormalMap1, terrainUv, terrainUv2, terrainPatches) +",
-                "    terrainWeights.z * terrainSampleNormal(terrainLayerNormalMap2, terrainUv, terrainUv2, terrainPatches) +",
-                "    terrainWeights.w * terrainSampleNormal(terrainLayerNormalMap3, terrainUv, terrainUv2, terrainPatches);",
-                "  terrainMapNormal.xy *= terrainNormalMapStrength;",
-                "  // The X and Y of textures follow the X and Y of the 3D world, projected on",
-                "  // the ground (the camera space of the normal is used).",
-                "  vec3 terrainTangent = (viewMatrix * vec4(1.0, 0.0, 0.0, 0.0)).xyz;",
+                "#ifdef TERRAIN_NORMAL_MAPS",
+                "// Layers without normal map are flat.",
+                "vec3 terrainMapNormal = vec3(0.0);",
+                "${forEachLayerCode(",
+                "    (layer) => `#ifdef TERRAIN_LAYER_NORMAL_MAP_${layer}",
+                "terrainMapNormal += terrainWeights[${layer}] * terrainSampleNormal(terrainLayerNormalMap${layer}, terrainUv, terrainUv2, terrainPatches);",
+                "#else",
+                "terrainMapNormal.z += terrainWeights[${layer}];",
+                "#endif`",
+                ")}",
+                "terrainMapNormal.xy *= terrainNormalMapStrength;",
+                "// The X and Y of textures follow the X and Y of the 3D world, projected on",
+                "// the ground (the camera space of the normal is used).",
+                "vec3 terrainTangent = (viewMatrix * vec4(1.0, 0.0, 0.0, 0.0)).xyz;",
+                "terrainTangent -= normal * dot(normal, terrainTangent);",
+                "// A ground facing the X axis (a rotated terrain) uses the Y axis instead.",
+                "if (dot(terrainTangent, terrainTangent) < 0.000001) {",
+                "  terrainTangent = (viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz;",
                 "  terrainTangent -= normal * dot(normal, terrainTangent);",
-                "  // A ground facing the X axis (a rotated terrain) uses the Y axis instead.",
-                "  if (dot(terrainTangent, terrainTangent) < 0.000001) {",
-                "    terrainTangent = (viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz;",
-                "    terrainTangent -= normal * dot(normal, terrainTangent);",
-                "  }",
-                "  terrainTangent = normalize(terrainTangent);",
-                "  vec3 terrainBitangent = cross(normal, terrainTangent);",
-                "  normal = normalize(mat3(terrainTangent, terrainBitangent, normal) * terrainMapNormal);",
                 "}",
+                "terrainTangent = normalize(terrainTangent);",
+                "vec3 terrainBitangent = cross(normal, terrainTangent);",
+                "normal = normalize(mat3(terrainTangent, terrainBitangent, normal) * terrainMapNormal);",
+                "#endif",
                 "`;",
                 "",
                 "let whiteTexture = null;",
@@ -39008,7 +39037,30 @@
                 "    return flatNormalTexture;",
                 "};",
                 "",
+                "let noiseTexture = null;",
+                "/** Random values, in 4 independent channels, read by `terrainNoise` in the shader. */",
+                "const getNoiseTexture = () => {",
+                "    if (!noiseTexture) {",
+                "        const random = createRandom(1);",
+                "        const bytes = new Uint8Array(NOISE_MAP_SIZE * NOISE_MAP_SIZE * 4);",
+                "        for (let index = 0; index < bytes.length; index++) {",
+                "            bytes[index] = Math.floor(random() * 256);",
+                "        }",
+                "        noiseTexture = new THREE.DataTexture(bytes, NOISE_MAP_SIZE, NOISE_MAP_SIZE);",
+                "        noiseTexture.wrapS = THREE.RepeatWrapping;",
+                "        noiseTexture.wrapT = THREE.RepeatWrapping;",
+                "        // No mipmaps: the shader moves the read position between samples.",
+                "        noiseTexture.magFilter = THREE.LinearFilter;",
+                "        noiseTexture.minFilter = THREE.LinearFilter;",
+                "        noiseTexture.needsUpdate = true;",
+                "    }",
+                "    return noiseTexture;",
+                "};",
+                "",
+                "const DEFAULT_ANISOTROPY = 4;",
+                "/** @type {WeakMap<THREE.Texture, Map<number, THREE.Texture>>} */",
                 "const layerTextures = new WeakMap();",
+                "/** @type {WeakMap<THREE.Texture, Map<number, THREE.Texture>>} */",
                 "const layerNormalMaps = new WeakMap();",
                 "/**",
                 " * Textures of the image manager have no mipmaps: they would shimmer when",
@@ -39016,12 +39068,18 @@
                 " * @param {gdjs.RuntimeGame} game",
                 " * @param {string} resourceName",
                 " * @param {boolean} isNormalMap Normal maps are directions, not colors.",
+                " * @param {number} anisotropy",
                 " */",
-                "const getLayerTexture = (game, resourceName, isNormalMap) => {",
+                "const getLayerTexture = (game, resourceName, isNormalMap, anisotropy) => {",
                 "    if (!resourceName) return isNormalMap ? getFlatNormalTexture() : getWhiteTexture();",
                 "    const imageTexture = game.getImageManager().getThreeTexture(resourceName);",
-                "    const textures = isNormalMap ? layerNormalMaps : layerTextures;",
-                "    let texture = textures.get(imageTexture);",
+                "    const texturesByImage = isNormalMap ? layerNormalMaps : layerTextures;",
+                "    let texturesByAnisotropy = texturesByImage.get(imageTexture);",
+                "    if (!texturesByAnisotropy) {",
+                "        texturesByAnisotropy = new Map();",
+                "        texturesByImage.set(imageTexture, texturesByAnisotropy);",
+                "    }",
+                "    let texture = texturesByAnisotropy.get(anisotropy);",
                 "    if (!texture) {",
                 "        texture = imageTexture.clone();",
                 "        if (isNormalMap) texture.colorSpace = THREE.NoColorSpace;",
@@ -39029,11 +39087,69 @@
                 "        texture.wrapT = THREE.RepeatWrapping;",
                 "        texture.minFilter = THREE.LinearMipmapLinearFilter;",
                 "        texture.generateMipmaps = true;",
-                "        texture.anisotropy = 4;",
+                "        texture.anisotropy = anisotropy;",
                 "        texture.needsUpdate = true;",
-                "        textures.set(imageTexture, texture);",
+                "        texturesByAnisotropy.set(anisotropy, texture);",
                 "    }",
                 "    return texture;",
+                "};",
+                "",
+                "/** @type {Float32Array | null} */",
+                "let srgbToLinearValues = null;",
+                "/** @type {WeakMap<object, THREE.Vector3>} */",
+                "const linearAverageColors = new WeakMap();",
+                "/**",
+                " * @param {THREE.Texture} texture",
+                " * @returns {THREE.Vector3 | null} The average color of the texture, in the",
+                " * linear color space (like colors read by shaders), or null if the image",
+                " * can't be read: not loaded yet, or from another domain without CORS.",
+                " */",
+                "const getLinearAverageColor = (texture) => {",
+                "    const image = texture.image;",
+                "    if (!image) return null;",
+                "    const cachedColor = linearAverageColors.get(image);",
+                "    if (cachedColor) return cachedColor;",
+                "    const isDrawable =",
+                "        typeof document !== 'undefined' &&",
+                "        ((image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0) ||",
+                "            image instanceof HTMLCanvasElement ||",
+                "            (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap));",
+                "    if (!isDrawable) return null;",
+                "    const size = 64;",
+                "    let pixels;",
+                "    try {",
+                "        const canvas = document.createElement('canvas');",
+                "        canvas.width = size;",
+                "        canvas.height = size;",
+                "        const context = canvas.getContext('2d');",
+                "        // Downscaled with filtering, so that all pixels are counted.",
+                "        context.imageSmoothingEnabled = true;",
+                "        context.imageSmoothingQuality = 'high';",
+                "        context.drawImage(image, 0, 0, size, size);",
+                "        pixels = context.getImageData(0, 0, size, size).data;",
+                "    } catch (error) {",
+                "        return null;",
+                "    }",
+                "    if (!srgbToLinearValues) {",
+                "        srgbToLinearValues = new Float32Array(256);",
+                "        for (let value = 0; value < 256; value++) {",
+                "            const srgb = value / 255;",
+                "            srgbToLinearValues[value] = srgb <= 0.04045 ? srgb / 12.92 : Math.pow((srgb + 0.055) / 1.055, 2.4);",
+                "        }",
+                "    }",
+                "    const isSrgb = texture.colorSpace === THREE.SRGBColorSpace;",
+                "    let red = 0;",
+                "    let green = 0;",
+                "    let blue = 0;",
+                "    for (let index = 0; index < pixels.length; index += 4) {",
+                "        red += isSrgb ? srgbToLinearValues[pixels[index]] : pixels[index] / 255;",
+                "        green += isSrgb ? srgbToLinearValues[pixels[index + 1]] : pixels[index + 1] / 255;",
+                "        blue += isSrgb ? srgbToLinearValues[pixels[index + 2]] : pixels[index + 2] / 255;",
+                "    }",
+                "    const count = size * size;",
+                "    const color = new THREE.Vector3(red / count, green / count, blue / count);",
+                "    linearAverageColors.set(image, color);",
+                "    return color;",
                 "};",
                 "",
                 "/**",
@@ -39094,11 +39210,14 @@
                 "            terrainLayerMap1: { value: getWhiteTexture() },",
                 "            terrainLayerMap2: { value: getWhiteTexture() },",
                 "            terrainLayerMap3: { value: getWhiteTexture() },",
+                "            // Used by the height blending, in the linear color space.",
+                "            terrainLayerAverageColors: {",
+                "                value: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)],",
+                "            },",
                 "            terrainLayerNormalMap0: { value: getFlatNormalTexture() },",
                 "            terrainLayerNormalMap1: { value: getFlatNormalTexture() },",
                 "            terrainLayerNormalMap2: { value: getFlatNormalTexture() },",
                 "            terrainLayerNormalMap3: { value: getFlatNormalTexture() },",
-                "            terrainHasNormalMaps: { value: 0 },",
                 "            terrainNormalMapStrength: { value: 1 },",
                 "            terrainTextureSize: { value: 256 },",
                 "            terrainHeightBlending: { value: 0 },",
@@ -39107,6 +39226,7 @@
                 "            terrainCliffCosines: { value: new THREE.Vector2() },",
                 "            terrainBrush: { value: new THREE.Vector4() },",
                 "            terrainColorMap: { value: getWhiteTexture() },",
+                "            terrainNoiseMap: { value: getNoiseTexture() },",
                 "            // Z (in the terrain group) under which the ground is wet, fade height, and 1 if it's used.",
                 "            terrainWetShore: { value: new THREE.Vector3() },",
                 "            // Scene units by 3D world unit.",
@@ -39126,8 +39246,12 @@
                 "                ['#include <normal_fragment_maps>', '#include <normal_fragment_maps>\\n' + fragmentShaderNormalCode],",
                 "            ], 'Terrain3D');",
                 "        };",
-                "        this.material.customProgramCacheKey = () => (this.hasHoles ? 'Terrain3DWithHoles' : 'Terrain3D');",
                 "        this.hasHoles = false;",
+                "        /** The defines of the features used by the terrain (see `updateMaterial`), without holes. */",
+                "        this.featureDefines = [];",
+                "        /** All the defines of the shader, separated by semicolons. */",
+                "        this.shaderKey = '';",
+                "        this.material.customProgramCacheKey = () => 'Terrain3D;' + this.shaderKey;",
                 "        // Without them, holes would cast shadows.",
                 "        this.depthMaterial = this._createHoleDepthMaterial(new THREE.MeshDepthMaterial());",
                 "        this.distanceMaterial = this._createHoleDepthMaterial(new THREE.MeshDistanceMaterial());",
@@ -39164,11 +39288,28 @@
                 "    setHasHoles(hasHoles) {",
                 "        if (hasHoles === this.hasHoles) return;",
                 "        this.hasHoles = hasHoles;",
-                "        // The material has its own defines (STANDARD).",
-                "        if (hasHoles) this.material.defines.TERRAIN_HOLES = '';",
-                "        else delete this.material.defines.TERRAIN_HOLES;",
-                "        this.material.needsUpdate = true;",
+                "        this._updateShaderDefines();",
                 "        for (const chunk of this.chunks) this._setChunkShadowMaterials(chunk.mesh);",
+                "    }",
+                "",
+                "    /**",
+                "     * Compile the shader only with the features used by the terrain. It is",
+                "     * compiled again only when they change: properties only change in the",
+                "     * editor, holes can be made by actions.",
+                "     */",
+                "    _updateShaderDefines() {",
+                "        const defines = this.hasHoles ? [...this.featureDefines, 'TERRAIN_HOLES'] : this.featureDefines;",
+                "        const shaderKey = defines.join(';');",
+                "        if (shaderKey === this.shaderKey) return;",
+                "        // The material has its own defines (STANDARD).",
+                "        for (const name of this.shaderKey ? this.shaderKey.split(';') : []) {",
+                "            delete this.material.defines[name];",
+                "        }",
+                "        for (const name of defines) {",
+                "            this.material.defines[name] = '';",
+                "        }",
+                "        this.shaderKey = shaderKey;",
+                "        this.material.needsUpdate = true;",
                 "    }",
                 "",
                 "    /** @param {THREE.Mesh} mesh */",
@@ -39400,16 +39541,38 @@
                 "            object._getLayer3NormalMap(),",
                 "            object._getLayer4NormalMap(),",
                 "        ];",
+                "        const anisotropy = Math.max(parseInt(object._getAnisotropy(), 10) || DEFAULT_ANISOTROPY, 1);",
+                "        const heightBlending = clamp01(object._getHeightBlending());",
+                "        const textureVariation = clamp01(object._getTextureVariation());",
+                "        const featureDefines = [];",
                 "        for (let layer = 0; layer < LAYER_COUNT; layer++) {",
                 "            this.uniforms.terrainLayerColors.value[layer].set(gdjs.rgbOrHexStringToNumber(colors[layer]));",
-                "            this.uniforms['terrainLayerMap' + layer].value = getLayerTexture(game, textures[layer], false);",
-                "            this.uniforms['terrainLayerNormalMap' + layer].value = getLayerTexture(game, normalMaps[layer], true);",
+                "            const layerTexture = getLayerTexture(game, textures[layer], false, anisotropy);",
+                "            this.uniforms['terrainLayerMap' + layer].value = layerTexture;",
+                "            this.uniforms['terrainLayerNormalMap' + layer].value = getLayerTexture(game, normalMaps[layer], true, anisotropy);",
+                "            const averageColor = this.uniforms.terrainLayerAverageColors.value[layer];",
+                "            if (textures[layer]) {",
+                "                featureDefines.push('TERRAIN_LAYER_MAP_' + layer);",
+                "                const linearAverageColor = heightBlending > 0 ? getLinearAverageColor(layerTexture) : null;",
+                "                if (linearAverageColor) {",
+                "                    averageColor.copy(linearAverageColor);",
+                "                } else if (heightBlending > 0) {",
+                "                    featureDefines.push('TERRAIN_LAYER_MIPMAP_AVERAGE_' + layer);",
+                "                }",
+                "            } else {",
+                "                averageColor.set(1, 1, 1);",
+                "            }",
+                "            if (normalMaps[layer]) featureDefines.push('TERRAIN_LAYER_NORMAL_MAP_' + layer);",
                 "        }",
-                "        this.uniforms.terrainHasNormalMaps.value = normalMaps.some((normalMap) => !!normalMap) ? 1 : 0;",
+                "        if (normalMaps.some((normalMap) => !!normalMap)) featureDefines.push('TERRAIN_NORMAL_MAPS');",
+                "        if (heightBlending > 0) featureDefines.push('TERRAIN_HEIGHT_BLENDING');",
+                "        if (textureVariation > 0) featureDefines.push('TERRAIN_TEXTURE_VARIATION');",
+                "        this.featureDefines = featureDefines;",
+                "        this._updateShaderDefines();",
                 "        this.uniforms.terrainNormalMapStrength.value = Math.max(object._getNormalMapStrength(), 0);",
                 "        this.uniforms.terrainTextureSize.value = Math.max(object._getTextureSize(), 1);",
-                "        this.uniforms.terrainHeightBlending.value = clamp01(object._getHeightBlending());",
-                "        this.uniforms.terrainTextureVariation.value = clamp01(object._getTextureVariation());",
+                "        this.uniforms.terrainHeightBlending.value = heightBlending;",
+                "        this.uniforms.terrainTextureVariation.value = textureVariation;",
                 "",
                 "        const cliffLayer = parseInt(object._getCliffLayer(), 10);",
                 "        const cliffAngle = gdjs.toRad(object._getCliffAngle());",
@@ -40327,40 +40490,21 @@
                 "    return typeof scene.getRenderer3DWorldScale === 'function' ? scene.getRenderer3DWorldScale() : 1;",
                 "};",
                 "",
+                "/** @type {WeakMap<THREE.Vector3, THREE.Color>} */",
                 "const averageColors = new WeakMap();",
                 "let white = null;",
                 "/**",
                 " * @param {THREE.Texture} texture",
-                " * @returns {THREE.Color} The average color of the texture (white when it's not loaded).",
+                " * @returns {THREE.Color} The average color of the texture (white when it can't be read).",
                 " */",
                 "const getAverageColor = (texture) => {",
-                "    const cachedColor = averageColors.get(texture);",
-                "    if (cachedColor) return cachedColor;",
-                "    const image = texture.image;",
-                "    const isDrawable =",
-                "        typeof document !== 'undefined' &&",
-                "        ((image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0) ||",
-                "            image instanceof HTMLCanvasElement ||",
-                "            (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap));",
-                "    if (!isDrawable) return white || (white = new THREE.Color(1, 1, 1));",
-                "    const size = 8;",
-                "    const canvas = document.createElement('canvas');",
-                "    canvas.width = size;",
-                "    canvas.height = size;",
-                "    const context = canvas.getContext('2d');",
-                "    context.drawImage(image, 0, 0, size, size);",
-                "    const pixels = context.getImageData(0, 0, size, size).data;",
-                "    let red = 0;",
-                "    let green = 0;",
-                "    let blue = 0;",
-                "    for (let index = 0; index < pixels.length; index += 4) {",
-                "        red += pixels[index];",
-                "        green += pixels[index + 1];",
-                "        blue += pixels[index + 2];",
+                "    const linearAverageColor = getLinearAverageColor(texture);",
+                "    if (!linearAverageColor) return white || (white = new THREE.Color(1, 1, 1));",
+                "    let color = averageColors.get(linearAverageColor);",
+                "    if (!color) {",
+                "        color = new THREE.Color(linearAverageColor.x, linearAverageColor.y, linearAverageColor.z);",
+                "        averageColors.set(linearAverageColor, color);",
                 "    }",
-                "    const count = size * size * 255;",
-                "    const color = new THREE.Color().setRGB(red / count, green / count, blue / count, THREE.SRGBColorSpace);",
-                "    averageColors.set(texture, color);",
                 "    return color;",
                 "};",
                 "",
@@ -40666,14 +40810,14 @@
             }
           ],
           "parameters": [],
-          "objectGroups": [],
-          "description": "Define helper classes JavaScript code.",
-          "private": true
+          "objectGroups": []
         },
         {
+          "description": "Define grass helper classes JavaScript code.",
           "fullName": "Define grass helper classes",
           "functionType": "Action",
           "name": "DefineGrassHelperClasses",
+          "private": true,
           "sentence": "Define grass helper classes JavaScript code",
           "events": [
             {
@@ -41011,18 +41155,18 @@
               ],
               "parameterObjects": "",
               "useStrict": true,
-              "eventsSheetExpanded": false
+              "eventsSheetExpanded": true
             }
           ],
           "parameters": [],
-          "objectGroups": [],
-          "description": "Define grass helper classes JavaScript code.",
-          "private": true
+          "objectGroups": []
         },
         {
+          "description": "Define scattered models helper classes JavaScript code.",
           "fullName": "Define scattered models helper classes",
           "functionType": "Action",
           "name": "DefineScatterHelperClasses",
+          "private": true,
           "sentence": "Define scattered models helper classes JavaScript code",
           "events": [
             {
@@ -41254,18 +41398,39 @@
                 "};",
                 "",
                 "/**",
+                " * The parts of a model and its size, per unit of height, around the point",
+                " * of the model put on the ground (its anchor).",
+                " * @typedef {{",
+                " *   parts: Array<{geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[]}>,",
+                " *   width: number,",
+                " *   depth: number,",
+                " *   bottom: number,",
+                " *   top: number,",
+                " *   reach: number,",
+                " * }} ModelParts",
+                " * `bottom` and `top` are the Z of the model base and top from the anchor.",
+                " * `reach` is the farthest distance of the model from the anchor on X and Y,",
+                " * whatever the rotation of the copy.",
+                " */",
+                "",
+                "/** @type {ModelParts} */",
+                "const emptyModelParts = { parts: [], width: 0, depth: 0, bottom: 0, top: 1, reach: 0, sourceHeight: 1 };",
+                "",
+                "/**",
                 " * The parts of a model, ready to be drawn with instancing: each glTF",
-                " * primitive with its material. Geometries are moved so that the model base",
-                " * is at the origin, its height is 1 and it stands along Z (like 3D model",
-                " * objects with a 90° rotation around X).",
+                " * primitive with its material. Geometries are moved so that the anchor is at",
+                " * the origin, the model height is 1 and it stands along Z (like 3D model",
+                " * objects with a 90° rotation around X, for models standing on Y).",
                 " * @param {THREE.Object3D} modelScene",
                 " * @param {object} uniforms Uniforms added to the materials.",
-                " * @returns {{parts: Array<{geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[]}>, width: number, depth: number}}",
+                " * @param {{isStandingOnZ: boolean, isAnchoredAtOrigin: boolean}} options",
+                " * The anchor is the origin of the model, or else the center of its base.",
+                " * @returns {ModelParts}",
                 " */",
-                "const createModelParts = (modelScene, uniforms) => {",
+                "const createModelParts = (modelScene, uniforms, { isStandingOnZ, isAnchoredAtOrigin }) => {",
                 "    modelScene.updateMatrixWorld(true);",
                 "    const rootInverse = modelScene.matrixWorld.clone().invert();",
-                "    const standUp = new THREE.Matrix4().makeRotationX(Math.PI / 2);",
+                "    const standUp = isStandingOnZ ? new THREE.Matrix4() : new THREE.Matrix4().makeRotationX(Math.PI / 2);",
                 "    /** @type {Array<{mesh: THREE.Mesh, matrix: THREE.Matrix4}>} */",
                 "    const meshes = [];",
                 "    const box = new THREE.Box3();",
@@ -41276,19 +41441,22 @@
                 "        box.union(node.geometry.boundingBox.clone().applyMatrix4(matrix));",
                 "        meshes.push({ mesh: node, matrix });",
                 "    });",
-                "    if (box.isEmpty()) return { parts: [], width: 0, depth: 0 };",
+                "    if (box.isEmpty()) return emptyModelParts;",
                 "",
                 "    const height = Math.max(box.max.z - box.min.z, 0.000001);",
                 "    // The Y axis of the scene goes down: the model is flipped, like 3D model objects.",
                 "    const normalization = new THREE.Matrix4()",
                 "        .makeScale(1 / height, -1 / height, 1 / height)",
                 "        .multiply(",
-                "            new THREE.Matrix4().makeTranslation(",
-                "                -(box.min.x + box.max.x) / 2,",
-                "                -(box.min.y + box.max.y) / 2,",
-                "                -box.min.z",
-                "            )",
+                "            isAnchoredAtOrigin",
+                "                ? new THREE.Matrix4()",
+                "                : new THREE.Matrix4().makeTranslation(",
+                "                    -(box.min.x + box.max.x) / 2,",
+                "                    -(box.min.y + box.max.y) / 2,",
+                "                    -box.min.z",
+                "                )",
                 "        );",
+                "    const normalizedBox = box.clone().applyMatrix4(normalization);",
                 "    const parts = meshes.map(({ mesh, matrix }) => {",
                 "        let geometry = mesh.geometry.clone();",
                 "        if (!geometry.index) {",
@@ -41317,17 +41485,26 @@
                 "        const material = Array.isArray(mesh.material) ? mesh.material.map(patchMaterial) : patchMaterial(mesh.material);",
                 "        return { geometry, material };",
                 "    });",
+                "    // The sizes are relative to a height of 1, except sourceHeight which is in the model file units.",
                 "    return {",
                 "        parts,",
+                "        sourceHeight: height,",
                 "        width: (box.max.x - box.min.x) / height,",
                 "        depth: (box.max.y - box.min.y) / height,",
+                "        bottom: normalizedBox.min.z,",
+                "        top: normalizedBox.max.z,",
+                "        reach: Math.hypot(",
+                "            Math.max(-normalizedBox.min.x, normalizedBox.max.x),",
+                "            Math.max(-normalizedBox.min.y, normalizedBox.max.y)",
+                "        ),",
                 "    };",
                 "};",
                 "",
                 "/**",
-                " * A copy of the model: its base position in the scene, its scale (the",
-                " * height of the copy) and the key of its cell in the grid of copies.",
-                " * @typedef {{x: number, y: number, z: number, angle: number, height: number, key: number}} Copy",
+                " * A copy of the model: the position of its anchor in the scene (on the ground), its scale",
+                " * factor (1 = the model at its original size) and rendered height in pixels, and the key",
+                " * of its cell in the grid of copies.",
+                " * @typedef {{x: number, y: number, z: number, angle: number, height: number, scale: number, key: number}} Copy",
                 " */",
                 "",
                 "/**",
@@ -41354,8 +41531,11 @@
                 "            scatterDrawDistance: { value: 1 },",
                 "        };",
                 "        /** @type {{parts: Array<{geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[]}>, width: number, depth: number}} */",
-                "        this.model = { parts: [], width: 0, depth: 0 };",
+                "        /** @type {ModelParts} */",
+                "        this.model = emptyModelParts;",
                 "        this.modelResourceName = '';",
+                "        /** The properties the model was loaded from (see `_getModelKey`). */",
+                "        this.modelKey = '';",
                 "        this.loadingModelResourceName = '';",
                 "        /**",
                 "         * Copies removed by events (for example, cut trees), by key.",
@@ -41449,11 +41629,16 @@
                 "        return this.paintData;",
                 "    }",
                 "",
-                "    updateFromProperties() {",
+                "    _getModelKey() {",
                 "        const { object } = this;",
-                "        const modelResourceName = object._getModel();",
-                "        if (modelResourceName !== this.modelResourceName) {",
-                "            this.modelResourceName = modelResourceName;",
+                "        return object._getModel() + '|' + object._getModelUpAxis() + '|' + object._getModelAnchor();",
+                "    }",
+                "",
+                "    updateFromProperties() {",
+                "        const modelKey = this._getModelKey();",
+                "        if (modelKey !== this.modelKey) {",
+                "            this.modelKey = modelKey;",
+                "            this.modelResourceName = this.object._getModel();",
                 "            this._loadModel();",
                 "        }",
                 "        this.placement.placeAgain();",
@@ -41466,7 +41651,8 @@
                 "                material.dispose();",
                 "            }",
                 "        }",
-                "        this.model = { parts: [], width: 0, depth: 0 };",
+                "        /** @type {ModelParts} */",
+                "        this.model = emptyModelParts;",
                 "    }",
                 "",
                 "    _loadModel() {",
@@ -41494,14 +41680,17 @@
                 "                .catch(() => {});",
                 "            return;",
                 "        }",
-                "        this.model = createModelParts(gltf.scene, this.uniforms);",
+                "        this.model = createModelParts(gltf.scene, this.uniforms, {",
+                "            isStandingOnZ: this.object._getModelUpAxis() === 'Z',",
+                "            isAnchoredAtOrigin: this.object._getModelAnchor() === 'ModelOrigin',",
+                "        });",
                 "    }",
                 "",
                 "    _getPlacementKey() {",
                 "        const { object } = this;",
                 "        return [",
                 "            object.getX(), object.getY(), object.getZ(), object.getWidth(), object.getHeight(), object.getDepth(),",
-                "            object._getDensity(), object._getSize(), object._getMinScale(), object._getMaxScale(),",
+                "            object._getDensity(), object._getSize(), object._getScaleFactor(), object._getMinScale(), object._getMaxScale(),",
                 "            object._getRandomRotation(), object._getRandomTint(), object._getGroundLayer(), object._getMaxSlope(),",
                 "            object._getMinGroundZ(), object._getMaxGroundZ(), object._getSeed(), object._getDrawDistance(),",
                 "            object._getCastShadow(), object._getReceiveShadow(), this.model.parts.length,",
@@ -41549,9 +41738,14 @@
                 "        const { ground, z } = findHighestGround(grounds, sceneX, sceneY, this._groundAtCopy);",
                 "        const groundZ = ground ? z : object.getZ();",
                 "        if (groundZ < object._getMinGroundZ() || groundZ > object._getMaxGroundZ()) return null;",
-                "        const copyHeight =",
-                "            Math.max(object._getSize(), 0) *",
-                "            (object._getMinScale() + (object._getMaxScale() - object._getMinScale()) * scaleFactor);",
+                "        const randomScale = object._getMinScale() + (object._getMaxScale() - object._getMinScale()) * scaleFactor;",
+                "        const sourceHeightInPixels = this.model.sourceHeight * 100;",
+                "        // Objects made before \"Scale factor of a copy\" (store prefabs included) scale their fixed",
+                "        // height (deprecated \"Size\" property) instead of the model height: they look the same at 100%.",
+                "        const legacyHeight = object._getSize();",
+                "        const baseHeight = legacyHeight > 0 ? legacyHeight : sourceHeightInPixels;",
+                "        const copyHeight = (Math.max(object._getScaleFactor(), 0) / 100) * randomScale * baseHeight;",
+                "        const copyScale = copyHeight / sourceHeightInPixels;",
                 "        if (ground) {",
                 "            if (ground.getSlopeAt(sceneX, sceneY) > object._getMaxSlope()) return null;",
                 "            const groundLayer = parseInt(object._getGroundLayer(), 10) || 0;",
@@ -41570,6 +41764,7 @@
                 "            z: groundZ,",
                 "            angle: object._getRandomRotation() ? angle : 0,",
                 "            height: copyHeight,",
+                "            scale: copyScale,",
                 "            key,",
                 "        };",
                 "    }",
@@ -41682,9 +41877,9 @@
                 "                this._color.setRGB(1, 1, 1).lerp(this._tint, createRandom(copy.key + 1)());",
                 "                this._color.toArray(colors, index * 3);",
                 "            }",
-                "            const reach = (copy.height * Math.max(this.model.width, this.model.depth)) / 2;",
-                "            min.min(this._chunkPosition.set(copy.x - reach, copy.y - reach, copy.z));",
-                "            max.max(this._chunkPosition.set(copy.x + reach, copy.y + reach, copy.z + copy.height));",
+                "            const reach = copy.height * this.model.reach;",
+                "            min.min(this._chunkPosition.set(copy.x - reach, copy.y - reach, copy.z + copy.height * this.model.bottom));",
+                "            max.max(this._chunkPosition.set(copy.x + reach, copy.y + reach, copy.z + copy.height * this.model.top));",
                 "        });",
                 "        const instanceMatrix = new THREE.InstancedBufferAttribute(matrices, 16);",
                 "        const instanceColor = colors ? new THREE.InstancedBufferAttribute(colors, 3) : null;",
@@ -41739,12 +41934,12 @@
                 "        ray.origin.multiply(scale).add(this._chunkPosition.set(object.getX(), object.getY(), object.getZ()));",
                 "        ray.direction.multiply(scale);",
                 "",
-                "        const reachPerHeight = Math.max(this.model.width, this.model.depth) / 2;",
+                "        const { reach: reachPerHeight, bottom, top } = this.model;",
                 "        const instanceMatrices = chunk.meshes[0].instanceMatrix.array;",
                 "        chunk.copies.forEach((copy, index) => {",
                 "            const reach = copy.height * reachPerHeight;",
-                "            this._raycastBox.min.set(copy.x - reach, copy.y - reach, copy.z);",
-                "            this._raycastBox.max.set(copy.x + reach, copy.y + reach, copy.z + copy.height);",
+                "            this._raycastBox.min.set(copy.x - reach, copy.y - reach, copy.z + copy.height * bottom);",
+                "            this._raycastBox.max.set(copy.x + reach, copy.y + reach, copy.z + copy.height * top);",
                 "            if (!ray.intersectsBox(this._raycastBox)) return;",
                 "            this._raycastMesh.matrixWorld.fromArray(instanceMatrices, index * 16).premultiply(group.matrixWorld);",
                 "            for (const mesh of chunk.meshes) {",
@@ -41918,8 +42113,11 @@
                 "        const depth = object.getDepth() || 1;",
                 "        let indexOffset = 0;",
                 "        copies.forEach((copy, copyIndex) => {",
-                "            const radius = (Math.max(object._getTrunkDiameter(), 0) / 2) * (copy.height / Math.max(object._getSize(), 1));",
-                "            const top = copy.z + copy.height * 0.8;",
+                "            const legacyHeight = object._getSize();",
+                "            const trunkScale = legacyHeight > 0 ? copy.height / legacyHeight : copy.scale;",
+                "            const radius = (Math.max(object._getTrunkDiameter(), 0) / 2) * trunkScale;",
+                "            // Up to 80% of the model height, at least a bit above the ground.",
+                "            const top = copy.z + copy.height * Math.max(this.model.bottom + 0.8, 0.1);",
                 "            const firstVertex = copyIndex * verticesPerCopy;",
                 "            const setVertex = (vertex, x, y, z) => {",
                 "                positions[vertex * 3] = (x - object.getX()) / width;",
@@ -42216,15 +42414,265 @@
               ],
               "parameterObjects": "",
               "useStrict": true,
-              "eventsSheetExpanded": false
+              "eventsSheetExpanded": true
             }
           ],
           "parameters": [],
-          "objectGroups": [],
-          "description": "Define scattered models helper classes JavaScript code.",
-          "private": true
+          "objectGroups": []
+        },
+        {
+          "description": "Create an object at the position, angle and scale of the copy of scattered models nearest to a position, and optionally erase that copy. The created object stays picked, so you apply actions to it right after.",
+          "fullName": "Replace the nearest copy with an object",
+          "functionType": "Action",
+          "name": "ReplaceNearestCopyWithObject",
+          "sentence": "Replace the copy of _PARAM1_ nearest to _PARAM5_; _PARAM6_ with _PARAM2_ (erase the copy: _PARAM7_)",
+          "events": [
+            {
+              "aiGeneratedEventId": "01M6WAPE2W8KS8P2871Y641HST",
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyX",
+                    "=",
+                    "ScatterObject.NearestCopyX(X, Y)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyY",
+                    "=",
+                    "ScatterObject.NearestCopyY(X, Y)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyZ",
+                    "=",
+                    "ScatterObject.NearestCopyZ(CopyX, CopyY)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyAngle",
+                    "=",
+                    "ScatterObject.NearestCopyAngle(CopyX, CopyY)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CopyScale",
+                    "=",
+                    "ScatterObject.NearestCopyScale(CopyX, CopyY)"
+                  ]
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "CopyScale",
+                        ">",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "value": "BooleanVariable"
+                          },
+                          "parameters": [
+                            "EraseTheCopy",
+                            "True",
+                            ""
+                          ]
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Terrain3D::ScatteredModels::EraseCopies"
+                          },
+                          "parameters": [
+                            "ScatterObject",
+                            "CopyX",
+                            "CopyY",
+                            "1",
+                            ""
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "ObjectToCreate",
+                            "CopyX",
+                            "CopyY",
+                            "ScatterObject.Layer()"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "Scene3D::Base3DBehavior::SetZ"
+                          },
+                          "parameters": [
+                            "ObjectToCreate",
+                            "Object3DBehavior",
+                            "=",
+                            "CopyZ"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "SetAngle"
+                          },
+                          "parameters": [
+                            "ObjectToCreate",
+                            "=",
+                            "CopyAngle"
+                          ]
+                        },
+                        {
+                          "type": {
+                            "value": "ScalableCapability::ScalableBehavior::SetValue"
+                          },
+                          "parameters": [
+                            "ObjectToCreate",
+                            "ScaleBehavior",
+                            "=",
+                            "CopyScale"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "variables": [
+                {
+                  "name": "CopyX",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "CopyY",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "CopyZ",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "CopyAngle",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "CopyScale",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Scattered models",
+              "name": "ScatterObject",
+              "supplementaryInformation": "Terrain3D::ScatteredModels",
+              "type": "objectList"
+            },
+            {
+              "description": "Object to create",
+              "name": "ObjectToCreate",
+              "type": "objectListOrEmptyIfJustDeclared"
+            },
+            {
+              "description": "3D behavior",
+              "name": "Object3DBehavior",
+              "supplementaryInformation": "Scene3D::Base3DBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "Scale behavior",
+              "name": "ScaleBehavior",
+              "supplementaryInformation": "ScalableCapability::ScalableBehavior",
+              "type": "behavior"
+            },
+            {
+              "description": "X position",
+              "name": "X",
+              "type": "expression"
+            },
+            {
+              "description": "Y position",
+              "name": "Y",
+              "type": "expression"
+            },
+            {
+              "defaultValue": "yes",
+              "description": "Erase the copy",
+              "name": "EraseTheCopy",
+              "optional": true,
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
         }
       ],
+      "eventsFunctionsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "functionName": "DefineHelperClasses"
+          },
+          {
+            "functionName": "DefineGrassHelperClasses"
+          },
+          {
+            "functionName": "DefineScatterHelperClasses"
+          },
+          {
+            "functionName": "ReplaceNearestCopyWithObject"
+          }
+        ]
+      },
       "eventsBasedBehaviors": [],
       "eventsBasedObjects": [
         {
@@ -42234,10 +42682,11 @@
           "areaMinX": 0,
           "areaMinY": 0,
           "areaMinZ": 0,
-          "defaultName": "Terrain",
           "assetStoreTag": "3d terrains",
+          "defaultName": "Terrain",
           "description": "A ground with hills, mountains or valleys that can be sculpted and painted in the scene editor, or changed with events. Add the 3D physics behavior to it to make objects walk or roll on it.",
           "fullName": "3D terrain",
+          "helpPath": "",
           "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXRlcnJhaW4iIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTQsNkwxMC4yNSwxMUwxMy4xLDE0LjhMMTEuNSwxNkM5LjgxLDEzLjc1IDcsMTAgNywxMEwxLDE4SDIzTDE0LDZaIiAvPjwvc3ZnPg==",
           "is3D": true,
           "isUsingLegacyInstancesRenderer": true,
@@ -42325,16 +42774,15 @@
             {
               "angle": 0,
               "customSize": true,
-              "width": 4096,
-              "height": 4096,
               "depth": 600,
+              "height": 4096,
               "keepRatio": true,
               "layer": "",
               "name": "AreaPlaceholder",
               "persistentUuid": "5d7a8b1e-3c2f-4e6a-9b1d-004096004096",
+              "width": 4096,
               "x": 0,
               "y": 0,
-              "z": 0,
               "zOrder": 1,
               "numberProperties": [],
               "stringProperties": [],
@@ -42384,8 +42832,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -42412,8 +42860,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -42440,8 +42888,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -42468,15 +42916,17 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
             },
             {
+              "description": "Raise the ground around a position (or lower it with a negative height). It's raised the most at the center and less and less up to the radius.",
               "fullName": "Raise or lower the ground",
               "functionType": "Action",
+              "group": "Sculpt",
               "name": "RaiseGround",
               "sentence": "Raise the ground of _PARAM0_ by _PARAM4_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -42500,8 +42950,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -42515,9 +42965,9 @@
                 },
                 {
                   "description": "Radius",
+                  "longDescription": "The effect fades out smoothly up to this distance.",
                   "name": "Radius",
-                  "type": "expression",
-                  "longDescription": "The effect fades out smoothly up to this distance."
+                  "type": "expression"
                 },
                 {
                   "description": "Height to add (negative to lower the ground)",
@@ -42525,13 +42975,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Raise the ground around a position (or lower it with a negative height). It's raised the most at the center and less and less up to the radius.",
-              "group": "Sculpt"
+              "objectGroups": []
             },
             {
+              "description": "Raise the ground along a line, for example for a ridge, or lower it with a negative height to dig a river bed or a valley.",
               "fullName": "Raise or lower the ground along a line",
               "functionType": "Action",
+              "group": "Sculpt",
               "name": "RaiseGroundAlongLine",
               "sentence": "Raise the ground of _PARAM0_ by _PARAM6_ from _PARAM1_; _PARAM2_ to _PARAM3_; _PARAM4_ with a radius of _PARAM5_",
               "events": [
@@ -42557,8 +43007,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the start",
@@ -42582,9 +43032,9 @@
                 },
                 {
                   "description": "Radius",
+                  "longDescription": "The effect fades out smoothly up to this distance from the line.",
                   "name": "Radius",
-                  "type": "expression",
-                  "longDescription": "The effect fades out smoothly up to this distance from the line."
+                  "type": "expression"
                 },
                 {
                   "description": "Height to add (negative to lower the ground)",
@@ -42592,13 +43042,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Raise the ground along a line, for example for a ridge, or lower it with a negative height to dig a river bed or a valley.",
-              "group": "Sculpt"
+              "objectGroups": []
             },
             {
+              "description": "Flatten the ground around a position to a given height, for example to place a building.",
               "fullName": "Flatten the ground",
               "functionType": "Action",
+              "group": "Sculpt",
               "name": "FlattenGround",
               "sentence": "Flatten the ground of _PARAM0_ to a Z of _PARAM4_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -42622,8 +43072,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -42637,9 +43087,9 @@
                 },
                 {
                   "description": "Radius",
+                  "longDescription": "The effect fades out smoothly up to this distance.",
                   "name": "Radius",
-                  "type": "expression",
-                  "longDescription": "The effect fades out smoothly up to this distance."
+                  "type": "expression"
                 },
                 {
                   "description": "Z position of the flat ground",
@@ -42647,13 +43097,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Flatten the ground around a position to a given height, for example to place a building.",
-              "group": "Sculpt"
+              "objectGroups": []
             },
             {
+              "description": "Smooth the ground around a position, softening bumps and cliffs.",
               "fullName": "Smooth the ground",
               "functionType": "Action",
+              "group": "Sculpt",
               "name": "SmoothGround",
               "sentence": "Smooth the ground of _PARAM0_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_ (strength: _PARAM4_)",
               "events": [
@@ -42677,8 +43127,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -42692,9 +43142,9 @@
                 },
                 {
                   "description": "Radius",
+                  "longDescription": "The effect fades out smoothly up to this distance.",
                   "name": "Radius",
-                  "type": "expression",
-                  "longDescription": "The effect fades out smoothly up to this distance."
+                  "type": "expression"
                 },
                 {
                   "description": "Strength (between 0 and 1)",
@@ -42702,13 +43152,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Smooth the ground around a position, softening bumps and cliffs.",
-              "group": "Sculpt"
+              "objectGroups": []
             },
             {
+              "description": "Paint a layer (like grass, dirt, rock or sand) on the ground around a position.",
               "fullName": "Paint a layer",
               "functionType": "Action",
+              "group": "Paint",
               "name": "PaintLayer",
               "sentence": "Paint layer _PARAM4_ on _PARAM0_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -42732,8 +43182,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -42747,9 +43197,9 @@
                 },
                 {
                   "description": "Radius",
+                  "longDescription": "The effect fades out smoothly up to this distance.",
                   "name": "Radius",
-                  "type": "expression",
-                  "longDescription": "The effect fades out smoothly up to this distance."
+                  "type": "expression"
                 },
                 {
                   "description": "Layer (1 to 4)",
@@ -42757,13 +43207,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Paint a layer (like grass, dirt, rock or sand) on the ground around a position.",
-              "group": "Paint"
+              "objectGroups": []
             },
             {
+              "description": "Paint a layer on the ground along a line, for example for a path or a road.",
               "fullName": "Paint a layer along a line",
               "functionType": "Action",
+              "group": "Paint",
               "name": "PaintLayerAlongLine",
               "sentence": "Paint layer _PARAM6_ on _PARAM0_ from _PARAM1_; _PARAM2_ to _PARAM3_; _PARAM4_ with a radius of _PARAM5_",
               "events": [
@@ -42789,8 +43239,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the start",
@@ -42814,9 +43264,9 @@
                 },
                 {
                   "description": "Radius",
+                  "longDescription": "The effect fades out smoothly up to this distance from the line.",
                   "name": "Radius",
-                  "type": "expression",
-                  "longDescription": "The effect fades out smoothly up to this distance from the line."
+                  "type": "expression"
                 },
                 {
                   "description": "Layer (1 to 4)",
@@ -42824,13 +43274,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Paint a layer on the ground along a line, for example for a path or a road.",
-              "group": "Paint"
+              "objectGroups": []
             },
             {
+              "description": "Tint the ground around a position with a color multiplying its layers, like dry grass or darker mud. White removes the tint.",
               "fullName": "Tint the ground",
               "functionType": "Action",
+              "group": "Paint",
               "name": "TintGround",
               "sentence": "Tint the ground of _PARAM0_ with _PARAM4_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -42854,8 +43304,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -42869,9 +43319,9 @@
                 },
                 {
                   "description": "Radius",
+                  "longDescription": "The effect fades out smoothly up to this distance.",
                   "name": "Radius",
-                  "type": "expression",
-                  "longDescription": "The effect fades out smoothly up to this distance."
+                  "type": "expression"
                 },
                 {
                   "description": "Color",
@@ -42879,13 +43329,13 @@
                   "type": "color"
                 }
               ],
-              "objectGroups": [],
-              "description": "Tint the ground around a position with a color multiplying its layers, like dry grass or darker mud. White removes the tint.",
-              "group": "Paint"
+              "objectGroups": []
             },
             {
+              "description": "Make the ground around a position wet (darker and shiny, like after rain or near water) or dry.",
               "fullName": "Change the wetness of the ground",
               "functionType": "Action",
+              "group": "Paint",
               "name": "WetGround",
               "sentence": "Change the wetness of the ground of _PARAM0_ to _PARAM4_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -42909,8 +43359,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -42924,9 +43374,9 @@
                 },
                 {
                   "description": "Radius",
+                  "longDescription": "The effect fades out smoothly up to this distance.",
                   "name": "Radius",
-                  "type": "expression",
-                  "longDescription": "The effect fades out smoothly up to this distance."
+                  "type": "expression"
                 },
                 {
                   "description": "Wetness (from 0 for dry to 1)",
@@ -42934,13 +43384,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Make the ground around a position wet (darker and shiny, like after rain or near water) or dry.",
-              "group": "Paint"
+              "objectGroups": []
             },
             {
+              "description": "the wetness of the ground at a position, from 0 (dry) to 1, painted or near the water (wet shore).",
               "fullName": "Ground wetness",
               "functionType": "ExpressionAndCondition",
+              "group": "Paint",
               "name": "GroundWetness",
               "sentence": "the wetness of the ground at _PARAM1_; _PARAM2_",
               "events": [
@@ -42958,12 +43408,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -42976,16 +43429,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "the wetness of the ground at a position, from 0 (dry) to 1, painted or near the water (wet shore).",
-              "group": "Paint",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             },
             {
+              "description": "The tint painted on the ground at a position, like \"255;255;255\" (white when there is none).",
               "fullName": "Ground tint",
               "functionType": "StringExpression",
+              "group": "Paint",
               "name": "GroundTint",
               "sentence": "",
               "events": [
@@ -43003,12 +43453,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "string"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -43021,16 +43474,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "The tint painted on the ground at a position, like \"255;255;255\" (white when there is none).",
-              "group": "Paint",
-              "expressionType": {
-                "type": "string"
-              }
+              "objectGroups": []
             },
             {
+              "description": "Remove the ground in a circle, for the entrance of a tunnel, a cave or a well: there is nothing drawn and no collision there. Fill it again with the \"Fill holes\" action. A height field can't go under itself: put a 3D model (with a collision shape) for the tunnel or the cave under the ground. The physics engine removes the triangles touching a hole, so the hole in the collisions can be up to a cell larger than the one drawn: make the model go a bit further than the hole, or put rocks around the entrance.",
               "fullName": "Make a hole",
               "functionType": "Action",
+              "group": "Holes",
               "name": "MakeHole",
               "sentence": "Make a hole in _PARAM0_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -43053,8 +43503,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -43072,13 +43522,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Remove the ground in a circle, for the entrance of a tunnel, a cave or a well: there is nothing drawn and no collision there. Fill it again with the \"Fill holes\" action. A height field can't go under itself: put a 3D model (with a collision shape) for the tunnel or the cave under the ground. The physics engine removes the triangles touching a hole, so the hole in the collisions can be up to a cell larger than the one drawn: make the model go a bit further than the hole, or put rocks around the entrance.",
-              "group": "Holes"
+              "objectGroups": []
             },
             {
+              "description": "Fill the holes in a circle with the layers of the ground around them: the ground is drawn and has collisions again.",
               "fullName": "Fill holes",
               "functionType": "Action",
+              "group": "Holes",
               "name": "FillHoles",
               "sentence": "Fill the holes in _PARAM0_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -43101,8 +43551,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -43120,13 +43570,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Fill the holes in a circle with the layers of the ground around them: the ground is drawn and has collisions again.",
-              "group": "Holes"
+              "objectGroups": []
             },
             {
+              "description": "Make the entrance of a tunnel or a cave on a slope: a hole, with the ground in front of it flattened to the floor of the tunnel.",
               "fullName": "Carve an entrance",
               "functionType": "Action",
+              "group": "Holes",
               "name": "CarveEntrance",
               "sentence": "Carve an entrance in _PARAM0_ at _PARAM1_; _PARAM2_ with a radius of _PARAM3_, going in at _PARAM4_° with its floor at Z _PARAM5_ and _PARAM6_ pixels of flat ground in front",
               "events": [
@@ -43152,8 +43602,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -43186,13 +43636,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Make the entrance of a tunnel or a cave on a slope: a hole, with the ground in front of it flattened to the floor of the tunnel.",
-              "group": "Holes"
+              "objectGroups": []
             },
             {
+              "description": "Check if there is a hole in the ground at a position.",
               "fullName": "Hole",
               "functionType": "Condition",
+              "group": "Holes",
               "name": "IsHole",
               "sentence": "There is a hole in _PARAM0_ at _PARAM1_; _PARAM2_",
               "events": [
@@ -43214,8 +43664,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -43228,13 +43678,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Check if there is a hole in the ground at a position.",
-              "group": "Holes"
+              "objectGroups": []
             },
             {
+              "description": "The Z position of the ground at a position, or the given value where there is a hole.",
               "fullName": "Ground Z position, with holes",
               "functionType": "Expression",
+              "group": "Holes",
               "name": "GroundZWithHoles",
               "sentence": "",
               "events": [
@@ -43253,12 +43703,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -43272,21 +43725,18 @@
                 },
                 {
                   "description": "Value in holes",
+                  "longDescription": "For example, a Z position far under the ground.",
                   "name": "ZInHoles",
-                  "type": "expression",
-                  "longDescription": "For example, a Z position far under the ground."
+                  "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "The Z position of the ground at a position, or the given value where there is a hole.",
-              "group": "Holes",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             },
             {
+              "description": "Replace the ground with a generated relief. Painted layers are reset.",
               "fullName": "Generate a relief",
               "functionType": "Action",
+              "group": "Generation",
               "name": "GenerateRelief",
               "sentence": "Generate a relief of _PARAM1_ on _PARAM0_ with seed _PARAM2_",
               "events": [
@@ -43308,29 +43758,29 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "Relief",
                   "name": "Relief",
-                  "type": "stringWithSelector",
-                  "supplementaryInformation": "[\"Flat\", \"Hills\", \"Mountains\", \"Island\"]"
+                  "supplementaryInformation": "[\"Flat\", \"Hills\", \"Mountains\", \"Island\"]",
+                  "type": "stringWithSelector"
                 },
                 {
                   "description": "Seed",
+                  "longDescription": "Each seed gives a different terrain with the same relief.",
                   "name": "Seed",
-                  "type": "expression",
-                  "longDescription": "Each seed gives a different terrain with the same relief."
+                  "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Replace the ground with a generated relief. Painted layers are reset.",
-              "group": "Generation"
+              "objectGroups": []
             },
             {
+              "description": "Replace the ground with the heights of an image. Painted layers are kept.",
               "fullName": "Load a heightmap",
               "functionType": "Action",
+              "group": "Generation",
               "name": "LoadHeightmap",
               "sentence": "Load the heights of _PARAM0_ from _PARAM1_",
               "events": [
@@ -43351,23 +43801,23 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "Heightmap image",
+                  "longDescription": "Black is the lowest, white the highest. For more precision, store the height on 16 bits in the red (most significant byte) and green channels.",
                   "name": "Image",
-                  "type": "imageResource",
-                  "longDescription": "Black is the lowest, white the highest. For more precision, store the height on 16 bits in the red (most significant byte) and green channels."
+                  "type": "imageResource"
                 }
               ],
-              "objectGroups": [],
-              "description": "Replace the ground with the heights of an image. Painted layers are kept.",
-              "group": "Generation"
+              "objectGroups": []
             },
             {
+              "description": "Move objects up or down so that their bottom is on the ground, under their center. Useful to place trees, rocks or characters on a terrain.",
               "fullName": "Put objects on the ground",
               "functionType": "Action",
+              "group": "Position",
               "name": "PutOnGround",
               "sentence": "Put _PARAM1_ on the ground of _PARAM0_",
               "events": [
@@ -43387,8 +43837,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "Objects to put on the ground",
@@ -43396,13 +43846,13 @@
                   "type": "objectList"
                 }
               ],
-              "objectGroups": [],
-              "description": "Move objects up or down so that their bottom is on the ground, under their center. Useful to place trees, rocks or characters on a terrain.",
-              "group": "Position"
+              "objectGroups": []
             },
             {
+              "description": "the Z position of the ground at a position of the scene.",
               "fullName": "Ground Z position",
               "functionType": "ExpressionAndCondition",
+              "group": "Position",
               "name": "GroundZ",
               "sentence": "the ground Z position at _PARAM1_; _PARAM2_",
               "events": [
@@ -43420,12 +43870,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -43438,16 +43891,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "the Z position of the ground at a position of the scene.",
-              "group": "Position",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             },
             {
+              "description": "the slope of the ground (angle with the horizontal, in degrees) at a position of the scene.",
               "fullName": "Ground slope",
               "functionType": "ExpressionAndCondition",
+              "group": "Position",
               "name": "GroundSlope",
               "sentence": "the ground slope at _PARAM1_; _PARAM2_",
               "events": [
@@ -43465,12 +43915,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -43483,16 +43936,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "the slope of the ground (angle with the horizontal, in degrees) at a position of the scene.",
-              "group": "Position",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             },
             {
+              "description": "the layer (from 1 to 4) painted the most at a position of the scene. Useful to play footstep sounds or to slow down characters in water or mud.",
               "fullName": "Ground layer",
               "functionType": "ExpressionAndCondition",
+              "group": "Paint",
               "name": "GroundLayer",
               "sentence": "the ground layer at _PARAM1_; _PARAM2_",
               "events": [
@@ -43510,12 +43960,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::Terrain3D"
+                  "supplementaryInformation": "Terrain3D::Terrain3D",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -43528,14 +43981,114 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "the layer (from 1 to 4) painted the most at a position of the scene. Useful to play footstep sounds or to slow down characters in water or mud.",
-              "group": "Paint",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             }
           ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "onCreated"
+              },
+              {
+                "functionName": "onDestroy"
+              },
+              {
+                "functionName": "doStepPostEvents"
+              },
+              {
+                "functionName": "onHotReloading"
+              },
+              {
+                "folderName": "Sculpt",
+                "children": [
+                  {
+                    "functionName": "RaiseGround"
+                  },
+                  {
+                    "functionName": "RaiseGroundAlongLine"
+                  },
+                  {
+                    "functionName": "FlattenGround"
+                  },
+                  {
+                    "functionName": "SmoothGround"
+                  }
+                ]
+              },
+              {
+                "folderName": "Paint",
+                "children": [
+                  {
+                    "functionName": "PaintLayer"
+                  },
+                  {
+                    "functionName": "PaintLayerAlongLine"
+                  },
+                  {
+                    "functionName": "TintGround"
+                  },
+                  {
+                    "functionName": "WetGround"
+                  },
+                  {
+                    "functionName": "GroundWetness"
+                  },
+                  {
+                    "functionName": "GroundTint"
+                  },
+                  {
+                    "functionName": "GroundLayer"
+                  }
+                ]
+              },
+              {
+                "folderName": "Holes",
+                "children": [
+                  {
+                    "functionName": "MakeHole"
+                  },
+                  {
+                    "functionName": "FillHoles"
+                  },
+                  {
+                    "functionName": "CarveEntrance"
+                  },
+                  {
+                    "functionName": "IsHole"
+                  },
+                  {
+                    "functionName": "GroundZWithHoles"
+                  }
+                ]
+              },
+              {
+                "folderName": "Generation",
+                "children": [
+                  {
+                    "functionName": "GenerateRelief"
+                  },
+                  {
+                    "functionName": "LoadHeightmap"
+                  }
+                ]
+              },
+              {
+                "folderName": "Position",
+                "children": [
+                  {
+                    "functionName": "PutOnGround"
+                  },
+                  {
+                    "functionName": "GroundZ"
+                  },
+                  {
+                    "functionName": "GroundSlope"
+                  }
+                ]
+              }
+            ]
+          },
           "propertyDescriptors": [
             {
               "value": "Hills",
@@ -43580,6 +44133,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "HeightmapImage"
             },
             {
@@ -43637,6 +44191,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "Layer1Texture"
             },
             {
@@ -43648,6 +44203,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "Layer1NormalMap"
             },
             {
@@ -43666,6 +44222,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "Layer2Texture"
             },
             {
@@ -43677,6 +44234,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "Layer2NormalMap"
             },
             {
@@ -43695,6 +44253,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "Layer3Texture"
             },
             {
@@ -43706,6 +44265,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "Layer3NormalMap"
             },
             {
@@ -43724,6 +44284,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "Layer4Texture"
             },
             {
@@ -43735,6 +44296,7 @@
               "extraInformation": [
                 "image"
               ],
+              "choices": [],
               "name": "Layer4NormalMap"
             },
             {
@@ -43748,8 +44310,8 @@
             {
               "value": "256",
               "type": "Number",
-              "label": "Texture size",
               "unit": "Pixel",
+              "label": "Texture size",
               "description": "The size, in the scene, of one repetition of the layer textures.",
               "group": "Layers",
               "name": "TextureSize"
@@ -43829,8 +44391,8 @@
             {
               "value": "45",
               "type": "Number",
-              "label": "Steep slope angle",
               "unit": "DegreeAngle",
+              "label": "Steep slope angle",
               "group": "Layers",
               "name": "CliffAngle"
             },
@@ -43849,6 +44411,37 @@
               "name": "ReceiveShadow"
             },
             {
+              "value": "4",
+              "type": "Choice",
+              "label": "Anisotropic filtering",
+              "description": "Keeps layer textures sharp where the ground is seen at a low angle (like from a car). Lower is faster on slow graphics cards, but blurs the ground in the distance.",
+              "group": "Rendering",
+              "choices": [
+                {
+                  "label": "None (fastest)",
+                  "value": "1"
+                },
+                {
+                  "label": "2x",
+                  "value": "2"
+                },
+                {
+                  "label": "4x",
+                  "value": "4"
+                },
+                {
+                  "label": "8x",
+                  "value": "8"
+                },
+                {
+                  "label": "16x (sharpest)",
+                  "value": "16"
+                }
+              ],
+              "advanced": true,
+              "name": "Anisotropy"
+            },
+            {
               "value": "",
               "type": "String",
               "label": "Sculpted and painted data",
@@ -43856,7 +44449,123 @@
               "advanced": true,
               "name": "SculptData"
             }
-          ]
+          ],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "folderName": "Shape",
+                "children": [
+                  {
+                    "propertyName": "Relief"
+                  },
+                  {
+                    "propertyName": "Seed"
+                  },
+                  {
+                    "propertyName": "HeightmapImage"
+                  },
+                  {
+                    "propertyName": "Edits"
+                  },
+                  {
+                    "propertyName": "Resolution"
+                  }
+                ]
+              },
+              {
+                "folderName": "Layers",
+                "children": [
+                  {
+                    "propertyName": "Layer1Color"
+                  },
+                  {
+                    "propertyName": "Layer1Texture"
+                  },
+                  {
+                    "propertyName": "Layer1NormalMap"
+                  },
+                  {
+                    "propertyName": "Layer2Color"
+                  },
+                  {
+                    "propertyName": "Layer2Texture"
+                  },
+                  {
+                    "propertyName": "Layer2NormalMap"
+                  },
+                  {
+                    "propertyName": "Layer3Color"
+                  },
+                  {
+                    "propertyName": "Layer3Texture"
+                  },
+                  {
+                    "propertyName": "Layer3NormalMap"
+                  },
+                  {
+                    "propertyName": "Layer4Color"
+                  },
+                  {
+                    "propertyName": "Layer4Texture"
+                  },
+                  {
+                    "propertyName": "Layer4NormalMap"
+                  },
+                  {
+                    "propertyName": "NormalMapStrength"
+                  },
+                  {
+                    "propertyName": "TextureSize"
+                  },
+                  {
+                    "propertyName": "HeightBlending"
+                  },
+                  {
+                    "propertyName": "TextureVariation"
+                  },
+                  {
+                    "propertyName": "CliffLayer"
+                  },
+                  {
+                    "propertyName": "CliffAngle"
+                  }
+                ]
+              },
+              {
+                "folderName": "Wetness",
+                "children": [
+                  {
+                    "propertyName": "WetShore"
+                  },
+                  {
+                    "propertyName": "WetShoreZ"
+                  },
+                  {
+                    "propertyName": "WetShoreFade"
+                  }
+                ]
+              },
+              {
+                "folderName": "Rendering",
+                "children": [
+                  {
+                    "propertyName": "CastShadow"
+                  },
+                  {
+                    "propertyName": "ReceiveShadow"
+                  },
+                  {
+                    "propertyName": "Anisotropy"
+                  }
+                ]
+              },
+              {
+                "propertyName": "SculptData"
+              }
+            ]
+          },
+          "variants": []
         },
         {
           "areaMaxX": 1000,
@@ -43868,6 +44577,7 @@
           "defaultName": "Grass",
           "description": "A field of grass blades swaying in the wind and pushed aside by characters. They grow in the area of the object, on the highest 3D terrain at each point (one field can cover several terrains), or at the Z position of the object where there is no terrain.",
           "fullName": "Terrain grass",
+          "helpPath": "",
           "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0zIDIxYzEtNSAxLTkgMC0xMyAyIDMgMyA3IDMgMTN6bTQgMGMwLTYgMS0xMSA0LTE2LTEgNS0xIDEwIDAgMTZ6bTUgMGMwLTUgMi05IDUtMTItMiA0LTIgOC0xIDEyem01IDBjMS00IDItNiA0LTgtMSAzLTEgNS0xIDh6Ii8+PC9zdmc+",
           "is3D": true,
           "isUsingLegacyInstancesRenderer": true,
@@ -43955,16 +44665,15 @@
             {
               "angle": 0,
               "customSize": true,
-              "width": 1000,
-              "height": 1000,
               "depth": 40,
+              "height": 1000,
               "keepRatio": true,
               "layer": "",
               "name": "AreaPlaceholder",
               "persistentUuid": "5d7a8b1e-3c2f-4e6a-9b1d-001000001000",
+              "width": 1000,
               "x": 0,
               "y": 0,
-              "z": 0,
               "zOrder": 1,
               "numberProperties": [],
               "stringProperties": [],
@@ -44029,8 +44738,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::TerrainGrass"
+                  "supplementaryInformation": "Terrain3D::TerrainGrass",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -44057,8 +44766,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::TerrainGrass"
+                  "supplementaryInformation": "Terrain3D::TerrainGrass",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -44093,8 +44802,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::TerrainGrass"
+                  "supplementaryInformation": "Terrain3D::TerrainGrass",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -44121,13 +44830,30 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::TerrainGrass"
+                  "supplementaryInformation": "Terrain3D::TerrainGrass",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
             }
           ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "onCreated"
+              },
+              {
+                "functionName": "onDestroy"
+              },
+              {
+                "functionName": "doStepPostEvents"
+              },
+              {
+                "functionName": "onHotReloading"
+              }
+            ]
+          },
           "propertyDescriptors": [
             {
               "value": "60",
@@ -44140,8 +44866,8 @@
             {
               "value": "36",
               "type": "Number",
-              "label": "Blade height",
               "unit": "Pixel",
+              "label": "Blade height",
               "description": "The average height of blades (each blade is between 60% and 140% of it).",
               "group": "Blades",
               "name": "BladeHeight"
@@ -44149,8 +44875,8 @@
             {
               "value": "5",
               "type": "Number",
-              "label": "Blade width",
               "unit": "Pixel",
+              "label": "Blade width",
               "group": "Blades",
               "name": "BladeWidth"
             },
@@ -44209,8 +44935,8 @@
             {
               "value": "40",
               "type": "Number",
-              "label": "Maximum slope",
               "unit": "DegreeAngle",
+              "label": "Maximum slope",
               "description": "No blades grow on steeper ground.",
               "group": "Ground",
               "name": "MaxSlope"
@@ -44241,13 +44967,75 @@
             {
               "value": "2500",
               "type": "Number",
-              "label": "Fade distance",
               "unit": "Pixel",
+              "label": "Fade distance",
               "description": "Blades are less and less dense up to this distance from the camera, and hidden after.",
               "group": "Rendering",
               "name": "FadeDistance"
             }
-          ]
+          ],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "folderName": "Blades",
+                "children": [
+                  {
+                    "propertyName": "Density"
+                  },
+                  {
+                    "propertyName": "BladeHeight"
+                  },
+                  {
+                    "propertyName": "BladeWidth"
+                  },
+                  {
+                    "propertyName": "BaseColor"
+                  },
+                  {
+                    "propertyName": "TipColor"
+                  },
+                  {
+                    "propertyName": "Seed"
+                  }
+                ]
+              },
+              {
+                "folderName": "Ground",
+                "children": [
+                  {
+                    "propertyName": "GroundLayer"
+                  },
+                  {
+                    "propertyName": "MaxSlope"
+                  }
+                ]
+              },
+              {
+                "folderName": "Wind",
+                "children": [
+                  {
+                    "propertyName": "WindStrength"
+                  },
+                  {
+                    "propertyName": "WindSpeed"
+                  },
+                  {
+                    "propertyName": "BendingObject"
+                  }
+                ]
+              },
+              {
+                "folderName": "Rendering",
+                "children": [
+                  {
+                    "propertyName": "FadeDistance"
+                  }
+                ]
+              }
+            ]
+          },
+          "variants": []
         },
         {
           "areaMaxX": 2000,
@@ -44256,10 +45044,11 @@
           "areaMinX": 0,
           "areaMinY": 0,
           "areaMinZ": 0,
-          "defaultName": "ScatteredModels",
           "assetStoreTag": "3d scattered models",
+          "defaultName": "ScatteredModels",
           "description": "Many copies of a 3D model (trees, rocks, bushes, flowers...) placed in the area of the object and drawn all at once, which is much faster than an object for each one. They stand on the highest 3D terrain at each point, or at the Z position of the object where there is no terrain. Paint where they grow with the brushes of the scene editor.",
           "fullName": "Scattered models (forests, rocks...)",
+          "helpPath": "",
           "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMCAyMXYtM0gzbDUtNUg1bDUtNUg3bDUtNSA1IDVoLTNsNSA1aC0zbDUgNWgtN3YzeiIvPjwvc3ZnPg==",
           "is3D": true,
           "isUsingLegacyInstancesRenderer": true,
@@ -44269,6 +45058,7 @@
             {
               "assetStoreId": "",
               "name": "AreaPlaceholder",
+              "persistentUuid": "06ba5ea9-2e29-4867-90ba-dd3268867171",
               "type": "Scene3D::Cube3DObject",
               "variables": [],
               "effects": [],
@@ -44347,23 +45137,38 @@
             {
               "angle": 0,
               "customSize": true,
-              "width": 2000,
-              "height": 2000,
               "depth": 200,
+              "height": 2000,
               "keepRatio": true,
               "layer": "",
               "name": "AreaPlaceholder",
               "persistentUuid": "5d7a8b1e-3c2f-4e6a-9b1d-002000002000",
+              "width": 2000,
               "x": 0,
               "y": 0,
-              "z": 0,
               "zOrder": 1,
               "numberProperties": [],
               "stringProperties": [],
               "initialVariables": []
             }
           ],
-          "editionSettings": {},
+          "editionSettings": {
+            "grid": false,
+            "gridType": "rectangular",
+            "gridWidth": 32,
+            "gridHeight": 32,
+            "gridDepth": 32,
+            "gridOffsetX": 0,
+            "gridOffsetY": 0,
+            "gridOffsetZ": 0,
+            "gridColor": 10401023,
+            "gridAlpha": 0.8,
+            "snap": false,
+            "zoomFactor": 0.35,
+            "windowMask": false,
+            "selectedLayer": "",
+            "gameEditorMode": "instances-editor"
+          },
           "eventsFunctions": [
             {
               "fullName": "",
@@ -44421,8 +45226,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -44449,8 +45254,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -44481,8 +45286,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
@@ -44509,15 +45314,17 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 }
               ],
               "objectGroups": []
             },
             {
+              "description": "Paint the density of copies around a position, up to the density of the object (copies removed with \"Erase copies\" come back). The effect fades out up to the radius.",
               "fullName": "Add copies",
               "functionType": "Action",
+              "group": "Paint",
               "name": "AddCopies",
               "sentence": "Add copies of _PARAM0_ around _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -44540,8 +45347,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -44559,13 +45366,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Paint the density of copies around a position, up to the density of the object (copies removed with \"Erase copies\" come back). The effect fades out up to the radius.",
-              "group": "Paint"
+              "objectGroups": []
             },
             {
+              "description": "Remove the copies standing in a circle, for example a tree cut by the player (use the position of the nearest copy and a small radius) or a forest cleared for a building. They come back when the scene is restarted.",
               "fullName": "Erase copies",
               "functionType": "Action",
+              "group": "Paint",
               "name": "EraseCopies",
               "sentence": "Erase the copies of _PARAM0_ in a circle at _PARAM1_; _PARAM2_ with a radius of _PARAM3_",
               "events": [
@@ -44588,8 +45395,8 @@
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 },
                 {
                   "description": "X position of the center",
@@ -44607,13 +45414,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "Remove the copies standing in a circle, for example a tree cut by the player (use the position of the nearest copy and a small radius) or a forest cleared for a building. They come back when the scene is restarted.",
-              "group": "Paint"
+              "objectGroups": []
             },
             {
+              "description": "the number of copies placed in the area.",
               "fullName": "Number of copies",
               "functionType": "ExpressionAndCondition",
+              "group": "Copies",
               "name": "CopyCount",
               "sentence": "the number of copies",
               "events": [
@@ -44629,24 +45436,24 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 }
               ],
-              "objectGroups": [],
-              "description": "the number of copies placed in the area.",
-              "group": "Copies",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             },
             {
+              "description": "The X position of the base of the copy nearest to a position (the position itself if there is no copy).",
               "fullName": "X position of the nearest copy",
               "functionType": "Expression",
+              "group": "Copies",
               "name": "NearestCopyX",
               "sentence": "",
               "events": [
@@ -44665,12 +45472,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -44683,16 +45493,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "The X position of the base of the copy nearest to a position (the position itself if there is no copy).",
-              "group": "Copies",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             },
             {
+              "description": "The Y position of the base of the copy nearest to a position (the position itself if there is no copy).",
               "fullName": "Y position of the nearest copy",
               "functionType": "Expression",
+              "group": "Copies",
               "name": "NearestCopyY",
               "sentence": "",
               "events": [
@@ -44711,12 +45518,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -44729,16 +45539,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "The Y position of the base of the copy nearest to a position (the position itself if there is no copy).",
-              "group": "Copies",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             },
             {
+              "description": "The Z position of the base of the copy nearest to a position (on the ground).",
               "fullName": "Z position of the nearest copy",
               "functionType": "Expression",
+              "group": "Copies",
               "name": "NearestCopyZ",
               "sentence": "",
               "events": [
@@ -44754,15 +45561,18 @@
                   ],
                   "parameterObjects": "Object",
                   "useStrict": true,
-                  "eventsSheetExpanded": false
+                  "eventsSheetExpanded": true
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -44775,16 +45585,13 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "The Z position of the base of the copy nearest to a position (on the ground).",
-              "group": "Copies",
-              "expressionType": {
-                "type": "expression"
-              }
+              "objectGroups": []
             },
             {
+              "description": "the distance (on X and Y) from a position to the base of the nearest copy. It's a very big number when there is no copy.",
               "fullName": "Distance to the nearest copy",
               "functionType": "ExpressionAndCondition",
+              "group": "Copies",
               "name": "NearestCopyDistance",
               "sentence": "the distance from _PARAM1_; _PARAM2_ to the nearest copy",
               "events": [
@@ -44803,12 +45610,15 @@
                   "eventsSheetExpanded": false
                 }
               ],
+              "expressionType": {
+                "type": "expression"
+              },
               "parameters": [
                 {
                   "description": "Object",
                   "name": "Object",
-                  "type": "object",
-                  "supplementaryInformation": "Terrain3D::ScatteredModels"
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
                 },
                 {
                   "description": "X position",
@@ -44821,33 +45631,223 @@
                   "type": "expression"
                 }
               ],
-              "objectGroups": [],
-              "description": "the distance (on X and Y) from a position to the base of the nearest copy. It's a very big number when there is no copy.",
+              "objectGroups": []
+            },
+            {
+              "description": "The angle (in degrees, around the Z axis) of the copy nearest to a position (0 when there is no copy).",
+              "fullName": "Angle of the nearest copy",
+              "functionType": "Expression",
               "group": "Copies",
+              "name": "NearestCopyAngle",
+              "sentence": "",
+              "events": [
+                {
+                  "aiGeneratedEventId": "01M6W13A1GCBRR93J2V6ZPRBYZ",
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.CustomRuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const x = eventsFunctionContext.getArgument(\"X\");",
+                    "const y = eventsFunctionContext.getArgument(\"Y\");",
+                    "const copy = object.__terrainScatter.findNearestCopy(x, y);",
+                    "eventsFunctionContext.returnValue = copy ? (copy.angle * 180) / Math.PI : 0;"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
               "expressionType": {
                 "type": "expression"
-              }
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
+                },
+                {
+                  "description": "X position",
+                  "name": "X",
+                  "type": "expression"
+                },
+                {
+                  "description": "Y position",
+                  "name": "Y",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The scale factor of the copy nearest to a position (1 = the model at its original size, 0 when there is no copy).",
+              "fullName": "Scale of the nearest copy",
+              "functionType": "Expression",
+              "group": "Copies",
+              "name": "NearestCopyScale",
+              "sentence": "",
+              "events": [
+                {
+                  "aiGeneratedEventId": "01M6W15Y2Y5KXQHWMS0ZX3RSMT",
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "/** @type {gdjs.CustomRuntimeObject3D} */",
+                    "const object = objects[0];",
+                    "const x = eventsFunctionContext.getArgument(\"X\");",
+                    "const y = eventsFunctionContext.getArgument(\"Y\");",
+                    "const copy = object.__terrainScatter.findNearestCopy(x, y);",
+                    "eventsFunctionContext.returnValue = copy ? copy.scale : 0;"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Terrain3D::ScatteredModels",
+                  "type": "object"
+                },
+                {
+                  "description": "X position",
+                  "name": "X",
+                  "type": "expression"
+                },
+                {
+                  "description": "Y position",
+                  "name": "Y",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
             }
           ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "onCreated"
+              },
+              {
+                "functionName": "onDestroy"
+              },
+              {
+                "functionName": "doStepPostEvents"
+              },
+              {
+                "functionName": "onHotReloading"
+              },
+              {
+                "folderName": "Paint",
+                "children": [
+                  {
+                    "functionName": "AddCopies"
+                  },
+                  {
+                    "functionName": "EraseCopies"
+                  }
+                ]
+              },
+              {
+                "folderName": "Copies",
+                "children": [
+                  {
+                    "functionName": "CopyCount"
+                  },
+                  {
+                    "functionName": "NearestCopyX"
+                  },
+                  {
+                    "functionName": "NearestCopyY"
+                  },
+                  {
+                    "functionName": "NearestCopyZ"
+                  },
+                  {
+                    "functionName": "NearestCopyDistance"
+                  },
+                  {
+                    "functionName": "NearestCopyAngle"
+                  },
+                  {
+                    "functionName": "NearestCopyScale"
+                  }
+                ]
+              }
+            ]
+          },
           "propertyDescriptors": [
             {
               "value": "",
               "type": "Resource",
               "label": "3D model",
-              "description": "The model copied everywhere (a .glb file). Models standing on the Y axis, like most models of the asset store, are stood up along Z.",
+              "description": "The model copied everywhere (a .glb file).",
               "group": "Model",
               "extraInformation": [
                 "model3D"
               ],
+              "choices": [],
               "name": "Model"
             },
             {
-              "value": "300",
-              "type": "Number",
-              "label": "Height of a copy",
-              "unit": "Pixel",
-              "description": "Copies keep the proportions of the model.",
+              "value": "Y",
+              "type": "Choice",
+              "label": "Model up axis",
+              "description": "The axis the model stands on in the file. Most models of the asset store stand on Y, they are stood up along Z.",
               "group": "Model",
+              "choices": [
+                {
+                  "label": "Y (like most models)",
+                  "value": "Y"
+                },
+                {
+                  "label": "Z (like the scene)",
+                  "value": "Z"
+                }
+              ],
+              "name": "ModelUpAxis"
+            },
+            {
+              "value": "ModelOrigin",
+              "type": "Choice",
+              "label": "Point put on the ground",
+              "description": "The point of the model put on the ground, also at the center of the trunk collision. Use the origin of the model when the trunk is not at the center of the model (asymmetric canopy, leaning tree), or to sink the base of copies in the ground on slopes.",
+              "group": "Model",
+              "choices": [
+                {
+                  "label": "Center of the model base",
+                  "value": "BaseCenter"
+                },
+                {
+                  "label": "Origin of the model",
+                  "value": "ModelOrigin"
+                }
+              ],
+              "name": "ModelAnchor"
+            },
+            {
+              "value": "100",
+              "type": "Number",
+              "unit": "Dimensionless",
+              "label": "Scale factor of a copy",
+              "description": "The size of a copy, in percent of the original model size (100 = the model at its original size, like a 3D model object with a scale of 1). For objects made before this property, like the ones of the asset store, it is a percent of their former height of a copy. Copies keep the proportions of the model.",
+              "group": "Model",
+              "name": "ScaleFactor"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "unit": "Pixel",
+              "label": "Height of a copy",
+              "description": "Kept for objects made before \"Scale factor of a copy\": when greater than 0, copies have this height, multiplied by the scale factor.",
+              "group": "Model",
+              "deprecated": true,
               "name": "Size"
             },
             {
@@ -44948,8 +45948,8 @@
             {
               "value": "30",
               "type": "Number",
-              "label": "Maximum slope",
               "unit": "DegreeAngle",
+              "label": "Maximum slope",
               "description": "No copies grow on steeper ground.",
               "group": "Ground",
               "name": "MaxSlope"
@@ -44957,8 +45957,8 @@
             {
               "value": "-100000",
               "type": "Number",
-              "label": "Minimum ground Z",
               "unit": "Pixel",
+              "label": "Minimum ground Z",
               "description": "No copies grow where the ground is lower (for example, under the water level).",
               "group": "Ground",
               "name": "MinGroundZ"
@@ -44966,8 +45966,8 @@
             {
               "value": "100000",
               "type": "Number",
-              "label": "Maximum ground Z",
               "unit": "Pixel",
+              "label": "Maximum ground Z",
               "description": "No copies grow where the ground is higher (for example, above the tree line).",
               "group": "Ground",
               "name": "MaxGroundZ"
@@ -44983,17 +45983,17 @@
             {
               "value": "30",
               "type": "Number",
-              "label": "Trunk diameter",
               "unit": "Pixel",
-              "description": "The diameter of the collision shape of a copy at the height given in \"Height of a copy\" (it is scaled with the copy).",
+              "label": "Trunk diameter",
+              "description": "The diameter of the collision shape of a copy at the scale given in \"Scale factor of a copy\" (it is scaled with the copy).",
               "group": "Collisions",
               "name": "TrunkDiameter"
             },
             {
               "value": "8000",
               "type": "Number",
-              "label": "Draw distance",
               "unit": "Pixel",
+              "label": "Draw distance",
               "description": "Copies shrink and are hidden at this distance from the camera.",
               "group": "Rendering",
               "name": "DrawDistance"
@@ -45029,7 +46029,107 @@
               "advanced": true,
               "name": "PaintData"
             }
-          ]
+          ],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "folderName": "Model",
+                "children": [
+                  {
+                    "propertyName": "Model"
+                  },
+                  {
+                    "propertyName": "ModelUpAxis"
+                  },
+                  {
+                    "propertyName": "ModelAnchor"
+                  },
+                  {
+                    "propertyName": "ScaleFactor"
+                  },
+                  {
+                    "propertyName": "MinScale"
+                  },
+                  {
+                    "propertyName": "MaxScale"
+                  },
+                  {
+                    "propertyName": "RandomRotation"
+                  },
+                  {
+                    "propertyName": "RandomTint"
+                  },
+                  {
+                    "propertyName": "Size"
+                  }
+                ]
+              },
+              {
+                "folderName": "Placement",
+                "children": [
+                  {
+                    "propertyName": "Density"
+                  },
+                  {
+                    "propertyName": "Seed"
+                  },
+                  {
+                    "propertyName": "Coverage"
+                  },
+                  {
+                    "propertyName": "Edits"
+                  }
+                ]
+              },
+              {
+                "folderName": "Ground",
+                "children": [
+                  {
+                    "propertyName": "GroundLayer"
+                  },
+                  {
+                    "propertyName": "MaxSlope"
+                  },
+                  {
+                    "propertyName": "MinGroundZ"
+                  },
+                  {
+                    "propertyName": "MaxGroundZ"
+                  }
+                ]
+              },
+              {
+                "folderName": "Collisions",
+                "children": [
+                  {
+                    "propertyName": "TrunkCollisions"
+                  },
+                  {
+                    "propertyName": "TrunkDiameter"
+                  }
+                ]
+              },
+              {
+                "folderName": "Rendering",
+                "children": [
+                  {
+                    "propertyName": "DrawDistance"
+                  },
+                  {
+                    "propertyName": "CastShadow"
+                  },
+                  {
+                    "propertyName": "ReceiveShadow"
+                  }
+                ]
+              },
+              {
+                "propertyName": "PaintData"
+              }
+            ]
+          },
+          "variants": []
         }
       ]
     }
