@@ -247,7 +247,27 @@ jobs:
 
       - run:
           name: Report whether the gameplay tests passed
-          command: exit "$(cat /tmp/gameplay-tests-exit-code)"
+          # Summarize the failures here, where the job turns red: for each
+          # game, how many of its tests failed and which ones.
+          command: |
+            EXIT_CODE="$(cat /tmp/gameplay-tests-exit-code)"
+            if [ "$EXIT_CODE" != "0" ]; then
+              # For each game of the JUnit report with a failure: its path, how
+              # many tests passed out of how many, and the names of the failed ones.
+              awk '
+                function attribute(tag, key) {
+                  if (!match(tag, " " key "=\"[^\"]*\"")) return ""
+                  value = substr(tag, RSTART + length(key) + 3, RLENGTH - length(key) - 4)
+                  gsub(/&quot;/, "\"", value); gsub(/&lt;/, "<", value); gsub(/&gt;/, ">", value); gsub(/&amp;/, "\\&", value)
+                  return value
+                }
+                /<testsuite / && attribute($0, "failures") + 0 > 0 {
+                  print "❌ " attribute($0, "name") ": " attribute($0, "tests") - attribute($0, "failures") "/" attribute($0, "tests") " gameplay tests passed"
+                }
+                /<testcase / && !/\/>$/ { print "   - " attribute($0, "name") }
+              ' /tmp/gameplay-tests-results/results.xml
+            fi
+            exit "$EXIT_CODE"
 
   # Check that the games are still drawn the same: their rendering tests
   # (gameplay tests named "Rendering: ...") take screenshots compared with the
@@ -305,7 +325,28 @@ jobs:
 
       - run:
           name: Report whether the games are drawn like their expected images
-          command: exit "$(cat /tmp/rendering-screenshots-exit-code)"
+          # Summarize the differences here, where the job turns red: for each
+          # game, how many of its screenshots differ and which ones.
+          command: |
+            EXIT_CODE="$(cat /tmp/rendering-screenshots-exit-code)"
+            if [ "$EXIT_CODE" != "0" ]; then
+              # For each game of the JUnit report with a difference: its path,
+              # how many screenshots match out of how many, and the ones that differ.
+              awk '
+                function attribute(tag, key) {
+                  if (!match(tag, " " key "=\"[^\"]*\"")) return ""
+                  value = substr(tag, RSTART + length(key) + 3, RLENGTH - length(key) - 4)
+                  gsub(/&quot;/, "\"", value); gsub(/&lt;/, "<", value); gsub(/&gt;/, ">", value); gsub(/&amp;/, "\\&", value)
+                  return value
+                }
+                /<testsuite / && attribute($0, "failures") + 0 > 0 {
+                  print "❌ " attribute($0, "name") ": " attribute($0, "tests") - attribute($0, "failures") "/" attribute($0, "tests") " screenshots match"
+                }
+                /<testcase / && !/\/>$/ { print "   - " attribute($0, "name") }
+              ' /tmp/rendering-screenshots-results/results.xml
+              echo "If the change is on purpose, update the images with: node scripts/check-rendering-screenshots.js --update"
+            fi
+            exit "$EXIT_CODE"
 
 workflows:
   tests:

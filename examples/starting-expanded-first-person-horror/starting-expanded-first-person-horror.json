@@ -1441,8 +1441,7 @@
             "ConeLength": 4000,
             "ConeAngle": 22,
             "Decay": 1,
-            "Smoothing": 0.15,
-            "ShadowBias": 0.0001
+            "Smoothing": 0.15
           }
         },
         {
@@ -18389,7 +18388,7 @@
       "name": "Light3D",
       "previewIconUrl": "https://asset-resources.gdevelop.io/public-resources/Icons/f237ae4e3b857c556846c7b2c0b132556fd4bcdeff217034b4d9c97dc1aab1d6_lightbulb-on-outline.svg",
       "shortDescription": "A collection of light object for 3D.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "description": "A collection of light object for 3D.",
       "origin": {
         "identifier": "Light3D",
@@ -18585,6 +18584,8 @@
                 "    constructor(object, spotLight) {",
                 "        this.object = object;",
                 "        this.spotLight = spotLight;",
+                "        /** In texels of the shadow map. */",
+                "        this.shadowNormalBias = 0;",
                 "    }",
                 "",
                 "    /**",
@@ -18642,6 +18643,7 @@
                 "        const runtimeSene = this.object.getRuntimeScene();",
                 "        const inverseWorldScale = runtimeSene.getRenderer3DInverseWorldScale ? runtimeSene.getRenderer3DInverseWorldScale() : 1;",
                 "        this.spotLight.distance = value * inverseWorldScale;",
+                "        this.updateShadowNormalBias();",
                 "    }",
                 "",
                 "    /**",
@@ -18649,6 +18651,7 @@
                 "     */",
                 "    setConeAngle(coneAngle) {",
                 "        this.spotLight.angle = coneAngle * Math.PI / 180;",
+                "        this.updateShadowNormalBias();",
                 "    }",
                 "",
                 "    /**",
@@ -18688,6 +18691,7 @@
                 "        const mapSize = shadow.mapSize;",
                 "        if (mapSize.width !== size) {",
                 "            mapSize.set(size, size);",
+                "            this.updateShadowNormalBias();",
                 "",
                 "            // Force the recreation of the shadow map texture:",
                 "            if (shadow.map) {",
@@ -18714,6 +18718,7 @@
                 "        const runtimeSene = this.object.getRuntimeScene();",
                 "        const inverseWorldScale = runtimeSene.getRenderer3DInverseWorldScale ? runtimeSene.getRenderer3DInverseWorldScale() : 1;",
                 "        this.spotLight.shadow.camera.far = value * inverseWorldScale;",
+                "        this.updateShadowNormalBias();",
                 "    }",
                 "",
                 "    /**",
@@ -18747,6 +18752,28 @@
                 "        }",
                 "        const texture = game.getImageManager().getThreeTexture(resourceName);",
                 "        this.spotLight.map = texture;",
+                "    }",
+                "",
+                "    /**",
+                "     * @param value {number} in texels of the shadow map",
+                "     */",
+                "    setShadowNormalBias(value) {",
+                "        this.shadowNormalBias = Math.max(0, value);",
+                "        this.updateShadowNormalBias();",
+                "    }",
+                "",
+                "    /**",
+                "     * Contrary to the bias, the normal bias is a distance in the world.",
+                "     * As texels of a perspective shadow map get bigger with the distance,",
+                "     * it is converted from the texels at the farthest lit distance.",
+                "     */",
+                "    updateShadowNormalBias() {",
+                "        const shadow = this.spotLight.shadow;",
+                "        // Three.js uses the cone length as the far plane of the shadow camera.",
+                "        const shadowDistance = this.spotLight.distance || shadow.camera.far;",
+                "        const coneAngle = Math.min(this.spotLight.angle, gdjs.toRad(89));",
+                "        const shadowMapWidth = 2 * shadowDistance * Math.tan(coneAngle);",
+                "        shadow.normalBias = this.shadowNormalBias * shadowMapWidth / shadow.mapSize.width;",
                 "    }",
                 "}",
                 "",
@@ -18838,6 +18865,8 @@
                 "    constructor(object, pointLight) {",
                 "        this.object = object;",
                 "        this.pointLight = pointLight;",
+                "        /** In texels of the shadow map. */",
+                "        this.shadowNormalBias = 0;",
                 "    }",
                 "",
                 "    /**",
@@ -18868,6 +18897,7 @@
                 "        const runtimeScene = this.object.getRuntimeScene();",
                 "        const inverseWorldScale = runtimeScene.getRenderer3DInverseWorldScale ? runtimeScene.getRenderer3DInverseWorldScale() : 1;",
                 "        this.pointLight.distance = value * inverseWorldScale;",
+                "        this.updateShadowNormalBias();",
                 "    }",
                 "",
                 "    /**",
@@ -18897,6 +18927,7 @@
                 "        const mapSize = shadow.mapSize;",
                 "        if (mapSize.width !== size) {",
                 "            mapSize.set(size, size);",
+                "            this.updateShadowNormalBias();",
                 "",
                 "            // Force the recreation of the shadow map texture:",
                 "            if (shadow.map) {",
@@ -18925,6 +18956,7 @@
                 "        const inverseWorldScale = runtimeSene.getRenderer3DInverseWorldScale ? runtimeSene.getRenderer3DInverseWorldScale() : 1;",
                 "",
                 "        this.pointLight.shadow.camera.far = value * inverseWorldScale;",
+                "        this.updateShadowNormalBias();",
                 "    }",
                 "",
                 "    /**",
@@ -18942,6 +18974,28 @@
                 "                    ? 2",
                 "                    : 1;",
                 "        this.pointLight.shadow.bias = -value * biasMultiplier * inverseWorldScale;",
+                "    }",
+                "",
+                "    /**",
+                "     * @param value {number} in texels of the shadow map",
+                "     */",
+                "    setShadowNormalBias(value) {",
+                "        this.shadowNormalBias = Math.max(0, value);",
+                "        this.updateShadowNormalBias();",
+                "    }",
+                "",
+                "    /**",
+                "     * Contrary to the bias, the normal bias is a distance in the world.",
+                "     * As texels of a perspective shadow map get bigger with the distance,",
+                "     * it is converted from the texels at the farthest lit distance.",
+                "     */",
+                "    updateShadowNormalBias() {",
+                "        const shadow = this.pointLight.shadow;",
+                "        // Three.js uses the range as the far plane of the shadow cameras.",
+                "        const shadowDistance = this.pointLight.distance || shadow.camera.far;",
+                "        // Each face of the shadow cube map covers 90 degrees.",
+                "        const shadowMapWidth = 2 * shadowDistance;",
+                "        shadow.normalBias = this.shadowNormalBias * shadowMapWidth / shadow.mapSize.width;",
                 "    }",
                 "}",
                 "",
@@ -20136,6 +20190,17 @@
                         "Object",
                         "=",
                         "ShadowBias",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Light3D::SpotLight3D::SetShadowNormalBias"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "ShadowNormalBias",
                         ""
                       ]
                     },
@@ -21495,6 +21560,89 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the shadow normal bias of the light. Reduce the dark stripes (\"shadow acne\") that can appear on surfaces lit from the side. Raise it if stripes are still visible, 0 disables it.",
+              "fullName": "Shadow normal bias",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D spot light shadow configuration",
+              "name": "ShadowNormalBias",
+              "sentence": "the shadow normal bias",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "ShadowNormalBias"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Light3D::SpotLight3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "ShadowNormalBias",
+              "group": "3D spot light shadow configuration",
+              "name": "SetShadowNormalBias",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ShadowNormalBias",
+                        "=",
+                        "max(0, Value)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const value = eventsFunctionContext.getArgument(\"Value\");",
+                    "",
+                    "object.__spotLightAdapter.setShadowNormalBias(value);"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Light3D::SpotLight3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "eventsFunctionsFolderStructure": {
@@ -21603,6 +21751,12 @@
                   },
                   {
                     "functionName": "ApplyShadowBias"
+                  },
+                  {
+                    "functionName": "ShadowNormalBias"
+                  },
+                  {
+                    "functionName": "SetShadowNormalBias"
                   }
                 ]
               }
@@ -21724,6 +21878,15 @@
               "group": "Shadow",
               "advanced": true,
               "name": "ShadowBias"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "label": "Shadow normal bias",
+              "description": "Reduce the dark stripes (\"shadow acne\") that can appear on surfaces lit from the side. Raise it if stripes are still visible, 0 disables it.",
+              "group": "Shadow",
+              "advanced": true,
+              "name": "ShadowNormalBias"
             }
           ],
           "propertiesFolderStructure": {
@@ -21772,6 +21935,9 @@
                   },
                   {
                     "propertyName": "ShadowBias"
+                  },
+                  {
+                    "propertyName": "ShadowNormalBias"
                   }
                 ]
               }
@@ -22200,6 +22366,17 @@
                         "Object",
                         "=",
                         "ShadowBias",
+                        ""
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "Light3D::PointLight3D::SetShadowNormalBias"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "ShadowNormalBias",
                         ""
                       ]
                     },
@@ -23249,6 +23426,89 @@
                 }
               ],
               "objectGroups": []
+            },
+            {
+              "description": "the shadow normal bias of the light. Reduce the dark stripes (\"shadow acne\") that can appear on surfaces lit from the side. Raise it if stripes are still visible, 0 disables it.",
+              "fullName": "Shadow normal bias",
+              "functionType": "ExpressionAndCondition",
+              "group": "3D point light shadow configuration",
+              "name": "ShadowNormalBias",
+              "sentence": "the shadow normal bias",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "ShadowNormalBias"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Light3D::PointLight3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "",
+              "functionType": "ActionWithOperator",
+              "getterName": "ShadowNormalBias",
+              "group": "3D point light shadow configuration",
+              "name": "SetShadowNormalBias",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "ShadowNormalBias",
+                        "=",
+                        "max(0, Value)"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": [
+                    "const object = objects[0];",
+                    "const value = eventsFunctionContext.getArgument(\"Value\");",
+                    "",
+                    "object.__pointLightAdapter.setShadowNormalBias(value);"
+                  ],
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "Light3D::PointLight3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
             }
           ],
           "eventsFunctionsFolderStructure": {
@@ -23331,6 +23591,12 @@
                   },
                   {
                     "functionName": "ApplyShadowBias"
+                  },
+                  {
+                    "functionName": "ShadowNormalBias"
+                  },
+                  {
+                    "functionName": "SetShadowNormalBias"
                   }
                 ]
               }
@@ -23418,6 +23684,15 @@
               "group": "Shadow",
               "advanced": true,
               "name": "ShadowBias"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "label": "Shadow normal bias",
+              "description": "Reduce the dark stripes (\"shadow acne\") that can appear on surfaces lit from the side. Raise it if stripes are still visible, 0 disables it.",
+              "group": "Shadow",
+              "advanced": true,
+              "name": "ShadowNormalBias"
             }
           ],
           "propertiesFolderStructure": {
@@ -23452,6 +23727,9 @@
                   },
                   {
                     "propertyName": "ShadowBias"
+                  },
+                  {
+                    "propertyName": "ShadowNormalBias"
                   }
                 ]
               }
