@@ -10,7 +10,7 @@ const fs = require('fs').promises;
  *   slots: Array<{id: string, kind: ThemeSlotKind, label: string, description: string}>,
  * }} ThemeSlotsVocabulary
  *
- * @typedef {'model' | 'texture' | 'material' | 'skybox' | 'color'} ThemeSlotKind
+ * @typedef {'model' | 'texture' | 'material' | 'skybox' | 'color' | 'sprite' | 'tilemap'} ThemeSlotKind
  */
 
 /**
@@ -24,14 +24,29 @@ const fs = require('fs').promises;
  * to a texture slot, a color to a color slot, or an image resource to a
  * material slot along with the property taking the normal map of the material
  * (`{"slot": "terrain.ground", "normalMap": "Layer1NormalMap"}`).
+ *
+ * In a 2D starter, a sprite maps to a sprite slot, or to
+ * `{"slot": "2d.side.player", "anchor": "bottom", "fit": "height"}` to say how
+ * the theme art is placed where the placeholder art was: standing on its
+ * bottom instead of centered, taking its width or its height instead of
+ * covering the same area. A tiled sprite or a panel sprite maps to a texture
+ * slot. A tile map maps to a tile map slot along with the role each of its
+ * tiles plays (`{"slot": "2d.overhead.tilemap", "tiles": {"0": "ground"}}`).
+ * With `requireAllSlots`, a theme re-skins the starter only if it fills every
+ * slot the starter maps: 2D art of a theme next to placeholder art looks
+ * broken, where an unthemed 3D model is hardly noticed.
  * @typedef {{
  *   version: number,
- *   objects: Object.<string, string | Object.<string, string | MaterialMapping>>,
+ *   requireAllSlots?: boolean,
+ *   tileSize?: number,
+ *   objects: Object.<string, string | SpriteMapping | TileMapMapping | Object.<string, string | MaterialMapping>>,
  *   effects?: Object.<string, string>,
  *   ignoredObjects?: Array<string>,
  * }} StarterThemeSlots
  *
  * @typedef {{slot: string, normalMap: string}} MaterialMapping
+ * @typedef {{slot?: string, anchor?: 'center' | 'bottom', fit?: 'area' | 'width' | 'height', animations?: Object.<string, Array<string>>, animationSlots?: Object.<string, string>}} SpriteMapping
+ * @typedef {{slot: string, tiles: Object.<string, string>}} TileMapMapping
  */
 
 const vocabularyPath = path.join(__dirname, '../../theme-slots.json');
@@ -39,6 +54,124 @@ const vocabularyPath = path.join(__dirname, '../../theme-slots.json');
 /** @returns {Promise<ThemeSlotsVocabulary>} */
 const loadThemeSlotsVocabulary = async () =>
   JSON.parse(await fs.readFile(vocabularyPath, 'utf8'));
+
+/** The kind of slot each type of 2D object maps to. */
+const slotKindBy2DObjectType = {
+  Sprite: 'sprite',
+  'TiledSpriteObject::TiledSprite': 'texture',
+  'PanelSpriteObject::PanelSprite': 'texture',
+  'TileMap::SimpleTileMap': 'tilemap',
+};
+
+/**
+ * The 2D objects of a project a theme can re-skin, by the path a mapping
+ * refers to them by.
+ * @param {any} projectObject
+ * @returns {Map<string, string>} The type of each object.
+ */
+const get2DThemeableObjects = (projectObject) => {
+  /** @type {Map<string, string>} */
+  const typeByPath = new Map();
+  /** @param {string} prefix @param {Array<any>} list */
+  const collect = (prefix, list) =>
+    (list || []).forEach((object) => {
+      if (object.type in slotKindBy2DObjectType) {
+        typeByPath.set(`${prefix}/${object.name}`, object.type);
+      }
+    });
+  collect('global', projectObject.objects);
+  (projectObject.layouts || []).forEach(
+    /** @param {any} layout */ (layout) =>
+      collect(`scene:${layout.name}`, layout.objects)
+  );
+  return typeByPath;
+};
+
+/**
+ * The 2D objects a starter maps must exist and map to a slot of their kind.
+ * Unlike 3D objects, the 2D objects left unmapped are not an error: they are
+ * the interface of the starter (buttons, joysticks, texts).
+ * @param {ThemeSlotsVocabulary} vocabulary
+ * @param {string} slug
+ * @param {any} projectObject
+ * @param {StarterThemeSlots} starterThemeSlots
+ * @param {boolean} is3D
+ * @returns {Error[]}
+ */
+const check2DObjectsThemeSlots = (
+  vocabulary,
+  slug,
+  projectObject,
+  starterThemeSlots,
+  is3D
+) => {
+  /** @type {Error[]} */
+  const errors = [];
+  const slotKindById = new Map(
+    vocabulary.slots.map((slot) => [slot.id, slot.kind])
+  );
+  const typeByPath = get2DThemeableObjects(projectObject);
+
+  Object.entries(starterThemeSlots.objects || {}).forEach(
+    ([objectPath, mapping]) => {
+      const type = typeByPath.get(objectPath);
+      if (!type) {
+        // The objects of a 3D starter are checked with its 3D objects.
+        if (!is3D) {
+          errors.push(
+            new Error(
+              `Starter "${slug}": theme-slots.json maps "${objectPath}", which is not a sprite, tiled sprite, panel sprite or tile map of the starter.`
+            )
+          );
+        }
+        return;
+      }
+
+      // @ts-ignore - the type is one of the keys.
+      const expectedKind = slotKindBy2DObjectType[type];
+      /** @type {any} */
+      const mappingObject = typeof mapping === 'string' ? {} : mapping;
+      // A sprite can map each of its animations to its own slot.
+      /** @type {Array<string>} */
+      const slotIds = [
+        ...(typeof mapping === 'string'
+          ? [mapping]
+          : mappingObject.slot !== undefined || !mappingObject.animationSlots
+          ? [mappingObject.slot]
+          : []),
+        ...Object.values(mappingObject.animationSlots || {}),
+      ];
+      let hasError = false;
+      slotIds.forEach((slotId) => {
+        const declaredKind = slotKindById.get(slotId);
+        if (typeof slotId !== 'string' || !declaredKind) {
+          hasError = true;
+          errors.push(
+            new Error(
+              `Starter "${slug}": "${objectPath}" maps to "${slotId}", which is not a slot of theme-slots.json.`
+            )
+          );
+        } else if (declaredKind !== expectedKind) {
+          hasError = true;
+          errors.push(
+            new Error(
+              `Starter "${slug}": "${objectPath}" maps to "${slotId}", a ${declaredKind} slot, but needs a ${expectedKind} slot.`
+            )
+          );
+        }
+      });
+      if (hasError) return;
+      if (expectedKind === 'tilemap' && !mappingObject.tiles) {
+        errors.push(
+          new Error(
+            `Starter "${slug}": the tile map "${objectPath}" must map the role of each of its tiles ("tiles").`
+          )
+        );
+      }
+    }
+  );
+  return errors;
+};
 
 const cubeFaceProperties = [
   'frontFaceResourceName',
@@ -187,6 +320,17 @@ const checkStarterThemeSlots = (
   const errors = [];
   const { objects, customObjects, effects, is3D } =
     getThemeableObjects(projectObject);
+  if (starterThemeSlots) {
+    errors.push(
+      ...check2DObjectsThemeSlots(
+        vocabulary,
+        slug,
+        projectObject,
+        starterThemeSlots,
+        is3D
+      )
+    );
+  }
   if (!is3D) return errors;
 
   if (!starterThemeSlots) {
@@ -317,7 +461,10 @@ const checkStarterThemeSlots = (
       );
       return;
     }
-    Object.entries(mapping).forEach(([property, propertyMapping]) => {
+    /** @type {Object.<string, string | MaterialMapping>} */
+    // @ts-ignore - the mapping of a custom object maps its properties.
+    const propertiesMapping = mapping;
+    Object.entries(propertiesMapping).forEach(([property, propertyMapping]) => {
       const where = `"${objectPath}" property "${property}"`;
       if (typeof propertyMapping !== 'string') {
         if (

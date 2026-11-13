@@ -455,3 +455,71 @@ describe('checkStarterThemeSlots', () => {
     expect(errors[0].message).toContain('must map its properties to slots');
   });
 });
+
+describe('checkStarterThemeSlots on a 2D starter', () => {
+  /** @type {ThemeSlotsVocabulary} */
+  const vocabulary2D = {
+    version: 1,
+    slots: [
+      { id: '2d.side.player', kind: 'sprite', label: '', description: '' },
+      { id: '2d.side.ground', kind: 'texture', label: '', description: '' },
+      { id: '2d.tilemap', kind: 'tilemap', label: '', description: '' },
+    ],
+  };
+  const project = {
+    layouts: [
+      {
+        name: 'Game Scene',
+        objects: [
+          { name: 'Player', type: 'Sprite' },
+          { name: 'Ground', type: 'TiledSpriteObject::TiledSprite' },
+          { name: 'Tiles', type: 'TileMap::SimpleTileMap' },
+          { name: 'JumpButton', type: 'Sprite' },
+        ],
+      },
+    ],
+  };
+
+  it('accepts sprites, tiled sprites and tile maps mapped to slots of their kind', () => {
+    expect(
+      checkStarterThemeSlots(vocabulary2D, 'starting-platformer', project, {
+        version: 1,
+        requireAllSlots: true,
+        objects: {
+          'scene:Game Scene/Player': {
+            slot: '2d.side.player',
+            anchor: 'bottom',
+          },
+          'scene:Game Scene/Ground': '2d.side.ground',
+          'scene:Game Scene/Tiles': {
+            slot: '2d.tilemap',
+            tiles: { 0: 'ground' },
+          },
+        },
+      })
+    ).toEqual([]);
+  });
+
+  it('reports an object the starter does not have, and a slot of the wrong kind', () => {
+    const errors = checkStarterThemeSlots(
+      vocabulary2D,
+      'starting-platformer',
+      project,
+      {
+        version: 1,
+        objects: {
+          'scene:Game Scene/Hero': '2d.side.player',
+          'scene:Game Scene/Player': '2d.side.ground',
+          'scene:Game Scene/Ground': '2d.side.unknown',
+          'scene:Game Scene/Tiles': { slot: '2d.tilemap' },
+        },
+      }
+    ).map((error) => error.message);
+
+    expect(errors).toHaveLength(4);
+    expect(errors[0]).toContain('"scene:Game Scene/Hero", which is not');
+    expect(errors[1]).toContain('a texture slot, but needs a sprite slot');
+    expect(errors[2]).toContain('which is not a slot of theme-slots.json');
+    expect(errors[3]).toContain('must map the role of each of its tiles');
+  });
+});

@@ -28,6 +28,20 @@
  *   kind: 'skybox',
  *   faces: Object.<string, ThemeFile>,
  *   assetStoreId?: string,
+ * } | {
+ *   kind: 'sprite',
+ *   objectContent: any,
+ *   resources: Array<any>,
+ *   width: number,
+ *   height: number,
+ *   tileSize?: number,
+ *   assetStoreId?: string,
+ * } | ThemeFile & {
+ *   kind: 'tilemap',
+ *   tileSize: number,
+ *   columnCount: number,
+ *   rowCount: number,
+ *   tiles: Object.<string, number>,
  * }} ThemeSlot
  *
  * @typedef {{
@@ -36,6 +50,14 @@
  *   description: string,
  *   slots: Object.<string, ThemeSlot>,
  * }} Theme
+ *
+ * What the themer needs to know about an image of the starter, to fit the
+ * theme's art where the placeholder art was.
+ * @typedef {import('./PngBox.js').ImageBox} ImageBox
+ *
+ * @typedef {{
+ *   getStarterImageBox?: (resourceFile: string) => ImageBox | null,
+ * }} ThemeApplicationOptions
  *
  * @typedef {{
  *   appliedSlots: Array<string>,
@@ -158,6 +180,209 @@ const getSizeRatio = (objectContent, themeContent) => {
 };
 
 /**
+ * The instances of an object, wherever its path lets it be placed.
+ * @param {any} projectObject
+ * @param {string} objectPath
+ * @returns {Array<any>}
+ */
+const getInstancesOfObject = (projectObject, objectPath) => {
+  const separatorIndex = objectPath.lastIndexOf('/');
+  const scope = objectPath.slice(0, separatorIndex);
+  const objectName = objectPath.slice(separatorIndex + 1);
+  const sceneName = scope.startsWith('scene:') ? scope.slice(6) : null;
+  if (scope !== 'global' && sceneName === null) return [];
+
+  /** @type {Array<any>} */
+  const instances = [];
+  (projectObject.layouts || []).forEach(
+    /** @param {any} layout */ (layout) => {
+      if (sceneName !== null && layout.name !== sceneName) return;
+      instances.push(...(layout.instances || []));
+    }
+  );
+  (projectObject.externalLayouts || []).forEach(
+    /** @param {any} externalLayout */ (externalLayout) => {
+      if (sceneName !== null && externalLayout.associatedLayout !== sceneName) {
+        return;
+      }
+      instances.push(...(externalLayout.instances || []));
+    }
+  );
+  return instances.filter((instance) => instance.name === objectName);
+};
+
+/**
+ * The box around the collision mask of a sprite frame, or null without one.
+ * @param {any} frame
+ * @returns {{left: number, top: number, right: number, bottom: number} | null}
+ */
+const getFrameMaskBox = (frame) => {
+  if (!frame.hasCustomCollisionMask) return null;
+  /** @type {Array<{x: number, y: number}>} */
+  const vertices = (frame.customCollisionMask || []).flat();
+  if (!vertices.length) return null;
+  return {
+    left: Math.min(...vertices.map((vertex) => vertex.x)),
+    top: Math.min(...vertices.map((vertex) => vertex.y)),
+    right: Math.max(...vertices.map((vertex) => vertex.x)),
+    bottom: Math.max(...vertices.map((vertex) => vertex.y)),
+  };
+};
+
+/** @param {any} object @returns {any | null} */
+const getFirstFrame = (object) => {
+  for (const animation of object.animations || []) {
+    for (const direction of animation.directions || []) {
+      if ((direction.sprites || []).length) return direction.sprites[0];
+    }
+  }
+  return null;
+};
+
+/**
+ * How the art of a theme sprite is drawn where a placeholder image was: its
+ * scale, and the position on the theme image of a position on the placeholder.
+ * @typedef {{
+ *   scale: number,
+ *   toThemeImage: (x: number, y: number) => {x: number, y: number},
+ * }} SpritePlacement
+ */
+
+/**
+ * Place the art of a theme sprite where the placeholder art was: scaled to
+ * cover what the placeholder covered, centered on it (or standing on its
+ * bottom).
+ * @param {ImageBox} placeholderImage
+ * @param {any} themeFrame The first frame of the theme art.
+ * @param {'center' | 'bottom'} anchor
+ * @param {'area' | 'width' | 'height'} fit Whether the art covers the same
+ * area as the placeholder, or takes its width or its height.
+ * @param {number=} forcedScale The scale to use instead of fitting the art.
+ * @returns {SpritePlacement | null}
+ */
+const placeThemeSprite = (
+  placeholderImage,
+  themeFrame,
+  anchor,
+  fit,
+  forcedScale
+) => {
+  const themeBox = getFrameMaskBox(themeFrame);
+  if (!themeBox) return null;
+  const themeBoxWidth = themeBox.right - themeBox.left;
+  const themeBoxHeight = themeBox.bottom - themeBox.top;
+  const box = placeholderImage.box;
+  if (themeBoxWidth <= 0 || themeBoxHeight <= 0) return null;
+
+  const widthScale = (box.right - box.left) / themeBoxWidth;
+  const heightScale = (box.bottom - box.top) / themeBoxHeight;
+  // By default, the art covers as much of the scene as the placeholder did,
+  // without growing out of the image of the placeholder: art of another shape
+  // (a wide tank for a tall pawn) is then not shrunk to the narrow side.
+  const scale =
+    forcedScale ||
+    (fit === 'width'
+      ? widthScale
+      : fit === 'height'
+      ? heightScale
+      : Math.min(
+          Math.sqrt(widthScale * heightScale),
+          placeholderImage.width / themeBoxWidth,
+          placeholderImage.height / themeBoxHeight,
+          // Never enlarged: small art of a pack stays as sharp, and as small
+          // compared to the rest of the pack, as its author drew it.
+          1
+        ));
+  if (!(scale > 0)) return null;
+
+  return {
+    scale,
+    toThemeImage: (x, y) => ({
+      x:
+        (themeBox.left + themeBox.right) / 2 +
+        (x - (box.left + box.right) / 2) / scale,
+      y:
+        anchor === 'bottom'
+          ? themeBox.bottom + (y - box.bottom) / scale
+          : (themeBox.top + themeBox.bottom) / 2 +
+            (y - (box.top + box.bottom) / 2) / scale,
+    }),
+  };
+};
+
+/**
+ * Give an animation of a starter sprite the frames of a theme animation. The
+ * origin, center and points of the placeholder are kept where they were in
+ * the scene, so the events and the instances of the starter behave as before.
+ * The collision mask is the one of the theme art: it follows what is drawn.
+ * @param {any} themeAnimation
+ * @param {string} name The name the animation keeps in the starter.
+ * @param {any} placeholderFrame
+ * @param {ImageBox} placeholderImage
+ * @param {SpritePlacement} placement
+ * @param {(imageName: string) => string | null} useThemeImage
+ * @returns {any}
+ */
+const makeThemedAnimation = (
+  themeAnimation,
+  name,
+  placeholderFrame,
+  placeholderImage,
+  placement,
+  useThemeImage
+) => {
+  const { toThemeImage } = placement;
+  const placeholderCenter = placeholderFrame.centerPoint.automatic
+    ? { x: placeholderImage.width / 2, y: placeholderImage.height / 2 }
+    : placeholderFrame.centerPoint;
+  const frameGeometry = {
+    originPoint: {
+      ...placeholderFrame.originPoint,
+      ...toThemeImage(
+        placeholderFrame.originPoint.x,
+        placeholderFrame.originPoint.y
+      ),
+    },
+    centerPoint: {
+      ...placeholderFrame.centerPoint,
+      automatic: false,
+      ...toThemeImage(placeholderCenter.x, placeholderCenter.y),
+    },
+    points: (placeholderFrame.points || []).map(
+      /** @param {any} point */ (point) => ({
+        ...point,
+        ...toThemeImage(point.x, point.y),
+      })
+    ),
+  };
+
+  return {
+    ...themeAnimation,
+    name,
+    directions: (themeAnimation.directions || []).map(
+      /** @param {any} direction */ (direction) => ({
+        ...direction,
+        sprites: (direction.sprites || []).map(
+          /** @param {any} frame */ (frame) => ({
+            ...frame,
+            ...frameGeometry,
+            image: useThemeImage(frame.image) || frame.image,
+          })
+        ),
+      })
+    ),
+  };
+};
+
+/** @param {any} animation @returns {any | null} */
+const getAnimationFirstFrame = (animation) => {
+  for (const direction of (animation && animation.directions) || []) {
+    if ((direction.sprites || []).length) return direction.sprites[0];
+  }
+  return null;
+};
+
+/**
  * Re-skin a starter with a theme by rewriting its serialized project, in place.
  *
  * The starter's theme-slots.json says which of its objects play which slot.
@@ -173,10 +398,23 @@ const getSizeRatio = (objectContent, themeContent) => {
  *
  * @param {any} projectObject
  * @param {StarterThemeSlots} starterThemeSlots
+ * A sprite takes the animations of the theme sprite, drawn where its
+ * placeholder art was; a tiled sprite or a panel sprite takes the theme image
+ * as its texture; a tile map takes the theme atlas, each of its tiles being
+ * replaced by the tile of the atlas playing the same role.
+ *
+ * @param {any} projectObject
+ * @param {StarterThemeSlots} starterThemeSlots
  * @param {Theme} theme
+ * @param {ThemeApplicationOptions=} options
  * @returns {ThemeApplicationResult}
  */
-const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
+const applyThemeToStarter = (
+  projectObject,
+  starterThemeSlots,
+  theme,
+  options
+) => {
   /** @type {Array<any>} */
   const resources = (projectObject.resources || {}).resources || [];
   /** @type {Map<string, any>} */
@@ -332,10 +570,387 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
     return changed;
   };
 
+  const starterTileSize = starterThemeSlots.tileSize || 64;
+  /**
+   * The assets of a theme for a slot: usually one, or several when the theme
+   * has one for each size of tiles.
+   * @param {string} slotId
+   * @returns {Array<any>}
+   */
+  const getSlotCandidates = (slotId) => {
+    /** @type {any} */
+    const slot = theme.slots[slotId];
+    return slot ? [slot, ...(slot.variants || [])] : [];
+  };
+
   Object.entries(starterThemeSlots.objects || {}).forEach(
     ([objectPath, mapping]) => {
       const object = objectsByPath.get(objectPath);
-      if (!object || !object.content) return;
+      if (!object) return;
+      /** @type {any} */
+      const mappingObject = typeof mapping === 'string' ? {} : mapping;
+
+      if (object.type === 'Sprite') {
+        // Each animation of the sprite is played by a theme sprite: the same
+        // one for all of them, or one per animation (`animationSlots`, for a
+        // sprite showing different things, like the icons of an inventory).
+        /** @type {Array<any>} */
+        const objectAnimations = object.animations || [];
+        /** @type {Object.<string, string>} */
+        const slotIdByAnimation = mappingObject.animationSlots || {};
+        const mainSlotId =
+          typeof mapping === 'string' ? mapping : mappingObject.slot;
+        const usedSlotIds = [
+          ...new Set(
+            objectAnimations
+              .map(
+                (animation) => slotIdByAnimation[animation.name] || mainSlotId
+              )
+              .filter((slotId) => typeof slotId === 'string')
+          ),
+        ];
+        if (!usedSlotIds.length) return;
+
+        /** @param {string} imageName @returns {ImageBox | null} */
+        const getPlaceholderImage = (imageName) => {
+          const resource = resourceByName.get(imageName);
+          return resource && options && options.getStarterImageBox
+            ? options.getStarterImageBox(resource.file)
+            : null;
+        };
+        const anchor = mappingObject.anchor === 'bottom' ? 'bottom' : 'center';
+        const fit =
+          mappingObject.fit === 'width' || mappingObject.fit === 'height'
+            ? mappingObject.fit
+            : 'area';
+
+        // First find how each animation would be drawn, as the sprite has a
+        // single scale: the smallest one, so nothing grows out of its place.
+        /** @type {Array<{animation: any, slotId: string, slot: any, placeholderFrame: any, placeholderImage: ImageBox, themeAnimation: any} | null>} */
+        const themedAnimations = objectAnimations.map((animation) => {
+          const slotId = slotIdByAnimation[animation.name] || mainSlotId;
+          // A theme can have pixel art for the starters built on small tiles
+          // next to its other art.
+          const candidates =
+            typeof slotId === 'string' ? getSlotCandidates(slotId) : [];
+          const slot =
+            (starterTileSize !== 64
+              ? candidates.find((candidate) => !!candidate.tileSize)
+              : candidates.find((candidate) => !candidate.tileSize)) ||
+            candidates[0];
+          const placeholderFrame = getAnimationFirstFrame(animation);
+          const placeholderImage =
+            placeholderFrame && getPlaceholderImage(placeholderFrame.image);
+          if (!slot || slot.kind !== 'sprite' || !placeholderImage) return null;
+          // A starter built on smaller tiles is pixel art: only art drawn on
+          // a grid can be scaled to its pixels.
+          if (starterTileSize !== 64 && !slot.tileSize) return null;
+
+          /** @type {Array<any>} */
+          const themeAnimations = slot.objectContent.animations || [];
+          // The theme animation is the one the starter asks for by name
+          // (`animations`), or the one named like the animation of the
+          // starter, or the first one.
+          /** @type {Array<string>} */
+          const wantedNames = [
+            ...((mappingObject.animations || {})[animation.name] || []),
+            animation.name,
+          ];
+          const themeAnimation =
+            wantedNames
+              .map((wantedName) =>
+                themeAnimations.find(
+                  (themeAnimation) =>
+                    !!wantedName &&
+                    (themeAnimation.name || '').toLowerCase() ===
+                      wantedName.toLowerCase()
+                )
+              )
+              .find((themeAnimation) => !!themeAnimation) || themeAnimations[0];
+          if (!getAnimationFirstFrame(themeAnimation)) return null;
+          return {
+            animation,
+            slotId,
+            slot,
+            placeholderFrame,
+            placeholderImage,
+            themeAnimation,
+          };
+        });
+        if (themedAnimations.some((themedAnimation) => !themedAnimation)) {
+          usedSlotIds.forEach((slotId) => {
+            const slot = theme.slots[slotId];
+            if (!slot || slot.kind !== 'sprite') missingSlots.add(slotId);
+          });
+          if (!usedSlotIds.some((slotId) => missingSlots.has(slotId))) {
+            usedSlotIds.forEach((slotId) => missingSlots.add(slotId));
+          }
+          return;
+        }
+
+        /** @param {any} themedAnimation @param {number=} forcedScale */
+        const place = (themedAnimation, forcedScale) =>
+          placeThemeSprite(
+            themedAnimation.placeholderImage,
+            getAnimationFirstFrame(themedAnimation.themeAnimation),
+            anchor,
+            fit,
+            // Art drawn on a grid of tiles (pixel art) is scaled so its grid
+            // becomes the one of the starter: the same scale for the whole
+            // theme, whatever the size of each placeholder.
+            forcedScale ||
+              (themedAnimation.slot.tileSize
+                ? starterTileSize / themedAnimation.slot.tileSize
+                : undefined)
+          );
+        const placements = themedAnimations.map((themedAnimation) =>
+          place(themedAnimation)
+        );
+        if (placements.some((placement) => !placement)) {
+          usedSlotIds.forEach((slotId) => missingSlots.add(slotId));
+          return;
+        }
+        const scale = Math.min(
+          ...placements.map((placement) => (placement ? placement.scale : 1))
+        );
+
+        /** @type {Array<string>} */
+        const placeholderImageNames = objectAnimations.flatMap(
+          /** @param {any} animation */ (animation) =>
+            (animation.directions || []).flatMap(
+              /** @param {any} direction */ (direction) =>
+                (direction.sprites || []).map(
+                  /** @param {any} frame */ (frame) => frame.image
+                )
+            )
+        );
+        /** @param {any} slot @param {string} slotId */
+        const makeUseThemeImage =
+          (slot, slotId) =>
+          /** @param {string} imageName */
+          (imageName) => {
+            const themeResource = slot.resources.find(
+              /** @param {any} resource */ (resource) =>
+                resource.name === imageName
+            );
+            return themeResource
+              ? useThemeResource(
+                  '',
+                  slotId,
+                  {
+                    file: themeResource.file,
+                    resourceName: themeResource.name,
+                    origin: themeResource.origin,
+                  },
+                  themeResource
+                )
+              : null;
+          };
+
+        const animations = themedAnimations.map((themedAnimation) => {
+          // @ts-ignore - checked above: every animation is themed and placed.
+          const { animation, slot, slotId, themeAnimation } = themedAnimation;
+          return makeThemedAnimation(
+            themeAnimation,
+            animation.name,
+            // @ts-ignore
+            themedAnimation.placeholderFrame,
+            // @ts-ignore
+            themedAnimation.placeholderImage,
+            // @ts-ignore
+            place(themedAnimation, scale),
+            makeUseThemeImage(slot, slotId)
+          );
+        });
+        // A sprite played by a single theme sprite also gets the other
+        // animations of that sprite, ready to be used.
+        const firstThemed = themedAnimations[0];
+        if (usedSlotIds.length === 1 && firstThemed) {
+          const usedNames = new Set(
+            themedAnimations.map((themedAnimation) =>
+              themedAnimation
+                ? (themedAnimation.themeAnimation.name || '').toLowerCase()
+                : ''
+            )
+          );
+          (firstThemed.slot.objectContent.animations || []).forEach(
+            /** @param {any} themeAnimation */ (themeAnimation) => {
+              const name = themeAnimation.name || '';
+              const isUsed =
+                !name ||
+                usedNames.has(name.toLowerCase()) ||
+                objectAnimations.some(
+                  (animation) =>
+                    (animation.name || '').toLowerCase() === name.toLowerCase()
+                );
+              if (isUsed) return;
+              animations.push(
+                makeThemedAnimation(
+                  themeAnimation,
+                  name,
+                  firstThemed.placeholderFrame,
+                  firstThemed.placeholderImage,
+                  // @ts-ignore
+                  place(firstThemed, scale),
+                  makeUseThemeImage(firstThemed.slot, firstThemed.slotId)
+                )
+              );
+            }
+          );
+        }
+
+        object.animations = animations;
+        object.preScale = (object.preScale || 1) * scale;
+        placeholderImageNames.forEach((imageName) =>
+          replacedResourceNames.add(imageName)
+        );
+
+        // An instance with a custom size was sized for the placeholder image.
+        if (firstThemed) {
+          const widthRatio =
+            (firstThemed.slot.width * scale) /
+            firstThemed.placeholderImage.width;
+          const heightRatio =
+            (firstThemed.slot.height * scale) /
+            firstThemed.placeholderImage.height;
+          const themedOrigin = getAnimationFirstFrame(
+            animations[0]
+          ).originPoint;
+          getInstancesOfObject(projectObject, objectPath).forEach(
+            (instance) => {
+              if (!instance.customSize) return;
+              if (!firstThemed.slot.tileSize) {
+                instance.width *= widthRatio;
+                instance.height *= heightRatio;
+                return;
+              }
+
+              // Art drawn on a grid keeps the scale of its grid: the instance
+              // takes the size of the art, placed where the instance was.
+              const { placeholderFrame, placeholderImage } = firstThemed;
+              const left =
+                instance.x -
+                (placeholderFrame.originPoint.x * instance.width) /
+                  placeholderImage.width;
+              const top =
+                instance.y -
+                (placeholderFrame.originPoint.y * instance.height) /
+                  placeholderImage.height;
+              const width = firstThemed.slot.width * scale;
+              const height = firstThemed.slot.height * scale;
+              instance.x =
+                left + (instance.width - width) / 2 + themedOrigin.x * scale;
+              instance.y =
+                top +
+                (anchor === 'bottom'
+                  ? instance.height - height
+                  : (instance.height - height) / 2) +
+                themedOrigin.y * scale;
+              instance.customSize = false;
+            }
+          );
+          if (usedSlotIds.length === 1 && firstThemed.slot.assetStoreId) {
+            object.assetStoreId = firstThemed.slot.assetStoreId;
+          }
+        }
+        changedObjectsCount++;
+        return;
+      }
+
+      if (
+        object.type === 'TiledSpriteObject::TiledSprite' ||
+        object.type === 'PanelSpriteObject::PanelSprite'
+      ) {
+        if (typeof mapping !== 'string') return;
+        const content = object.content || object;
+        // An image is made for a size of tiles: 64 pixels unless it says so.
+        const slot = getSlotCandidates(mapping).find(
+          (candidate) =>
+            candidate.kind === 'texture' &&
+            (candidate.tileSize || 64) === starterTileSize
+        );
+        if (!slot || slot.kind !== 'texture') {
+          missingSlots.add(mapping);
+          return;
+        }
+        const textureResourceName = useThemeResource(
+          content.texture,
+          mapping,
+          slot
+        );
+        if (!textureResourceName) return;
+        content.texture = textureResourceName;
+        changedObjectsCount++;
+        return;
+      }
+
+      if (object.type === 'TileMap::SimpleTileMap') {
+        const slotId = mappingObject.slot;
+        if (typeof slotId !== 'string') return;
+        const content = object.content;
+        const slot = getSlotCandidates(slotId).find(
+          (candidate) =>
+            candidate.kind === 'tilemap' &&
+            candidate.tileSize === content.tileSize
+        );
+        /** @type {Object.<string, string>} */
+        const roleByTileId = mappingObject.tiles || {};
+        if (
+          !slot ||
+          slot.kind !== 'tilemap' ||
+          slot.tileSize !== content.tileSize ||
+          Object.values(roleByTileId).some(
+            (role) => slot.tiles[role] === undefined
+          )
+        ) {
+          missingSlots.add(slotId);
+          return;
+        }
+        const atlasResourceName = useThemeResource(
+          content.atlasImage,
+          slotId,
+          slot
+        );
+        if (!atlasResourceName) return;
+
+        /** @param {number} tileId */
+        const toThemeTileId = (tileId) => {
+          const role = roleByTileId[String(tileId)];
+          return role === undefined ? -1 : slot.tiles[role];
+        };
+        content.atlasImage = atlasResourceName;
+        content.columnCount = slot.columnCount;
+        content.rowCount = slot.rowCount;
+        content.tilesWithHitBox = String(content.tilesWithHitBox || '')
+          .split(',')
+          .filter((tileId) => tileId !== '')
+          .map((tileId) => toThemeTileId(Number(tileId)))
+          .filter((tileId) => tileId >= 0)
+          .join(',');
+        getInstancesOfObject(projectObject, objectPath).forEach((instance) =>
+          (instance.stringProperties || []).forEach(
+            /** @param {any} property */ (property) => {
+              if (property.name !== 'tilemap' || !property.value) return;
+              const tileMap = JSON.parse(property.value);
+              (tileMap.layers || []).forEach(
+                /** @param {any} layer */ (layer) => {
+                  layer.tiles = (layer.tiles || []).map(
+                    /** @param {Array<number>} row */ (row) =>
+                      row.map((tileId) =>
+                        tileId < 0 ? tileId : toThemeTileId(tileId)
+                      )
+                  );
+                }
+              );
+              property.value = JSON.stringify(tileMap);
+            }
+          )
+        );
+        changedObjectsCount++;
+        return;
+      }
+
+      if (!object.content) return;
       const objectContent = object.content;
 
       if (object.type === 'Scene3D::Model3DObject') {
@@ -378,7 +993,7 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
         let changed = false;
         Object.keys(cubeFaceProperties).forEach((face) => {
           const faceMapping =
-            typeof mapping === 'string' ? mapping : mapping[face];
+            typeof mapping === 'string' ? mapping : mappingObject[face];
           const slotId = typeof faceMapping === 'string' ? faceMapping : null;
           const faceProperty = cubeFaceProperties[face];
           const resourceName = objectContent[faceProperty];
@@ -403,7 +1018,7 @@ const applyThemeToStarter = (projectObject, starterThemeSlots, theme) => {
 
       if (
         typeof mapping !== 'string' &&
-        themeCustomObjectProperties(objectContent, mapping)
+        themeCustomObjectProperties(objectContent, mappingObject)
       ) {
         changedObjectsCount++;
       }

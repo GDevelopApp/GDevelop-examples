@@ -25,6 +25,7 @@ const {
   applyThemeToStarter,
   getThemedStarterFileName,
 } = require('./lib/StarterThemer');
+const { readPngBox } = require('./lib/PngBox');
 const { default: axios } = require('axios');
 
 /** @typedef {import('./lib/FileTreeParser.js').DreeWithMetadata} DreeWithMetadata */
@@ -748,13 +749,28 @@ const generateThemedStarters = async (
       const projectObject = JSON.parse(
         await fs.readFile(starterFilePath, 'utf8')
       );
-      const { changedObjectsCount, changedResourcesCount } =
-        applyThemeToStarter(
-          projectObject,
-          themeSlotsByStarterSlug[slug],
-          theme
-        );
+      const starterThemeSlots = themeSlotsByStarterSlug[slug];
+      const starterFolderPath = path.dirname(starterFilePath);
+      const { changedObjectsCount, changedResourcesCount, missingSlots } =
+        applyThemeToStarter(projectObject, starterThemeSlots, theme, {
+          getStarterImageBox: (resourceFile) => {
+            try {
+              return readPngBox(
+                fsSync.readFileSync(
+                  path.join(
+                    starterFolderPath,
+                    normalizePathSeparators(resourceFile)
+                  )
+                )
+              );
+            } catch (error) {
+              return null;
+            }
+          },
+        });
       if (!changedObjectsCount && !changedResourcesCount) continue;
+      // A 2D starter with only part of its art themed looks broken.
+      if (starterThemeSlots.requireAllSlots && missingSlots.length) continue;
 
       const themedStarterFilePath = path.join(
         path.dirname(starterFilePath),

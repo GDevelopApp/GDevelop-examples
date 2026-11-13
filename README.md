@@ -170,6 +170,52 @@ to end without merging anything:
 
 Staging holds the result of the last branch that was pushed, whoever pushed it.
 
+#### 2D starters
+
+A 2D starter can have a `theme-slots.json` too. It is optional, and maps only
+the art of the game: the interface (buttons, joysticks, texts) is left out.
+
+```json
+{
+  "version": 1,
+  "requireAllSlots": true,
+  "objects": {
+    "scene:Game Scene/Player": { "slot": "2d.side.player", "anchor": "bottom" },
+    "scene:Game Scene/Coins": "2d.side.coin",
+    "scene:Game Scene/Platform_Ground": "2d.side.ground",
+    "scene:Game Scene/Ground_Tilemap": {
+      "slot": "2d.overhead.tilemap",
+      "tiles": { "0": "ground", "1": "ground.detail1", "3": "area" }
+    }
+  }
+}
+```
+
+- A **sprite** maps to a sprite slot. The theme art is drawn where the
+  placeholder was (same origin, center and points, so events and instances are
+  untouched), covering the same area and never enlarged. `"anchor": "bottom"`
+  makes it stand on the bottom of the placeholder instead of being centered on
+  it, and `"fit": "width"` or `"height"` makes it take that dimension of the
+  placeholder.
+- A **tiled sprite** or a **panel sprite** maps to a texture slot.
+- A **tile map** maps to a tile map slot, with the role each of its tiles
+  plays: the theme gives its own atlas and the tile playing each role.
+- A sprite whose animations need precise art of the theme names the
+  animations of the theme each one can be played by, the first found being
+  used: `"animations": { "Walk0": ["Walk Right", "Right"] }`.
+- A sprite showing different things in its animations (the icons of an
+  inventory) maps each animation to its own slot instead of `slot`:
+  `"animationSlots": { "Rock": "2d.rpg.resource.rock", "Log": "2d.rpg.resource.log" }`.
+- `"tileSize"` (64 by default, next to `"version"`) is the size of the tiles
+  of the starter. Pixel art, drawn for smaller tiles, is scaled by a whole
+  number so its tiles become these.
+- Keep `requireAllSlots`: a theme then re-skins the starter only if it fills
+  every slot it maps, as 2D theme art next to placeholder art looks broken.
+
+The 2D slots are named after the point of view of the starters using them
+(`2d.side.*`, `2d.overhead.*`, `2d.driving.*`...), because 2D art only works
+from the point of view it was drawn for.
+
 ### Gameplay tests
 
 A game can contain _gameplay tests_: scripts that play the game like a player
