@@ -813,7 +813,7 @@ const generateThemedStarters = async (
       if (starterThemeSlots.requireAllSlots && missingSlots.length) continue;
 
       sizedModels.forEach((sizedModel) => {
-        if (sizedModel.fit === 'volume') {
+        if (!sizedModel.fit) {
           modelsSizedByVolumeCountByTheme.set(
             theme.id,
             (modelsSizedByVolumeCountByTheme.get(theme.id) || 0) + 1

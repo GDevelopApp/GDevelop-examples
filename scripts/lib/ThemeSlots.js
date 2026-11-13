@@ -15,8 +15,9 @@ const fs = require('fs').promises;
  *
  * How a theme model takes the place of a placeholder: with its height (a
  * character, a tree: a giant or a dwarf would break the game), its length (a
- * vehicle), or as large as it fits in the placeholder (a prop, a building).
- * @typedef {'height' | 'length' | 'contain'} ModelFit
+ * vehicle), its volume (a projectile, a ball in the place of a missile), or as
+ * large as it fits in the room of the placeholder object (a prop, a building).
+ * @typedef {'height' | 'length' | 'volume' | 'contain'} ModelFit
  */
 
 /**

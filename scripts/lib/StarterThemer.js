@@ -27,6 +27,7 @@
  *   kind: 'model' | 'texture',
  *   objectContent?: any,
  *   dimensions?: ModelDimensions,
+ *   scale?: number,
  *   assetStoreId?: string,
  * } | ThemeFile & {
  *   kind: 'material',
@@ -76,12 +77,15 @@
  * }} ThemeApplicationOptions
  *
  * How large a theme model is drawn compared to the placeholder it replaces,
- * for the checks of the build. `volume` is a model sized by the volume of the
- * placeholder object, for lack of the real dimensions of the model.
+ * for the checks of the build. `fit` is null for a model sized by the volume
+ * of the placeholder object, for lack of the real dimensions of the model.
+ * `scale` is the scale the theme deliberately gives its model on top of the
+ * fit (1 for most).
  * @typedef {{
  *   objectPath: string,
  *   slotId: string,
- *   fit: ModelFit | 'volume',
+ *   fit: ModelFit | null,
+ *   scale: number,
  *   placeholder: ModelDimensions,
  *   themed: ModelDimensions,
  * }} SizedModel
@@ -271,30 +275,37 @@ const getGroundSizes = ({ width, height }) => [
   Math.min(width, height),
 ];
 
+/** @param {ModelDimensions} dimensions */
+const getVolume = ({ width, height, depth }) => width * height * depth;
+
 /**
  * The scale giving a model the size its slot means, in the place of a
- * placeholder drawn at `placeholder`: its height for a character, its length
- * for a vehicle, or the largest size fitting in the placeholder for a prop.
- * Models of a theme don't all face the direction of the placeholder: a prop
- * is fit whichever way it faces, its longest size across the ground against
- * the longest one of the placeholder.
+ * placeholder drawn at `placeholder` in an object of size `room`: its height
+ * for a character, its length for a vehicle, its volume for a projectile, or
+ * the largest size fitting in the room of the object for a prop. Models of a
+ * theme don't all face the direction of the placeholder: a prop is fit
+ * whichever way it faces, its longest size across the ground against the
+ * longest one of the room.
  * @param {ModelFit} fit
  * @param {ModelDimensions} placeholder
+ * @param {ModelDimensions} room
  * @param {ModelDimensions} model
  * @returns {number | null} null if the model has no size to fit.
  */
-const getFitScale = (fit, placeholder, model) => {
-  const [placeholderLength, placeholderBreadth] = getGroundSizes(placeholder);
+const getFitScale = (fit, placeholder, room, model) => {
+  const [roomLength, roomBreadth] = getGroundSizes(room);
   const [modelLength, modelBreadth] = getGroundSizes(model);
   const scale =
     fit === 'height'
       ? placeholder.depth / model.depth
       : fit === 'length'
-      ? placeholderLength / modelLength
+      ? getGroundSizes(placeholder)[0] / modelLength
+      : fit === 'volume'
+      ? Math.cbrt(getVolume(placeholder) / getVolume(model))
       : getContainScale([
-          [placeholderLength, modelLength],
-          [placeholderBreadth, modelBreadth],
-          [placeholder.depth, model.depth],
+          [roomLength, modelLength],
+          [roomBreadth, modelBreadth],
+          [room.depth, model.depth],
         ]);
   return scale > 0 && Number.isFinite(scale) ? scale : null;
 };
@@ -596,7 +607,7 @@ const applyThemeToStarter = (
    * giving it the size its slot means where the placeholder copies were.
    * @param {string} objectPath
    * @param {string} slotId
-   * @param {{objectContent?: any, dimensions?: ModelDimensions}} slot
+   * @param {{objectContent?: any, dimensions?: ModelDimensions, scale?: number}} slot
    * @param {any} objectContent
    * @param {string} placeholderResourceName
    */
@@ -642,11 +653,17 @@ const applyThemeToStarter = (
       placeholderModel,
       placeholderCopyHeight / placeholderModel.depth
     );
-    const fitScale = getFitScale(fit, placeholder, slot.dimensions);
+    const fitScale = getFitScale(
+      fit,
+      placeholder,
+      placeholder,
+      slot.dimensions
+    );
     if (!fitScale) return;
-    const themed = scaleModelDimensions(slot.dimensions, fitScale);
+    const scale = slot.scale || 1;
+    const themed = scaleModelDimensions(slot.dimensions, fitScale * scale);
     objectContent.Size = String(Math.round(themed.depth * 100) / 100);
-    sizedModels.push({ objectPath, slotId, fit, placeholder, themed });
+    sizedModels.push({ objectPath, slotId, fit, scale, placeholder, themed });
   };
 
   /**
@@ -1222,22 +1239,25 @@ const applyThemeToStarter = (
             placeholderModel,
             !!objectContent.keepAspectRatio
           );
-        const placeholder = getDrawnPlaceholder({
+        const room = {
           width: objectContent.width || 0,
           height: objectContent.height || 0,
           depth: objectContent.depth || 0,
-        });
+        };
+        const placeholder = getDrawnPlaceholder(room);
         const modelDimensions = slot.dimensions;
+        const scale = slot.scale || 1;
         const fitScale =
           fit && modelDimensions
-            ? getFitScale(fit, placeholder, modelDimensions)
+            ? getFitScale(fit, placeholder, room, modelDimensions)
             : null;
-        const sizeRatio = getSizeRatio(objectContent, themeContent);
+        const sizeRatio = getSizeRatio(objectContent, themeContent) * scale;
         /** @type {SizedModel} */
         const sizedModel = {
           objectPath,
           slotId: mapping,
-          fit: 'volume',
+          fit: null,
+          scale,
           placeholder,
           themed: {
             width: (themeContent.width || 0) * sizeRatio,
@@ -1247,29 +1267,34 @@ const applyThemeToStarter = (
         };
         if (fit && modelDimensions && fitScale) {
           sizedModel.fit = fit;
-          sizedModel.themed = scaleModelDimensions(modelDimensions, fitScale);
+          sizedModel.themed = scaleModelDimensions(
+            modelDimensions,
+            fitScale * scale
+          );
 
           // An instance given its own size is the placeholder at another
           // size: the theme model takes the size its slot means there too.
           getInstancesOfObject(projectObject, objectPath).forEach(
             (instance) => {
               if (!instance.customSize) return;
+              const instanceRoom = {
+                width: instance.width,
+                height: instance.height,
+                depth:
+                  instance.depth === undefined
+                    ? objectContent.depth || 0
+                    : instance.depth,
+              };
               const instanceFitScale = getFitScale(
                 fit,
-                getDrawnPlaceholder({
-                  width: instance.width,
-                  height: instance.height,
-                  depth:
-                    instance.depth === undefined
-                      ? objectContent.depth || 0
-                      : instance.depth,
-                }),
+                getDrawnPlaceholder(instanceRoom),
+                instanceRoom,
                 modelDimensions
               );
               if (!instanceFitScale) return;
               const instanceSize = scaleModelDimensions(
                 modelDimensions,
-                instanceFitScale
+                instanceFitScale * scale
               );
               instance.width = instanceSize.width;
               instance.height = instanceSize.height;

@@ -155,30 +155,46 @@ it with `fit`:
   grass), so a player is never a giant or a dwarf next to the level;
 - `length`: the model is as long as the placeholder (vehicles), so a truck
   fills the lane of a car;
-- `contain`: the model is as large as it fits in the place of the placeholder
-  (props, buildings, rocks, projectiles...), so it never overlaps what stands
-  next to it. Models don't all face the same direction: a prop is fit
-  whichever way it faces.
+- `volume`: the model takes the volume of the placeholder (projectiles, rocks),
+  for objects whose shape varies a lot: a ball in the place of a missile, a
+  boulder in the place of a flat rock;
+- `contain`: the model is as large as it fits in the *room* of the object
+  (props, buildings...), so it never overlaps what stands next to it. Models
+  don't all face the same direction: a prop is fit whichever way it faces.
 
 This uses the real dimensions of the theme model, published with the themes,
 and the size of the placeholder model (its `.glb`) as drawn in its object. The
 same goes for an instance given its own size, and for the copies of scattered
 models (their "Height of a copy" changes for a model not sized by its height).
 
-A model of another shape than its placeholder (a traffic cone in the place of a
-long barrier) ends up much smaller, and the build reports it, along with a
-vehicle much broader than its placeholder (and the themes giving no real
-dimensions, whose models are sized by volume):
+The room of an object is its size (width, height and depth). A model keeping
+its proportions is drawn as large as it fits in it, and its object takes that
+size in the game, so the room can be larger than the placeholder on an axis it
+does not fill, without changing the starter. Give the room a theme model may
+need: the market of the RTS is flat, but a house can stand where it is, so its
+object is as deep as it is wide; the gun of the FPS is thin, but a blaster is
+not.
+
+Slots are split by shape when objects of one role differ too much: a
+`prop.obstacle` (a cone) and a `prop.barrier` (a long barrier), a
+`building.house` and a `building.tower`. Their descriptions say the shape a
+theme should give them.
+
+A model of another shape than its placeholder (a squarish house on a long
+lot) ends up much smaller, and the build reports it, along with a vehicle much
+broader than its placeholder (and the themes giving no real dimensions, whose
+models are sized by the volume of the placeholder object):
 
 ```
-⚠️ starting-expanded-first-person-shooter-enemies: scene:Game Scene/Barrier
-(prop.obstacle, sized by contain) is drawn at a size far from its placeholder
-with 24 themes: battle-royale (50% of the largest dimension of the placeholder), ...
+⚠️ starting-expanded-3d-grand-theft-auto: scene:Game Scene/Building_K
+(building.house, sized by contain) is drawn at a size far from its placeholder
+with 26 themes: battle-royale (60% of the largest dimension of the placeholder), ...
 ```
 
-It is not an error, but it says that the placeholder or the slot is to fix:
-a starter whose placeholder has an unusual shape for its slot, or a slot
-grouping objects of too different shapes, to split.
+It is not an error, but it says what is to fix: a placeholder with too little
+room, a slot grouping objects of too different shapes, or a theme model of the
+wrong shape. A theme can also give a model a `scale` (0.5 to 2, see the assets
+repository) to draw it larger or smaller on purpose: that is not reported.
 
 The copies are rebuilt on every deploy of this repository, and every night by
 the `nightly-rebuild` workflow of the CircleCI configuration, which is how they

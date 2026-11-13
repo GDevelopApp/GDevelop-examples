@@ -768,9 +768,10 @@ describe('applyThemeToStarter sizing models by the meaning of their slot', () =>
    * @param {string} slotId
    * @param {ModelDimensions=} dimensions
    * @param {number=} rotationX
+   * @param {number=} scale
    * @returns {Theme}
    */
-  const makeSizedTheme = (slotId, dimensions, rotationX = 90) => {
+  const makeSizedTheme = (slotId, dimensions, rotationX = 90, scale) => {
     const side = dimensions
       ? Math.max(dimensions.width, dimensions.height, dimensions.depth)
       : 100;
@@ -784,6 +785,7 @@ describe('applyThemeToStarter sizing models by the meaning of their slot', () =>
           file: 'https://asset-resources.gdevelop.io/public-resources/Theme.glb',
           resourceName: 'Theme.glb',
           dimensions,
+          ...(scale ? { scale } : {}),
           objectContent: {
             modelResourceName: 'Theme.glb',
             width: side,
@@ -920,10 +922,74 @@ describe('applyThemeToStarter sizing models by the meaning of their slot', () =>
         objectPath: 'scene:Game Scene/Thing',
         slotId: 'prop.obstacle',
         fit: 'contain',
+        scale: 1,
         placeholder: { width: 200, height: 40, depth: 60 },
         themed: { width: 30, height: 30, depth: 60 },
       },
     ]);
+  });
+
+  it('fits a prop in the room of the object, larger than its placeholder', () => {
+    // A thin bag drawn 20 wide in an object of 50 by 50: a crate takes the
+    // room of the object.
+    const projectContent = makeSizedProject({
+      box: { width: 50, height: 50, depth: 50 },
+    });
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('prop.container', { width: 10, height: 10, depth: 10 }),
+      'contain',
+      { x: 2, y: 5, z: 4 }
+    );
+
+    expectDimensions(projectContent.layouts[0].objects[0].content, {
+      width: 50,
+      height: 50,
+      depth: 50,
+    });
+  });
+
+  it('gives a projectile the volume of the placeholder', () => {
+    // A missile 80 long and 10 thick, and a ball.
+    const projectContent = makeSizedProject({
+      box: { width: 80, height: 10, depth: 10 },
+    });
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('projectile.player', { width: 1, height: 1, depth: 1 }),
+      'volume',
+      { x: 8, y: 1, z: 1 }
+    );
+
+    expectDimensions(projectContent.layouts[0].objects[0].content, {
+      width: 20,
+      height: 20,
+      depth: 20,
+    });
+  });
+
+  it('draws a model at the scale its theme deliberately gives it', () => {
+    const projectContent = makeSizedProject({
+      box: { width: 30, height: 30, depth: 60 },
+    });
+    const theme = makeSizedTheme(
+      'character.monster',
+      { width: 30, height: 30, depth: 150 },
+      90,
+      1.5
+    );
+    const { sizedModels } = applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      theme,
+      'height',
+      { x: 1, y: 2, z: 1 }
+    );
+
+    expect(projectContent.layouts[0].objects[0].content.depth).toBeCloseTo(90);
+    expect(sizedModels.map(({ scale }) => scale)).toEqual([1.5]);
   });
 
   it('measures the placeholder as drawn in its box, keeping its proportions', () => {
@@ -987,7 +1053,7 @@ describe('applyThemeToStarter sizing models by the meaning of their slot', () =>
       height: 100,
       depth: 100,
     });
-    expect(sizedModels.map(({ fit }) => fit)).toEqual(['volume']);
+    expect(sizedModels.map(({ fit }) => fit)).toEqual([null]);
   });
 
   /**
