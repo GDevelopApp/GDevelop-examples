@@ -836,17 +836,27 @@ const applyThemeToStarter = (
                 instance.y -
                 (placeholderFrame.originPoint.y * instance.height) /
                   placeholderImage.height;
-              const width = firstThemed.slot.width * scale;
-              const height = firstThemed.slot.height * scale;
+              // Art wider than the instance is drawn at half the scale, so
+              // that it does not cover what is next to the instance.
+              const isHalved =
+                scale % 2 === 0 &&
+                firstThemed.slot.width * scale > instance.width;
+              const instanceScale = isHalved ? scale / 2 : scale;
+              const width = firstThemed.slot.width * instanceScale;
+              const height = firstThemed.slot.height * instanceScale;
               instance.x =
-                left + (instance.width - width) / 2 + themedOrigin.x * scale;
+                left +
+                (instance.width - width) / 2 +
+                themedOrigin.x * instanceScale;
               instance.y =
                 top +
                 (anchor === 'bottom'
                   ? instance.height - height
                   : (instance.height - height) / 2) +
-                themedOrigin.y * scale;
-              instance.customSize = false;
+                themedOrigin.y * instanceScale;
+              instance.customSize = isHalved;
+              instance.width = width;
+              instance.height = height;
             }
           );
           if (usedSlotIds.length === 1 && firstThemed.slot.assetStoreId) {
