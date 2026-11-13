@@ -722,6 +722,352 @@ describe('applyThemeToStarter on custom objects', () => {
   });
 });
 
+describe('applyThemeToStarter sizing models by the meaning of their slot', () => {
+  /** @typedef {import('../StarterThemer.js').ModelDimensions} ModelDimensions */
+  /** @typedef {import('../GlbBox.js').GlbSize} GlbSize */
+  /** @typedef {import('../ThemeSlots.js').ModelFit} ModelFit */
+
+  /**
+   * A starter whose object `Thing` draws a placeholder model, standing on Y
+   * in its file, in a box keeping its proportions.
+   * @param {{box: ModelDimensions, instances?: Array<any>}} options
+   * @returns {any}
+   */
+  const makeSizedProject = ({ box, instances }) => ({
+    resources: {
+      resources: [
+        {
+          name: 'Placeholder.glb',
+          file: 'assets/Placeholder.glb',
+          kind: 'model3D',
+        },
+      ],
+    },
+    layouts: [
+      {
+        name: 'Game Scene',
+        layers: [],
+        objects: [
+          {
+            name: 'Thing',
+            type: 'Scene3D::Model3DObject',
+            content: {
+              ...makeModelContent('Placeholder.glb'),
+              ...box,
+              rotationX: 90,
+              keepAspectRatio: true,
+            },
+          },
+        ],
+        instances: instances || [],
+      },
+    ],
+  });
+
+  /**
+   * @param {string} slotId
+   * @param {ModelDimensions=} dimensions
+   * @param {number=} rotationX
+   * @returns {Theme}
+   */
+  const makeSizedTheme = (slotId, dimensions, rotationX = 90) => {
+    const side = dimensions
+      ? Math.max(dimensions.width, dimensions.height, dimensions.depth)
+      : 100;
+    return {
+      id: 'city',
+      name: 'City',
+      description: 'A city.',
+      slots: {
+        [slotId]: {
+          kind: 'model',
+          file: 'https://asset-resources.gdevelop.io/public-resources/Theme.glb',
+          resourceName: 'Theme.glb',
+          dimensions,
+          objectContent: {
+            modelResourceName: 'Theme.glb',
+            width: side,
+            height: side,
+            depth: side,
+            rotationX,
+            keepAspectRatio: true,
+          },
+        },
+      },
+    };
+  };
+
+  /**
+   * @param {any} projectContent
+   * @param {string} objectPath
+   * @param {Theme} theme
+   * @param {ModelFit} fit
+   * @param {GlbSize} placeholderSize
+   */
+  const applySizedTheme = (
+    projectContent,
+    objectPath,
+    theme,
+    fit,
+    placeholderSize
+  ) => {
+    const [slotId] = Object.keys(theme.slots);
+    const slot = theme.slots[slotId];
+    const isScattered = objectPath.endsWith('Copies');
+    return applyThemeToStarter(
+      projectContent,
+      {
+        version: 1,
+        objects: { [objectPath]: isScattered ? { Model: slotId } : slotId },
+      },
+      theme,
+      {
+        modelFitBySlot: { [slotId]: fit },
+        getStarterModelSize: (resourceFile) =>
+          resourceFile === 'assets/Placeholder.glb' ? placeholderSize : null,
+      }
+    );
+  };
+
+  /**
+   * @param {any} object An object content or an instance.
+   * @param {ModelDimensions} dimensions
+   */
+  const expectDimensions = (object, { width, height, depth }) => {
+    expect(object.width).toBeCloseTo(width);
+    expect(object.height).toBeCloseTo(height);
+    expect(object.depth).toBeCloseTo(depth);
+  };
+
+  it('gives a character the height of the placeholder', () => {
+    // A capsule 30 wide and 60 tall, and a character in its bind pose, arms
+    // spread along Y.
+    const projectContent = makeSizedProject({
+      box: { width: 30, height: 30, depth: 60 },
+    });
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('character.player', {
+        width: 29,
+        height: 156,
+        depth: 145,
+      }),
+      'height',
+      { x: 2, y: 4, z: 2 }
+    );
+
+    expectDimensions(projectContent.layouts[0].objects[0].content, {
+      width: (29 * 60) / 145,
+      height: (156 * 60) / 145,
+      depth: 60,
+    });
+  });
+
+  it('gives a vehicle the length of the placeholder, whichever way it faces', () => {
+    const projectContent = makeSizedProject({
+      box: { width: 200, height: 100, depth: 50 },
+    });
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('vehicle.car', { width: 50, height: 100, depth: 60 }),
+      'length',
+      { x: 4, y: 1, z: 2 }
+    );
+
+    expectDimensions(projectContent.layouts[0].objects[0].content, {
+      width: 100,
+      height: 200,
+      depth: 120,
+    });
+  });
+
+  it('fits a prop in the place of the placeholder, whichever way it faces', () => {
+    // A barrier 200 long, 40 thick and 60 tall.
+    const projectContent = makeSizedProject({
+      box: { width: 200, height: 40, depth: 60 },
+    });
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('prop.obstacle', { width: 20, height: 100, depth: 30 }),
+      'contain',
+      { x: 10, y: 3, z: 2 }
+    );
+
+    expectDimensions(projectContent.layouts[0].objects[0].content, {
+      width: 40,
+      height: 200,
+      depth: 60,
+    });
+  });
+
+  it('keeps a prop of another shape within the size of the placeholder', () => {
+    const projectContent = makeSizedProject({
+      box: { width: 200, height: 40, depth: 60 },
+    });
+    const { sizedModels } = applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('prop.obstacle', { width: 20, height: 20, depth: 40 }),
+      'contain',
+      { x: 10, y: 3, z: 2 }
+    );
+
+    expect(sizedModels).toEqual([
+      {
+        objectPath: 'scene:Game Scene/Thing',
+        slotId: 'prop.obstacle',
+        fit: 'contain',
+        placeholder: { width: 200, height: 40, depth: 60 },
+        themed: { width: 30, height: 30, depth: 60 },
+      },
+    ]);
+  });
+
+  it('measures the placeholder as drawn in its box, keeping its proportions', () => {
+    // The box is a cube, but the placeholder model is twice as tall as wide.
+    const projectContent = makeSizedProject({
+      box: { width: 100, height: 100, depth: 100 },
+    });
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('character.player', { width: 30, height: 30, depth: 150 }),
+      'height',
+      { x: 1, y: 2, z: 1 }
+    );
+
+    expect(projectContent.layouts[0].objects[0].content.depth).toBeCloseTo(100);
+  });
+
+  it('gives an instance with its own size the size its slot means there', () => {
+    const projectContent = makeSizedProject({
+      box: { width: 100, height: 100, depth: 100 },
+      instances: [
+        { name: 'Thing', customSize: true, width: 25, height: 25 },
+        { name: 'Thing', customSize: false, width: 0, height: 0 },
+      ],
+    });
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('character.enemy', { width: 30, height: 90, depth: 150 }),
+      'height',
+      { x: 1, y: 2, z: 1 }
+    );
+
+    const [resizedInstance, instance] = projectContent.layouts[0].instances;
+    // The placeholder is drawn 25 wide and 50 tall in the box of the
+    // instance (25 by 25, as tall as the object).
+    expectDimensions(resizedInstance, { width: 10, height: 30, depth: 50 });
+    expect(instance).toEqual({
+      name: 'Thing',
+      customSize: false,
+      width: 0,
+      height: 0,
+    });
+  });
+
+  it('sizes a model by the volume of the placeholder without its real dimensions', () => {
+    const projectContent = makeSizedProject({
+      box: { width: 100, height: 100, depth: 100 },
+    });
+    const { sizedModels } = applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('prop.obstacle'),
+      'contain',
+      { x: 1, y: 1, z: 1 }
+    );
+
+    expectDimensions(projectContent.layouts[0].objects[0].content, {
+      width: 100,
+      height: 100,
+      depth: 100,
+    });
+    expect(sizedModels.map(({ fit }) => fit)).toEqual(['volume']);
+  });
+
+  /**
+   * @param {number} size
+   * @returns {any}
+   */
+  const makeScatteredProject = (size) => ({
+    resources: {
+      resources: [
+        {
+          name: 'Placeholder.glb',
+          file: 'assets/Placeholder.glb',
+          kind: 'model3D',
+        },
+      ],
+    },
+    layouts: [
+      {
+        name: 'Game Scene',
+        layers: [],
+        objects: [
+          {
+            name: 'Copies',
+            type: 'Terrain3D::ScatteredModels',
+            content: { Model: 'Placeholder.glb', Size: String(size) },
+          },
+        ],
+      },
+    ],
+  });
+
+  it('gives scattered copies of a prop the height fitting it where the placeholder copies were', () => {
+    // Placeholder rocks 50 tall, 200 by 100 across the ground; theme rocks 50
+    // tall, 400 by 200 across.
+    const projectContent = makeScatteredProject(50);
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Copies',
+      makeSizedTheme('nature.rock.big', { width: 400, height: 200, depth: 50 }),
+      'contain',
+      { x: 4, y: 1, z: 2 }
+    );
+
+    expect(projectContent.layouts[0].objects[0].content).toEqual({
+      Model: 'Theme.glb',
+      Size: '25',
+    });
+  });
+
+  it('keeps the height of scattered trees', () => {
+    const projectContent = makeScatteredProject(300);
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Copies',
+      makeSizedTheme('nature.tree', { width: 100, height: 100, depth: 50 }),
+      'height',
+      { x: 1, y: 3, z: 1 }
+    );
+
+    expect(projectContent.layouts[0].objects[0].content.Size).toBe('300');
+  });
+
+  it('stands up the scattered copies of a model standing on Z in its file', () => {
+    const projectContent = makeScatteredProject(300);
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Copies',
+      makeSizedTheme('nature.tree', { width: 100, height: 100, depth: 300 }, 0),
+      'height',
+      { x: 1, y: 3, z: 1 }
+    );
+
+    expect(projectContent.layouts[0].objects[0].content).toEqual({
+      Model: 'Theme.glb',
+      Size: '300',
+      ModelUpAxis: 'Z',
+    });
+  });
+});
+
 describe('applyThemeToStarter on a 2D starter', () => {
   const makeProject = () => ({
     resources: {

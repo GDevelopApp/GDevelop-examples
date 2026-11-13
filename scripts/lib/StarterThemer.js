@@ -1,11 +1,20 @@
 // @ts-check
 
 /** @typedef {import('./ThemeSlots.js').StarterThemeSlots} StarterThemeSlots */
+/** @typedef {import('./ThemeSlots.js').ModelFit} ModelFit */
+/** @typedef {import('./GlbBox.js').GlbSize} GlbSize */
+
+/**
+ * The size of a 3D model in a scene: `width` along X, `height` along Y and
+ * `depth` along Z, the up axis.
+ * @typedef {{width: number, height: number, depth: number}} ModelDimensions
+ */
 
 /**
  * A theme, as published by the assets repository: for each slot, the file to
- * use and, for a 3D model, the serialized content of the asset's object. A
- * skybox slot has one file per face instead.
+ * use and, for a 3D model, the serialized content of the asset's object and
+ * the real dimensions of the model (its object is sized as a cube). A skybox
+ * slot has one file per face instead.
  * @typedef {{
  *   file: string,
  *   resourceName: string,
@@ -17,6 +26,7 @@
  * @typedef {ThemeFile & {
  *   kind: 'model' | 'texture',
  *   objectContent?: any,
+ *   dimensions?: ModelDimensions,
  *   assetStoreId?: string,
  * } | ThemeFile & {
  *   kind: 'material',
@@ -55,15 +65,33 @@
  * theme's art where the placeholder art was.
  * @typedef {import('./PngBox.js').ImageBox} ImageBox
  *
+ * `modelFitBySlot` says how a model slot sizes its model (see `ModelFit`), and
+ * `getStarterModelSize` gives the size of a placeholder model, to know how
+ * large it is drawn. Without them, a theme model takes the volume of the
+ * placeholder object.
  * @typedef {{
  *   getStarterImageBox?: (resourceFile: string) => ImageBox | null,
+ *   getStarterModelSize?: (resourceFile: string) => GlbSize | null,
+ *   modelFitBySlot?: Object.<string, ModelFit>,
  * }} ThemeApplicationOptions
+ *
+ * How large a theme model is drawn compared to the placeholder it replaces,
+ * for the checks of the build. `volume` is a model sized by the volume of the
+ * placeholder object, for lack of the real dimensions of the model.
+ * @typedef {{
+ *   objectPath: string,
+ *   slotId: string,
+ *   fit: ModelFit | 'volume',
+ *   placeholder: ModelDimensions,
+ *   themed: ModelDimensions,
+ * }} SizedModel
  *
  * @typedef {{
  *   appliedSlots: Array<string>,
  *   missingSlots: Array<string>,
  *   changedObjectsCount: number,
  *   changedResourcesCount: number,
+ *   sizedModels: Array<SizedModel>,
  * }} ThemeApplicationResult
  */
 
@@ -177,6 +205,119 @@ const getSizeRatio = (objectContent, themeContent) => {
     (themeContent.depth || 0);
   if (objectVolume <= 0 || themeVolume <= 0) return 1;
   return Math.pow(objectVolume / themeVolume, 1 / 3);
+};
+
+/**
+ * The size of a model rotated like a 3D model object rotates it: in degrees,
+ * around the X axis of the scene, then its Y axis, then its Z axis.
+ * @param {GlbSize} size
+ * @param {number} rotationX
+ * @param {number} rotationY
+ * @param {number} rotationZ
+ * @returns {ModelDimensions}
+ */
+const getRotatedModelDimensions = (size, rotationX, rotationY, rotationZ) => {
+  const [cx, sx, cy, sy, cz, sz] = [rotationX, rotationY, rotationZ].flatMap(
+    (angle) => [
+      Math.cos((angle * Math.PI) / 180),
+      Math.sin((angle * Math.PI) / 180),
+    ]
+  );
+  const rotation = [
+    [cy * cz, sx * sy * cz - cx * sz, cx * sy * cz + sx * sz],
+    [cy * sz, sx * sy * sz + cx * cz, cx * sy * sz - sx * cz],
+    [-sy, sx * cy, cx * cy],
+  ];
+  const [width, height, depth] = rotation.map(
+    ([fromX, fromY, fromZ]) =>
+      Math.abs(fromX) * size.x +
+      Math.abs(fromY) * size.y +
+      Math.abs(fromZ) * size.z
+  );
+  return { width, height, depth };
+};
+
+/**
+ * @param {ModelDimensions} dimensions
+ * @param {number} scale
+ * @returns {ModelDimensions}
+ */
+const scaleModelDimensions = ({ width, height, depth }, scale) => ({
+  width: width * scale,
+  height: height * scale,
+  depth: depth * scale,
+});
+
+/**
+ * The largest scale fitting a model in a box, each size of the model facing
+ * the size of the box given with it.
+ * @param {Array<[number, number]>} boxAndModelSizes
+ * @returns {number}
+ */
+const getContainScale = (boxAndModelSizes) =>
+  Math.min(
+    ...boxAndModelSizes
+      .filter(([, modelSize]) => modelSize > 0)
+      .map(([boxSize, modelSize]) => boxSize / modelSize)
+  );
+
+/**
+ * The longest then the shortest of the sizes of a model across the ground.
+ * @param {ModelDimensions} dimensions
+ * @returns {[number, number]}
+ */
+const getGroundSizes = ({ width, height }) => [
+  Math.max(width, height),
+  Math.min(width, height),
+];
+
+/**
+ * The scale giving a model the size its slot means, in the place of a
+ * placeholder drawn at `placeholder`: its height for a character, its length
+ * for a vehicle, or the largest size fitting in the placeholder for a prop.
+ * Models of a theme don't all face the direction of the placeholder: a prop
+ * is fit whichever way it faces, its longest size across the ground against
+ * the longest one of the placeholder.
+ * @param {ModelFit} fit
+ * @param {ModelDimensions} placeholder
+ * @param {ModelDimensions} model
+ * @returns {number | null} null if the model has no size to fit.
+ */
+const getFitScale = (fit, placeholder, model) => {
+  const [placeholderLength, placeholderBreadth] = getGroundSizes(placeholder);
+  const [modelLength, modelBreadth] = getGroundSizes(model);
+  const scale =
+    fit === 'height'
+      ? placeholder.depth / model.depth
+      : fit === 'length'
+      ? placeholderLength / modelLength
+      : getContainScale([
+          [placeholderLength, modelLength],
+          [placeholderBreadth, modelBreadth],
+          [placeholder.depth, model.depth],
+        ]);
+  return scale > 0 && Number.isFinite(scale) ? scale : null;
+};
+
+/**
+ * The size a 3D model object draws its model at in a box: stretched to the
+ * box, or as large as it fits in it when the object keeps the proportions of
+ * the model.
+ * @param {ModelDimensions} box
+ * @param {ModelDimensions | null} modelDimensions
+ * @param {boolean} keepAspectRatio
+ * @returns {ModelDimensions}
+ */
+const getDrawnModelDimensions = (box, modelDimensions, keepAspectRatio) => {
+  if (!keepAspectRatio || !modelDimensions) return box;
+  const scale = getContainScale([
+    [box.width, modelDimensions.width],
+    [box.height, modelDimensions.height],
+    [box.depth, modelDimensions.depth],
+  ]);
+  return scale > 0 && Number.isFinite(scale)
+    ? scaleModelDimensions(modelDimensions, scale)
+    : box;
 };
 
 /**
@@ -433,6 +574,80 @@ const applyThemeToStarter = (
   /** @type {Set<string>} */
   const replacedResourceNames = new Set();
   let changedObjectsCount = 0;
+  /** @type {Array<SizedModel>} */
+  const sizedModels = [];
+
+  /** @param {string} slotId @returns {ModelFit | null} */
+  const getModelFit = (slotId) =>
+    (options && options.modelFitBySlot && options.modelFitBySlot[slotId]) ||
+    null;
+
+  /** @param {string} resourceName @returns {GlbSize | null} */
+  const getStarterModelSize = (resourceName) => {
+    const resource = resourceByName.get(resourceName);
+    return resource && options && options.getStarterModelSize
+      ? options.getStarterModelSize(resource.file)
+      : null;
+  };
+
+  /**
+   * Copies of a scattered model are given a height ("Size", when not sized by
+   * a scale factor): for a model fit otherwise than by its height, the height
+   * giving it the size its slot means where the placeholder copies were.
+   * @param {string} objectPath
+   * @param {string} slotId
+   * @param {{objectContent?: any, dimensions?: ModelDimensions}} slot
+   * @param {any} objectContent
+   * @param {string} placeholderResourceName
+   */
+  const fitScatteredCopies = (
+    objectPath,
+    slotId,
+    slot,
+    objectContent,
+    placeholderResourceName
+  ) => {
+    const themeModelUpAxis =
+      slot.objectContent && slot.objectContent.rotationX === 0 ? 'Z' : 'Y';
+    const placeholderUpAxis = objectContent.ModelUpAxis || 'Y';
+    if (themeModelUpAxis !== placeholderUpAxis) {
+      objectContent.ModelUpAxis = themeModelUpAxis;
+    }
+
+    const placeholderCopyHeight = Number(objectContent.Size) || 0;
+    const fit = getModelFit(slotId);
+    const placeholderSize = getStarterModelSize(placeholderResourceName);
+    if (
+      !placeholderCopyHeight ||
+      !fit ||
+      !slot.dimensions ||
+      !placeholderSize
+    ) {
+      return;
+    }
+    const placeholderModel =
+      placeholderUpAxis === 'Z'
+        ? {
+            width: placeholderSize.x,
+            height: placeholderSize.y,
+            depth: placeholderSize.z,
+          }
+        : {
+            width: placeholderSize.x,
+            height: placeholderSize.z,
+            depth: placeholderSize.y,
+          };
+    if (!(placeholderModel.depth > 0)) return;
+    const placeholder = scaleModelDimensions(
+      placeholderModel,
+      placeholderCopyHeight / placeholderModel.depth
+    );
+    const fitScale = getFitScale(fit, placeholder, slot.dimensions);
+    if (!fitScale) return;
+    const themed = scaleModelDimensions(slot.dimensions, fitScale);
+    objectContent.Size = String(Math.round(themed.depth * 100) / 100);
+    sizedModels.push({ objectPath, slotId, fit, placeholder, themed });
+  };
 
   /**
    * Add a file of a slot to the project as a resource configured like the
@@ -491,11 +706,13 @@ const applyThemeToStarter = (
    * texture of a texture or material slot, along with the normal map of the
    * material if the starter maps one; a 3D model resource takes the model of
    * a model slot; a color takes the color of a color slot.
-   * @param {any} objectContent
+   * @param {string} objectPath
+   * @param {any} object
    * @param {Object.<string, string | import('./ThemeSlots.js').MaterialMapping>} mapping
    * @returns {boolean} Whether a property changed.
    */
-  const themeCustomObjectProperties = (objectContent, mapping) => {
+  const themeCustomObjectProperties = (objectPath, object, mapping) => {
+    const objectContent = object.content;
     let changed = false;
     Object.entries(mapping).forEach(([property, propertyMapping]) => {
       const slotId =
@@ -518,16 +735,24 @@ const applyThemeToStarter = (
         slot.kind === 'model' &&
         typeof propertyMapping === 'string'
       ) {
-        // The custom object keeps its own settings for the model (like the
-        // size of scattered copies): only the model changes.
+        const placeholderResourceName = String(objectContent[property] || '');
         const themeModelResourceName = useThemeResource(
-          String(objectContent[property] || ''),
+          placeholderResourceName,
           slotId,
           slot,
           { kind: 'model3D', metadata: '', userAdded: false }
         );
         if (!themeModelResourceName) return;
         objectContent[property] = themeModelResourceName;
+        if (object.type === 'Terrain3D::ScatteredModels') {
+          fitScatteredCopies(
+            objectPath,
+            slotId,
+            slot,
+            objectContent,
+            placeholderResourceName
+          );
+        }
         changed = true;
         return;
       }
@@ -978,7 +1203,83 @@ const applyThemeToStarter = (
         if (!modelResourceName) return;
 
         const themeContent = slot.objectContent;
+        const fit = getModelFit(mapping);
+        const placeholderSize = getStarterModelSize(
+          objectContent.modelResourceName
+        );
+        const placeholderModel = placeholderSize
+          ? getRotatedModelDimensions(
+              placeholderSize,
+              objectContent.rotationX || 0,
+              objectContent.rotationY || 0,
+              objectContent.rotationZ || 0
+            )
+          : null;
+        /** @param {ModelDimensions} box @returns {ModelDimensions} */
+        const getDrawnPlaceholder = (box) =>
+          getDrawnModelDimensions(
+            box,
+            placeholderModel,
+            !!objectContent.keepAspectRatio
+          );
+        const placeholder = getDrawnPlaceholder({
+          width: objectContent.width || 0,
+          height: objectContent.height || 0,
+          depth: objectContent.depth || 0,
+        });
+        const modelDimensions = slot.dimensions;
+        const fitScale =
+          fit && modelDimensions
+            ? getFitScale(fit, placeholder, modelDimensions)
+            : null;
         const sizeRatio = getSizeRatio(objectContent, themeContent);
+        /** @type {SizedModel} */
+        const sizedModel = {
+          objectPath,
+          slotId: mapping,
+          fit: 'volume',
+          placeholder,
+          themed: {
+            width: (themeContent.width || 0) * sizeRatio,
+            height: (themeContent.height || 0) * sizeRatio,
+            depth: (themeContent.depth || 0) * sizeRatio,
+          },
+        };
+        if (fit && modelDimensions && fitScale) {
+          sizedModel.fit = fit;
+          sizedModel.themed = scaleModelDimensions(modelDimensions, fitScale);
+
+          // An instance given its own size is the placeholder at another
+          // size: the theme model takes the size its slot means there too.
+          getInstancesOfObject(projectObject, objectPath).forEach(
+            (instance) => {
+              if (!instance.customSize) return;
+              const instanceFitScale = getFitScale(
+                fit,
+                getDrawnPlaceholder({
+                  width: instance.width,
+                  height: instance.height,
+                  depth:
+                    instance.depth === undefined
+                      ? objectContent.depth || 0
+                      : instance.depth,
+                }),
+                modelDimensions
+              );
+              if (!instanceFitScale) return;
+              const instanceSize = scaleModelDimensions(
+                modelDimensions,
+                instanceFitScale
+              );
+              instance.width = instanceSize.width;
+              instance.height = instanceSize.height;
+              instance.depth = instanceSize.depth;
+            }
+          );
+        }
+        sizedModels.push(sizedModel);
+        const { themed } = sizedModel;
+
         object.content = {
           ...themeContent,
           modelResourceName,
@@ -986,9 +1287,9 @@ const applyThemeToStarter = (
             objectContent.animations || [],
             themeContent.animations || []
           ),
-          width: (themeContent.width || 0) * sizeRatio,
-          height: (themeContent.height || 0) * sizeRatio,
-          depth: (themeContent.depth || 0) * sizeRatio,
+          width: themed.width,
+          height: themed.height,
+          depth: themed.depth,
           // The origin and center drive collisions and placement: keep the
           // starter's, which its events and instances were built around.
           originLocation: objectContent.originLocation,
@@ -1028,7 +1329,7 @@ const applyThemeToStarter = (
 
       if (
         typeof mapping !== 'string' &&
-        themeCustomObjectProperties(objectContent, mappingObject)
+        themeCustomObjectProperties(objectPath, object, mappingObject)
       ) {
         changedObjectsCount++;
       }
@@ -1079,6 +1380,7 @@ const applyThemeToStarter = (
     missingSlots: [...missingSlots].sort(),
     changedObjectsCount,
     changedResourcesCount: themeResourceNames.size,
+    sizedModels,
   };
 };
 

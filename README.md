@@ -92,7 +92,7 @@ along with the property that takes the normal map:
 
 A theme whose material has no normal map empties the normal map property: the
 bumps of the starter's texture would not match the theme's. A theme model keeps
-the other properties of the object, like the size of the scattered copies.
+the other properties of the object, like the density of the scattered copies.
 Custom objects don't have to be mapped, except those drawing a 3D model (like
 scattered models), which are mapped or listed in `ignoredObjects` like 3D
 models. The children of a custom object that are 3D models or cubes are mapped
@@ -146,6 +146,39 @@ only offered once its copies are there.
 
 A theme only re-skins what it has an asset for. Anything else keeps the
 starter's placeholder art.
+
+A theme model takes the place of the placeholder as drawn in the starter, at
+the size its slot means. Each model slot of the root `theme-slots.json` says
+it with `fit`:
+
+- `height`: the model is as tall as the placeholder (characters, trees,
+  grass), so a player is never a giant or a dwarf next to the level;
+- `length`: the model is as long as the placeholder (vehicles), so a truck
+  fills the lane of a car;
+- `contain`: the model is as large as it fits in the place of the placeholder
+  (props, buildings, rocks, projectiles...), so it never overlaps what stands
+  next to it. Models don't all face the same direction: a prop is fit
+  whichever way it faces.
+
+This uses the real dimensions of the theme model, published with the themes,
+and the size of the placeholder model (its `.glb`) as drawn in its object. The
+same goes for an instance given its own size, and for the copies of scattered
+models (their "Height of a copy" changes for a model not sized by its height).
+
+A model of another shape than its placeholder (a traffic cone in the place of a
+long barrier) ends up much smaller, and the build reports it, along with a
+vehicle much broader than its placeholder (and the themes giving no real
+dimensions, whose models are sized by volume):
+
+```
+⚠️ starting-expanded-first-person-shooter-enemies: scene:Game Scene/Barrier
+(prop.obstacle, sized by contain) is drawn at a size far from its placeholder
+with 24 themes: battle-royale (50% of the largest dimension of the placeholder), ...
+```
+
+It is not an error, but it says that the placeholder or the slot is to fix:
+a starter whose placeholder has an unusual shape for its slot, or a slot
+grouping objects of too different shapes, to split.
 
 The copies are rebuilt on every deploy of this repository, and every night by
 the `nightly-rebuild` workflow of the CircleCI configuration, which is how they
