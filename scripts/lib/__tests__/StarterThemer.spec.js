@@ -985,6 +985,8 @@ describe('applyThemeToStarter on a 2D starter', () => {
     const slot = theme.slots['2d.side.player'];
     // 16 pixels tiles, for a starter built on 64 pixels tiles.
     slot.tileSize = 16;
+    slot.width = 32;
+    slot.height = 32;
     const project = makeProject();
     applyThemeToStarter(project, makeThemeSlots(), theme, options);
     /** @type {any} */
@@ -1005,6 +1007,42 @@ describe('applyThemeToStarter on a 2D starter', () => {
     /** @type {any} */
     const pixelPlayer = pixelProject.layouts[0].objects[0];
     expect(pixelPlayer.preScale).toBe(2);
+  });
+
+  it('halves the scale of grid art wider than an instance with a custom size', () => {
+    const theme = makeTheme();
+    /** @type {any} */
+    const slot = theme.slots['2d.side.player'];
+    slot.tileSize = 16;
+    slot.width = 32;
+    slot.height = 48;
+    slot.objectContent.animations.forEach((/** @type {any} */ animation) => {
+      animation.directions[0].sprites[0].customCollisionMask = [
+        [
+          { x: 0, y: 0 },
+          { x: 32, y: 0 },
+          { x: 32, y: 48 },
+          { x: 0, y: 48 },
+        ],
+      ];
+    });
+    const project = makeProject();
+    Object.assign(project.layouts[0].instances[1], {
+      x: 100,
+      y: 200,
+      width: 64,
+      height: 128,
+    });
+    applyThemeToStarter(project, makeThemeSlots(), theme, options);
+    // 128x192 at the scale of the grid: 64x96, standing on the same bottom.
+    // The origin is at (8, 32) in the art, so the art is drawn at (100, 232).
+    expect(project.layouts[0].instances[1]).toMatchObject({
+      customSize: true,
+      x: 116,
+      y: 296,
+      width: 64,
+      height: 96,
+    });
   });
 
   it('plays an animation with the theme animation the starter asks for', () => {
