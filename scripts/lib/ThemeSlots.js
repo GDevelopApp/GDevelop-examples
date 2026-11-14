@@ -5,10 +5,11 @@ const fs = require('fs').promises;
 /**
  * The vocabulary of slots a theme can fill, shared by every starter. The
  * description of a slot is what the authors of themes read to choose its asset.
- * A model slot says how its model is sized (`fit`).
+ * A model slot says how its model is sized (`fit`), and can draw it larger or
+ * smaller than that (`scale`).
  * @typedef {{
  *   version: number,
- *   slots: Array<{id: string, kind: ThemeSlotKind, fit?: ModelFit, label: string, description: string}>,
+ *   slots: Array<{id: string, kind: ThemeSlotKind, fit?: ModelFit, scale?: number, label: string, description: string}>,
  * }} ThemeSlotsVocabulary
  *
  * @typedef {'model' | 'texture' | 'material' | 'skybox' | 'color' | 'sprite' | 'tilemap'} ThemeSlotKind

@@ -805,13 +805,15 @@ describe('applyThemeToStarter sizing models by the meaning of their slot', () =>
    * @param {Theme} theme
    * @param {ModelFit} fit
    * @param {GlbSize} placeholderSize
+   * @param {number=} slotScale
    */
   const applySizedTheme = (
     projectContent,
     objectPath,
     theme,
     fit,
-    placeholderSize
+    placeholderSize,
+    slotScale
   ) => {
     const [slotId] = Object.keys(theme.slots);
     const slot = theme.slots[slotId];
@@ -825,6 +827,7 @@ describe('applyThemeToStarter sizing models by the meaning of their slot', () =>
       theme,
       {
         modelFitBySlot: { [slotId]: fit },
+        modelScaleBySlot: slotScale ? { [slotId]: slotScale } : {},
         getStarterModelSize: (resourceFile) =>
           resourceFile === 'assets/Placeholder.glb' ? placeholderSize : null,
       }
@@ -968,6 +971,28 @@ describe('applyThemeToStarter sizing models by the meaning of their slot', () =>
       height: 20,
       depth: 20,
     });
+  });
+
+  it('draws a model at the scale of its slot, times the one of its theme', () => {
+    const projectContent = makeSizedProject({
+      box: { width: 30, height: 30, depth: 60 },
+    });
+    const { sizedModels } = applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme(
+        'character.player',
+        { width: 30, height: 30, depth: 150 },
+        90,
+        1.5
+      ),
+      'height',
+      { x: 1, y: 2, z: 1 },
+      1.2
+    );
+
+    expect(projectContent.layouts[0].objects[0].content.depth).toBeCloseTo(108);
+    expect(sizedModels[0].scale).toBeCloseTo(1.8);
   });
 
   it('draws a model at the scale its theme deliberately gives it', () => {

@@ -748,8 +748,11 @@ const generateThemedStarters = async (
   const themedStarters = [];
   /** @type {Object.<string, import('./lib/ThemeSlots').ModelFit>} */
   const modelFitBySlot = {};
+  /** @type {Object.<string, number>} */
+  const modelScaleBySlot = {};
   themeSlotsVocabulary.slots.forEach((slot) => {
     if (slot.fit) modelFitBySlot[slot.id] = slot.fit;
+    if (slot.scale) modelScaleBySlot[slot.id] = slot.scale;
   });
   /** @type {Map<string, import('./lib/GlbBox').GlbSize | null>} */
   const starterModelSizeByPath = new Map();
@@ -789,6 +792,7 @@ const generateThemedStarters = async (
         sizedModels,
       } = applyThemeToStarter(projectObject, starterThemeSlots, theme, {
         modelFitBySlot,
+        modelScaleBySlot,
         getStarterModelSize: (resourceFile) =>
           readStarterModelSize(
             path.join(starterFolderPath, normalizePathSeparators(resourceFile))

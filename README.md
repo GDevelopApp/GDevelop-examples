@@ -152,7 +152,9 @@ the size its slot means. Each model slot of the root `theme-slots.json` says
 it with `fit`:
 
 - `height`: the model is as tall as the placeholder (characters, trees,
-  grass), so a player is never a giant or a dwarf next to the level;
+  grass), so a player is never a giant or a dwarf next to the level. The
+  character slots also have a `scale` of 1.2: a person is much thinner than
+  the capsule standing for it, and looks smaller at the same height;
 - `length`: the model is as long as the placeholder (vehicles), so a truck
   fills the lane of a car;
 - `volume`: the model takes the volume of the placeholder (projectiles, rocks),

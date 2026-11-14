@@ -66,7 +66,8 @@
  * theme's art where the placeholder art was.
  * @typedef {import('./PngBox.js').ImageBox} ImageBox
  *
- * `modelFitBySlot` says how a model slot sizes its model (see `ModelFit`), and
+ * `modelFitBySlot` says how a model slot sizes its model (see `ModelFit`),
+ * `modelScaleBySlot` the scale a slot gives its models on top of the fit, and
  * `getStarterModelSize` gives the size of a placeholder model, to know how
  * large it is drawn. Without them, a theme model takes the volume of the
  * placeholder object.
@@ -74,6 +75,7 @@
  *   getStarterImageBox?: (resourceFile: string) => ImageBox | null,
  *   getStarterModelSize?: (resourceFile: string) => GlbSize | null,
  *   modelFitBySlot?: Object.<string, ModelFit>,
+ *   modelScaleBySlot?: Object.<string, number>,
  * }} ThemeApplicationOptions
  *
  * How large a theme model is drawn compared to the placeholder it replaces,
@@ -593,6 +595,19 @@ const applyThemeToStarter = (
     (options && options.modelFitBySlot && options.modelFitBySlot[slotId]) ||
     null;
 
+  /**
+   * The scale of a model on top of its fit: the one of its slot, times the
+   * one its theme deliberately gives it.
+   * @param {string} slotId
+   * @param {{scale?: number}} slot
+   * @returns {number}
+   */
+  const getModelScale = (slotId, slot) =>
+    ((options &&
+      options.modelScaleBySlot &&
+      options.modelScaleBySlot[slotId]) ||
+      1) * (slot.scale || 1);
+
   /** @param {string} resourceName @returns {GlbSize | null} */
   const getStarterModelSize = (resourceName) => {
     const resource = resourceByName.get(resourceName);
@@ -660,7 +675,7 @@ const applyThemeToStarter = (
       slot.dimensions
     );
     if (!fitScale) return;
-    const scale = slot.scale || 1;
+    const scale = getModelScale(slotId, slot);
     const themed = scaleModelDimensions(slot.dimensions, fitScale * scale);
     objectContent.Size = String(Math.round(themed.depth * 100) / 100);
     sizedModels.push({ objectPath, slotId, fit, scale, placeholder, themed });
@@ -1246,7 +1261,7 @@ const applyThemeToStarter = (
         };
         const placeholder = getDrawnPlaceholder(room);
         const modelDimensions = slot.dimensions;
-        const scale = slot.scale || 1;
+        const scale = getModelScale(mapping, slot);
         const fitScale =
           fit && modelDimensions
             ? getFitScale(fit, placeholder, room, modelDimensions)
