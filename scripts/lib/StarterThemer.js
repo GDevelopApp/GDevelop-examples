@@ -334,6 +334,46 @@ const getDrawnModelDimensions = (box, modelDimensions, keepAspectRatio) => {
 };
 
 /**
+ * A body the 3D physics behavior sizes on its own takes the size of its
+ * object. For a model fit by its height, that is the arms of a character in its
+ * bind pose, or the canopy of a tree: much larger than the body of the
+ * placeholder the game was made with. Keep the body of the placeholder
+ * instead, scaled like the model, and its mass.
+ * @param {Array<any>} behaviors
+ * @param {ModelDimensions} placeholder
+ * @param {number} scale How much taller the model is than the placeholder.
+ */
+const keepPlaceholderBodies = (behaviors, placeholder, scale) => {
+  const { width, height, depth } = scaleModelDimensions(placeholder, scale);
+  behaviors.forEach((behavior) => {
+    if (
+      behavior.type !== 'Physics3D::Physics3DBehavior' ||
+      (behavior.shapeOrientation || 'Z') !== 'Z' ||
+      behavior.shapeDimensionA > 0 ||
+      behavior.shapeDimensionB > 0 ||
+      behavior.shapeDimensionC > 0
+    ) {
+      return;
+    }
+    if (behavior.shape === 'Box') {
+      behavior.shapeDimensionA = width;
+      behavior.shapeDimensionB = height;
+      behavior.shapeDimensionC = depth;
+    } else if (behavior.shape === 'Capsule' || behavior.shape === 'Cylinder') {
+      behavior.shapeDimensionA = Math.sqrt(width * height) / 2;
+      behavior.shapeDimensionB = depth;
+    } else if (behavior.shape === 'Sphere') {
+      behavior.shapeDimensionA = Math.cbrt(width * height * depth) / 2;
+    } else {
+      return;
+    }
+    behavior.density =
+      (behavior.density === undefined ? 1 : behavior.density) /
+      Math.pow(scale, 3);
+  });
+};
+
+/**
  * The instances of an object, wherever its path lets it be placed.
  * @param {any} projectObject
  * @param {string} objectPath
@@ -1289,6 +1329,7 @@ const applyThemeToStarter = (
 
           // An instance given its own size is the placeholder at another
           // size: the theme model takes the size its slot means there too.
+          let hasInstancesOfAnotherSize = false;
           getInstancesOfObject(projectObject, objectPath).forEach(
             (instance) => {
               if (!instance.customSize) return;
@@ -1300,9 +1341,16 @@ const applyThemeToStarter = (
                     ? objectContent.depth || 0
                     : instance.depth,
               };
+              const instancePlaceholder = getDrawnPlaceholder(instanceRoom);
+              if (
+                Math.abs(instancePlaceholder.depth - placeholder.depth) >
+                placeholder.depth / 100
+              ) {
+                hasInstancesOfAnotherSize = true;
+              }
               const instanceFitScale = getFitScale(
                 fit,
-                getDrawnPlaceholder(instanceRoom),
+                instancePlaceholder,
                 instanceRoom,
                 modelDimensions
               );
@@ -1316,6 +1364,17 @@ const applyThemeToStarter = (
               instance.depth = instanceSize.depth;
             }
           );
+          if (
+            fit === 'height' &&
+            placeholder.depth > 0 &&
+            !hasInstancesOfAnotherSize
+          ) {
+            keepPlaceholderBodies(
+              object.behaviors || [],
+              placeholder,
+              sizedModel.themed.depth / placeholder.depth
+            );
+          }
         }
         sizedModels.push(sizedModel);
         const { themed } = sizedModel;

@@ -995,6 +995,42 @@ describe('applyThemeToStarter sizing models by the meaning of their slot', () =>
     expect(sizedModels[0].scale).toBeCloseTo(1.8);
   });
 
+  it('keeps the physics body and the mass of the placeholder for a character', () => {
+    // A capsule 30 wide and 60 tall, and a character in its bind pose, its
+    // arms spread along Y: its body stays the capsule, 20% taller.
+    const projectContent = makeSizedProject({
+      box: { width: 30, height: 30, depth: 60 },
+    });
+    projectContent.layouts[0].objects[0].behaviors = [
+      {
+        type: 'Physics3D::Physics3DBehavior',
+        shape: 'Capsule',
+        shapeOrientation: 'Z',
+        shapeDimensionA: 0,
+        shapeDimensionB: 0,
+        shapeDimensionC: 0,
+        density: 1.728,
+      },
+    ];
+    applySizedTheme(
+      projectContent,
+      'scene:Game Scene/Thing',
+      makeSizedTheme('character.player', {
+        width: 29,
+        height: 156,
+        depth: 145,
+      }),
+      'height',
+      { x: 2, y: 4, z: 2 },
+      1.2
+    );
+
+    const [body] = projectContent.layouts[0].objects[0].behaviors;
+    expect(body.shapeDimensionA).toBeCloseTo(18);
+    expect(body.shapeDimensionB).toBeCloseTo(72);
+    expect(body.density).toBeCloseTo(1);
+  });
+
   it('draws a model at the scale its theme deliberately gives it', () => {
     const projectContent = makeSizedProject({
       box: { width: 30, height: 30, depth: 60 },
