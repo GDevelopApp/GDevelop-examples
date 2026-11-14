@@ -26,6 +26,8 @@ const {
   getThemedStarterFileName,
 } = require('./lib/StarterThemer');
 const { readPngBox } = require('./lib/PngBox');
+const { readGlbSize } = require('./lib/GlbBox');
+const { getSizeWarnings } = require('./lib/ThemeSizeCheck');
 const { default: axios } = require('axios');
 
 /** @typedef {import('./lib/FileTreeParser.js').DreeWithMetadata} DreeWithMetadata */
@@ -729,16 +731,48 @@ const fetchThemes = async () => {
  * (`<slug>.theme-<id>.json`). They sit in the starter's folder so the resources
  * it refers to by a relative path still resolve, and are not examples of their
  * own: only `themedStarters.json` lists them.
+ *
+ * A theme model drawn at a size far from the placeholder it replaces is
+ * reported (not an error: the theme or the starter is to fix).
+ * @param {import('./lib/ThemeSlots').ThemeSlotsVocabulary} themeSlotsVocabulary
  * @param {Object.<string, any>} themeSlotsByStarterSlug
  * @param {Object.<string, string>} starterFilePathBySlug
  * @returns {Promise<Array<{id: string, name: string, description: string, starters: Object.<string, string>}>>}
  */
 const generateThemedStarters = async (
+  themeSlotsVocabulary,
   themeSlotsByStarterSlug,
   starterFilePathBySlug
 ) => {
   const themes = await fetchThemes();
   const themedStarters = [];
+  /** @type {Object.<string, import('./lib/ThemeSlots').ModelFit>} */
+  const modelFitBySlot = {};
+  /** @type {Object.<string, number>} */
+  const modelScaleBySlot = {};
+  themeSlotsVocabulary.slots.forEach((slot) => {
+    if (slot.fit) modelFitBySlot[slot.id] = slot.fit;
+    if (slot.scale) modelScaleBySlot[slot.id] = slot.scale;
+  });
+  /** @type {Map<string, import('./lib/GlbBox').GlbSize | null>} */
+  const starterModelSizeByPath = new Map();
+  /** @param {string} filePath */
+  const readStarterModelSize = (filePath) => {
+    if (!starterModelSizeByPath.has(filePath)) {
+      let size = null;
+      try {
+        size = readGlbSize(fsSync.readFileSync(filePath));
+      } catch (error) {}
+      starterModelSizeByPath.set(filePath, size);
+    }
+    return starterModelSizeByPath.get(filePath) || null;
+  };
+  // `<starter>: <object> (<slot>)` -> `<theme> (<warning>)`, so that a
+  // placeholder or a slot to fix shows on one line.
+  /** @type {Map<string, Array<string>>} */
+  const sizeWarningsByObject = new Map();
+  /** @type {Map<string, number>} */
+  const modelsSizedByVolumeCountByTheme = new Map();
 
   for (const theme of themes) {
     // Starter slug -> URL of its copy re-skinned with the theme.
@@ -751,26 +785,53 @@ const generateThemedStarters = async (
       );
       const starterThemeSlots = themeSlotsByStarterSlug[slug];
       const starterFolderPath = path.dirname(starterFilePath);
-      const { changedObjectsCount, changedResourcesCount, missingSlots } =
-        applyThemeToStarter(projectObject, starterThemeSlots, theme, {
-          getStarterImageBox: (resourceFile) => {
-            try {
-              return readPngBox(
-                fsSync.readFileSync(
-                  path.join(
-                    starterFolderPath,
-                    normalizePathSeparators(resourceFile)
-                  )
+      const {
+        changedObjectsCount,
+        changedResourcesCount,
+        missingSlots,
+        sizedModels,
+      } = applyThemeToStarter(projectObject, starterThemeSlots, theme, {
+        modelFitBySlot,
+        modelScaleBySlot,
+        getStarterModelSize: (resourceFile) =>
+          readStarterModelSize(
+            path.join(starterFolderPath, normalizePathSeparators(resourceFile))
+          ),
+        getStarterImageBox: (resourceFile) => {
+          try {
+            return readPngBox(
+              fsSync.readFileSync(
+                path.join(
+                  starterFolderPath,
+                  normalizePathSeparators(resourceFile)
                 )
-              );
-            } catch (error) {
-              return null;
-            }
-          },
-        });
+              )
+            );
+          } catch (error) {
+            return null;
+          }
+        },
+      });
       if (!changedObjectsCount && !changedResourcesCount) continue;
       // A 2D starter with only part of its art themed looks broken.
       if (starterThemeSlots.requireAllSlots && missingSlots.length) continue;
+
+      sizedModels.forEach((sizedModel) => {
+        if (!sizedModel.fit) {
+          modelsSizedByVolumeCountByTheme.set(
+            theme.id,
+            (modelsSizedByVolumeCountByTheme.get(theme.id) || 0) + 1
+          );
+          return;
+        }
+        const warnings = getSizeWarnings(sizedModel);
+        if (!warnings.length) return;
+        const objectKey = `${slug}: ${sizedModel.objectPath} (${sizedModel.slotId}, sized by ${sizedModel.fit})`;
+        sizeWarningsByObject.set(objectKey, [
+          ...(sizeWarningsByObject.get(objectKey) || []),
+          `${theme.id} (${warnings.join(', ')})`,
+        ]);
+      });
 
       const themedStarterFilePath = path.join(
         path.dirname(starterFilePath),
@@ -793,6 +854,18 @@ const generateThemedStarters = async (
       starters,
     });
   }
+  modelsSizedByVolumeCountByTheme.forEach((count, themeId) =>
+    console.warn(
+      `⚠️ Theme "${themeId}": ${count} models sized by the volume of their placeholder, for lack of their real dimensions in the theme.`
+    )
+  );
+  sizeWarningsByObject.forEach((themeWarnings, objectKey) =>
+    console.warn(
+      `⚠️ ${objectKey} is drawn at a size far from its placeholder with ${
+        themeWarnings.length
+      } themes: ${themeWarnings.join(', ')}.`
+    )
+  );
 
   return themedStarters;
 };
@@ -911,6 +984,7 @@ const generateThemedStarters = async (
   }
 
   const themedStarters = await generateThemedStarters(
+    themeSlotsVocabulary,
     themeSlotsByStarterSlug,
     starterFilePathBySlug
   );

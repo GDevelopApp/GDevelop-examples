@@ -92,7 +92,7 @@ along with the property that takes the normal map:
 
 A theme whose material has no normal map empties the normal map property: the
 bumps of the starter's texture would not match the theme's. A theme model keeps
-the other properties of the object, like the size of the scattered copies.
+the other properties of the object, like the density of the scattered copies.
 Custom objects don't have to be mapped, except those drawing a 3D model (like
 scattered models), which are mapped or listed in `ignoredObjects` like 3D
 models. The children of a custom object that are 3D models or cubes are mapped
@@ -146,6 +146,57 @@ only offered once its copies are there.
 
 A theme only re-skins what it has an asset for. Anything else keeps the
 starter's placeholder art.
+
+A theme model takes the place of the placeholder as drawn in the starter, at
+the size its slot means. Each model slot of the root `theme-slots.json` says
+it with `fit`:
+
+- `height`: the model is as tall as the placeholder (characters, trees,
+  grass), so a player is never a giant or a dwarf next to the level. The
+  character slots also have a `scale` of 1.08: a person is much thinner than
+  the capsule standing for it, and looks smaller at the same height;
+- `length`: the model is as long as the placeholder (vehicles), so a truck
+  fills the lane of a car;
+- `volume`: the model takes the volume of the placeholder (projectiles, rocks),
+  for objects whose shape varies a lot: a ball in the place of a missile, a
+  boulder in the place of a flat rock;
+- `contain`: the model is as large as it fits in the *room* of the object
+  (props, buildings...), so it never overlaps what stands next to it. Models
+  don't all face the same direction: a prop is fit whichever way it faces.
+
+This uses the real dimensions of the theme model, published with the themes,
+and the size of the placeholder model (its `.glb`) as drawn in its object. The
+same goes for an instance given its own size, and for the copies of scattered
+models (their "Height of a copy" changes for a model not sized by its height).
+
+The room of an object is its size (width, height and depth). A model keeping
+its proportions is drawn as large as it fits in it, and its object takes that
+size in the game, so the room can be larger than the placeholder on an axis it
+does not fill, without changing the starter. Give the room a theme model may
+need: the market of the RTS is flat, but a house can stand where it is, so its
+object is as deep as it is wide; the gun of the FPS is thin, but a blaster is
+not.
+
+Slots are split by shape when objects of one role differ too much: a
+`prop.obstacle` (a cone) and a `prop.barrier` (a long barrier), a
+`building.house` and a `building.tower`. Their descriptions say the shape a
+theme should give them.
+
+A model of another shape than its placeholder (a squarish house on a long
+lot) ends up much smaller, and the build reports it, along with a vehicle much
+broader than its placeholder (and the themes giving no real dimensions, whose
+models are sized by the volume of the placeholder object):
+
+```
+⚠️ starting-expanded-3d-grand-theft-auto: scene:Game Scene/Building_K
+(building.house, sized by contain) is drawn at a size far from its placeholder
+with 26 themes: battle-royale (60% of the largest dimension of the placeholder), ...
+```
+
+It is not an error, but it says what is to fix: a placeholder with too little
+room, a slot grouping objects of too different shapes, or a theme model of the
+wrong shape. A theme can also give a model a `scale` (0.5 to 2, see the assets
+repository) to draw it larger or smaller on purpose: that is not reported.
 
 The copies are rebuilt on every deploy of this repository, and every night by
 the `nightly-rebuild` workflow of the CircleCI configuration, which is how they
