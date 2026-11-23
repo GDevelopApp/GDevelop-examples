@@ -1099,6 +1099,13 @@
               "massCenterOffsetY": 0,
               "massCenterOffsetZ": 0,
               "massOverride": 0
+            },
+            {
+              "name": "NavMeshObstacle",
+              "type": "NavMeshPathfinding::NavMeshObstacleBehavior",
+              "shape": "Box",
+              "meshShapeResourceName": "",
+              "obstacleOnly": true
             }
           ],
           "content": {
@@ -3754,7 +3761,7 @@
         {
           "name": "NavMeshCharacter",
           "type": "NavMeshPathfinding::NavMeshCharacterBehavior",
-          "cellSize": 20,
+          "cellSize": 10,
           "cellDepth": 2,
           "slopeMaxAngle": 40,
           "stairHeightMax": 20,
@@ -4009,6 +4016,56 @@
         "}",
         "console.log('caught=' + caught + ' highestZ=' + highestZ.toFixed(1) + ' mostNodes=' + mostNodes);",
         "harness.assert(caught, 'The enemy caught the player, which restarted the scene.');"
+      ]
+    },
+    {
+      "description": "Puts a pushable box between the player and a chasing enemy: the enemy goes around the box, which is an obstacle of the navmesh, instead of pushing it, and catches the player.",
+      "name": "The enemy walks around a box between it and the player",
+      "type": "gameplay",
+      "source": [
+        "await harness.goToScene('Game Scene');",
+        "// Faster in the software renderer used to run tests.",
+        "harness.setGameResolutionSize(160, 90);",
+        "harness.getCurrentRuntimeScene().getLayer('').setEffectBooleanParameter('3D Global Light', 'isCastingShadow', false);",
+        "harness.setTimeoutMs(60000);",
+        "const DT = { dtMs: 50 };",
+        "await harness.stepFrames(4, DT);",
+        "const scene = harness.getCurrentRuntimeScene();",
+        "const player = harness.getObjects('Player')[0];",
+        "const [enemy, ...others] = harness.getObjects('Enemy');",
+        "for (const other of others) harness.removeObject(other.id);",
+        "const terrains = harness.getObjects('Terrain');",
+        "const groundZ = (x, y) => terrains.length ? harness.getRuntimeObject(terrains[0].id).__terrain3D.getHeightAt(x, y) : player.z;",
+        "const playerCenter = { x: 640, y: 925 };",
+        "const enemyCenter = { x: 640, y: 625 };",
+        "// The box on top of the others, so that moving it away does not make another one fall.",
+        "const box = harness.getObjects('PushableBox').reduce((highest, one) => (one.z > highest.z ? one : highest));",
+        "const boxCenter = { x: (playerCenter.x + enemyCenter.x) / 2, y: (playerCenter.y + enemyCenter.y) / 2 };",
+        "const placeAt = (object, center) => harness.setObjectPosition(object.id, center.x - object.width / 2, center.y - object.height / 2, groundZ(center.x, center.y) + 1);",
+        "placeAt(player, playerCenter);",
+        "placeAt(box, boxCenter);",
+        "// Out of the way while the box settles on the ground.",
+        "harness.setObjectPosition(enemy.id, playerCenter.x + 2000, playerCenter.y, groundZ(playerCenter.x + 2000, playerCenter.y));",
+        "await harness.stepFrames(4, DT);",
+        "const getBox = () => harness.getObjects('PushableBox').find((one) => one.id === box.id);",
+        "const settledBox = getBox();",
+        "placeAt(enemy, enemyCenter);",
+        "harness.getRuntimeObject(enemy.id).getVariables().get('State').setString('Chasing');",
+        "const navMeshCharacter = harness.getRuntimeObject(enemy.id).getBehavior('NavMeshCharacter');",
+        "let mostNodes = 0;",
+        "let boxMoved = 0;",
+        "let caught = false;",
+        "for (let frame = 0; frame < 120 && !caught; frame++) {",
+        "  await harness.stepFrames(1, DT);",
+        "  caught = harness.getCurrentRuntimeScene() !== scene;",
+        "  if (caught) break;",
+        "  mostNodes = Math.max(mostNodes, navMeshCharacter.getNodeCount());",
+        "  const now = getBox();",
+        "  boxMoved = Math.max(boxMoved, Math.hypot(now.centerX - settledBox.centerX, now.centerY - settledBox.centerY));",
+        "}",
+        "console.log('caught=' + caught + ' boxMoved=' + boxMoved.toFixed(1) + ' mostNodes=' + mostNodes);",
+        "harness.assert(boxMoved < 10, 'The enemy walked around the box instead of pushing it (the box moved by ' + boxMoved.toFixed(0) + ' pixels).');",
+        "harness.assert(caught, 'The enemy reached the player, which restarted the scene.');"
       ]
     }
   ],
