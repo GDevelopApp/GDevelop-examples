@@ -8,4 +8,6 @@ Styles A, B and C start as copies of the placeholder, each with its own images i
 
 The scenes are: button, slider, toggle switch, continuous resource bar, resource bar with separated units, text input, multitouch joystick, two choices dialog box, game over dialog, volume settings, animated score counter, star rating bar, multiplayer avatar, info dialog, choices dialog, area title and level banner.
 
+Each scene has a few events showing how to use its prefab: the styles of a scene are in one object group, so a single event handles them all, and a text under the title shows what the player just did.
+
 The project is self-contained: the extensions, their variants and all the images and fonts are included in the project.
