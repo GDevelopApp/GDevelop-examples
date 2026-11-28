@@ -1,0 +1,3 @@
+# Virtual pet simulator
+
+A virtual pet simulation game, where you care for a virtual pet and help it improve. The game features a virtual pet with "needs" like hunger, hygiene, and boredom, as well as some "wants" stats that you can build up to improve your pet. The player interacts with their pet by dragging action icons onto the pet and waiting for the action to be completed. This starter project can be controlled with a mouse or with touch screen controls, and is ideal for creating virtual pet games like Tamagotchi, Chao garden, GigaPets, and neopets.
