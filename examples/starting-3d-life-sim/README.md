@@ -1,0 +1,3 @@
+# 3D Life Simulation
+
+A 3D life simulation game, where you select characters inside of the game, and tell them each which tasks they should be doing in order to maintain their health, and to improve their stats. The game features a 2 character objects with "needs" like hunger, hygiene, and boredom, as well as some "wants" stats that you can build up to improve each character. The player interacts with the characters by selecting them, and clicking on task objects, which are added to each characters task list, so they can do each task in order. This starter project can be controlled with a mouse or with touch screen controls, and is ideal for creating life sim games, like The Sims, inZOI, Paralives, or TinyLife.
